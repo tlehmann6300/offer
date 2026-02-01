@@ -143,10 +143,44 @@ class AuthHandler {
             return false;
         }
         
-        $roleHierarchy = ['member' => 1, 'manager' => 2, 'board' => 3, 'admin' => 4];
+        // Role hierarchy: alumni and member have read-only access (level 1)
+        // manager can edit inventory (level 2)
+        // board and alumni_board have full board access (level 3)
+        // admin has full system access (level 4)
+        $roleHierarchy = [
+            'alumni' => 1, 
+            'member' => 1, 
+            'manager' => 2, 
+            'alumni_board' => 3,
+            'board' => 3, 
+            'admin' => 4
+        ];
         $userRole = $_SESSION['user_role'];
         
+        // Check if user role exists in hierarchy
+        if (!isset($roleHierarchy[$userRole]) || !isset($roleHierarchy[$requiredRole])) {
+            return false;
+        }
+        
         return $roleHierarchy[$userRole] >= $roleHierarchy[$requiredRole];
+    }
+
+    /**
+     * Check if alumni user is validated
+     * Alumni users need board approval before accessing internal alumni network data
+     */
+    public static function isAlumniValidated() {
+        self::startSession();
+        if (!self::isAuthenticated()) {
+            return false;
+        }
+        
+        $user = self::getCurrentUser();
+        if (!$user || $user['role'] !== 'alumni') {
+            return true; // Non-alumni users are always "validated"
+        }
+        
+        return $user['is_alumni_validated'] == 1;
     }
 
     /**

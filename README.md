@@ -23,8 +23,12 @@ Ein professionelles Intranet-System für den Verein "IBC" mit Token-basiertem Lo
 
 ### Rollen & Berechtigungen
 - **Admin/Vorstand**: Vollzugriff, Benutzerverwaltung, Audit-Logs
+- **Alumni-Vorstand**: Vollzugriff wie Vorstand, spezielle Alumni-Verwaltung
 - **Ressortleiter**: Inventar verwalten, Bestand ändern
 - **Mitglied**: Nur Lesezugriff auf Inventar
+- **Alumni**: Lesezugriff, benötigt Validierung durch Vorstand für Alumni-Netzwerkdaten
+
+Weitere Details zum Alumni-System: siehe [ALUMNI_SYSTEM.md](ALUMNI_SYSTEM.md)
 
 ### Design & UX
 - ✅ Moderne Benutzeroberfläche mit Tailwind CSS

@@ -36,6 +36,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $error = 'Fehler beim Ändern der Rolle';
         }
+    } else if (isset($_POST['toggle_alumni_validation'])) {
+        $userId = $_POST['user_id'] ?? 0;
+        $isValidated = $_POST['is_validated'] ?? 0;
+        
+        if (User::update($userId, ['is_alumni_validated' => $isValidated])) {
+            $message = $isValidated ? 'Alumni-Profil freigegeben' : 'Alumni-Profil gesperrt';
+        } else {
+            $error = 'Fehler beim Ändern des Alumni-Status';
+        }
     } else if (isset($_POST['delete_user'])) {
         $userId = $_POST['user_id'] ?? 0;
         
@@ -99,7 +108,9 @@ ob_start();
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
                 <option value="member">Mitglied</option>
+                <option value="alumni">Alumni</option>
                 <option value="manager">Ressortleiter</option>
+                <option value="alumni_board">Alumni-Vorstand</option>
                 <option value="board">Vorstand</option>
                 <option value="admin">Administrator</option>
             </select>
@@ -120,7 +131,7 @@ ob_start();
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Benutzer</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rolle</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">2FA</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">2FA / Validierung</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Letzter Login</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aktionen</th>
                 </tr>
@@ -154,7 +165,9 @@ ob_start();
                                 <?php echo ($user['id'] == $_SESSION['user_id']) ? 'disabled' : ''; ?>
                             >
                                 <option value="member" <?php echo ($user['role'] == 'member') ? 'selected' : ''; ?>>Mitglied</option>
+                                <option value="alumni" <?php echo ($user['role'] == 'alumni') ? 'selected' : ''; ?>>Alumni</option>
                                 <option value="manager" <?php echo ($user['role'] == 'manager') ? 'selected' : ''; ?>>Ressortleiter</option>
+                                <option value="alumni_board" <?php echo ($user['role'] == 'alumni_board') ? 'selected' : ''; ?>>Alumni-Vorstand</option>
                                 <option value="board" <?php echo ($user['role'] == 'board') ? 'selected' : ''; ?>>Vorstand</option>
                                 <option value="admin" <?php echo ($user['role'] == 'admin') ? 'selected' : ''; ?>>Administrator</option>
                             </select>
@@ -162,15 +175,32 @@ ob_start();
                         </form>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <?php if ($user['tfa_enabled']): ?>
-                        <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">
-                            <i class="fas fa-shield-alt mr-1"></i>Aktiv
-                        </span>
-                        <?php else: ?>
-                        <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full">
-                            <i class="fas fa-times mr-1"></i>Inaktiv
-                        </span>
-                        <?php endif; ?>
+                        <div class="flex flex-col space-y-1">
+                            <?php if ($user['tfa_enabled']): ?>
+                            <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full inline-flex items-center">
+                                <i class="fas fa-shield-alt mr-1"></i>2FA
+                            </span>
+                            <?php endif; ?>
+                            <?php if ($user['role'] == 'alumni'): ?>
+                                <?php if ($user['is_alumni_validated']): ?>
+                                <form method="POST" class="inline">
+                                    <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                    <input type="hidden" name="is_validated" value="0">
+                                    <button type="submit" name="toggle_alumni_validation" class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full inline-flex items-center hover:bg-green-200">
+                                        <i class="fas fa-check-circle mr-1"></i>Verifiziert
+                                    </button>
+                                </form>
+                                <?php else: ?>
+                                <form method="POST" class="inline">
+                                    <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                    <input type="hidden" name="is_validated" value="1">
+                                    <button type="submit" name="toggle_alumni_validation" class="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-full inline-flex items-center hover:bg-yellow-200">
+                                        <i class="fas fa-clock mr-1"></i>Ausstehend
+                                    </button>
+                                </form>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                         <?php echo $user['last_login'] ? date('d.m.Y H:i', strtotime($user['last_login'])) : 'Nie'; ?>

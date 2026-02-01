@@ -11,7 +11,7 @@ class User {
      */
     public static function getById($id) {
         $db = Database::getUserDB();
-        $stmt = $db->prepare("SELECT id, email, role, tfa_enabled, last_login, created_at FROM users WHERE id = ?");
+        $stmt = $db->prepare("SELECT id, email, role, tfa_enabled, is_alumni_validated, last_login, created_at FROM users WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch();
     }
@@ -33,8 +33,13 @@ class User {
         $db = Database::getUserDB();
         $passwordHash = password_hash($password, HASH_ALGO);
         
-        $stmt = $db->prepare("INSERT INTO users (email, password_hash, role) VALUES (?, ?, ?)");
-        $stmt->execute([$email, $passwordHash, $role]);
+        // Alumni users need manual board approval, so is_alumni_validated is set to FALSE (0)
+        // Non-alumni users don't require validation, so it's set to TRUE (1) by default
+        // This allows the isAlumniValidated() check to work correctly for all users
+        $isAlumniValidated = ($role === 'alumni') ? 0 : 1;
+        
+        $stmt = $db->prepare("INSERT INTO users (email, password_hash, role, is_alumni_validated) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$email, $passwordHash, $role, $isAlumniValidated]);
         
         return $db->lastInsertId();
     }
@@ -75,10 +80,10 @@ class User {
         $db = Database::getUserDB();
         
         if ($role) {
-            $stmt = $db->prepare("SELECT id, email, role, tfa_enabled, last_login, created_at FROM users WHERE role = ? ORDER BY created_at DESC");
+            $stmt = $db->prepare("SELECT id, email, role, tfa_enabled, is_alumni_validated, last_login, created_at FROM users WHERE role = ? ORDER BY created_at DESC");
             $stmt->execute([$role]);
         } else {
-            $stmt = $db->query("SELECT id, email, role, tfa_enabled, last_login, created_at FROM users ORDER BY created_at DESC");
+            $stmt = $db->query("SELECT id, email, role, tfa_enabled, is_alumni_validated, last_login, created_at FROM users ORDER BY created_at DESC");
         }
         
         return $stmt->fetchAll();
