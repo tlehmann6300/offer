@@ -47,7 +47,7 @@ if (!in_array($newRole, ['member', 'alumni', 'manager', 'alumni_board', 'board',
 }
 
 // Check if user is trying to change their own role
-if ($userId == $_SESSION['user_id']) {
+if ($userId === $_SESSION['user_id']) {
     echo json_encode([
         'success' => false,
         'message' => 'Sie können Ihre eigene Rolle nicht ändern'

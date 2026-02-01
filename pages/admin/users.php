@@ -223,10 +223,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const roleSelects = document.querySelectorAll('.role-select');
     
     roleSelects.forEach(select => {
+        // Store original value when attaching event listener
+        const originalValue = select.value;
+        
         select.addEventListener('change', function() {
             const userId = this.getAttribute('data-user-id');
             const newRole = this.value;
-            const originalValue = this.querySelector('option[selected]')?.value || this.value;
             
             // Disable select while processing
             this.disabled = true;
