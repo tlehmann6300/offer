@@ -1,0 +1,115 @@
+<?php
+/**
+ * User Model
+ * Manages user data and operations
+ */
+
+class User {
+    
+    /**
+     * Get user by ID
+     */
+    public static function getById($id) {
+        $db = Database::getUserDB();
+        $stmt = $db->prepare("SELECT id, email, role, tfa_enabled, last_login, created_at FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    }
+
+    /**
+     * Get user by email
+     */
+    public static function getByEmail($email) {
+        $db = Database::getUserDB();
+        $stmt = $db->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        return $stmt->fetch();
+    }
+
+    /**
+     * Create new user
+     */
+    public static function create($email, $password, $role = 'member') {
+        $db = Database::getUserDB();
+        $passwordHash = password_hash($password, HASH_ALGO);
+        
+        $stmt = $db->prepare("INSERT INTO users (email, password_hash, role) VALUES (?, ?, ?)");
+        $stmt->execute([$email, $passwordHash, $role]);
+        
+        return $db->lastInsertId();
+    }
+
+    /**
+     * Update user
+     */
+    public static function update($id, $data) {
+        $db = Database::getUserDB();
+        $fields = [];
+        $values = [];
+        
+        foreach ($data as $key => $value) {
+            $fields[] = "$key = ?";
+            $values[] = $value;
+        }
+        
+        $values[] = $id;
+        $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ?";
+        
+        $stmt = $db->prepare($sql);
+        return $stmt->execute($values);
+    }
+
+    /**
+     * Delete user
+     */
+    public static function delete($id) {
+        $db = Database::getUserDB();
+        $stmt = $db->prepare("DELETE FROM users WHERE id = ?");
+        return $stmt->execute([$id]);
+    }
+
+    /**
+     * Get all users
+     */
+    public static function getAll($role = null) {
+        $db = Database::getUserDB();
+        
+        if ($role) {
+            $stmt = $db->prepare("SELECT id, email, role, tfa_enabled, last_login, created_at FROM users WHERE role = ? ORDER BY created_at DESC");
+            $stmt->execute([$role]);
+        } else {
+            $stmt = $db->query("SELECT id, email, role, tfa_enabled, last_login, created_at FROM users ORDER BY created_at DESC");
+        }
+        
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Enable 2FA for user
+     */
+    public static function enable2FA($userId, $secret) {
+        $db = Database::getUserDB();
+        $stmt = $db->prepare("UPDATE users SET tfa_secret = ?, tfa_enabled = 1 WHERE id = ?");
+        return $stmt->execute([$secret, $userId]);
+    }
+
+    /**
+     * Disable 2FA for user
+     */
+    public static function disable2FA($userId) {
+        $db = Database::getUserDB();
+        $stmt = $db->prepare("UPDATE users SET tfa_secret = NULL, tfa_enabled = 0 WHERE id = ?");
+        return $stmt->execute([$userId]);
+    }
+
+    /**
+     * Change password
+     */
+    public static function changePassword($userId, $newPassword) {
+        $db = Database::getUserDB();
+        $passwordHash = password_hash($newPassword, HASH_ALGO);
+        
+        $stmt = $db->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
+        return $stmt->execute([$passwordHash, $userId]);
+    }
+}

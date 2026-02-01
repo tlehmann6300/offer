@@ -1,0 +1,32 @@
+# Environment files
+.env.local
+.env.production
+
+# Upload directory
+assets/uploads/*
+!assets/uploads/.gitkeep
+
+# Composer
+vendor/
+composer.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Cache
+cache/
+
+# Setup scripts (should not be in production)
+create_admin.php
