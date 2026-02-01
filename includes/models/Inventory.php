@@ -305,6 +305,7 @@ class Inventory {
             $stmt->execute([$newStock, $itemId]);
             
             // Log checkout in history
+            // Note: change_amount is negative to indicate stock reduction
             self::logHistory($itemId, $userId, 'checkout', $item['current_stock'], $newStock, -$quantity, 'Ausgeliehen', $purpose . ($destination ? ' - ' . $destination : ''));
             
             $db->commit();
@@ -391,12 +392,33 @@ class Inventory {
     public static function getItemCheckouts($itemId) {
         $db = Database::getContentDB();
         $stmt = $db->prepare("
-            SELECT * FROM inventory_checkouts
-            WHERE item_id = ? AND status = 'checked_out'
-            ORDER BY checkout_date DESC
+            SELECT c.* 
+            FROM inventory_checkouts c
+            WHERE c.item_id = ? AND c.status = 'checked_out'
+            ORDER BY c.checkout_date DESC
         ");
         $stmt->execute([$itemId]);
-        return $stmt->fetchAll();
+        $checkouts = $stmt->fetchAll();
+        
+        // Fetch user information from user database
+        if (!empty($checkouts)) {
+            $userDb = Database::getUserDB();
+            $userIds = array_column($checkouts, 'user_id');
+            $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
+            $userStmt = $userDb->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
+            $userStmt->execute($userIds);
+            $users = [];
+            foreach ($userStmt->fetchAll() as $user) {
+                $users[$user['id']] = $user;
+            }
+            
+            // Add user info to checkouts
+            foreach ($checkouts as &$checkout) {
+                $checkout['user_email'] = $users[$checkout['user_id']]['email'] ?? 'Unknown';
+            }
+        }
+        
+        return $checkouts;
     }
 
     /**

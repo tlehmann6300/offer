@@ -278,7 +278,7 @@ ob_start();
                 <?php foreach ($activeCheckouts as $checkout): ?>
                 <tr class="hover:bg-gray-50">
                     <td class="px-4 py-3 text-sm text-gray-600">
-                        User ID: <?php echo $checkout['user_id']; ?>
+                        <?php echo htmlspecialchars($checkout['user_email'] ?? 'User ID: ' . $checkout['user_id']); ?>
                     </td>
                     <td class="px-4 py-3 text-sm">
                         <span class="font-semibold text-gray-800"><?php echo $checkout['quantity']; ?></span>
