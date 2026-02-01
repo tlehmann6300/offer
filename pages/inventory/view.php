@@ -24,6 +24,12 @@ if (!$item) {
 $message = '';
 $error = '';
 
+// Check for success messages from checkout
+if (isset($_SESSION['checkout_success'])) {
+    $message = $_SESSION['checkout_success'];
+    unset($_SESSION['checkout_success']);
+}
+
 // Handle stock adjustment
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['adjust_stock'])) {
     if (!AuthHandler::hasPermission('manager')) {
@@ -47,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['adjust_stock'])) {
 }
 
 $history = Inventory::getHistory($itemId, 20);
+$activeCheckouts = Inventory::getItemCheckouts($itemId);
 
 $title = htmlspecialchars($item['name']) . ' - Inventar';
 ob_start();
@@ -91,11 +98,22 @@ ob_start();
                     </div>
                 </div>
                 <?php if (AuthHandler::hasPermission('manager')): ?>
-                <a href="edit.php?id=<?php echo $item['id']; ?>" class="btn-primary">
-                    <i class="fas fa-edit mr-2"></i>Bearbeiten
-                </a>
+                <div class="flex space-x-2">
+                    <a href="edit.php?id=<?php echo $item['id']; ?>" class="btn-primary">
+                        <i class="fas fa-edit mr-2"></i>Bearbeiten
+                    </a>
+                </div>
                 <?php endif; ?>
             </div>
+
+            <!-- Checkout Button for all users -->
+            <?php if ($item['current_stock'] > 0): ?>
+            <div class="mb-6">
+                <a href="checkout.php?id=<?php echo $item['id']; ?>" class="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold">
+                    <i class="fas fa-hand-holding-box mr-2"></i>Entnehmen / Ausleihen
+                </a>
+            </div>
+            <?php endif; ?>
 
             <!-- Image -->
             <?php if ($item['image_path']): ?>
@@ -238,6 +256,51 @@ ob_start();
     </div>
 </div>
 
+<!-- Active Checkouts -->
+<?php if (!empty($activeCheckouts)): ?>
+<div class="card p-6 mt-6">
+    <h2 class="text-xl font-bold text-gray-800 mb-4">
+        <i class="fas fa-clipboard-list text-blue-600 mr-2"></i>
+        Aktive Ausleihen
+    </h2>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Benutzer</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Menge</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Verwendungszweck</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Zielort</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Seit</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <?php foreach ($activeCheckouts as $checkout): ?>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-sm text-gray-600">
+                        <?php echo htmlspecialchars($checkout['user_email'] ?? 'User ID: ' . $checkout['user_id']); ?>
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="font-semibold text-gray-800"><?php echo $checkout['quantity']; ?></span>
+                        <span class="text-gray-500"><?php echo htmlspecialchars($item['unit']); ?></span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-600">
+                        <?php echo htmlspecialchars($checkout['purpose']); ?>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-600">
+                        <?php echo $checkout['destination'] ? htmlspecialchars($checkout['destination']) : '-'; ?>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-600">
+                        <?php echo date('d.m.Y', strtotime($checkout['checkout_date'])); ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<?php endif; ?>
+
 <!-- History -->
 <div class="card p-6 mt-6">
     <h2 class="text-xl font-bold text-gray-800 mb-4">
@@ -270,14 +333,20 @@ ob_start();
                             'adjustment' => 'blue',
                             'create' => 'green',
                             'update' => 'yellow',
-                            'delete' => 'red'
+                            'delete' => 'red',
+                            'checkout' => 'purple',
+                            'checkin' => 'green',
+                            'writeoff' => 'red'
                         ];
                         $color = $typeColors[$entry['change_type']] ?? 'gray';
                         $typeLabels = [
                             'adjustment' => 'Anpassung',
                             'create' => 'Erstellt',
                             'update' => 'Aktualisiert',
-                            'delete' => 'Gelöscht'
+                            'delete' => 'Gelöscht',
+                            'checkout' => 'Ausgeliehen',
+                            'checkin' => 'Zurückgegeben',
+                            'writeoff' => 'Ausschuss'
                         ];
                         $label = $typeLabels[$entry['change_type']] ?? $entry['change_type'];
                         ?>

@@ -21,6 +21,7 @@ If you already have a running IBC Intranet system and want to upgrade to the lat
 2. **Run migrations in numerical order:**
    ```bash
    mysql -h <host> -u <user> -p < sql/migrations/001_add_alumni_roles_and_locations.sql
+   mysql -h <host> -u <user> -p < sql/migrations/002_add_checkout_system.sql
    ```
 
 ## Available Migrations
@@ -38,6 +39,21 @@ If you already have a running IBC Intranet system and want to upgrade to the lat
 
 **Required Actions After Migration:**
 - None - all changes are automatic
+
+### 002_add_checkout_system.sql
+**Date:** 2026-02-01
+
+**Changes:**
+- Adds new locations: Furtwangen H-Bau -1.87 and Furtwangen H-Bau -1.88
+- Creates `inventory_checkouts` table for tracking borrowed inventory items
+- Extends `inventory_history.change_type` ENUM to include: `checkout`, `checkin`, `writeoff`
+- Supports checkout/check-in workflow with defect tracking
+
+**Breaking Changes:** None - fully backward compatible
+
+**Required Actions After Migration:**
+- None - all changes are automatic
+- New features become available immediately in the UI
 
 ## Migration Best Practices
 
