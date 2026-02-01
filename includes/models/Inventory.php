@@ -458,4 +458,125 @@ class Inventory {
         $stmt->execute([$checkoutId]);
         return $stmt->fetch();
     }
+
+    /**
+     * Get in-stock statistics for dashboard
+     * Returns total items currently in stock (available inventory)
+     */
+    public static function getInStockStats() {
+        $db = Database::getContentDB();
+        
+        $stats = [];
+        
+        // Total items in stock (sum of all current_stock)
+        $stmt = $db->query("SELECT SUM(current_stock) as total_in_stock FROM inventory");
+        $stats['total_in_stock'] = $stmt->fetch()['total_in_stock'] ?? 0;
+        
+        // Total unique items in stock
+        $stmt = $db->query("SELECT COUNT(*) as unique_items FROM inventory WHERE current_stock > 0");
+        $stats['unique_items_in_stock'] = $stmt->fetch()['unique_items'];
+        
+        // Total value in stock
+        $stmt = $db->query("SELECT SUM(current_stock * unit_price) as total_value FROM inventory");
+        $stats['total_value_in_stock'] = $stmt->fetch()['total_value'] ?? 0;
+        
+        return $stats;
+    }
+
+    /**
+     * Get checked-out statistics for dashboard
+     * Returns items currently checked out with borrower info and destination
+     */
+    public static function getCheckedOutStats() {
+        $db = Database::getContentDB();
+        
+        // Get all active checkouts with item details
+        $stmt = $db->query("
+            SELECT 
+                c.id, c.item_id, c.user_id, c.quantity, c.purpose, c.destination,
+                c.checkout_date, c.expected_return_date,
+                i.name as item_name, i.unit
+            FROM inventory_checkouts c
+            JOIN inventory i ON c.item_id = i.id
+            WHERE c.status = 'checked_out'
+            ORDER BY c.checkout_date DESC
+        ");
+        $checkouts = $stmt->fetchAll();
+        
+        // Fetch user information from user database
+        if (!empty($checkouts)) {
+            $userDb = Database::getUserDB();
+            $userIds = array_unique(array_column($checkouts, 'user_id'));
+            $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
+            $userStmt = $userDb->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
+            $userStmt->execute($userIds);
+            $users = [];
+            foreach ($userStmt->fetchAll() as $user) {
+                $users[$user['id']] = $user;
+            }
+            
+            // Add user info to checkouts
+            foreach ($checkouts as &$checkout) {
+                $checkout['borrower_email'] = $users[$checkout['user_id']]['email'] ?? 'Unbekannt';
+            }
+        }
+        
+        // Calculate statistics
+        $stats = [
+            'total_checked_out' => count($checkouts),
+            'total_quantity_out' => array_sum(array_column($checkouts, 'quantity')),
+            'checkouts' => $checkouts
+        ];
+        
+        return $stats;
+    }
+
+    /**
+     * Get write-off statistics for this month
+     * Returns items reported as write-off (loss/defect) this month
+     */
+    public static function getWriteOffStatsThisMonth() {
+        $db = Database::getContentDB();
+        
+        // Get all write-offs this month
+        $stmt = $db->query("
+            SELECT 
+                ih.id, ih.item_id, ih.user_id, ih.change_amount, ih.reason, ih.comment, ih.timestamp,
+                i.name as item_name, i.unit
+            FROM inventory_history ih
+            JOIN inventory i ON ih.item_id = i.id
+            WHERE ih.change_type = 'writeoff'
+            AND MONTH(ih.timestamp) = MONTH(CURRENT_DATE())
+            AND YEAR(ih.timestamp) = YEAR(CURRENT_DATE())
+            ORDER BY ih.timestamp DESC
+        ");
+        $writeoffs = $stmt->fetchAll();
+        
+        // Fetch user information from user database
+        if (!empty($writeoffs)) {
+            $userDb = Database::getUserDB();
+            $userIds = array_unique(array_column($writeoffs, 'user_id'));
+            $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
+            $userStmt = $userDb->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
+            $userStmt->execute($userIds);
+            $users = [];
+            foreach ($userStmt->fetchAll() as $user) {
+                $users[$user['id']] = $user;
+            }
+            
+            // Add user info to writeoffs
+            foreach ($writeoffs as &$writeoff) {
+                $writeoff['reported_by_email'] = $users[$writeoff['user_id']]['email'] ?? 'Unbekannt';
+            }
+        }
+        
+        // Calculate statistics
+        $stats = [
+            'total_writeoffs' => count($writeoffs),
+            'total_quantity_lost' => abs(array_sum(array_column($writeoffs, 'change_amount'))),
+            'writeoffs' => $writeoffs
+        ];
+        
+        return $stats;
+    }
 }
