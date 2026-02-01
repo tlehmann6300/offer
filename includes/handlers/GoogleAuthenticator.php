@@ -66,7 +66,7 @@ class PHPGangsta_GoogleAuthenticator
     }
 
     /**
-     * Get QR-Code URL for image, from google charts
+     * Get QR-Code URL for image, using QR Server API (alternative to deprecated Google Charts)
      *
      * @param string $name
      * @param string $secret
@@ -74,11 +74,12 @@ class PHPGangsta_GoogleAuthenticator
      * @return string
      */
     public function getQRCodeGoogleUrl($name, $secret, $title = null) {
-        $urlencoded = urlencode('otpauth://totp/'.$name.'?secret='.$secret.'');
+        $otpauth = 'otpauth://totp/'.$name.'?secret='.$secret;
         if(isset($title)) {
-            $urlencoded .= urlencode('&issuer='.urlencode($title));
+            $otpauth .= '&issuer='.$title;
         }
-        return 'https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl='.$urlencoded.'';
+        // Use QR Server API - a free and reliable alternative to deprecated Google Charts API
+        return 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='.urlencode($otpauth);
     }
 
     /**
