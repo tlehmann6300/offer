@@ -33,7 +33,9 @@ class User {
         $db = Database::getUserDB();
         $passwordHash = password_hash($password, HASH_ALGO);
         
-        // Alumni users are not validated by default - need board approval
+        // Alumni users need manual board approval, so is_alumni_validated is set to FALSE (0)
+        // Non-alumni users don't require validation, so it's set to TRUE (1) by default
+        // This allows the isAlumniValidated() check to work correctly for all users
         $isAlumniValidated = ($role === 'alumni') ? 0 : 1;
         
         $stmt = $db->prepare("INSERT INTO users (email, password_hash, role, is_alumni_validated) VALUES (?, ?, ?, ?)");
