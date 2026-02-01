@@ -96,12 +96,20 @@ ob_start();
                     $roleNames = [
                         'admin' => 'Administrator',
                         'board' => 'Vorstand',
+                        'alumni_board' => 'Alumni-Vorstand',
                         'manager' => 'Ressortleiter',
-                        'member' => 'Mitglied'
+                        'member' => 'Mitglied',
+                        'alumni' => 'Alumni'
                     ];
                     echo $roleNames[$invitation['role']] ?? ucfirst($invitation['role']);
                     ?>
                 </p>
+                <?php if ($invitation['role'] === 'alumni'): ?>
+                <div class="mt-3 p-2 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-white/90">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    <strong>Hinweis für Alumni:</strong> Ihr Profil wird nach der Registrierung vom Vorstand manuell geprüft und freigeschaltet, bevor Sie Zugriff auf interne Alumni-Netzwerkdaten erhalten.
+                </div>
+                <?php endif; ?>
             </div>
 
             <div>

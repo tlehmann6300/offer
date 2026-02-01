@@ -93,4 +93,6 @@ INSERT INTO locations (name, description) VALUES
 ('Hauptbüro', 'Hauptstandort der Organisation'),
 ('Lager', 'Zentrales Warenlager'),
 ('Konferenzraum A', 'Konferenzraum im 1. Stock'),
-('Werkstatt', 'Technische Werkstatt');
+('Werkstatt', 'Technische Werkstatt'),
+('H-1.88', 'Lagerraum H-1.88'),
+('H-1.87', 'Lagerraum H-1.87');
