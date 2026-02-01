@@ -267,4 +267,173 @@ class Inventory {
         $stmt->execute([$name, $description, $address]);
         return $db->lastInsertId();
     }
+
+    /**
+     * Checkout item (Borrow/Remove from inventory)
+     */
+    public static function checkoutItem($itemId, $userId, $quantity, $purpose, $destination = null, $expectedReturnDate = null) {
+        $db = Database::getContentDB();
+        
+        // Get current stock
+        $stmt = $db->prepare("SELECT current_stock, name FROM inventory WHERE id = ?");
+        $stmt->execute([$itemId]);
+        $item = $stmt->fetch();
+        
+        if (!$item) {
+            return ['success' => false, 'message' => 'Artikel nicht gefunden'];
+        }
+        
+        // Check if enough stock available
+        if ($item['current_stock'] < $quantity) {
+            return ['success' => false, 'message' => 'Nicht genügend Bestand verfügbar'];
+        }
+        
+        // Begin transaction
+        $db->beginTransaction();
+        
+        try {
+            // Create checkout record
+            $stmt = $db->prepare("
+                INSERT INTO inventory_checkouts (item_id, user_id, quantity, purpose, destination, expected_return_date, status)
+                VALUES (?, ?, ?, ?, ?, ?, 'checked_out')
+            ");
+            $stmt->execute([$itemId, $userId, $quantity, $purpose, $destination, $expectedReturnDate]);
+            
+            // Update stock
+            $newStock = $item['current_stock'] - $quantity;
+            $stmt = $db->prepare("UPDATE inventory SET current_stock = ? WHERE id = ?");
+            $stmt->execute([$newStock, $itemId]);
+            
+            // Log checkout in history
+            self::logHistory($itemId, $userId, 'checkout', $item['current_stock'], $newStock, -$quantity, 'Ausgeliehen', $purpose . ($destination ? ' - ' . $destination : ''));
+            
+            $db->commit();
+            return ['success' => true, 'message' => 'Artikel erfolgreich ausgeliehen'];
+        } catch (Exception $e) {
+            $db->rollBack();
+            return ['success' => false, 'message' => 'Fehler beim Ausleihen: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Check-in item (Return to inventory)
+     */
+    public static function checkinItem($checkoutId, $returnedQuantity, $isDefective, $defectiveQuantity = 0, $defectiveReason = null) {
+        $db = Database::getContentDB();
+        
+        // Get checkout record
+        $stmt = $db->prepare("
+            SELECT c.*, i.current_stock, i.name 
+            FROM inventory_checkouts c
+            JOIN inventory i ON c.item_id = i.id
+            WHERE c.id = ? AND c.status = 'checked_out'
+        ");
+        $stmt->execute([$checkoutId]);
+        $checkout = $stmt->fetch();
+        
+        if (!$checkout) {
+            return ['success' => false, 'message' => 'Ausleihe nicht gefunden oder bereits zurückgegeben'];
+        }
+        
+        // Validate quantities
+        if ($returnedQuantity > $checkout['quantity']) {
+            return ['success' => false, 'message' => 'Rückgabemenge kann nicht größer als ausgeliehene Menge sein'];
+        }
+        
+        if ($isDefective && $defectiveQuantity > $returnedQuantity) {
+            return ['success' => false, 'message' => 'Defekte Menge kann nicht größer als Rückgabemenge sein'];
+        }
+        
+        // Begin transaction
+        $db->beginTransaction();
+        
+        try {
+            $goodQuantity = $returnedQuantity - $defectiveQuantity;
+            $newStock = $checkout['current_stock'] + $goodQuantity;
+            
+            // Update checkout record
+            $status = ($returnedQuantity == $checkout['quantity']) ? 'returned' : 'partially_returned';
+            $stmt = $db->prepare("
+                UPDATE inventory_checkouts 
+                SET return_date = NOW(), returned_quantity = ?, defective_quantity = ?, 
+                    defective_reason = ?, status = ?
+                WHERE id = ?
+            ");
+            $stmt->execute([$returnedQuantity, $defectiveQuantity, $defectiveReason, $status, $checkoutId]);
+            
+            // Update stock (only add back good items)
+            $stmt = $db->prepare("UPDATE inventory SET current_stock = ? WHERE id = ?");
+            $stmt->execute([$newStock, $checkout['item_id']]);
+            
+            // Log check-in
+            $comment = "Rückgabe: {$returnedQuantity} Stück";
+            if ($defectiveQuantity > 0) {
+                $comment .= " (davon {$defectiveQuantity} defekt: {$defectiveReason})";
+            }
+            self::logHistory($checkout['item_id'], $checkout['user_id'], 'checkin', $checkout['current_stock'], $newStock, $goodQuantity, 'Zurückgegeben', $comment);
+            
+            // If items are defective, log write-off
+            if ($defectiveQuantity > 0) {
+                self::logHistory($checkout['item_id'], $checkout['user_id'], 'writeoff', $newStock, $newStock, -$defectiveQuantity, 'Ausschuss', $defectiveReason);
+            }
+            
+            $db->commit();
+            return ['success' => true, 'message' => 'Artikel erfolgreich zurückgegeben'];
+        } catch (Exception $e) {
+            $db->rollBack();
+            return ['success' => false, 'message' => 'Fehler bei der Rückgabe: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Get active checkouts for an item
+     */
+    public static function getItemCheckouts($itemId) {
+        $db = Database::getContentDB();
+        $stmt = $db->prepare("
+            SELECT * FROM inventory_checkouts
+            WHERE item_id = ? AND status = 'checked_out'
+            ORDER BY checkout_date DESC
+        ");
+        $stmt->execute([$itemId]);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Get all checkouts for a user
+     */
+    public static function getUserCheckouts($userId, $includeReturned = false) {
+        $db = Database::getContentDB();
+        $sql = "
+            SELECT c.*, i.name as item_name, i.unit
+            FROM inventory_checkouts c
+            JOIN inventory i ON c.item_id = i.id
+            WHERE c.user_id = ?
+        ";
+        
+        if (!$includeReturned) {
+            $sql .= " AND c.status = 'checked_out'";
+        }
+        
+        $sql .= " ORDER BY c.checkout_date DESC";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Get checkout by ID
+     */
+    public static function getCheckoutById($checkoutId) {
+        $db = Database::getContentDB();
+        $stmt = $db->prepare("
+            SELECT c.*, i.name as item_name, i.unit, i.current_stock
+            FROM inventory_checkouts c
+            JOIN inventory i ON c.item_id = i.id
+            WHERE c.id = ?
+        ");
+        $stmt->execute([$checkoutId]);
+        return $stmt->fetch();
+    }
 }
