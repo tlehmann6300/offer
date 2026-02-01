@@ -156,23 +156,18 @@ ob_start();
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <form method="POST" class="inline">
-                            <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                            <select 
-                                name="new_role" 
-                                onchange="this.form.submit()"
-                                class="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                <?php echo ($user['id'] == $_SESSION['user_id']) ? 'disabled' : ''; ?>
-                            >
-                                <option value="member" <?php echo ($user['role'] == 'member') ? 'selected' : ''; ?>>Mitglied</option>
-                                <option value="alumni" <?php echo ($user['role'] == 'alumni') ? 'selected' : ''; ?>>Alumni</option>
-                                <option value="manager" <?php echo ($user['role'] == 'manager') ? 'selected' : ''; ?>>Ressortleiter</option>
-                                <option value="alumni_board" <?php echo ($user['role'] == 'alumni_board') ? 'selected' : ''; ?>>Alumni-Vorstand</option>
-                                <option value="board" <?php echo ($user['role'] == 'board') ? 'selected' : ''; ?>>Vorstand</option>
-                                <option value="admin" <?php echo ($user['role'] == 'admin') ? 'selected' : ''; ?>>Administrator</option>
-                            </select>
-                            <input type="hidden" name="change_role" value="1">
-                        </form>
+                        <select 
+                            data-user-id="<?php echo $user['id']; ?>"
+                            class="role-select px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            <?php echo ($user['id'] == $_SESSION['user_id']) ? 'disabled' : ''; ?>
+                        >
+                            <option value="member" <?php echo ($user['role'] == 'member') ? 'selected' : ''; ?>>Mitglied</option>
+                            <option value="alumni" <?php echo ($user['role'] == 'alumni') ? 'selected' : ''; ?>>Alumni</option>
+                            <option value="manager" <?php echo ($user['role'] == 'manager') ? 'selected' : ''; ?>>Ressortleiter</option>
+                            <option value="alumni_board" <?php echo ($user['role'] == 'alumni_board') ? 'selected' : ''; ?>>Alumni-Vorstand</option>
+                            <option value="board" <?php echo ($user['role'] == 'board') ? 'selected' : ''; ?>>Vorstand</option>
+                            <option value="admin" <?php echo ($user['role'] == 'admin') ? 'selected' : ''; ?>>Administrator</option>
+                        </select>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex flex-col space-y-1">
@@ -221,6 +216,82 @@ ob_start();
         </table>
     </div>
 </div>
+
+<script>
+// AJAX role change handler
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelects = document.querySelectorAll('.role-select');
+    
+    roleSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            const userId = this.getAttribute('data-user-id');
+            const newRole = this.value;
+            const originalValue = this.querySelector('option[selected]')?.value || this.value;
+            
+            // Disable select while processing
+            this.disabled = true;
+            
+            // Send AJAX request
+            fetch('ajax_update_role.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'user_id=' + encodeURIComponent(userId) + '&new_role=' + encodeURIComponent(newRole)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    showMessage(data.message, 'success');
+                    // Update the selected option
+                    this.querySelectorAll('option').forEach(opt => {
+                        opt.removeAttribute('selected');
+                        if (opt.value === newRole) {
+                            opt.setAttribute('selected', 'selected');
+                        }
+                    });
+                } else {
+                    // Show error and revert selection
+                    showMessage(data.message, 'error');
+                    this.value = originalValue;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Fehler beim Ändern der Rolle', 'error');
+                this.value = originalValue;
+            })
+            .finally(() => {
+                // Re-enable select
+                this.disabled = false;
+            });
+        });
+    });
+    
+    // Function to show messages
+    function showMessage(message, type) {
+        // Remove existing messages
+        const existingMessages = document.querySelectorAll('.ajax-message');
+        existingMessages.forEach(msg => msg.remove());
+        
+        // Create new message element
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'ajax-message mb-6 p-4 rounded-lg ' + 
+            (type === 'success' ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700');
+        messageDiv.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check' : 'exclamation') + '-circle mr-2"></i>' + message;
+        
+        // Insert at the top of main content
+        const mainContent = document.querySelector('main > div:first-child') || document.querySelector('main');
+        mainContent.insertBefore(messageDiv, mainContent.firstChild);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            messageDiv.remove();
+        }, 5000);
+    }
+});
+</script>
 
 <?php
 $content = ob_get_clean();
