@@ -13,6 +13,14 @@ if (!AuthHandler::isAuthenticated()) {
 $user = AuthHandler::getCurrentUser();
 $stats = Inventory::getDashboardStats();
 
+// Get extended statistics for board/managers
+$hasExtendedAccess = AuthHandler::hasPermission('manager');
+if ($hasExtendedAccess) {
+    $inStockStats = Inventory::getInStockStats();
+    $checkedOutStats = Inventory::getCheckedOutStats();
+    $writeOffStats = Inventory::getWriteOffStatsThisMonth();
+}
+
 $title = 'Dashboard - IBC Intranet';
 ob_start();
 ?>
@@ -84,6 +92,162 @@ ob_start();
         </div>
     </div>
 </div>
+
+<?php if ($hasExtendedAccess): ?>
+<!-- Extended Dashboard for Board/Managers -->
+
+<!-- Write-off Warning Box (if any this month) -->
+<?php if ($writeOffStats['total_writeoffs'] > 0): ?>
+<div class="mb-8 p-6 bg-red-50 border-l-4 border-red-500 rounded-lg">
+    <div class="flex items-center mb-4">
+        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
+            <i class="fas fa-exclamation-circle text-red-600 text-2xl"></i>
+        </div>
+        <div>
+            <h2 class="text-xl font-bold text-red-800">Verlust/Defekt diesen Monat</h2>
+            <p class="text-red-600"><?php echo $writeOffStats['total_writeoffs']; ?> Meldungen, <?php echo $writeOffStats['total_quantity_lost']; ?> Einheiten betroffen</p>
+        </div>
+    </div>
+    <div class="bg-white rounded-lg p-4 max-h-80 overflow-y-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 sticky top-0">
+                <tr>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Artikel</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Menge</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Gemeldet von</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Grund</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <?php foreach ($writeOffStats['writeoffs'] as $writeoff): ?>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-3 py-2 whitespace-nowrap">
+                        <?php echo date('d.m.Y', strtotime($writeoff['timestamp'])); ?>
+                    </td>
+                    <td class="px-3 py-2">
+                        <a href="../inventory/view.php?id=<?php echo $writeoff['item_id']; ?>" class="text-purple-600 hover:text-purple-800 font-medium">
+                            <?php echo htmlspecialchars($writeoff['item_name']); ?>
+                        </a>
+                    </td>
+                    <td class="px-3 py-2 whitespace-nowrap">
+                        <span class="text-red-600 font-semibold"><?php echo abs($writeoff['change_amount']); ?> <?php echo htmlspecialchars($writeoff['unit']); ?></span>
+                    </td>
+                    <td class="px-3 py-2">
+                        <?php echo htmlspecialchars($writeoff['reported_by_email']); ?>
+                    </td>
+                    <td class="px-3 py-2">
+                        <?php echo htmlspecialchars($writeoff['comment'] ?? $writeoff['reason'] ?? '-'); ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- In Stock and On Route Tiles -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Im Lager (In Stock) -->
+    <div class="card p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">
+            <i class="fas fa-warehouse text-green-600 mr-2"></i>
+            Im Lager
+        </h2>
+        <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Gesamtbestand</p>
+                    <p class="text-2xl font-bold text-green-700"><?php echo number_format($inStockStats['total_in_stock']); ?> Einheiten</p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-box-open text-green-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Verschiedene Artikel</p>
+                    <p class="text-2xl font-bold text-blue-700"><?php echo number_format($inStockStats['unique_items_in_stock']); ?> Artikel</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-boxes text-blue-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Wert im Lager</p>
+                    <p class="text-2xl font-bold text-purple-700"><?php echo number_format($inStockStats['total_value_in_stock'], 2); ?> €</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-euro-sign text-purple-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unterwegs (On Route / Checked Out) -->
+    <div class="card p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">
+            <i class="fas fa-truck text-orange-600 mr-2"></i>
+            Unterwegs
+        </h2>
+        <?php if ($checkedOutStats['total_checked_out'] > 0): ?>
+        <div class="space-y-2 mb-4">
+            <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                <div>
+                    <p class="text-sm text-gray-600">Aktive Ausleihen</p>
+                    <p class="text-xl font-bold text-orange-700"><?php echo $checkedOutStats['total_checked_out']; ?> Ausleihen</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Entliehene Menge</p>
+                    <p class="text-xl font-bold text-orange-700"><?php echo $checkedOutStats['total_quantity_out']; ?> Einheiten</p>
+                </div>
+            </div>
+        </div>
+        <div class="max-h-64 overflow-y-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 sticky top-0">
+                    <tr>
+                        <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Artikel</th>
+                        <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Menge</th>
+                        <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Entleiher</th>
+                        <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Zielort</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <?php foreach ($checkedOutStats['checkouts'] as $checkout): ?>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-2 py-2">
+                            <a href="../inventory/view.php?id=<?php echo $checkout['item_id']; ?>" class="text-purple-600 hover:text-purple-800 font-medium text-xs">
+                                <?php echo htmlspecialchars($checkout['item_name']); ?>
+                            </a>
+                        </td>
+                        <td class="px-2 py-2 whitespace-nowrap text-xs">
+                            <?php echo $checkout['quantity']; ?> <?php echo htmlspecialchars($checkout['unit']); ?>
+                        </td>
+                        <td class="px-2 py-2 text-xs">
+                            <?php echo htmlspecialchars($checkout['borrower_email']); ?>
+                        </td>
+                        <td class="px-2 py-2 text-xs">
+                            <?php echo htmlspecialchars($checkout['destination'] ?? '-'); ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php else: ?>
+        <div class="text-center py-8">
+            <i class="fas fa-check-circle text-4xl mb-3 text-green-400"></i>
+            <p class="text-gray-500">Keine aktiven Ausleihen</p>
+            <p class="text-sm text-gray-400 mt-1">Alle Artikel sind im Lager</p>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<?php endif; ?>
 
 <!-- Quick Actions -->
 <div class="card p-6 mb-8">
