@@ -34,6 +34,52 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
+        
+        /* Mobile view improvements */
+        @media (max-width: 768px) {
+            .card {
+                padding: 1rem !important;
+            }
+            
+            /* Fix text overflow in cards */
+            .card p, .card div {
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+            
+            /* Better spacing on mobile */
+            main {
+                padding: 1rem !important;
+            }
+            
+            /* Prevent horizontal overflow */
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            /* Better form spacing on mobile */
+            form input, form select, form textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            /* Stack buttons vertically on mobile */
+            .flex.space-x-4 {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .flex.space-x-4 > * {
+                width: 100%;
+            }
+        }
+        
+        /* Ensure long text doesn't overflow */
+        .text-sm, .text-xs {
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
