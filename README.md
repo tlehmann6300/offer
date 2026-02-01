@@ -35,7 +35,7 @@ Ein professionelles Intranet-System für den Verein "IBC" mit Token-basiertem Lo
 
 ## 🗄️ Datenbank-Architektur
 
-Das System verwendet zwei getrennte MySQL-Datenbanken:
+Das System verwendet zwei getrennte MySQL-Datenbanken für verbesserte Sicherheit:
 
 ### User-Datenbank (dbs15253086)
 - `users` - Benutzerkonten, Logins, Passwörter
@@ -62,19 +62,44 @@ Das System verwendet zwei getrennte MySQL-Datenbanken:
 
 1. Führen Sie die SQL-Skripte aus:
    ```bash
-   mysql -h db5019508945.hosting-data.io -u dbu4494103 -p dbs15253086 < sql/user_database_schema.sql
-   mysql -h db5019375140.hosting-data.io -u dbu2067984 -p dbs15161271 < sql/content_database_schema.sql
+   # User Database
+   mysql -h <host> -u <user> -p <database> < sql/user_database_schema.sql
+   # Content Database
+   mysql -h <host> -u <user> -p <database> < sql/content_database_schema.sql
    ```
 
-2. Standard-Admin-Benutzer:
-   - Email: `admin@ibc.de`
-   - Passwort: `Admin123!`
+### Schritt 2: Initialen Admin erstellen
 
-### Schritt 2: Dateien hochladen
+Führen Sie das Setup-Skript aus und löschen Sie es danach:
+```bash
+php create_admin.php
+# Nach erfolgreichem Setup:
+rm create_admin.php
+```
 
-Laden Sie alle Dateien auf Ihren IONOS-Webspace hoch.
+### Schritt 3: Konfiguration
 
-### Schritt 3: Verzeichnis-Berechtigungen
+**Wichtig:** Für Produktion verwenden Sie Umgebungsvariablen statt der Fallback-Werte in `config/config.php`:
+
+```bash
+export DB_USER_HOST="your_host"
+export DB_USER_PASS="your_password"
+export ENVIRONMENT="production"
+# ... weitere Variablen
+```
+
+### Schritt 3: Konfiguration
+
+**Wichtig:** Für Produktion verwenden Sie Umgebungsvariablen statt der Fallback-Werte in `config/config.php`:
+
+```bash
+export DB_USER_HOST="your_host"
+export DB_USER_PASS="your_password"
+export ENVIRONMENT="production"
+# ... weitere Variablen
+```
+
+### Schritt 4: Verzeichnis-Berechtigungen
 
 Stellen Sie sicher, dass der Webserver Schreibrechte hat:
 ```bash

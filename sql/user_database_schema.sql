@@ -66,6 +66,11 @@ CREATE TABLE IF NOT EXISTS user_sessions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Insert default admin user (password: Admin123!)
-INSERT INTO users (email, password_hash, role, tfa_enabled) VALUES 
-('admin@ibc.de', '$argon2id$v=19$m=65536,t=4,p=1$RmFuY3lTYWx0MTIzNDU2$Z8cGvJ9wH3YqHvB0vN7sK8xL9mT2pQ4rS6wX5yZ7A1B', 'admin', 0);
+-- IMPORTANT: Create the initial admin user manually after deployment
+-- For security reasons, do not include default passwords in version control
+-- Example SQL to create admin user (change password as needed):
+-- INSERT INTO users (email, password_hash, role, tfa_enabled) VALUES 
+-- ('admin@ibc.de', PASSWORD_HASH_HERE, 'admin', 0);
+-- 
+-- To generate a password hash in PHP:
+-- password_hash('YourSecurePassword', PASSWORD_ARGON2ID);

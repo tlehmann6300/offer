@@ -11,24 +11,49 @@ if (AuthHandler::isAuthenticated()) {
 
 $error = '';
 $require2FA = false;
-$tempUserId = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
     $tfaCode = $_POST['tfa_code'] ?? null;
     
+    // If 2FA code is provided, retrieve credentials from session
+    if ($tfaCode !== null && isset($_SESSION['pending_2fa'])) {
+        $email = $_SESSION['pending_2fa']['email'];
+        $password = $_SESSION['pending_2fa']['password'];
+    }
+    
     $result = AuthHandler::login($email, $password, $tfaCode);
     
     if ($result['success']) {
+        // Clear pending 2FA data
+        unset($_SESSION['pending_2fa']);
         header('Location: ../dashboard/index.php');
         exit;
     } else {
         if (isset($result['require_2fa']) && $result['require_2fa']) {
+            // Store credentials in session (server-side) for 2FA verification
+            $_SESSION['pending_2fa'] = [
+                'email' => $email,
+                'password' => $password,
+                'timestamp' => time()
+            ];
             $require2FA = true;
-            $tempUserId = $result['user_id'];
         } else {
             $error = $result['message'];
+            // Clear any pending 2FA data on error
+            unset($_SESSION['pending_2fa']);
+        }
+    }
+} else {
+    // Check if we're in the middle of 2FA flow
+    if (isset($_SESSION['pending_2fa'])) {
+        // Verify the 2FA session hasn't expired (5 minutes)
+        if (time() - $_SESSION['pending_2fa']['timestamp'] > 300) {
+            unset($_SESSION['pending_2fa']);
+            $error = '2FA-Sitzung abgelaufen. Bitte melden Sie sich erneut an.';
+        } else {
+            $require2FA = true;
         }
     }
 }
@@ -97,8 +122,6 @@ ob_start();
                     placeholder="000000"
                     autofocus
                 >
-                <input type="hidden" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
-                <input type="hidden" name="password" value="<?php echo htmlspecialchars($_POST['password'] ?? ''); ?>">
                 <p class="mt-2 text-white/70 text-sm">Geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein</p>
             </div>
             <?php endif; ?>

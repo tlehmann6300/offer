@@ -53,25 +53,25 @@
             </h1>
             
             <nav class="space-y-2">
-                <a href="/pages/dashboard/index.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                <a href="../dashboard/index.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                     <i class="fas fa-home w-5"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="/pages/inventory/index.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                <a href="../inventory/index.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                     <i class="fas fa-boxes w-5"></i>
                     <span>Inventar</span>
                 </a>
                 <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
-                <a href="/pages/admin/users.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                <a href="../admin/users.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                     <i class="fas fa-users w-5"></i>
                     <span>Benutzerverwaltung</span>
                 </a>
-                <a href="/pages/admin/audit.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                <a href="../admin/audit.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                     <i class="fas fa-clipboard-list w-5"></i>
                     <span>Audit-Logs</span>
                 </a>
                 <?php endif; ?>
-                <a href="/pages/auth/profile.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                <a href="../auth/profile.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                     <i class="fas fa-user w-5"></i>
                     <span>Profil</span>
                 </a>
@@ -88,7 +88,7 @@
                     <div class="text-xs text-white/70"><?php echo htmlspecialchars(ucfirst($_SESSION['user_role'] ?? 'guest')); ?></div>
                 </div>
             </div>
-            <a href="/pages/auth/logout.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition text-red-300">
+            <a href="../auth/logout.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition text-red-300">
                 <i class="fas fa-sign-out-alt w-5"></i>
                 <span>Abmelden</span>
             </a>
