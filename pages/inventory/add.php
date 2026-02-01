@@ -97,71 +97,80 @@ ob_start();
 <?php endif; ?>
 
 <div class="card p-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">
         <i class="fas fa-plus text-purple-600 mr-2"></i>
         Neuer Artikel
     </h1>
+    <p class="text-gray-600 mb-6">Erstellen Sie einen neuen Artikel im Inventar</p>
 
-    <form method="POST" enctype="multipart/form-data" class="space-y-6">
-        <!-- Basic Info -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
-                <input 
-                    type="text" 
-                    name="name" 
-                    required 
-                    value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder="Artikelname"
-                >
-            </div>
+    <form method="POST" enctype="multipart/form-data" class="space-y-8">
+        
+        <!-- Basisdaten Section -->
+        <div class="bg-gray-50 rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                Basisdaten
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Name <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="name" 
+                        required 
+                        value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="Artikelname"
+                    >
+                </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Kategorie</label>
-                <select 
-                    name="category_id" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                    <option value="">Keine Kategorie</option>
-                    <?php foreach ($categories as $category): ?>
-                    <option value="<?php echo $category['id']; ?>" <?php echo (isset($_POST['category_id']) && $_POST['category_id'] == $category['id']) ? 'selected' : ''; ?>>
-                        <?php echo htmlspecialchars($category['name']); ?>
-                    </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Beschreibung</label>
+                    <textarea 
+                        name="description" 
+                        rows="3"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="Beschreibung des Artikels..."
+                    ><?php echo htmlspecialchars($_POST['description'] ?? ''); ?></textarea>
+                </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Standort</label>
-                <select 
-                    name="location_id" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                    <option value="">Kein Standort</option>
-                    <?php foreach ($locations as $location): ?>
-                    <option value="<?php echo $location['id']; ?>" <?php echo (isset($_POST['location_id']) && $_POST['location_id'] == $location['id']) ? 'selected' : ''; ?>>
-                        <?php echo htmlspecialchars($location['name']); ?>
-                    </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Kategorie</label>
+                    <select 
+                        name="category_id" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                        <option value="">Keine Kategorie</option>
+                        <?php foreach ($categories as $category): ?>
+                        <option value="<?php echo $category['id']; ?>" <?php echo (isset($_POST['category_id']) && $_POST['category_id'] == $category['id']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($category['name']); ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Beschreibung</label>
-                <textarea 
-                    name="description" 
-                    rows="4"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder="Beschreibung des Artikels..."
-                ><?php echo htmlspecialchars($_POST['description'] ?? ''); ?></textarea>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Einheit</label>
+                    <input 
+                        type="text" 
+                        name="unit" 
+                        value="<?php echo htmlspecialchars($_POST['unit'] ?? 'Stück'); ?>"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="z.B. Stück, Karton, Liter"
+                    >
+                </div>
             </div>
         </div>
 
-        <!-- Stock Info -->
-        <div class="border-t pt-6">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Bestandsinformationen</h2>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- Bestandsinformationen Section -->
+        <div class="bg-gray-50 rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-boxes text-green-600 mr-2"></i>
+                Bestandsinformationen
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Aktueller Bestand</label>
                     <input 
@@ -185,17 +194,6 @@ ob_start();
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Einheit</label>
-                    <input 
-                        type="text" 
-                        name="unit" 
-                        value="<?php echo htmlspecialchars($_POST['unit'] ?? 'Stück'); ?>"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder="z.B. Stück, Karton, Liter"
-                    >
-                </div>
-
-                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Stückpreis (€)</label>
                     <input 
                         type="number" 
@@ -209,38 +207,67 @@ ob_start();
             </div>
         </div>
 
-        <!-- Image Upload -->
-        <div class="border-t pt-6">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Bild</h2>
+        <!-- Lagerort Section -->
+        <div class="bg-gray-50 rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-map-marker-alt text-red-600 mr-2"></i>
+                Lagerort
+            </h2>
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Standort</label>
+                    <select 
+                        name="location_id" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                        <option value="">Kein Standort</option>
+                        <?php foreach ($locations as $location): ?>
+                        <option value="<?php echo $location['id']; ?>" <?php echo (isset($_POST['location_id']) && $_POST['location_id'] == $location['id']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($location['name']); ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Notizen zum Lagerort</label>
+                    <textarea 
+                        name="notes" 
+                        rows="2"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="Zusätzliche Notizen zum Lagerort..."
+                    ><?php echo htmlspecialchars($_POST['notes'] ?? ''); ?></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bild Section -->
+        <div class="bg-gray-50 rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-image text-purple-600 mr-2"></i>
+                Bild
+            </h2>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Artikelbild hochladen</label>
                 <input 
                     type="file" 
                     name="image" 
                     accept="image/jpeg,image/png,image/gif,image/webp"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
                 >
-                <p class="text-sm text-gray-500 mt-2">Erlaubt: JPG, PNG, GIF, WebP. Maximum: 5MB</p>
+                <p class="text-sm text-gray-500 mt-2">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Erlaubt: JPG, PNG, GIF, WebP. Maximum: 5MB
+                </p>
             </div>
         </div>
 
-        <!-- Notes -->
-        <div class="border-t pt-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Notizen</label>
-            <textarea 
-                name="notes" 
-                rows="3"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Zusätzliche Notizen..."
-            ><?php echo htmlspecialchars($_POST['notes'] ?? ''); ?></textarea>
-        </div>
-
         <!-- Actions -->
-        <div class="flex justify-end space-x-4 pt-6 border-t">
-            <a href="index.php" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
-                Abbrechen
+        <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
+            <a href="index.php" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-center">
+                <i class="fas fa-times mr-2"></i>Abbrechen
             </a>
-            <button type="submit" class="btn-primary">
+            <button type="submit" class="btn-primary px-6 py-3">
                 <i class="fas fa-save mr-2"></i>Artikel erstellen
             </button>
         </div>
