@@ -507,17 +507,20 @@ class Inventory {
         if (!empty($checkouts)) {
             $userDb = Database::getUserDB();
             $userIds = array_unique(array_column($checkouts, 'user_id'));
-            $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
-            $userStmt = $userDb->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
-            $userStmt->execute($userIds);
-            $users = [];
-            foreach ($userStmt->fetchAll() as $user) {
-                $users[$user['id']] = $user;
-            }
             
-            // Add user info to checkouts
-            foreach ($checkouts as &$checkout) {
-                $checkout['borrower_email'] = $users[$checkout['user_id']]['email'] ?? 'Unbekannt';
+            if (!empty($userIds)) {
+                $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
+                $userStmt = $userDb->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
+                $userStmt->execute($userIds);
+                $users = [];
+                foreach ($userStmt->fetchAll() as $user) {
+                    $users[$user['id']] = $user;
+                }
+                
+                // Add user info to checkouts
+                foreach ($checkouts as &$checkout) {
+                    $checkout['borrower_email'] = $users[$checkout['user_id']]['email'] ?? 'Unbekannt';
+                }
             }
         }
         
@@ -556,17 +559,20 @@ class Inventory {
         if (!empty($writeoffs)) {
             $userDb = Database::getUserDB();
             $userIds = array_unique(array_column($writeoffs, 'user_id'));
-            $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
-            $userStmt = $userDb->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
-            $userStmt->execute($userIds);
-            $users = [];
-            foreach ($userStmt->fetchAll() as $user) {
-                $users[$user['id']] = $user;
-            }
             
-            // Add user info to writeoffs
-            foreach ($writeoffs as &$writeoff) {
-                $writeoff['reported_by_email'] = $users[$writeoff['user_id']]['email'] ?? 'Unbekannt';
+            if (!empty($userIds)) {
+                $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
+                $userStmt = $userDb->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
+                $userStmt->execute($userIds);
+                $users = [];
+                foreach ($userStmt->fetchAll() as $user) {
+                    $users[$user['id']] = $user;
+                }
+                
+                // Add user info to writeoffs
+                foreach ($writeoffs as &$writeoff) {
+                    $writeoff['reported_by_email'] = $users[$writeoff['user_id']]['email'] ?? 'Unbekannt';
+                }
             }
         }
         
