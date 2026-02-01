@@ -1,0 +1,322 @@
+<?php
+require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../includes/models/Inventory.php';
+
+AuthHandler::startSession();
+
+if (!AuthHandler::isAuthenticated()) {
+    header('Location: ../auth/login.php');
+    exit;
+}
+
+$itemId = $_GET['id'] ?? null;
+if (!$itemId) {
+    header('Location: index.php');
+    exit;
+}
+
+$item = Inventory::getById($itemId);
+if (!$item) {
+    header('Location: index.php');
+    exit;
+}
+
+$message = '';
+$error = '';
+
+// Handle stock adjustment
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['adjust_stock'])) {
+    if (!AuthHandler::hasPermission('manager')) {
+        $error = 'Keine Berechtigung';
+    } else {
+        $amount = intval($_POST['amount'] ?? 0);
+        $reason = $_POST['reason'] ?? '';
+        $comment = $_POST['comment'] ?? '';
+        
+        if (empty($reason) || empty($comment)) {
+            $error = 'Grund und Kommentar sind erforderlich';
+        } else {
+            if (Inventory::adjustStock($itemId, $amount, $reason, $comment, $_SESSION['user_id'])) {
+                $message = 'Bestand erfolgreich aktualisiert';
+                $item = Inventory::getById($itemId); // Reload item
+            } else {
+                $error = 'Fehler beim Aktualisieren des Bestands';
+            }
+        }
+    }
+}
+
+$history = Inventory::getHistory($itemId, 20);
+
+$title = htmlspecialchars($item['name']) . ' - Inventar';
+ob_start();
+?>
+
+<div class="mb-6">
+    <a href="index.php" class="text-purple-600 hover:text-purple-700 inline-flex items-center mb-4">
+        <i class="fas fa-arrow-left mr-2"></i>Zurück zum Inventar
+    </a>
+</div>
+
+<?php if ($message): ?>
+<div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+    <i class="fas fa-check-circle mr-2"></i><?php echo htmlspecialchars($message); ?>
+</div>
+<?php endif; ?>
+
+<?php if ($error): ?>
+<div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+    <i class="fas fa-exclamation-circle mr-2"></i><?php echo htmlspecialchars($error); ?>
+</div>
+<?php endif; ?>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Item Details -->
+    <div class="lg:col-span-2">
+        <div class="card p-6">
+            <div class="flex items-start justify-between mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2"><?php echo htmlspecialchars($item['name']); ?></h1>
+                    <div class="flex flex-wrap gap-2">
+                        <?php if ($item['category_name']): ?>
+                        <span class="px-3 py-1 text-sm rounded-full" style="background-color: <?php echo htmlspecialchars($item['category_color']); ?>20; color: <?php echo htmlspecialchars($item['category_color']); ?>">
+                            <?php echo htmlspecialchars($item['category_name']); ?>
+                        </span>
+                        <?php endif; ?>
+                        <?php if ($item['location_name']): ?>
+                        <span class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full">
+                            <i class="fas fa-map-marker-alt mr-1"></i><?php echo htmlspecialchars($item['location_name']); ?>
+                        </span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php if (AuthHandler::hasPermission('manager')): ?>
+                <a href="edit.php?id=<?php echo $item['id']; ?>" class="btn-primary">
+                    <i class="fas fa-edit mr-2"></i>Bearbeiten
+                </a>
+                <?php endif; ?>
+            </div>
+
+            <!-- Image -->
+            <?php if ($item['image_path']): ?>
+            <div class="mb-6">
+                <img src="/<?php echo htmlspecialchars($item['image_path']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="w-full max-w-lg rounded-lg shadow-md">
+            </div>
+            <?php endif; ?>
+
+            <!-- Description -->
+            <?php if ($item['description']): ?>
+            <div class="mb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-2">Beschreibung</h2>
+                <p class="text-gray-600"><?php echo nl2br(htmlspecialchars($item['description'])); ?></p>
+            </div>
+            <?php endif; ?>
+
+            <!-- Details Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Aktueller Bestand</p>
+                    <p class="text-2xl font-bold <?php echo $item['current_stock'] <= $item['min_stock'] && $item['min_stock'] > 0 ? 'text-red-600' : 'text-gray-800'; ?>">
+                        <?php echo $item['current_stock']; ?>
+                    </p>
+                    <p class="text-xs text-gray-500"><?php echo htmlspecialchars($item['unit']); ?></p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Mindestbestand</p>
+                    <p class="text-2xl font-bold text-gray-800"><?php echo $item['min_stock']; ?></p>
+                    <p class="text-xs text-gray-500"><?php echo htmlspecialchars($item['unit']); ?></p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Stückpreis</p>
+                    <p class="text-2xl font-bold text-gray-800"><?php echo number_format($item['unit_price'], 2); ?> €</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Gesamtwert</p>
+                    <p class="text-2xl font-bold text-gray-800"><?php echo number_format($item['current_stock'] * $item['unit_price'], 2); ?> €</p>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <?php if ($item['notes']): ?>
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                <p class="text-sm text-gray-700"><strong>Notizen:</strong> <?php echo nl2br(htmlspecialchars($item['notes'])); ?></p>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Stock Adjustment -->
+    <div class="lg:col-span-1">
+        <?php if (AuthHandler::hasPermission('manager')): ?>
+        <div class="card p-6 mb-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-exchange-alt text-purple-600 mr-2"></i>
+                Bestand anpassen
+            </h2>
+            <form method="POST">
+                <input type="hidden" name="adjust_stock" value="1">
+                
+                <!-- Quick Buttons -->
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <button type="button" onclick="setAmount(-10)" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition">
+                        <i class="fas fa-minus mr-1"></i>10
+                    </button>
+                    <button type="button" onclick="setAmount(-1)" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition">
+                        <i class="fas fa-minus mr-1"></i>1
+                    </button>
+                    <button type="button" onclick="setAmount(1)" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition">
+                        <i class="fas fa-plus mr-1"></i>1
+                    </button>
+                    <button type="button" onclick="setAmount(10)" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition">
+                        <i class="fas fa-plus mr-1"></i>10
+                    </button>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Menge</label>
+                    <input 
+                        type="number" 
+                        id="amount" 
+                        name="amount" 
+                        required 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="z.B. +5 oder -3"
+                    >
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Grund *</label>
+                    <select 
+                        name="reason" 
+                        required 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                        <option value="">Bitte wählen...</option>
+                        <option value="Verliehen">Verliehen</option>
+                        <option value="Zurückgegeben">Zurückgegeben</option>
+                        <option value="Gekauft">Gekauft</option>
+                        <option value="Verkauft">Verkauft</option>
+                        <option value="Beschädigt">Beschädigt</option>
+                        <option value="Verloren">Verloren</option>
+                        <option value="Inventur">Inventur</option>
+                        <option value="Sonstiges">Sonstiges</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Kommentar *</label>
+                    <textarea 
+                        name="comment" 
+                        required 
+                        rows="3"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="Bitte beschreiben Sie die Änderung..."
+                    ></textarea>
+                </div>
+
+                <button type="submit" class="w-full btn-primary">
+                    <i class="fas fa-check mr-2"></i>Bestätigen
+                </button>
+            </form>
+        </div>
+        <?php endif; ?>
+
+        <!-- Quick Info -->
+        <div class="card p-6">
+            <h3 class="font-semibold text-gray-800 mb-3">Information</h3>
+            <div class="space-y-2 text-sm">
+                <p class="text-gray-600">
+                    <i class="fas fa-calendar-alt text-gray-400 mr-2"></i>
+                    Erstellt: <?php echo date('d.m.Y', strtotime($item['created_at'])); ?>
+                </p>
+                <p class="text-gray-600">
+                    <i class="fas fa-clock text-gray-400 mr-2"></i>
+                    Aktualisiert: <?php echo date('d.m.Y', strtotime($item['updated_at'])); ?>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- History -->
+<div class="card p-6 mt-6">
+    <h2 class="text-xl font-bold text-gray-800 mb-4">
+        <i class="fas fa-history text-blue-600 mr-2"></i>
+        Verlauf
+    </h2>
+    <?php if (empty($history)): ?>
+    <p class="text-gray-500 text-center py-4">Keine Verlaufsdaten vorhanden</p>
+    <?php else: ?>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Typ</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Änderung</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Grund</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kommentar</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <?php foreach ($history as $entry): ?>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-sm text-gray-600">
+                        <?php echo date('d.m.Y H:i', strtotime($entry['timestamp'])); ?>
+                    </td>
+                    <td class="px-4 py-3">
+                        <?php
+                        $typeColors = [
+                            'adjustment' => 'blue',
+                            'create' => 'green',
+                            'update' => 'yellow',
+                            'delete' => 'red'
+                        ];
+                        $color = $typeColors[$entry['change_type']] ?? 'gray';
+                        $typeLabels = [
+                            'adjustment' => 'Anpassung',
+                            'create' => 'Erstellt',
+                            'update' => 'Aktualisiert',
+                            'delete' => 'Gelöscht'
+                        ];
+                        $label = $typeLabels[$entry['change_type']] ?? $entry['change_type'];
+                        ?>
+                        <span class="px-2 py-1 text-xs bg-<?php echo $color; ?>-100 text-<?php echo $color; ?>-700 rounded-full">
+                            <?php echo $label; ?>
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                        <?php if ($entry['change_type'] === 'adjustment'): ?>
+                        <span class="font-semibold <?php echo $entry['change_amount'] >= 0 ? 'text-green-600' : 'text-red-600'; ?>">
+                            <?php echo ($entry['change_amount'] >= 0 ? '+' : '') . $entry['change_amount']; ?>
+                        </span>
+                        <span class="text-gray-500 text-xs ml-2">
+                            (<?php echo $entry['old_stock']; ?> → <?php echo $entry['new_stock']; ?>)
+                        </span>
+                        <?php else: ?>
+                        <span class="text-gray-500">-</span>
+                        <?php endif; ?>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-600">
+                        <?php echo htmlspecialchars($entry['reason'] ?? '-'); ?>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-600">
+                        <?php echo htmlspecialchars($entry['comment'] ?? '-'); ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php endif; ?>
+</div>
+
+<script>
+function setAmount(value) {
+    document.getElementById('amount').value = value;
+}
+</script>
+
+<?php
+$content = ob_get_clean();
+include __DIR__ . '/../../includes/templates/main_layout.php';
