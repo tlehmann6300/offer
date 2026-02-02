@@ -120,6 +120,10 @@
                     <i class="fas fa-clipboard-list w-5"></i>
                     <span>Meine Ausleihen</span>
                 </a>
+                <a href="../events/index.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                    <i class="fas fa-calendar-check w-5"></i>
+                    <span>Events</span>
+                </a>
                 <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board', 'alumni_board', 'manager'])): ?>
                 <a href="../events/manage.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                     <i class="fas fa-calendar-alt w-5"></i>
