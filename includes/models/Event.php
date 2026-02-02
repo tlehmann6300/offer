@@ -9,6 +9,9 @@ class Event {
     // Lock timeout in seconds (15 minutes)
     const LOCK_TIMEOUT = 900;
     
+    // Fields to exclude from update operations
+    const EXCLUDED_UPDATE_FIELDS = ['id', 'allowed_roles', 'helper_types'];
+    
     /**
      * Create new event
      */
@@ -118,7 +121,7 @@ class Event {
             
             // Build update query dynamically
             foreach ($data as $key => $value) {
-                if (!in_array($key, ['id', 'allowed_roles', 'helper_types'], true)) {
+                if (!in_array($key, self::EXCLUDED_UPDATE_FIELDS, true)) {
                     $fields[] = "$key = ?";
                     $values[] = $value;
                 }
@@ -296,14 +299,17 @@ class Event {
     
     /**
      * Process helper types and slots for an event
-     * This method handles creating helper types and their associated time slots
-     * within the same transaction context as the event create/update
+     * This method handles creating helper types and their associated time slots.
+     * 
+     * IMPORTANT: This method must be called within an existing database transaction.
+     * The caller (create/update methods) is responsible for transaction management.
      * 
      * @param int $eventId Event ID
      * @param array $helperTypes Array of helper types with their slots
      * @param string|null $eventStartTime Event start time for validation
      * @param string|null $eventEndTime Event end time for validation
      * @param int $userId User ID for logging
+     * @throws Exception If validation fails or database operations fail
      */
     private static function processHelperTypesAndSlots($eventId, $helperTypes, $eventStartTime, $eventEndTime, $userId) {
         if (empty($helperTypes) || !is_array($helperTypes)) {
