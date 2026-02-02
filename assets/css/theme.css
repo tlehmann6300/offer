@@ -1,0 +1,190 @@
+/* IBC Corporate Identity Design System */
+
+:root {
+    /* Primary IBC Colors */
+    --ibc-green: #00a651;
+    --ibc-green-light: #33b872;
+    --ibc-green-dark: #008741;
+    --ibc-green-hover: #009948;
+    
+    --ibc-blue: #0066b3;
+    --ibc-blue-light: #3385c4;
+    --ibc-blue-dark: #004f8c;
+    --ibc-blue-hover: #005a9e;
+    
+    --ibc-accent: #ff6b35;
+    --ibc-accent-light: #ff8b5d;
+    --ibc-accent-dark: #e55220;
+    
+    /* Neutral Colors */
+    --ibc-gray-50: #f9fafb;
+    --ibc-gray-100: #f3f4f6;
+    --ibc-gray-200: #e5e7eb;
+    --ibc-gray-300: #d1d5db;
+    --ibc-gray-400: #9ca3af;
+    --ibc-gray-500: #6b7280;
+    --ibc-gray-600: #4b5563;
+    --ibc-gray-700: #374151;
+    --ibc-gray-800: #1f2937;
+    --ibc-gray-900: #111827;
+    
+    /* Semantic Colors */
+    --ibc-success: #10b981;
+    --ibc-warning: #f59e0b;
+    --ibc-error: #ef4444;
+    --ibc-info: #3b82f6;
+    
+    /* Typography */
+    --ibc-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    
+    /* Shadows */
+    --shadow-glow-green: 0 0 20px rgba(0, 166, 81, 0.4), 0 4px 12px rgba(0, 166, 81, 0.3);
+    --shadow-premium: 0 20px 40px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.1);
+    
+    /* Spacing & Layout */
+    --mobile-header-offset: 5rem;
+}
+
+/* Shadow Utility Classes */
+.shadow-glow-green {
+    box-shadow: var(--shadow-glow-green);
+}
+
+.shadow-premium {
+    box-shadow: var(--shadow-premium);
+}
+
+/* Flatpickr Calendar Overrides - IBC Corporate Identity */
+.flatpickr-calendar {
+    border-radius: 12px;
+    box-shadow: var(--shadow-premium);
+    border: 1px solid var(--ibc-gray-200);
+    font-family: var(--ibc-font-family);
+}
+
+/* Flatpickr Header - IBC Blue */
+.flatpickr-months {
+    background: var(--ibc-blue);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.flatpickr-current-month {
+    color: white;
+}
+
+.flatpickr-month {
+    color: white;
+    fill: white;
+}
+
+.flatpickr-prev-month,
+.flatpickr-next-month {
+    color: white;
+    fill: white;
+}
+
+.flatpickr-prev-month:hover,
+.flatpickr-next-month:hover {
+    color: var(--ibc-gray-200);
+}
+
+.flatpickr-prev-month:hover svg,
+.flatpickr-next-month:hover svg {
+    fill: var(--ibc-gray-200);
+}
+
+/* Flatpickr Days */
+.flatpickr-weekdays {
+    background: var(--ibc-blue-light);
+    color: white;
+}
+
+.flatpickr-weekday {
+    color: white;
+    font-weight: 600;
+}
+
+/* Flatpickr Selected Day - IBC Green */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected.inRange,
+.flatpickr-day.startRange.inRange,
+.flatpickr-day.endRange.inRange,
+.flatpickr-day.selected:focus,
+.flatpickr-day.startRange:focus,
+.flatpickr-day.endRange:focus,
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange:hover,
+.flatpickr-day.endRange:hover,
+.flatpickr-day.selected.prevMonthDay,
+.flatpickr-day.selected.nextMonthDay {
+    background: var(--ibc-green);
+    border-color: var(--ibc-green);
+    color: white;
+}
+
+.flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n+1)),
+.flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)),
+.flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n+1)) {
+    box-shadow: -10px 0 0 var(--ibc-green);
+}
+
+/* Flatpickr Hover State */
+.flatpickr-day:hover,
+.flatpickr-day.prevMonthDay:hover,
+.flatpickr-day.nextMonthDay:hover {
+    background: var(--ibc-green-light);
+    border-color: var(--ibc-green-light);
+    color: white;
+}
+
+.flatpickr-day.today {
+    border-color: var(--ibc-blue);
+    font-weight: 600;
+}
+
+.flatpickr-day.today:hover,
+.flatpickr-day.today:focus {
+    border-color: var(--ibc-blue);
+    background: var(--ibc-blue-light);
+    color: white;
+}
+
+/* Flatpickr Time Picker */
+.flatpickr-time {
+    border-top: 1px solid var(--ibc-gray-200);
+}
+
+.flatpickr-time input:hover,
+.flatpickr-time input:focus {
+    background: var(--ibc-gray-50);
+    border-color: var(--ibc-green);
+}
+
+.flatpickr-time .flatpickr-am-pm:hover,
+.flatpickr-time .flatpickr-am-pm:focus {
+    background: var(--ibc-green-light);
+    color: white;
+}
+
+/* Flatpickr Disabled Days */
+.flatpickr-day.disabled,
+.flatpickr-day.disabled:hover {
+    color: var(--ibc-gray-300);
+}
+
+/* Flatpickr In Range */
+.flatpickr-day.inRange,
+.flatpickr-day.prevMonthDay.inRange,
+.flatpickr-day.nextMonthDay.inRange,
+.flatpickr-day.today.inRange,
+.flatpickr-day.prevMonthDay.today.inRange,
+.flatpickr-day.nextMonthDay.today.inRange,
+.flatpickr-day:hover.inRange,
+.flatpickr-day:focus.inRange {
+    background: rgba(0, 166, 81, 0.1);
+    border-color: transparent;
+    box-shadow: -5px 0 0 rgba(0, 166, 81, 0.1), 5px 0 0 rgba(0, 166, 81, 0.1);
+}
