@@ -1,0 +1,104 @@
+<?php
+/**
+ * System Cleanup Script
+ * 
+ * This script removes installation and setup files after system deployment
+ * to prevent unauthorized system modifications or admin creation.
+ * 
+ * IMPORTANT: This script will self-destruct after execution.
+ */
+
+// List of files to be deleted
+$filesToDelete = [
+    'create_tom.php',
+    'setup.sh',
+    'import_database.sh'
+];
+
+$deletedFiles = [];
+$notFoundFiles = [];
+
+// Delete each file if it exists
+foreach ($filesToDelete as $file) {
+    $filePath = __DIR__ . '/' . $file;
+    
+    if (file_exists($filePath)) {
+        if (unlink($filePath)) {
+            $deletedFiles[] = $file;
+        } else {
+            echo "FEHLER: Konnte $file nicht löschen.\n";
+        }
+    } else {
+        $notFoundFiles[] = $file;
+    }
+}
+
+// Check migrations folder for sensitive data
+$migrationsPath = __DIR__ . '/sql/migrations';
+$shouldDeleteMigrations = false;
+
+if (is_dir($migrationsPath)) {
+    // Check if migrations contain sensitive data (passwords, credentials)
+    $sensitivePatterns = [
+        '/password\s*=\s*["\'][^"\']+["\']/i',
+        '/INSERT\s+INTO.*password.*VALUES.*["\'][^"\']{20,}["\']/i',
+        '/IDENTIFIED\s+BY\s+["\'][^"\']+["\']/i'
+    ];
+    
+    $migrationsFiles = glob($migrationsPath . '/*.sql');
+    foreach ($migrationsFiles as $migrationFile) {
+        $content = file_get_contents($migrationFile);
+        foreach ($sensitivePatterns as $pattern) {
+            if (preg_match($pattern, $content)) {
+                $shouldDeleteMigrations = true;
+                break 2;
+            }
+        }
+    }
+}
+
+// Delete migrations folder if it contains sensitive data
+if ($shouldDeleteMigrations && is_dir($migrationsPath)) {
+    // Recursively delete migrations directory
+    $files = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($migrationsPath, RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+    
+    foreach ($files as $fileinfo) {
+        $func = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+        $func($fileinfo->getRealPath());
+    }
+    
+    if (rmdir($migrationsPath)) {
+        echo "Migrations-Ordner gelöscht (enthielt sensible Daten).\n";
+    }
+}
+
+// Output summary
+echo "\n========================================\n";
+echo "System bereinigt. Admin-Skripte gelöscht.\n";
+echo "========================================\n\n";
+
+if (!empty($deletedFiles)) {
+    echo "Gelöschte Dateien:\n";
+    foreach ($deletedFiles as $file) {
+        echo "  ✓ $file\n";
+    }
+    echo "\n";
+}
+
+if (!empty($notFoundFiles)) {
+    echo "Nicht gefundene Dateien (bereits gelöscht):\n";
+    foreach ($notFoundFiles as $file) {
+        echo "  - $file\n";
+    }
+    echo "\n";
+}
+
+echo "Dieses Skript wird jetzt gelöscht...\n";
+
+// Self-destruct: Delete this script
+unlink(__FILE__);
+
+echo "Bereinigung abgeschlossen.\n";
