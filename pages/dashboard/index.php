@@ -258,16 +258,16 @@ ob_start();
             <i class="fas fa-truck text-orange-600 mr-2"></i>
             Unterwegs
         </h2>
-        <?php if ($checkedOutStats['total_checked_out'] > 0): ?>
+        <?php if ($checkedOutStats['total_items_out'] > 0): ?>
         <div class="space-y-2 mb-4">
             <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
                 <div>
                     <p class="text-sm text-gray-600">Aktive Ausleihen</p>
-                    <p class="text-xl font-bold text-orange-700"><?php echo $checkedOutStats['total_checked_out']; ?> Ausleihen</p>
+                    <p class="text-xl font-bold text-orange-700"><?php echo count($checkedOutStats['checkouts']); ?> Ausleihen</p>
                 </div>
                 <div>
                     <p class="text-sm text-gray-600">Entliehene Menge</p>
-                    <p class="text-xl font-bold text-orange-700"><?php echo $checkedOutStats['total_quantity_out']; ?> Einheiten</p>
+                    <p class="text-xl font-bold text-orange-700"><?php echo $checkedOutStats['total_items_out']; ?> Einheiten</p>
                 </div>
             </div>
         </div>
