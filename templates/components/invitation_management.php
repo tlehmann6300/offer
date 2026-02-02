@@ -220,18 +220,32 @@
     });
     
     // Copy link button handler
-    copyLinkBtn.addEventListener('click', function() {
-        generatedLink.select();
-        document.execCommand('copy');
-        
-        const originalText = copyLinkBtn.innerHTML;
-        copyLinkBtn.innerHTML = '<i class="fas fa-check"></i> Kopiert!';
-        copyLinkBtn.classList.add('bg-green-700');
-        
-        setTimeout(() => {
-            copyLinkBtn.innerHTML = originalText;
-            copyLinkBtn.classList.remove('bg-green-700');
-        }, 2000);
+    copyLinkBtn.addEventListener('click', async function() {
+        try {
+            await navigator.clipboard.writeText(generatedLink.value);
+            
+            const originalText = copyLinkBtn.innerHTML;
+            copyLinkBtn.innerHTML = '<i class="fas fa-check"></i> Kopiert!';
+            copyLinkBtn.classList.add('bg-green-700');
+            
+            setTimeout(() => {
+                copyLinkBtn.innerHTML = originalText;
+                copyLinkBtn.classList.remove('bg-green-700');
+            }, 2000);
+        } catch (err) {
+            // Fallback for older browsers
+            generatedLink.select();
+            document.execCommand('copy');
+            
+            const originalText = copyLinkBtn.innerHTML;
+            copyLinkBtn.innerHTML = '<i class="fas fa-check"></i> Kopiert!';
+            copyLinkBtn.classList.add('bg-green-700');
+            
+            setTimeout(() => {
+                copyLinkBtn.innerHTML = originalText;
+                copyLinkBtn.classList.remove('bg-green-700');
+            }, 2000);
+        }
     });
     
     // Refresh button handler
@@ -355,15 +369,21 @@
     };
     
     // Copy invitation link function (exposed globally)
-    window.copyInvitationLink = function(link) {
-        const tempInput = document.createElement('input');
-        tempInput.value = link;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-        
-        showMessage('Link in die Zwischenablage kopiert', 'success');
+    window.copyInvitationLink = async function(link) {
+        try {
+            await navigator.clipboard.writeText(link);
+            showMessage('Link in die Zwischenablage kopiert', 'success');
+        } catch (err) {
+            // Fallback for older browsers
+            const tempInput = document.createElement('input');
+            tempInput.value = link;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            
+            showMessage('Link in die Zwischenablage kopiert', 'success');
+        }
     };
     
     // Helper functions
