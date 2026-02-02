@@ -302,7 +302,7 @@ ob_start();
                         value="<?php echo htmlspecialchars($event['location'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
-                        placeholder="Veranstaltungsort (z.B. H-1.88 Aula)"
+                        placeholder="Veranstaltungsort (z. B. H-1.88 Aula)"
                     >
                 </div>
 

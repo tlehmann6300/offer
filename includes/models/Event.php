@@ -66,6 +66,28 @@ class Event {
     }
     
     /**
+     * Update event status in database if it differs from calculated status
+     * Helper method to avoid code duplication
+     * 
+     * @param array $event Event data
+     * @param PDO $db Database connection
+     * @return array Updated event data with correct status
+     */
+    private static function updateEventStatusIfNeeded($event, $db) {
+        $currentStatus = $event['status'];
+        $calculatedStatus = self::calculateStatus($event);
+        
+        if ($currentStatus !== $calculatedStatus) {
+            // Update status in database
+            $updateStmt = $db->prepare("UPDATE events SET status = ? WHERE id = ?");
+            $updateStmt->execute([$calculatedStatus, $event['id']]);
+            $event['status'] = $calculatedStatus;
+        }
+        
+        return $event;
+    }
+    
+    /**
      * Create new event
      */
     public static function create($data, $userId) {
@@ -150,16 +172,8 @@ class Event {
             return null;
         }
         
-        // Lazy update: Check if status needs updating
-        $currentStatus = $event['status'];
-        $calculatedStatus = self::calculateStatus($event);
-        
-        if ($currentStatus !== $calculatedStatus) {
-            // Update status in database
-            $updateStmt = $db->prepare("UPDATE events SET status = ? WHERE id = ?");
-            $updateStmt->execute([$calculatedStatus, $id]);
-            $event['status'] = $calculatedStatus;
-        }
+        // Lazy update: Check and update status if needed
+        $event = self::updateEventStatusIfNeeded($event, $db);
         
         // Get allowed roles
         $event['allowed_roles'] = self::getEventRoles($id);
@@ -331,21 +345,40 @@ class Event {
         $stmt->execute($params);
         $events = $stmt->fetchAll();
         
-        // Filter events by role visibility and remove helper information for alumni
-        // Also perform lazy status updates
-        $filteredEvents = [];
-        foreach ($events as $event) {
-            // Lazy update: Check if status needs updating
+        // Batch update statuses - collect events that need updates
+        $eventsToUpdate = [];
+        foreach ($events as &$event) {
             $currentStatus = $event['status'];
             $calculatedStatus = self::calculateStatus($event);
             
             if ($currentStatus !== $calculatedStatus) {
-                // Update status in database
-                $updateStmt = $db->prepare("UPDATE events SET status = ? WHERE id = ?");
-                $updateStmt->execute([$calculatedStatus, $event['id']]);
+                $eventsToUpdate[] = [
+                    'id' => $event['id'],
+                    'status' => $calculatedStatus
+                ];
                 $event['status'] = $calculatedStatus;
             }
-            
+        }
+        unset($event); // Break reference
+        
+        // Perform batch status updates if needed
+        if (!empty($eventsToUpdate)) {
+            $db->beginTransaction();
+            try {
+                $updateStmt = $db->prepare("UPDATE events SET status = ? WHERE id = ?");
+                foreach ($eventsToUpdate as $update) {
+                    $updateStmt->execute([$update['status'], $update['id']]);
+                }
+                $db->commit();
+            } catch (Exception $e) {
+                $db->rollBack();
+                error_log("Failed to batch update event statuses: " . $e->getMessage());
+            }
+        }
+        
+        // Filter events by role visibility and remove helper information for alumni
+        $filteredEvents = [];
+        foreach ($events as $event) {
             // Get allowed roles for this event
             $allowedRoles = self::getEventRoles($event['id']);
             
