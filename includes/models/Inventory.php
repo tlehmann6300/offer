@@ -524,7 +524,7 @@ class Inventory {
 
     /**
      * Get checked-out statistics for dashboard
-     * Returns: ['total_items_out' => (int), 'unique_users' => (int), 'overdue' => (int)]
+     * Returns: ['total_items_out' => (int), 'unique_users' => (int), 'overdue' => (int), 'checkouts' => array]
      */
     public static function getCheckedOutStats() {
         $db = Database::getContentDB();
@@ -549,10 +549,52 @@ class Inventory {
         ");
         $overdueResult = $stmt->fetch();
         
+        // Get detailed checkout information
+        $stmt = $db->query("
+            SELECT 
+                r.id,
+                r.item_id,
+                r.user_id,
+                r.amount,
+                r.rented_at,
+                r.expected_return,
+                i.name as item_name,
+                i.unit
+            FROM rentals r
+            JOIN inventory i ON r.item_id = i.id
+            WHERE r.actual_return IS NULL
+            ORDER BY r.rented_at DESC
+        ");
+        $checkouts = $stmt->fetchAll();
+        
+        // Fetch user information from user database
+        if (!empty($checkouts)) {
+            $userDb = Database::getUserDB();
+            $userIds = array_unique(array_column($checkouts, 'user_id'));
+            
+            if (!empty($userIds)) {
+                $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
+                $userStmt = $userDb->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
+                $userStmt->execute($userIds);
+                $users = [];
+                foreach ($userStmt->fetchAll() as $user) {
+                    $users[$user['id']] = $user;
+                }
+                
+                // Add user info to checkouts
+                foreach ($checkouts as &$checkout) {
+                    $checkout['borrower_email'] = isset($users[$checkout['user_id']]) 
+                        ? $users[$checkout['user_id']]['email'] 
+                        : 'Unbekannt';
+                }
+            }
+        }
+        
         return [
             'total_items_out' => (int)$stats['total_items_out'],
             'unique_users' => (int)$stats['unique_users'],
-            'overdue' => (int)$overdueResult['overdue']
+            'overdue' => (int)$overdueResult['overdue'],
+            'checkouts' => $checkouts
         ];
     }
 

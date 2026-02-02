@@ -75,65 +75,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$readOnly) {
             'allowed_roles' => $_POST['allowed_roles'] ?? []
         ];
         
+        // Add helper types if needs_helpers is enabled
+        if ($data['needs_helpers']) {
+            $data['helper_types'] = json_decode($_POST['helper_types_json'] ?? '[]', true);
+        }
+        
         if (empty($data['title'])) {
             throw new Exception('Titel ist erforderlich');
         }
         
         if ($isEdit) {
-            // Update existing event
+            // Update existing event (model handles helper types and slots in transaction)
             Event::update($eventId, $data, $_SESSION['user_id']);
-            
-            // Handle helper types and slots if helpers are needed
-            if ($data['needs_helpers']) {
-                // Delete existing helper types and slots (will be recreated)
-                $db = Database::getContentDB();
-                $stmt = $db->prepare("DELETE FROM event_helper_types WHERE event_id = ?");
-                $stmt->execute([$eventId]);
-                
-                // Process helper types from form
-                $helperTypes = json_decode($_POST['helper_types_json'] ?? '[]', true);
-                
-                foreach ($helperTypes as $helperType) {
-                    if (empty($helperType['title'])) continue;
-                    
-                    $helperTypeId = Event::createHelperType(
-                        $eventId, 
-                        $helperType['title'], 
-                        $helperType['description'] ?? null,
-                        $_SESSION['user_id']
-                    );
-                    
-                    // Create slots for this helper type
-                    if (!empty($helperType['slots'])) {
-                        foreach ($helperType['slots'] as $slot) {
-                            if (empty($slot['start_time']) || empty($slot['end_time'])) continue;
-                            
-                            // Validate slot is within event timeframe
-                            $slotStart = strtotime($slot['start_time']);
-                            $slotEnd = strtotime($slot['end_time']);
-                            $eventStart = strtotime($startTime);
-                            $eventEnd = strtotime($endTime);
-                            
-                            if ($slotStart < $eventStart || $slotEnd > $eventEnd) {
-                                throw new Exception('Zeitslots müssen innerhalb des Event-Zeitraums liegen');
-                            }
-                            
-                            if ($slotStart >= $slotEnd) {
-                                throw new Exception('Slot-Startzeit muss vor der Endzeit liegen');
-                            }
-                            
-                            Event::createSlot(
-                                $helperTypeId,
-                                $slot['start_time'],
-                                $slot['end_time'],
-                                intval($slot['quantity'] ?? 1),
-                                $_SESSION['user_id'],
-                                $eventId
-                            );
-                        }
-                    }
-                }
-            }
             
             $message = 'Event erfolgreich aktualisiert';
             
@@ -142,53 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$readOnly) {
             header('Location: edit.php?id=' . $eventId . '&success=1');
             exit;
         } else {
-            // Create new event
+            // Create new event (model handles helper types and slots in transaction)
             $newEventId = Event::create($data, $_SESSION['user_id']);
-            
-            // Handle helper types and slots if helpers are needed
-            if ($data['needs_helpers']) {
-                $helperTypes = json_decode($_POST['helper_types_json'] ?? '[]', true);
-                
-                foreach ($helperTypes as $helperType) {
-                    if (empty($helperType['title'])) continue;
-                    
-                    $helperTypeId = Event::createHelperType(
-                        $newEventId, 
-                        $helperType['title'], 
-                        $helperType['description'] ?? null,
-                        $_SESSION['user_id']
-                    );
-                    
-                    if (!empty($helperType['slots'])) {
-                        foreach ($helperType['slots'] as $slot) {
-                            if (empty($slot['start_time']) || empty($slot['end_time'])) continue;
-                            
-                            // Validate slot is within event timeframe
-                            $slotStart = strtotime($slot['start_time']);
-                            $slotEnd = strtotime($slot['end_time']);
-                            $eventStart = strtotime($startTime);
-                            $eventEnd = strtotime($endTime);
-                            
-                            if ($slotStart < $eventStart || $slotEnd > $eventEnd) {
-                                throw new Exception('Zeitslots müssen innerhalb des Event-Zeitraums liegen');
-                            }
-                            
-                            if ($slotStart >= $slotEnd) {
-                                throw new Exception('Slot-Startzeit muss vor der Endzeit liegen');
-                            }
-                            
-                            Event::createSlot(
-                                $helperTypeId,
-                                $slot['start_time'],
-                                $slot['end_time'],
-                                intval($slot['quantity'] ?? 1),
-                                $_SESSION['user_id'],
-                                $newEventId
-                            );
-                        }
-                    }
-                }
-            }
             
             $message = 'Event erfolgreich erstellt';
             header('Location: edit.php?id=' . $newEventId . '&success=1');
