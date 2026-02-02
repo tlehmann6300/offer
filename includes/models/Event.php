@@ -4,6 +4,8 @@
  * Manages events, helper slots, signups, and locking mechanism
  */
 
+require_once __DIR__ . '/../utils/SecureImageUpload.php';
+
 class Event {
     
     // Lock timeout in seconds (15 minutes)
@@ -100,10 +102,11 @@ class Event {
             // Handle image upload
             $imagePath = null;
             if (isset($files['image']) && $files['image']['error'] === UPLOAD_ERR_OK) {
-                require_once __DIR__ . '/../utils/SecureImageUpload.php';
                 $uploadResult = SecureImageUpload::uploadImage($files['image']);
                 if ($uploadResult['success']) {
                     $imagePath = $uploadResult['path'];
+                } else {
+                    error_log("Failed to upload event image: " . $uploadResult['error']);
                 }
             }
             
@@ -224,7 +227,6 @@ class Event {
             
             // Handle image upload
             if (isset($files['image']) && $files['image']['error'] === UPLOAD_ERR_OK) {
-                require_once __DIR__ . '/../utils/SecureImageUpload.php';
                 $uploadResult = SecureImageUpload::uploadImage($files['image']);
                 if ($uploadResult['success']) {
                     // Delete old image if it exists
@@ -233,6 +235,8 @@ class Event {
                     }
                     // Set new image path in data
                     $data['image_path'] = $uploadResult['path'];
+                } else {
+                    error_log("Failed to upload event image for event ID $id: " . $uploadResult['error']);
                 }
             }
             
