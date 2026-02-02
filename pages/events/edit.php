@@ -65,10 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$readOnly) {
             'title' => trim($_POST['title'] ?? ''),
             'description' => trim($_POST['description'] ?? ''),
             'location' => trim($_POST['location'] ?? ''),
+            'maps_link' => trim($_POST['maps_link'] ?? ''),
             'start_time' => $startTime,
             'end_time' => $endTime,
+            'registration_start' => !empty($_POST['registration_start']) ? $_POST['registration_start'] : null,
+            'registration_end' => !empty($_POST['registration_end']) ? $_POST['registration_end'] : null,
             'contact_person' => trim($_POST['contact_person'] ?? ''),
-            'status' => $_POST['status'] ?? 'planned',
             'is_external' => isset($_POST['is_external']) ? 1 : 0,
             'external_link' => trim($_POST['external_link'] ?? ''),
             'needs_helpers' => isset($_POST['needs_helpers']) ? 1 : 0,
@@ -300,12 +302,25 @@ ob_start();
                         value="<?php echo htmlspecialchars($event['location'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
-                        placeholder="Veranstaltungsort"
+                        placeholder="Veranstaltungsort (z. B. H-1.88 Aula)"
+                    >
+                </div>
+
+                <!-- Maps Link -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Google Maps Link</label>
+                    <input 
+                        type="url" 
+                        name="maps_link"
+                        value="<?php echo htmlspecialchars($event['maps_link'] ?? ''); ?>"
+                        <?php echo $readOnly ? 'readonly' : ''; ?>
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        placeholder="https://maps.google.com/..."
                     >
                 </div>
 
                 <!-- Contact Person -->
-                <div>
+                <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Ansprechpartner</label>
                     <input 
                         type="text" 
@@ -361,20 +376,62 @@ ob_start();
                     >
                 </div>
 
-                <!-- Status -->
+                <!-- Registration Start Time -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                    <select 
-                        name="status"
-                        <?php echo $readOnly ? 'disabled' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Anmeldung Start
+                        <span class="text-xs text-gray-500 ml-2">(Optional)</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="registration_start"
+                        id="registration_start"
+                        value="<?php echo $isEdit && !empty($event['registration_start']) ? date('Y-m-d H:i', strtotime($event['registration_start'])) : ''; ?>"
+                        <?php echo $readOnly ? 'readonly' : ''; ?>
+                        class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        placeholder="Anmeldebeginn wählen"
                     >
-                        <option value="planned" <?php echo ($event['status'] ?? 'planned') === 'planned' ? 'selected' : ''; ?>>Geplant</option>
-                        <option value="open" <?php echo ($event['status'] ?? '') === 'open' ? 'selected' : ''; ?>>Offen</option>
-                        <option value="running" <?php echo ($event['status'] ?? '') === 'running' ? 'selected' : ''; ?>>Laufend</option>
-                        <option value="closed" <?php echo ($event['status'] ?? '') === 'closed' ? 'selected' : ''; ?>>Geschlossen</option>
-                        <option value="past" <?php echo ($event['status'] ?? '') === 'past' ? 'selected' : ''; ?>>Vergangen</option>
-                    </select>
+                </div>
+
+                <!-- Registration End Time -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Anmeldung Ende
+                        <span class="text-xs text-gray-500 ml-2">(Optional)</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="registration_end"
+                        id="registration_end"
+                        value="<?php echo $isEdit && !empty($event['registration_end']) ? date('Y-m-d H:i', strtotime($event['registration_end'])) : ''; ?>"
+                        <?php echo $readOnly ? 'readonly' : ''; ?>
+                        class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        placeholder="Anmeldeende wählen"
+                    >
+                </div>
+
+                <!-- Status (Read-only, automatically calculated) -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Status
+                        <span class="text-xs text-gray-500 ml-2">(Automatisch berechnet)</span>
+                    </label>
+                    <div class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700">
+                        <?php 
+                        $statusLabels = [
+                            'planned' => 'Geplant',
+                            'open' => 'Offen',
+                            'closed' => 'Geschlossen',
+                            'running' => 'Laufend',
+                            'past' => 'Vergangen'
+                        ];
+                        $currentStatus = $event['status'] ?? 'planned';
+                        echo $statusLabels[$currentStatus] ?? $currentStatus;
+                        ?>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Der Status wird automatisch basierend auf Anmelde- und Event-Zeiten berechnet.
+                    </p>
                 </div>
 
                 <!-- External Link -->
@@ -557,6 +614,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const endTimePicker = flatpickr("#end_time", {
         ...flatpickrOptions,
         minDate: document.getElementById('start_time').value || 'today'
+    });
+
+    // Initialize registration start time picker
+    const registrationStartPicker = flatpickr("#registration_start", {
+        ...flatpickrOptions,
+        onChange: function(selectedDates, dateStr, instance) {
+            // Update registration end picker minDate
+            if (registrationEndPicker) {
+                registrationEndPicker.set('minDate', dateStr);
+            }
+        }
+    });
+
+    // Initialize registration end time picker
+    const registrationEndPicker = flatpickr("#registration_end", {
+        ...flatpickrOptions,
+        minDate: document.getElementById('registration_start').value || null
     });
 });
 

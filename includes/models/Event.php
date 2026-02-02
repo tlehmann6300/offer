@@ -10,7 +10,82 @@ class Event {
     const LOCK_TIMEOUT = 900;
     
     // Fields to exclude from update operations
-    const EXCLUDED_UPDATE_FIELDS = ['id', 'allowed_roles', 'helper_types'];
+    const EXCLUDED_UPDATE_FIELDS = ['id', 'allowed_roles', 'helper_types', 'status'];
+    
+    /**
+     * Calculate event status based on current time and event dates
+     * 
+     * @param array $data Event data with timestamps
+     * @return string Status: 'planned', 'open', 'closed', 'running', or 'past'
+     */
+    private static function calculateStatus($data) {
+        $now = time();
+        
+        // Parse timestamps
+        $registrationStart = !empty($data['registration_start']) ? strtotime($data['registration_start']) : null;
+        $registrationEnd = !empty($data['registration_end']) ? strtotime($data['registration_end']) : null;
+        $startTime = strtotime($data['start_time']);
+        $endTime = strtotime($data['end_time']);
+        
+        // Status logic based on timestamps
+        // 1. If event has ended -> past
+        if ($now > $endTime) {
+            return 'past';
+        }
+        
+        // 2. If event is running -> running
+        if ($now >= $startTime && $now <= $endTime) {
+            return 'running';
+        }
+        
+        // 3. If registration dates are set, use them
+        if ($registrationStart !== null && $registrationEnd !== null) {
+            // Before registration starts -> planned
+            if ($now < $registrationStart) {
+                return 'planned';
+            }
+            
+            // During registration period -> open
+            if ($now >= $registrationStart && $now <= $registrationEnd) {
+                return 'open';
+            }
+            
+            // After registration ends but before event starts -> closed
+            if ($now > $registrationEnd && $now < $startTime) {
+                return 'closed';
+            }
+        } else {
+            // No registration dates: if event hasn't started yet -> open
+            if ($now < $startTime) {
+                return 'open';
+            }
+        }
+        
+        // Default fallback
+        return 'planned';
+    }
+    
+    /**
+     * Update event status in database if it differs from calculated status
+     * Helper method to avoid code duplication
+     * 
+     * @param array $event Event data
+     * @param PDO $db Database connection
+     * @return array Updated event data with correct status
+     */
+    private static function updateEventStatusIfNeeded($event, $db) {
+        $currentStatus = $event['status'];
+        $calculatedStatus = self::calculateStatus($event);
+        
+        if ($currentStatus !== $calculatedStatus) {
+            // Update status in database
+            $updateStmt = $db->prepare("UPDATE events SET status = ? WHERE id = ?");
+            $updateStmt->execute([$calculatedStatus, $event['id']]);
+            $event['status'] = $calculatedStatus;
+        }
+        
+        return $event;
+    }
     
     /**
      * Create new event
@@ -22,21 +97,28 @@ class Event {
         $db->beginTransaction();
         
         try {
+            // Calculate status automatically based on timestamps
+            $calculatedStatus = self::calculateStatus($data);
+            
             // Insert event
             $stmt = $db->prepare("
-                INSERT INTO events (title, description, location, start_time, end_time, 
-                                  contact_person, status, is_external, external_link, needs_helpers)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO events (title, description, location, maps_link, start_time, end_time, 
+                                  registration_start, registration_end, contact_person, status, 
+                                  is_external, external_link, needs_helpers)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             
             $stmt->execute([
                 $data['title'],
                 $data['description'] ?? null,
                 $data['location'] ?? null,
+                $data['maps_link'] ?? null,
                 $data['start_time'],
                 $data['end_time'],
+                $data['registration_start'] ?? null,
+                $data['registration_end'] ?? null,
                 $data['contact_person'] ?? null,
-                $data['status'] ?? 'planned',
+                $calculatedStatus,
                 $data['is_external'] ?? false,
                 $data['external_link'] ?? null,
                 $data['needs_helpers'] ?? false
@@ -63,7 +145,8 @@ class Event {
             // Log creation
             self::logHistory($eventId, $userId, 'create', [
                 'action' => 'Event created',
-                'title' => $data['title']
+                'title' => $data['title'],
+                'calculated_status' => $calculatedStatus
             ]);
             
             $db->commit();
@@ -88,6 +171,9 @@ class Event {
         if (!$event) {
             return null;
         }
+        
+        // Lazy update: Check and update status if needed
+        $event = self::updateEventStatusIfNeeded($event, $db);
         
         // Get allowed roles
         $event['allowed_roles'] = self::getEventRoles($id);
@@ -116,16 +202,35 @@ class Event {
         $db->beginTransaction();
         
         try {
+            // Get current event data for status calculation
+            $stmt = $db->prepare("SELECT * FROM events WHERE id = ?");
+            $stmt->execute([$id]);
+            $currentEvent = $stmt->fetch();
+            
+            if (!$currentEvent) {
+                throw new Exception("Event not found");
+            }
+            
+            // Merge current data with updates for status calculation
+            $mergedData = array_merge($currentEvent, $data);
+            
+            // Calculate status automatically based on timestamps
+            $calculatedStatus = self::calculateStatus($mergedData);
+            
             $fields = [];
             $values = [];
             
-            // Build update query dynamically
+            // Build update query dynamically, excluding status from manual update
             foreach ($data as $key => $value) {
                 if (!in_array($key, self::EXCLUDED_UPDATE_FIELDS, true)) {
                     $fields[] = "$key = ?";
                     $values[] = $value;
                 }
             }
+            
+            // Add calculated status to update
+            $fields[] = "status = ?";
+            $values[] = $calculatedStatus;
             
             if (!empty($fields)) {
                 $values[] = $id;
@@ -159,7 +264,8 @@ class Event {
             // Log update
             self::logHistory($id, $userId, 'update', [
                 'action' => 'Event updated',
-                'changes' => $data
+                'changes' => $data,
+                'calculated_status' => $calculatedStatus
             ]);
             
             $db->commit();
@@ -238,6 +344,37 @@ class Event {
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
         $events = $stmt->fetchAll();
+        
+        // Batch update statuses - collect events that need updates
+        $eventsToUpdate = [];
+        foreach ($events as &$event) {
+            $currentStatus = $event['status'];
+            $calculatedStatus = self::calculateStatus($event);
+            
+            if ($currentStatus !== $calculatedStatus) {
+                $eventsToUpdate[] = [
+                    'id' => $event['id'],
+                    'status' => $calculatedStatus
+                ];
+                $event['status'] = $calculatedStatus;
+            }
+        }
+        unset($event); // Break reference
+        
+        // Perform batch status updates if needed
+        if (!empty($eventsToUpdate)) {
+            $db->beginTransaction();
+            try {
+                $updateStmt = $db->prepare("UPDATE events SET status = ? WHERE id = ?");
+                foreach ($eventsToUpdate as $update) {
+                    $updateStmt->execute([$update['status'], $update['id']]);
+                }
+                $db->commit();
+            } catch (Exception $e) {
+                $db->rollBack();
+                error_log("Failed to batch update event statuses: " . $e->getMessage());
+            }
+        }
         
         // Filter events by role visibility and remove helper information for alumni
         $filteredEvents = [];
