@@ -199,9 +199,9 @@ ob_start();
 </div>
 <?php endif; ?>
 
-<div class="card p-6">
+<div class="glass-card shadow-premium rounded-xl p-6">
     <h1 class="text-3xl font-bold text-gray-800 mb-6">
-        <i class="fas fa-<?php echo $isEdit ? 'edit' : 'plus'; ?> text-purple-600 mr-2"></i>
+        <i class="fas fa-<?php echo $isEdit ? 'edit' : 'plus'; ?> text-ibc-blue mr-2"></i>
         <?php echo $isEdit ? 'Event bearbeiten' : 'Neues Event erstellen'; ?>
     </h1>
 
@@ -210,7 +210,7 @@ ob_start();
         <div class="border-b border-gray-200">
             <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                 <button 
-                    class="tab-button active border-purple-500 text-purple-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                    class="tab-button active border-ibc-blue text-ibc-blue whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ease-premium"
                     data-tab="basic"
                     type="button"
                 >
@@ -218,7 +218,7 @@ ob_start();
                     Basisdaten
                 </button>
                 <button 
-                    class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                    class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ease-premium"
                     data-tab="time"
                     type="button"
                 >
@@ -227,7 +227,7 @@ ob_start();
                 </button>
                 <button 
                     id="helper-tab-button"
-                    class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm <?php echo (!$isEdit || !$event['needs_helpers']) ? 'hidden' : ''; ?>"
+                    class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ease-premium <?php echo (!$isEdit || !$event['needs_helpers']) ? 'hidden' : ''; ?>"
                     data-tab="helpers"
                     type="button"
                 >
@@ -261,7 +261,7 @@ ob_start();
                         value="<?php echo htmlspecialchars($event['title'] ?? ''); ?>"
                         required 
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Event-Titel"
                     >
                 </div>
@@ -273,7 +273,7 @@ ob_start();
                         name="description" 
                         rows="4"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Event-Beschreibung..."
                     ><?php echo htmlspecialchars($event['description'] ?? ''); ?></textarea>
                 </div>
@@ -286,7 +286,7 @@ ob_start();
                         name="contact_person"
                         value="<?php echo htmlspecialchars($event['contact_person'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Name des Ansprechpartners"
                     >
                 </div>
@@ -299,7 +299,7 @@ ob_start();
                         name="location"
                         value="<?php echo htmlspecialchars($event['location'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="z.B. H-1.88 Aula"
                     >
                 </div>
@@ -310,14 +310,19 @@ ob_start();
                         Google Maps Link
                         <span class="text-xs text-gray-500 ml-2">(Optional)</span>
                     </label>
-                    <input 
-                        type="url" 
-                        name="maps_link"
-                        value="<?php echo htmlspecialchars($event['maps_link'] ?? ''); ?>"
-                        <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
-                        placeholder="https://maps.google.com/..."
-                    >
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-map-marked-alt text-gray-400"></i>
+                        </div>
+                        <input 
+                            type="url" 
+                            name="maps_link"
+                            value="<?php echo htmlspecialchars($event['maps_link'] ?? ''); ?>"
+                            <?php echo $readOnly ? 'readonly' : ''; ?>
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                            placeholder="https://maps.google.com/..."
+                        >
+                    </div>
                 </div>
             </div>
         </div>
@@ -325,7 +330,7 @@ ob_start();
         <!-- Tab 2: Zeit & Einstellungen -->
         <div id="tab-time" class="tab-content hidden">
             <h2 class="text-xl font-bold text-gray-800 mb-4">
-                <i class="fas fa-clock text-purple-600 mr-2"></i>
+                <i class="fas fa-clock text-ibc-blue mr-2"></i>
                 Zeit & Einstellungen
             </h2>
             
@@ -342,7 +347,7 @@ ob_start();
                         value="<?php echo $isEdit ? date('Y-m-d H:i', strtotime($event['start_time'])) : ''; ?>"
                         required
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Datum und Uhrzeit wählen"
                     >
                 </div>
@@ -359,7 +364,7 @@ ob_start();
                         value="<?php echo $isEdit ? date('Y-m-d H:i', strtotime($event['end_time'])) : ''; ?>"
                         required
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Datum und Uhrzeit wählen"
                     >
                 </div>
@@ -376,7 +381,7 @@ ob_start();
                         id="registration_start"
                         value="<?php echo $isEdit && !empty($event['registration_start']) ? date('Y-m-d H:i', strtotime($event['registration_start'])) : ''; ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Anmeldebeginn wählen"
                     >
                 </div>
@@ -393,21 +398,21 @@ ob_start();
                         id="registration_end"
                         value="<?php echo $isEdit && !empty($event['registration_end']) ? date('Y-m-d H:i', strtotime($event['registration_end'])) : ''; ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Anmeldeende wählen"
                     >
                 </div>
 
                 <!-- Status Info Badge -->
                 <div class="md:col-span-2">
-                    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="p-4 bg-ibc-blue/10 border border-ibc-blue/20 rounded-xl">
                         <div class="flex items-start">
                             <div class="flex-shrink-0">
-                                <i class="fas fa-info-circle text-blue-600 text-lg"></i>
+                                <i class="fas fa-info-circle text-ibc-blue text-lg"></i>
                             </div>
                             <div class="ml-3">
-                                <h4 class="text-sm font-semibold text-blue-800">Automatischer Status</h4>
-                                <p class="text-sm text-blue-700 mt-1">
+                                <h4 class="text-sm font-semibold text-ibc-blue">Automatischer Status</h4>
+                                <p class="text-sm text-ibc-blue mt-1">
                                     Der Status wird automatisch basierend auf dem Datum gesetzt.
                                 </p>
                             </div>
@@ -423,7 +428,7 @@ ob_start();
                         name="external_link"
                         value="<?php echo htmlspecialchars($event['external_link'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="https://..."
                     >
                 </div>
@@ -505,7 +510,7 @@ ob_start();
             <button 
                 type="button" 
                 id="addHelperTypeBtn"
-                class="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition inline-flex items-center"
+                class="mt-4 px-4 py-2 bg-ibc-green text-white rounded-xl hover:shadow-glow-green ease-premium inline-flex items-center"
             >
                 <i class="fas fa-plus mr-2"></i>Helfer-Rolle hinzufügen
             </button>
@@ -515,10 +520,10 @@ ob_start();
         <!-- Form Actions -->
         <?php if (!$readOnly): ?>
         <div class="flex space-x-4 pt-6 border-t">
-            <a href="manage.php" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-center">
+            <a href="manage.php" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 ease-premium text-center">
                 Abbrechen
             </a>
-            <button type="submit" class="flex-1 btn-primary">
+            <button type="submit" class="flex-1 px-6 py-3 bg-ibc-green text-white rounded-xl hover:shadow-glow-green ease-premium inline-flex items-center justify-center">
                 <i class="fas fa-save mr-2"></i><?php echo $isEdit ? 'Speichern' : 'Erstellen'; ?>
             </button>
         </div>
@@ -528,9 +533,9 @@ ob_start();
 
 <!-- History Section -->
 <?php if ($isEdit && !empty($history)): ?>
-<div class="card p-6 mt-6">
+<div class="glass-card shadow-soft rounded-xl p-6 mt-6">
     <h2 class="text-xl font-bold text-gray-800 mb-4">
-        <i class="fas fa-history text-purple-600 mr-2"></i>
+        <i class="fas fa-history text-ibc-blue mr-2"></i>
         Änderungshistorie (letzte 10 Einträge)
     </h2>
     <div class="space-y-3">
@@ -538,9 +543,9 @@ ob_start();
             $user = User::getById($entry['user_id']);
             $details = json_decode($entry['change_details'], true);
         ?>
-        <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+        <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-xl">
             <div class="flex-shrink-0">
-                <i class="fas fa-circle text-purple-600 text-xs mt-1"></i>
+                <i class="fas fa-circle text-ibc-blue text-xs mt-1"></i>
             </div>
             <div class="flex-1">
                 <div class="flex items-center justify-between mb-1">
@@ -622,10 +627,10 @@ document.querySelectorAll('.tab-button').forEach(button => {
         
         // Update buttons
         document.querySelectorAll('.tab-button').forEach(btn => {
-            btn.classList.remove('active', 'border-purple-500', 'text-purple-600');
+            btn.classList.remove('active', 'border-ibc-blue', 'text-ibc-blue');
             btn.classList.add('border-transparent', 'text-gray-500');
         });
-        this.classList.add('active', 'border-purple-500', 'text-purple-600');
+        this.classList.add('active', 'border-ibc-blue', 'text-ibc-blue');
         this.classList.remove('border-transparent', 'text-gray-500');
         
         // Update content
@@ -668,15 +673,15 @@ function addHelperType() {
     slotCounters[currentIndex] = 0;
     
     const helperTypeHtml = `
-        <div id="helper-type-${currentIndex}" class="helper-card p-6 rounded-lg bg-white" data-index="${currentIndex}">
+        <div id="helper-type-${currentIndex}" class="helper-card p-6 rounded-xl bg-white shadow-soft" data-index="${currentIndex}">
             <div class="flex items-center justify-between mb-4">
                 <h4 class="text-lg font-bold text-gray-800">
-                    <i class="fas fa-users mr-2 text-purple-600"></i>
+                    <i class="fas fa-users mr-2 text-ibc-blue"></i>
                     Helfer-Rolle #${currentIndex + 1}
                 </h4>
                 <button 
                     type="button" 
-                    class="remove-helper-type-btn text-red-600 hover:text-red-700 transition px-3 py-1 rounded hover:bg-red-50"
+                    class="remove-helper-type-btn text-red-600 hover:text-red-700 ease-premium px-3 py-1 rounded-xl hover:bg-red-50"
                     data-index="${currentIndex}"
                     title="Rolle entfernen"
                 >
@@ -691,7 +696,7 @@ function addHelperType() {
                     </label>
                     <input 
                         type="text" 
-                        class="helper-type-title w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        class="helper-type-title w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue"
                         placeholder="z.B. Aufbau-Team, Bar-Service, Technik"
                         data-index="${currentIndex}"
                     >
@@ -700,7 +705,7 @@ function addHelperType() {
                     <label class="block text-sm font-medium text-gray-700 mb-2">Beschreibung (optional)</label>
                     <input 
                         type="text" 
-                        class="helper-type-description w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        class="helper-type-description w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue"
                         placeholder="Kurze Beschreibung der Aufgaben"
                         data-index="${currentIndex}"
                     >
@@ -710,7 +715,7 @@ function addHelperType() {
             <div class="border-t pt-4">
                 <div class="flex items-center justify-between mb-3">
                     <h5 class="text-sm font-bold text-gray-700">
-                        <i class="fas fa-clock mr-2 text-purple-600"></i>
+                        <i class="fas fa-clock mr-2 text-ibc-blue"></i>
                         Zeitslots
                     </h5>
                 </div>
@@ -719,7 +724,7 @@ function addHelperType() {
                 </div>
                 <button 
                     type="button" 
-                    class="add-slot-btn mt-3 px-3 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition inline-flex items-center"
+                    class="add-slot-btn mt-3 px-3 py-2 bg-ibc-blue text-white text-sm rounded-xl hover:bg-ibc-blue-dark ease-premium inline-flex items-center"
                     data-type-index="${currentIndex}"
                 >
                     <i class="fas fa-plus mr-1"></i>Zeitslot hinzufügen
@@ -754,14 +759,14 @@ function addSlot(typeIndex) {
     const slotIndex = slotCounters[typeIndex]++;
     
     const slotHtml = `
-        <div id="slot-${typeIndex}-${slotIndex}" class="slot-item grid grid-cols-1 md:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200" data-type-index="${typeIndex}" data-slot-index="${slotIndex}">
+        <div id="slot-${typeIndex}-${slotIndex}" class="slot-item grid grid-cols-1 md:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200" data-type-index="${typeIndex}" data-slot-index="${slotIndex}">
             <div>
                 <label class="block text-xs font-medium text-gray-700 mb-1">
                     Startzeit <span class="text-red-500">*</span>
                 </label>
                 <input 
                     type="text" 
-                    class="slot-start flatpickr-slot w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="slot-start flatpickr-slot w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue"
                     placeholder="Wählen..."
                     data-type-index="${typeIndex}"
                     data-slot-index="${slotIndex}"
@@ -773,7 +778,7 @@ function addSlot(typeIndex) {
                 </label>
                 <input 
                     type="text" 
-                    class="slot-end flatpickr-slot w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="slot-end flatpickr-slot w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue"
                     placeholder="Wählen..."
                     data-type-index="${typeIndex}"
                     data-slot-index="${slotIndex}"
@@ -785,7 +790,7 @@ function addSlot(typeIndex) {
                 </label>
                 <input 
                     type="number" 
-                    class="slot-quantity w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="slot-quantity w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue"
                     min="1"
                     value="1"
                     data-type-index="${typeIndex}"
@@ -795,7 +800,7 @@ function addSlot(typeIndex) {
             <div class="flex items-end">
                 <button 
                     type="button" 
-                    class="remove-slot-btn w-full px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition"
+                    class="remove-slot-btn w-full px-3 py-2 bg-red-600 text-white text-sm rounded-xl hover:bg-red-700 ease-premium"
                     data-type-index="${typeIndex}"
                     data-slot-index="${slotIndex}"
                     title="Slot entfernen"

@@ -91,91 +91,94 @@ ob_start();
 
 <div class="max-w-5xl mx-auto">
     <!-- Back Button -->
-    <a href="index.php" class="inline-flex items-center text-purple-600 hover:text-purple-700 mb-6">
+    <a href="index.php" class="inline-flex items-center text-ibc-blue hover:text-ibc-blue-dark mb-6 ease-premium">
         <i class="fas fa-arrow-left mr-2"></i>
         Zurück zur Übersicht
     </a>
 
-    <!-- Event Header -->
-    <div class="card p-8 mb-6">
-        <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
+    <!-- Event Hero Header -->
+    <div class="bg-gradient-to-br from-ibc-blue to-ibc-blue-dark shadow-premium rounded-xl p-8 mb-6 text-white">
+        <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
             <div class="flex-1">
-                <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                <h1 class="text-3xl md:text-4xl font-bold mb-4">
                     <?php echo htmlspecialchars($event['title']); ?>
                 </h1>
                 
                 <!-- Status Badge -->
                 <?php 
                 $statusLabels = [
-                    'planned' => ['label' => 'Geplant', 'color' => 'bg-gray-100 text-gray-800'],
-                    'open' => ['label' => 'Anmeldung offen', 'color' => 'bg-green-100 text-green-800'],
-                    'closed' => ['label' => 'Anmeldung geschlossen', 'color' => 'bg-yellow-100 text-yellow-800'],
-                    'running' => ['label' => 'Läuft gerade', 'color' => 'bg-blue-100 text-blue-800'],
-                    'past' => ['label' => 'Beendet', 'color' => 'bg-gray-100 text-gray-600']
+                    'planned' => ['label' => 'Geplant', 'color' => 'bg-white/20 text-white border-white/30'],
+                    'open' => ['label' => 'Anmeldung offen', 'color' => 'bg-ibc-green/20 text-white border-ibc-green/30'],
+                    'closed' => ['label' => 'Anmeldung geschlossen', 'color' => 'bg-yellow-500/20 text-white border-yellow-500/30'],
+                    'running' => ['label' => 'Läuft gerade', 'color' => 'bg-white/30 text-white border-white/50'],
+                    'past' => ['label' => 'Beendet', 'color' => 'bg-white/10 text-white/70 border-white/20']
                 ];
                 $currentStatus = $event['status'] ?? 'planned';
-                $statusInfo = $statusLabels[$currentStatus] ?? ['label' => $currentStatus, 'color' => 'bg-gray-100 text-gray-800'];
+                $statusInfo = $statusLabels[$currentStatus] ?? ['label' => $currentStatus, 'color' => 'bg-white/20 text-white border-white/30'];
                 ?>
-                <div class="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm <?php echo $statusInfo['color']; ?> mb-4">
+                <div class="inline-flex items-center px-4 py-2 rounded-xl font-semibold text-sm <?php echo $statusInfo['color']; ?> border mb-4">
                     <i class="fas fa-circle text-xs mr-2"></i>
                     <?php echo $statusInfo['label']; ?>
-                </div>
-                
-                <!-- Event Meta -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-600">
-                    <div class="flex items-start">
-                        <i class="fas fa-calendar w-6 mt-1 text-purple-600"></i>
-                        <div>
-                            <div class="font-semibold">Beginn</div>
-                            <div><?php echo date('d.m.Y H:i', strtotime($event['start_time'])); ?> Uhr</div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-start">
-                        <i class="fas fa-clock w-6 mt-1 text-purple-600"></i>
-                        <div>
-                            <div class="font-semibold">Ende</div>
-                            <div><?php echo date('d.m.Y H:i', strtotime($event['end_time'])); ?> Uhr</div>
-                        </div>
-                    </div>
-                    
-                    <?php if (!empty($event['location'])): ?>
-                        <div class="flex items-start">
-                            <i class="fas fa-map-marker-alt w-6 mt-1 text-purple-600"></i>
-                            <div class="flex-1">
-                                <div class="font-semibold">Veranstaltungsort</div>
-                                <div class="text-lg font-medium text-gray-800"><?php echo htmlspecialchars($event['location']); ?></div>
-                                <?php if (!empty($event['maps_link'])): ?>
-                                    <a href="<?php echo htmlspecialchars($event['maps_link']); ?>" 
-                                       target="_blank" 
-                                       rel="noopener noreferrer"
-                                       class="inline-flex items-center mt-2 text-sm text-purple-600 hover:text-purple-700 font-semibold">
-                                        <i class="fas fa-map-marked-alt mr-1"></i>
-                                        Auf Karte anzeigen
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <?php if (!empty($event['contact_person'])): ?>
-                        <div class="flex items-start">
-                            <i class="fas fa-user w-6 mt-1 text-purple-600"></i>
-                            <div>
-                                <div class="font-semibold">Ansprechpartner</div>
-                                <div><?php echo htmlspecialchars($event['contact_person']); ?></div>
-                            </div>
-                        </div>
-                    <?php endif; ?>
                 </div>
             </div>
             
             <!-- Registration Status -->
             <?php if ($isRegistered): ?>
                 <div class="flex-shrink-0">
-                    <div class="px-6 py-3 bg-green-100 text-green-800 rounded-lg font-semibold text-center">
+                    <div class="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold text-center border border-white/30">
                         <i class="fas fa-check-circle mr-2"></i>
                         Angemeldet
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Event Details Card -->
+    <div class="glass-card shadow-soft rounded-xl p-8 mb-6">
+        <!-- Event Meta -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-600">
+            <div class="flex items-start">
+                <i class="fas fa-calendar w-6 mt-1 text-ibc-blue"></i>
+                <div>
+                    <div class="font-semibold">Beginn</div>
+                    <div><?php echo date('d.m.Y H:i', strtotime($event['start_time'])); ?> Uhr</div>
+                </div>
+            </div>
+            
+            <div class="flex items-start">
+                <i class="fas fa-clock w-6 mt-1 text-ibc-blue"></i>
+                <div>
+                    <div class="font-semibold">Ende</div>
+                    <div><?php echo date('d.m.Y H:i', strtotime($event['end_time'])); ?> Uhr</div>
+                </div>
+            </div>
+            
+            <?php if (!empty($event['location'])): ?>
+                <div class="flex items-start">
+                    <i class="fas fa-map-marker-alt w-6 mt-1 text-ibc-blue"></i>
+                    <div class="flex-1">
+                        <div class="font-semibold">Veranstaltungsort</div>
+                        <div class="text-lg font-medium text-gray-800"><?php echo htmlspecialchars($event['location']); ?></div>
+                        <?php if (!empty($event['maps_link'])): ?>
+                            <a href="<?php echo htmlspecialchars($event['maps_link']); ?>" 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               class="inline-flex items-center mt-2 px-4 py-2 bg-ibc-green text-white rounded-xl hover:shadow-glow-green ease-premium font-semibold text-sm">
+                                <i class="fas fa-route mr-2"></i>
+                                Route planen
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+            
+            <?php if (!empty($event['contact_person'])): ?>
+                <div class="flex items-start">
+                    <i class="fas fa-user w-6 mt-1 text-ibc-blue"></i>
+                    <div>
+                        <div class="font-semibold">Ansprechpartner</div>
+                        <div><?php echo htmlspecialchars($event['contact_person']); ?></div>
                     </div>
                 </div>
             <?php endif; ?>
@@ -183,21 +186,21 @@ ob_start();
 
         <!-- Description -->
         <?php if (!empty($event['description'])): ?>
-            <div class="mb-6">
+            <div class="mt-6 pt-6 border-t border-gray-200">
                 <h2 class="text-xl font-bold text-gray-800 mb-3">Beschreibung</h2>
                 <p class="text-gray-700 whitespace-pre-line"><?php echo htmlspecialchars($event['description']); ?></p>
             </div>
         <?php endif; ?>
 
         <!-- Participation Button -->
-        <div class="flex gap-4">
+        <div class="flex gap-4 mt-6 pt-6 border-t border-gray-200">
             <?php if ($event['is_external']): ?>
                 <!-- External Event - Open Link -->
                 <?php if (!empty($event['external_link'])): ?>
                     <a href="<?php echo htmlspecialchars($event['external_link']); ?>" 
                        target="_blank" 
                        rel="noopener noreferrer"
-                       class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg">
+                       class="inline-flex items-center px-8 py-3 bg-ibc-blue text-white rounded-xl font-semibold hover:bg-ibc-blue-dark ease-premium shadow-soft">
                         <i class="fas fa-external-link-alt mr-2"></i>
                         Zur Anmeldung (extern)
                     </a>
@@ -206,13 +209,13 @@ ob_start();
                 <!-- Internal Event - AJAX Signup -->
                 <?php if (!$isRegistered && !$userSlotId): ?>
                     <button onclick="signupForEvent(<?php echo $eventId; ?>)" 
-                            class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg">
+                            class="inline-flex items-center px-8 py-3 bg-ibc-green text-white rounded-xl font-semibold hover:shadow-glow-green ease-premium">
                         <i class="fas fa-user-plus mr-2"></i>
                         Teilnehmen
                     </button>
                 <?php elseif ($canCancel && $userSignupId && !$userSlotId): ?>
                     <button onclick="cancelSignup(<?php echo $userSignupId; ?>)" 
-                            class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-semibold hover:from-red-700 hover:to-red-800 transition-all shadow-lg">
+                            class="inline-flex items-center px-8 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 ease-premium">
                         <i class="fas fa-user-times mr-2"></i>
                         Abmelden
                     </button>
@@ -223,9 +226,9 @@ ob_start();
 
     <!-- Helper Slots Section (Only for non-alumni and if event needs helpers) -->
     <?php if ($event['needs_helpers'] && $userRole !== 'alumni' && !empty($helperTypes)): ?>
-        <div class="card p-8">
+        <div class="glass-card shadow-soft rounded-xl p-8">
             <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                <i class="fas fa-hands-helping mr-2 text-orange-600"></i>
+                <i class="fas fa-hands-helping mr-2 text-ibc-green"></i>
                 Helfer-Bereich
             </h2>
             
@@ -257,10 +260,10 @@ ob_start();
                                 $slotSignupHandler = "signupForSlot({$eventId}, {$slot['id']}, '{$slotStartFormatted}', '{$slotEndFormatted}')";
                             ?>
                             
-                            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
                                 <div class="flex-1">
                                     <div class="font-semibold text-gray-800">
-                                        <i class="fas fa-clock mr-2 text-purple-600"></i>
+                                        <i class="fas fa-clock mr-2 text-ibc-blue"></i>
                                         <?php echo $slotStart->format('H:i'); ?> - <?php echo $slotEnd->format('H:i'); ?> Uhr
                                     </div>
                                     <div class="text-sm text-gray-600 mt-1">
@@ -271,13 +274,13 @@ ob_start();
                                 <div class="flex-shrink-0">
                                     <?php if ($slot['user_in_slot']): ?>
                                         <div class="flex items-center gap-3">
-                                            <span class="px-4 py-2 bg-green-100 text-green-800 rounded-lg font-semibold text-sm">
+                                            <span class="px-4 py-2 bg-ibc-green/10 text-ibc-green border border-ibc-green/20 rounded-xl font-semibold text-sm">
                                                 <i class="fas fa-check mr-1"></i>
                                                 Eingetragen
                                             </span>
                                             <?php if ($canCancel): ?>
                                                 <button onclick="cancelHelperSlot(<?php echo $userSignupId; ?>)" 
-                                                        class="px-4 py-2 bg-red-100 text-red-800 rounded-lg font-semibold text-sm hover:bg-red-200 transition-all">
+                                                        class="px-4 py-2 bg-red-100 text-red-800 rounded-xl font-semibold text-sm hover:bg-red-200 ease-premium">
                                                     <i class="fas fa-times mr-1"></i>
                                                     Austragen
                                                 </button>
@@ -285,18 +288,18 @@ ob_start();
                                         </div>
                                     <?php elseif ($canSignup): ?>
                                         <button onclick="<?php echo $slotSignupHandler; ?>" 
-                                                class="px-6 py-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg font-semibold hover:from-orange-700 hover:to-orange-800 transition-all">
+                                                class="px-6 py-2 bg-ibc-green text-white rounded-xl font-semibold hover:shadow-glow-green ease-premium">
                                             <i class="fas fa-user-plus mr-2"></i>
                                             Eintragen
                                         </button>
                                     <?php elseif ($onWaitlist): ?>
                                         <button onclick="<?php echo $slotSignupHandler; ?>" 
-                                                class="px-6 py-2 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white rounded-lg font-semibold hover:from-yellow-700 hover:to-yellow-800 transition-all">
+                                                class="px-6 py-2 bg-yellow-600 text-white rounded-xl font-semibold hover:bg-yellow-700 ease-premium">
                                             <i class="fas fa-list mr-2"></i>
                                             Warteliste
                                         </button>
                                     <?php else: ?>
-                                        <span class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg font-semibold text-sm">
+                                        <span class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl font-semibold text-sm">
                                             Belegt
                                         </span>
                                     <?php endif; ?>
