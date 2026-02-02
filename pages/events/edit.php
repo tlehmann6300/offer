@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$readOnly) {
         
         if ($isEdit) {
             // Update existing event (model handles helper types and slots in transaction)
-            Event::update($eventId, $data, $_SESSION['user_id']);
+            Event::update($eventId, $data, $_SESSION['user_id'], $_FILES);
             
             $message = 'Event erfolgreich aktualisiert';
             
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$readOnly) {
             exit;
         } else {
             // Create new event (model handles helper types and slots in transaction)
-            $newEventId = Event::create($data, $_SESSION['user_id']);
+            $newEventId = Event::create($data, $_SESSION['user_id'], $_FILES);
             
             $message = 'Event erfolgreich erstellt';
             header('Location: edit.php?id=' . $newEventId . '&success=1');

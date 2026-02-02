@@ -4,6 +4,8 @@
  * Manages events, helper slots, signups, and locking mechanism
  */
 
+require_once __DIR__ . '/../utils/SecureImageUpload.php';
+
 class Event {
     
     // Lock timeout in seconds (15 minutes)
@@ -90,13 +92,27 @@ class Event {
     /**
      * Create new event
      */
-    public static function create($data, $userId) {
+    public static function create($data, $userId, $files = []) {
         $db = Database::getContentDB();
         
         // Begin transaction
         $db->beginTransaction();
         
         try {
+            // Handle image upload
+            // Note: If image upload fails, event creation continues with null image_path.
+            // This allows events to be created even if the image upload fails,
+            // as the image is optional. The error is logged for debugging.
+            $imagePath = null;
+            if (isset($files['image']) && $files['image']['error'] === UPLOAD_ERR_OK) {
+                $uploadResult = SecureImageUpload::uploadImage($files['image']);
+                if ($uploadResult['success']) {
+                    $imagePath = $uploadResult['path'];
+                } else {
+                    error_log("Failed to upload event image: " . $uploadResult['error']);
+                }
+            }
+            
             // Calculate status automatically based on timestamps
             $calculatedStatus = self::calculateStatus($data);
             
@@ -104,8 +120,8 @@ class Event {
             $stmt = $db->prepare("
                 INSERT INTO events (title, description, location, maps_link, start_time, end_time, 
                                   registration_start, registration_end, contact_person, status, 
-                                  is_external, external_link, needs_helpers)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                  is_external, external_link, needs_helpers, image_path)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             
             $stmt->execute([
@@ -121,7 +137,8 @@ class Event {
                 $calculatedStatus,
                 $data['is_external'] ?? false,
                 $data['external_link'] ?? null,
-                $data['needs_helpers'] ?? false
+                $data['needs_helpers'] ?? false,
+                $imagePath
             ]);
             
             $eventId = $db->lastInsertId();
@@ -189,7 +206,7 @@ class Event {
     /**
      * Update event
      */
-    public static function update($id, $data, $userId) {
+    public static function update($id, $data, $userId, $files = []) {
         $db = Database::getContentDB();
         
         // Check if event is locked by another user
@@ -209,6 +226,20 @@ class Event {
             
             if (!$currentEvent) {
                 throw new Exception("Event not found");
+            }
+            
+            // Handle image upload
+            $oldImagePath = null;
+            if (isset($files['image']) && $files['image']['error'] === UPLOAD_ERR_OK) {
+                $uploadResult = SecureImageUpload::uploadImage($files['image']);
+                if ($uploadResult['success']) {
+                    // Store old image path for deletion after transaction
+                    $oldImagePath = $currentEvent['image_path'] ?? null;
+                    // Set new image path in data
+                    $data['image_path'] = $uploadResult['path'];
+                } else {
+                    error_log("Failed to upload event image for event ID $id: " . $uploadResult['error']);
+                }
             }
             
             // Merge current data with updates for status calculation
@@ -269,6 +300,12 @@ class Event {
             ]);
             
             $db->commit();
+            
+            // Delete old image after successful transaction
+            if (!empty($oldImagePath)) {
+                SecureImageUpload::deleteImage($oldImagePath);
+            }
+            
             return true;
         } catch (Exception $e) {
             $db->rollBack();
