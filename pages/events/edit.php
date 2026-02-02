@@ -816,11 +816,12 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
         }
     }
     
-    // Collect helper types data
+    // Collect helper types data and validate
     const helperTypes = [];
     const helperTypeElements = document.querySelectorAll('#helper-types-container > .helper-card');
+    let validationFailed = false;
     
-    helperTypeElements.forEach(typeDiv => {
+    for (let typeDiv of helperTypeElements) {
         const typeIndex = typeDiv.getAttribute('data-index');
         const titleInput = typeDiv.querySelector(`.helper-type-title[data-index="${typeIndex}"]`);
         const descriptionInput = typeDiv.querySelector(`.helper-type-description[data-index="${typeIndex}"]`);
@@ -832,14 +833,15 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
             alert('Bitte geben Sie einen Titel für alle Helfer-Rollen ein!');
             titleInput?.focus();
-            return false;
+            validationFailed = true;
+            break;
         }
         
         // Collect slots for this helper type
         const slots = [];
         const slotElements = typeDiv.querySelectorAll(`.slot-item[data-type-index="${typeIndex}"]`);
         
-        slotElements.forEach(slotDiv => {
+        for (let slotDiv of slotElements) {
             const slotIndex = slotDiv.getAttribute('data-slot-index');
             const startInput = slotDiv.querySelector(`.slot-start[data-slot-index="${slotIndex}"]`);
             const endInput = slotDiv.querySelector(`.slot-end[data-slot-index="${slotIndex}"]`);
@@ -857,7 +859,8 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
                 if (slotStartDate >= slotEndDate) {
                     e.preventDefault();
                     alert('Slot-Startzeit muss vor der Endzeit liegen!');
-                    return false;
+                    validationFailed = true;
+                    break;
                 }
                 
                 slots.push({
@@ -866,14 +869,20 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
                     quantity: quantity
                 });
             }
-        });
+        }
+        
+        if (validationFailed) break;
         
         helperTypes.push({
             title: title,
             description: description,
             slots: slots
         });
-    });
+    }
+    
+    if (validationFailed) {
+        return false;
+    }
     
     // Set the JSON data
     document.getElementById('helper_types_json').value = JSON.stringify(helperTypes);
@@ -914,14 +923,20 @@ window.addEventListener('DOMContentLoaded', function() {
                     const lastSlot = lastType.querySelector(`.slot-item[data-type-index="${typeIndex}"]:last-child`);
                     const slotIndex = lastSlot.getAttribute('data-slot-index');
                     
-                    // Set slot values
+                    // Set slot values using local time formatting
                     const startInput = lastSlot.querySelector(`.slot-start[data-slot-index="${slotIndex}"]`);
                     const endInput = lastSlot.querySelector(`.slot-end[data-slot-index="${slotIndex}"]`);
                     const quantityInput = lastSlot.querySelector(`.slot-quantity[data-slot-index="${slotIndex}"]`);
                     
                     if (startInput) {
                         const slotStart = new Date(slot.start_time);
-                        startInput.value = slotStart.toISOString().slice(0, 16).replace('T', ' ');
+                        // Format as local time: YYYY-MM-DD HH:mm
+                        const year = slotStart.getFullYear();
+                        const month = String(slotStart.getMonth() + 1).padStart(2, '0');
+                        const day = String(slotStart.getDate()).padStart(2, '0');
+                        const hours = String(slotStart.getHours()).padStart(2, '0');
+                        const minutes = String(slotStart.getMinutes()).padStart(2, '0');
+                        startInput.value = `${year}-${month}-${day} ${hours}:${minutes}`;
                         // Update flatpickr instance if it exists
                         if (startInput._flatpickr) {
                             startInput._flatpickr.setDate(slotStart);
@@ -930,7 +945,13 @@ window.addEventListener('DOMContentLoaded', function() {
                     
                     if (endInput) {
                         const slotEnd = new Date(slot.end_time);
-                        endInput.value = slotEnd.toISOString().slice(0, 16).replace('T', ' ');
+                        // Format as local time: YYYY-MM-DD HH:mm
+                        const year = slotEnd.getFullYear();
+                        const month = String(slotEnd.getMonth() + 1).padStart(2, '0');
+                        const day = String(slotEnd.getDate()).padStart(2, '0');
+                        const hours = String(slotEnd.getHours()).padStart(2, '0');
+                        const minutes = String(slotEnd.getMinutes()).padStart(2, '0');
+                        endInput.value = `${year}-${month}-${day} ${hours}:${minutes}`;
                         // Update flatpickr instance if it exists
                         if (endInput._flatpickr) {
                             endInput._flatpickr.setDate(slotEnd);
