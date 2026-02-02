@@ -47,20 +47,30 @@ if (is_dir($migrationsPath)) {
     ];
     
     $migrationsFiles = glob($migrationsPath . '/*.sql');
+    
+    // Check each migration file for sensitive patterns
     foreach ($migrationsFiles as $migrationFile) {
         // Use file() to read line by line for better memory efficiency
         $handle = fopen($migrationFile, 'r');
-        if ($handle) {
-            while (($line = fgets($handle)) !== false) {
-                foreach ($sensitivePatterns as $pattern) {
-                    if (preg_match($pattern, $line)) {
-                        $shouldDeleteMigrations = true;
-                        fclose($handle);
-                        break 3; // Break out of all loops
-                    }
+        if (!$handle) {
+            echo "WARNUNG: Konnte $migrationFile nicht öffnen.\n";
+            continue;
+        }
+        
+        while (($line = fgets($handle)) !== false) {
+            foreach ($sensitivePatterns as $pattern) {
+                if (preg_match($pattern, $line)) {
+                    $shouldDeleteMigrations = true;
+                    fclose($handle);
+                    break 2; // Break out of both inner loops
                 }
             }
-            fclose($handle);
+        }
+        fclose($handle);
+        
+        // If sensitive data was found, no need to check more files
+        if ($shouldDeleteMigrations) {
+            break;
         }
     }
 }
@@ -107,4 +117,9 @@ if (!empty($notFoundFiles)) {
 echo "Dieses Skript wird jetzt gelöscht...\n";
 
 // Self-destruct: Delete this script
-unlink(__FILE__);
+if (unlink(__FILE__)) {
+    // Script successfully deleted, execution will continue briefly
+} else {
+    echo "\nFEHLER: Konnte cleanup_system.php nicht löschen.\n";
+    echo "Bitte löschen Sie diese Datei manuell aus Sicherheitsgründen!\n";
+}
