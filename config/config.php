@@ -26,10 +26,21 @@ function loadEnv($path) {
             $key = trim($key);
             $value = trim($value);
             
-            // Remove quotes if present
-            if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
-                (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
-                $value = substr($value, 1, -1);
+            // Remove inline comments (everything after # that's not in quotes)
+            if (strpos($value, '#') !== false) {
+                // Simple handling: if # exists and not quoted, remove it
+                if (!((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
+                      (substr($value, 0, 1) === "'" && substr($value, -1) === "'"))) {
+                    $value = trim(explode('#', $value)[0]);
+                }
+            }
+            
+            // Remove quotes if present (and value is longer than 2 chars)
+            if (strlen($value) > 2) {
+                if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
+                    (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
+                    $value = substr($value, 1, -1);
+                }
             }
             
             $env[$key] = $value;

@@ -21,18 +21,18 @@ The `.env` file should already be present in the root directory with the followi
 DB_USER_HOST=db5019508945.hosting-data.io
 DB_USER_NAME=dbs15253086
 DB_USER_USER=dbu4494103
-DB_USER_PASS=Q9!mZ7$A2v#Lr@8x
+DB_USER_PASS=your_user_db_password_here
 
 # Content Database Configuration
 DB_CONTENT_HOST=db5019375140.hosting-data.io
 DB_CONTENT_NAME=dbs15161271
 DB_CONTENT_USER=dbu2067984
-DB_CONTENT_PASS=Wort!Zahl?Wort#41254g
+DB_CONTENT_PASS=your_content_db_password_here
 
 # SMTP Configuration
 SMTP_HOST=smtp.ionos.de
 SMTP_USER=mail@test.business-consulting.de
-SMTP_PASS=Test12345678.
+SMTP_PASS=your_smtp_password_here
 SMTP_FROM=mail@test.business-consulting.de
 
 # Application Settings
