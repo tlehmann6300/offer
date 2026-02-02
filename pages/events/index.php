@@ -4,6 +4,9 @@ require_once __DIR__ . '/../../includes/models/Event.php';
 
 AuthHandler::startSession();
 
+// Update event statuses (pseudo-cron)
+require_once __DIR__ . '/../../includes/pseudo_cron.php';
+
 // Check authentication
 if (!AuthHandler::isAuthenticated()) {
     header('Location: ../auth/login.php');

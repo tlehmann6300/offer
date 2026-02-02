@@ -450,7 +450,56 @@ class Event {
             'slot_id' => $signup['slot_id']
         ]);
         
-        return true;
+        // If this was a confirmed slot signup, check if someone on waitlist can be promoted
+        $promotedUserId = null;
+        if ($signup['slot_id'] && $signup['status'] === 'confirmed') {
+            $promotedUserId = self::promoteWaitlistUser($signup['event_id'], $signup['slot_id']);
+        }
+        
+        return [
+            'success' => true,
+            'promoted_user_id' => $promotedUserId,
+            'event_id' => $signup['event_id'],
+            'slot_id' => $signup['slot_id']
+        ];
+    }
+    
+    /**
+     * Promote a waitlisted user to confirmed for a slot
+     * Called when a confirmed user cancels
+     * 
+     * @param int $eventId Event ID
+     * @param int $slotId Slot ID
+     * @return int|null User ID that was promoted, or null if no one was promoted
+     */
+    private static function promoteWaitlistUser($eventId, $slotId) {
+        $db = Database::getContentDB();
+        
+        // Get the first waitlisted user for this slot (oldest signup first)
+        $stmt = $db->prepare("
+            SELECT * FROM event_signups 
+            WHERE event_id = ? AND slot_id = ? AND status = 'waitlist'
+            ORDER BY created_at ASC
+            LIMIT 1
+        ");
+        $stmt->execute([$eventId, $slotId]);
+        $waitlistSignup = $stmt->fetch();
+        
+        if (!$waitlistSignup) {
+            return null; // No one on waitlist
+        }
+        
+        // Promote to confirmed
+        $stmt = $db->prepare("UPDATE event_signups SET status = 'confirmed' WHERE id = ?");
+        $stmt->execute([$waitlistSignup['id']]);
+        
+        // Log promotion
+        self::logHistory($eventId, $waitlistSignup['user_id'], 'waitlist_promoted', [
+            'signup_id' => $waitlistSignup['id'],
+            'slot_id' => $slotId
+        ]);
+        
+        return $waitlistSignup['user_id'];
     }
     
     /**
@@ -628,5 +677,62 @@ class Event {
         ");
         $stmt->execute([$eventId, $limit]);
         return $stmt->fetchAll();
+    }
+    
+    /**
+     * Update event statuses based on current time (pseudo-cron)
+     * This should be called on page loads to keep statuses current
+     * 
+     * Updates:
+     * - "planned" events to "open" when registration should open
+     * - Events to "past" when they have ended
+     * 
+     * @return array Summary of updates made
+     */
+    public static function updateEventStatuses() {
+        $db = Database::getContentDB();
+        $now = new DateTime();
+        $updates = [
+            'planned_to_open' => 0,
+            'to_past' => 0
+        ];
+        
+        try {
+            // Update "planned" events to "open" when registration period starts
+            // Assuming registration opens when current time is past the event start time minus some buffer
+            // For simplicity, we'll open registration as soon as the event is not in the past
+            // In a real system, you might have a separate registration_opens_at field
+            
+            $stmt = $db->prepare("
+                UPDATE events 
+                SET status = 'open' 
+                WHERE status = 'planned' 
+                AND start_time > NOW()
+            ");
+            $stmt->execute();
+            $updates['planned_to_open'] = $stmt->rowCount();
+            
+            // Update events to "past" when end_time has passed
+            $stmt = $db->prepare("
+                UPDATE events 
+                SET status = 'past' 
+                WHERE status IN ('open', 'running', 'closed', 'planned')
+                AND end_time < NOW()
+            ");
+            $stmt->execute();
+            $updates['to_past'] = $stmt->rowCount();
+            
+            // Log if any updates were made
+            if ($updates['planned_to_open'] > 0 || $updates['to_past'] > 0) {
+                error_log("Event status update: " . 
+                         $updates['planned_to_open'] . " events opened, " . 
+                         $updates['to_past'] . " events moved to past");
+            }
+            
+            return $updates;
+        } catch (Exception $e) {
+            error_log("Error updating event statuses: " . $e->getMessage());
+            return $updates;
+        }
     }
 }
