@@ -391,7 +391,7 @@ class Inventory {
     public static function getItemCheckouts($itemId) {
         $db = Database::getContentDB();
         $stmt = $db->prepare("
-            SELECT r.*, r.status as status
+            SELECT r.*
             FROM rentals r
             WHERE r.item_id = ? AND r.actual_return IS NULL
             ORDER BY r.rented_at DESC
@@ -426,7 +426,7 @@ class Inventory {
     public static function getUserCheckouts($userId, $includeReturned = false) {
         $db = Database::getContentDB();
         $sql = "
-            SELECT r.*, r.status as status, i.name as item_name, i.unit
+            SELECT r.*, i.name as item_name, i.unit
             FROM rentals r
             JOIN inventory i ON r.item_id = i.id
             WHERE r.user_id = ?
