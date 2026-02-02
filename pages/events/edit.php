@@ -464,7 +464,7 @@ ob_start();
             <?php if (!$readOnly): ?>
             <button 
                 type="button" 
-                onclick="addHelperType()" 
+                id="addHelperTypeBtn"
                 class="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
             >
                 <i class="fas fa-plus mr-2"></i>Helfer-Art hinzufügen
@@ -571,7 +571,7 @@ function addHelperType() {
         <div id="${typeId}" class="p-4 border-2 border-gray-200 rounded-lg bg-white">
             <div class="flex items-center justify-between mb-4">
                 <h4 class="text-md font-bold text-gray-800">Helfer-Art #${helperTypeCounter}</h4>
-                <button type="button" onclick="removeHelperType('${typeId}')" class="text-red-600 hover:text-red-700">
+                <button type="button" class="remove-helper-type-btn text-red-600 hover:text-red-700" data-type-id="${typeId}">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
@@ -605,8 +605,8 @@ function addHelperType() {
                 </div>
                 <button 
                     type="button" 
-                    onclick="addSlot('${typeId}')" 
-                    class="mt-3 px-3 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition"
+                    class="add-slot-btn mt-3 px-3 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition"
+                    data-type-id="${typeId}"
                 >
                     <i class="fas fa-plus mr-1"></i>Zeitslot hinzufügen
                 </button>
@@ -664,8 +664,8 @@ function addSlot(typeId) {
             <div class="flex items-end">
                 <button 
                     type="button" 
-                    onclick="removeSlot('${slotId}')" 
-                    class="w-full px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition"
+                    class="remove-slot-btn w-full px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition"
+                    data-slot-id="${slotId}"
                 >
                     <i class="fas fa-trash"></i>
                 </button>
@@ -780,6 +780,36 @@ window.addEventListener('DOMContentLoaded', function() {
     });
 });
 <?php endif; ?>
+
+// Event delegation for dynamically added buttons
+document.getElementById('addHelperTypeBtn')?.addEventListener('click', addHelperType);
+
+// Remove helper type buttons (event delegation)
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.remove-helper-type-btn')) {
+        const btn = e.target.closest('.remove-helper-type-btn');
+        const typeId = btn.getAttribute('data-type-id');
+        removeHelperType(typeId);
+    }
+});
+
+// Add slot buttons (event delegation)
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.add-slot-btn')) {
+        const btn = e.target.closest('.add-slot-btn');
+        const typeId = btn.getAttribute('data-type-id');
+        addSlot(typeId);
+    }
+});
+
+// Remove slot buttons (event delegation)
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.remove-slot-btn')) {
+        const btn = e.target.closest('.remove-slot-btn');
+        const slotId = btn.getAttribute('data-slot-id');
+        removeSlot(slotId);
+    }
+});
 
 // Release lock on page unload (only if we have the lock)
 <?php if ($isEdit && !$readOnly): ?>

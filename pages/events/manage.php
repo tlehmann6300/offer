@@ -250,7 +250,7 @@ ob_start();
             <input type="hidden" name="event_id" id="deleteEventId" value="">
             <input type="hidden" name="delete_event" value="1">
             <div class="flex space-x-4">
-                <button type="button" onclick="closeDeleteModal()" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                <button type="button" id="closeDeleteModalBtn" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
                     Abbrechen
                 </button>
                 <button type="submit" class="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
@@ -280,6 +280,9 @@ function confirmDelete(eventId, eventName) {
 function closeDeleteModal() {
     document.getElementById('deleteModal').classList.add('hidden');
 }
+
+// Close modal button
+document.getElementById('closeDeleteModalBtn')?.addEventListener('click', closeDeleteModal);
 
 // Close modal on escape key
 document.addEventListener('keydown', (e) => {
