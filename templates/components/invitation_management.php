@@ -348,9 +348,15 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
             return;
         }
         
+        const csrfTokenElement = document.querySelector('input[name="csrf_token"]');
+        if (!csrfTokenElement) {
+            showMessage('CSRF token nicht gefunden', 'error');
+            return;
+        }
+        
         const formData = new FormData();
         formData.append('invitation_id', invitationId);
-        formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+        formData.append('csrf_token', csrfTokenElement.value);
         
         try {
             const response = await fetch('/api/delete_invitation.php', {
