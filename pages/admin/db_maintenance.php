@@ -8,11 +8,8 @@
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../src/Database.php';
 
-// Ensure backward compatibility - if Auth class exists, alias it as AuthHandler
-if (class_exists('Auth') && !class_exists('AuthHandler')) {
-    class_alias('Auth', 'AuthHandler');
-}
-
+// src/Auth.php already creates the alias from AuthHandler to Auth
+// Both class names (Auth and AuthHandler) are now available
 AuthHandler::startSession();
 
 // Check if user has admin or board permission
