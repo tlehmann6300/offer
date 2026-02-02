@@ -278,7 +278,7 @@ ob_start();
                         <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Artikel</th>
                         <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Menge</th>
                         <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Entleiher</th>
-                        <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Zielort</th>
+                        <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Rückgabe</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -290,13 +290,13 @@ ob_start();
                             </a>
                         </td>
                         <td class="px-2 py-2 whitespace-nowrap text-xs">
-                            <?php echo $checkout['quantity']; ?> <?php echo htmlspecialchars($checkout['unit']); ?>
+                            <?php echo $checkout['amount']; ?> <?php echo htmlspecialchars($checkout['unit']); ?>
                         </td>
                         <td class="px-2 py-2 text-xs">
                             <?php echo htmlspecialchars($checkout['borrower_email']); ?>
                         </td>
                         <td class="px-2 py-2 text-xs">
-                            <?php echo htmlspecialchars($checkout['destination'] ?? '-'); ?>
+                            <?php echo date('d.m.Y', strtotime($checkout['expected_return'] ?? $checkout['rented_at'])); ?>
                         </td>
                     </tr>
                     <?php endforeach; ?>

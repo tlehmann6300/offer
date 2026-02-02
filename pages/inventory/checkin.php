@@ -17,7 +17,7 @@ if (!$checkoutId) {
 }
 
 $checkout = Inventory::getCheckoutById($checkoutId);
-if (!$checkout || $checkout['status'] !== 'checked_out') {
+if (!$checkout || $checkout['actual_return'] !== null) {
     header('Location: my_checkouts.php');
     exit;
 }
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['checkin'])) {
     $defectiveQuantity = $isDefective ? intval($_POST['defective_quantity'] ?? 0) : 0;
     $defectiveReason = $isDefective ? trim($_POST['defective_reason'] ?? '') : null;
     
-    if ($returnedQuantity <= 0 || $returnedQuantity > $checkout['quantity']) {
+    if ($returnedQuantity <= 0 || $returnedQuantity > $checkout['amount']) {
         $error = 'Bitte geben Sie eine gültige Rückgabemenge ein';
     } elseif ($isDefective && $defectiveQuantity <= 0) {
         $error = 'Bitte geben Sie die defekte Menge ein';
@@ -82,20 +82,16 @@ ob_start();
             <div class="grid grid-cols-2 gap-4 text-sm">
                 <div>
                     <p class="text-gray-500">Ausgeliehen am:</p>
-                    <p class="font-semibold"><?php echo date('d.m.Y', strtotime($checkout['checkout_date'])); ?></p>
+                    <p class="font-semibold"><?php echo date('d.m.Y H:i', strtotime($checkout['rented_at'])); ?></p>
                 </div>
                 <div>
                     <p class="text-gray-500">Menge:</p>
-                    <p class="font-semibold"><?php echo $checkout['quantity']; ?> <?php echo htmlspecialchars($checkout['unit']); ?></p>
+                    <p class="font-semibold"><?php echo $checkout['amount']; ?> <?php echo htmlspecialchars($checkout['unit']); ?></p>
                 </div>
+                <?php if ($checkout['expected_return']): ?>
                 <div class="col-span-2">
-                    <p class="text-gray-500">Verwendungszweck:</p>
-                    <p class="font-semibold"><?php echo htmlspecialchars($checkout['purpose']); ?></p>
-                </div>
-                <?php if ($checkout['destination']): ?>
-                <div class="col-span-2">
-                    <p class="text-gray-500">Zielort:</p>
-                    <p class="font-semibold"><?php echo htmlspecialchars($checkout['destination']); ?></p>
+                    <p class="text-gray-500">Erwartete Rückgabe:</p>
+                    <p class="font-semibold"><?php echo date('d.m.Y', strtotime($checkout['expected_return'])); ?></p>
                 </div>
                 <?php endif; ?>
             </div>
@@ -115,13 +111,13 @@ ob_start();
                     name="returned_quantity" 
                     id="returned_quantity"
                     min="1" 
-                    max="<?php echo $checkout['quantity']; ?>"
-                    value="<?php echo $checkout['quantity']; ?>"
+                    max="<?php echo $checkout['amount']; ?>"
+                    value="<?php echo $checkout['amount']; ?>"
                     required 
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                 <p class="text-xs text-gray-500 mt-1">
-                    Ausgeliehene Menge: <?php echo $checkout['quantity']; ?> <?php echo htmlspecialchars($checkout['unit']); ?>
+                    Ausgeliehene Menge: <?php echo $checkout['amount']; ?> <?php echo htmlspecialchars($checkout['unit']); ?>
                 </p>
             </div>
 
@@ -177,7 +173,7 @@ ob_start();
                         name="defective_quantity" 
                         id="defective_quantity"
                         min="1" 
-                        max="<?php echo $checkout['quantity']; ?>"
+                        max="<?php echo $checkout['amount']; ?>"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
                 </div>

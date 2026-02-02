@@ -66,9 +66,9 @@ ob_start();
                 <tr>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Artikel</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Menge</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Verwendungszweck</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Zielort</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ausgeliehen am</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Erwartete Rückgabe</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aktion</th>
                 </tr>
             </thead>
@@ -81,16 +81,18 @@ ob_start();
                         </a>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-600">
-                        <span class="font-semibold"><?php echo $checkout['quantity']; ?></span> <?php echo htmlspecialchars($checkout['unit']); ?>
+                        <span class="font-semibold"><?php echo $checkout['amount']; ?></span> <?php echo htmlspecialchars($checkout['unit']); ?>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-600">
-                        <?php echo htmlspecialchars($checkout['purpose']); ?>
+                        <?php echo date('d.m.Y H:i', strtotime($checkout['rented_at'])); ?>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-600">
-                        <?php echo $checkout['destination'] ? htmlspecialchars($checkout['destination']) : '-'; ?>
+                        <?php echo $checkout['expected_return'] ? date('d.m.Y', strtotime($checkout['expected_return'])) : '-'; ?>
                     </td>
-                    <td class="px-4 py-3 text-sm text-gray-600">
-                        <?php echo date('d.m.Y', strtotime($checkout['checkout_date'])); ?>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 text-xs rounded-full <?php echo $checkout['status'] === 'active' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'; ?>">
+                            <?php echo htmlspecialchars($checkout['status']); ?>
+                        </span>
                     </td>
                     <td class="px-4 py-3">
                         <a href="checkin.php?id=<?php echo $checkout['id']; ?>" class="inline-flex items-center px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition text-sm">
@@ -108,7 +110,7 @@ ob_start();
 <!-- History -->
 <?php
 $returnedCheckouts = array_filter($allCheckouts, function($c) {
-    return $c['status'] === 'returned' || $c['status'] === 'partially_returned';
+    return $c['status'] === 'returned' || $c['status'] === 'defective';
 });
 ?>
 
@@ -125,7 +127,6 @@ $returnedCheckouts = array_filter($allCheckouts, function($c) {
                 <tr>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Artikel</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Menge</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Verwendungszweck</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ausgeliehen</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Zurückgegeben</th>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
@@ -140,22 +141,19 @@ $returnedCheckouts = array_filter($allCheckouts, function($c) {
                         </a>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-600">
-                        <span class="font-semibold"><?php echo $checkout['quantity']; ?></span> <?php echo htmlspecialchars($checkout['unit']); ?>
+                        <span class="font-semibold"><?php echo $checkout['amount']; ?></span> <?php echo htmlspecialchars($checkout['unit']); ?>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-600">
-                        <?php echo htmlspecialchars($checkout['purpose']); ?>
+                        <?php echo date('d.m.Y', strtotime($checkout['rented_at'])); ?>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-600">
-                        <?php echo date('d.m.Y', strtotime($checkout['checkout_date'])); ?>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-600">
-                        <?php echo $checkout['return_date'] ? date('d.m.Y', strtotime($checkout['return_date'])) : '-'; ?>
+                        <?php echo $checkout['actual_return'] ? date('d.m.Y', strtotime($checkout['actual_return'])) : '-'; ?>
                     </td>
                     <td class="px-4 py-3">
-                        <?php if ($checkout['defective_quantity'] > 0): ?>
-                        <span class="px-2 py-1 text-xs bg-red-100 text-red-700 rounded-full" title="<?php echo htmlspecialchars($checkout['defective_reason']); ?>">
+                        <?php if ($checkout['status'] === 'defective'): ?>
+                        <span class="px-2 py-1 text-xs bg-red-100 text-red-700 rounded-full" title="<?php echo htmlspecialchars($checkout['defect_notes'] ?? ''); ?>">
                             <i class="fas fa-exclamation-triangle mr-1"></i>
-                            <?php echo $checkout['defective_quantity']; ?> defekt
+                            Defekt
                         </span>
                         <?php else: ?>
                         <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">

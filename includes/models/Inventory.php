@@ -292,12 +292,12 @@ class Inventory {
         $db->beginTransaction();
         
         try {
-            // Create checkout record
+            // Create rental record (using rentals table)
             $stmt = $db->prepare("
-                INSERT INTO inventory_checkouts (item_id, user_id, quantity, purpose, destination, expected_return_date, status)
-                VALUES (?, ?, ?, ?, ?, ?, 'checked_out')
+                INSERT INTO rentals (item_id, user_id, amount, expected_return)
+                VALUES (?, ?, ?, ?)
             ");
-            $stmt->execute([$itemId, $userId, $quantity, $purpose, $destination, $expectedReturnDate]);
+            $stmt->execute([$itemId, $userId, $quantity, $expectedReturnDate]);
             
             // Update stock
             $newStock = $item['current_stock'] - $quantity;
@@ -319,25 +319,25 @@ class Inventory {
     /**
      * Check-in item (Return to inventory)
      */
-    public static function checkinItem($checkoutId, $returnedQuantity, $isDefective, $defectiveQuantity = 0, $defectiveReason = null) {
+    public static function checkinItem($rentalId, $returnedQuantity, $isDefective, $defectiveQuantity = 0, $defectiveReason = null) {
         $db = Database::getContentDB();
         
-        // Get checkout record
+        // Get rental record (using rentals table)
         $stmt = $db->prepare("
-            SELECT c.*, i.current_stock, i.name 
-            FROM inventory_checkouts c
-            JOIN inventory i ON c.item_id = i.id
-            WHERE c.id = ? AND c.status = 'checked_out'
+            SELECT r.*, i.current_stock, i.name 
+            FROM rentals r
+            JOIN inventory i ON r.item_id = i.id
+            WHERE r.id = ? AND r.actual_return IS NULL
         ");
-        $stmt->execute([$checkoutId]);
-        $checkout = $stmt->fetch();
+        $stmt->execute([$rentalId]);
+        $rental = $stmt->fetch();
         
-        if (!$checkout) {
+        if (!$rental) {
             return ['success' => false, 'message' => 'Ausleihe nicht gefunden oder bereits zurückgegeben'];
         }
         
         // Validate quantities
-        if ($returnedQuantity > $checkout['quantity']) {
+        if ($returnedQuantity > $rental['amount']) {
             return ['success' => false, 'message' => 'Rückgabemenge kann nicht größer als ausgeliehene Menge sein'];
         }
         
@@ -350,32 +350,31 @@ class Inventory {
         
         try {
             $goodQuantity = $returnedQuantity - $defectiveQuantity;
-            $newStock = $checkout['current_stock'] + $goodQuantity;
+            $newStock = $rental['current_stock'] + $goodQuantity;
             
-            // Update checkout record
-            $status = ($returnedQuantity == $checkout['quantity']) ? 'returned' : 'partially_returned';
+            // Update rental record
+            $status = $isDefective && $defectiveQuantity > 0 ? 'defective' : 'returned';
             $stmt = $db->prepare("
-                UPDATE inventory_checkouts 
-                SET return_date = NOW(), returned_quantity = ?, defective_quantity = ?, 
-                    defective_reason = ?, status = ?
+                UPDATE rentals 
+                SET actual_return = NOW(), defect_notes = ?, status = ?
                 WHERE id = ?
             ");
-            $stmt->execute([$returnedQuantity, $defectiveQuantity, $defectiveReason, $status, $checkoutId]);
+            $stmt->execute([$defectiveReason, $status, $rentalId]);
             
             // Update stock (only add back good items)
             $stmt = $db->prepare("UPDATE inventory SET current_stock = ? WHERE id = ?");
-            $stmt->execute([$newStock, $checkout['item_id']]);
+            $stmt->execute([$newStock, $rental['item_id']]);
             
             // Log check-in
             $comment = "Rückgabe: {$returnedQuantity} Stück";
             if ($defectiveQuantity > 0) {
                 $comment .= " (davon {$defectiveQuantity} defekt: {$defectiveReason})";
             }
-            self::logHistory($checkout['item_id'], $checkout['user_id'], 'checkin', $checkout['current_stock'], $newStock, $goodQuantity, 'Zurückgegeben', $comment);
+            self::logHistory($rental['item_id'], $rental['user_id'], 'checkin', $rental['current_stock'], $newStock, $goodQuantity, 'Zurückgegeben', $comment);
             
             // If items are defective, log write-off
             if ($defectiveQuantity > 0) {
-                self::logHistory($checkout['item_id'], $checkout['user_id'], 'writeoff', $newStock, $newStock, -$defectiveQuantity, 'Ausschuss', $defectiveReason);
+                self::logHistory($rental['item_id'], $rental['user_id'], 'writeoff', $newStock, $newStock, -$defectiveQuantity, 'Ausschuss', $defectiveReason);
             }
             
             $db->commit();
@@ -392,18 +391,18 @@ class Inventory {
     public static function getItemCheckouts($itemId) {
         $db = Database::getContentDB();
         $stmt = $db->prepare("
-            SELECT c.* 
-            FROM inventory_checkouts c
-            WHERE c.item_id = ? AND c.status = 'checked_out'
-            ORDER BY c.checkout_date DESC
+            SELECT r.*
+            FROM rentals r
+            WHERE r.item_id = ? AND r.actual_return IS NULL
+            ORDER BY r.rented_at DESC
         ");
         $stmt->execute([$itemId]);
-        $checkouts = $stmt->fetchAll();
+        $rentals = $stmt->fetchAll();
         
         // Fetch user information from user database
-        if (!empty($checkouts)) {
+        if (!empty($rentals)) {
             $userDb = Database::getUserDB();
-            $userIds = array_column($checkouts, 'user_id');
+            $userIds = array_column($rentals, 'user_id');
             $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
             $userStmt = $userDb->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
             $userStmt->execute($userIds);
@@ -412,13 +411,13 @@ class Inventory {
                 $users[$user['id']] = $user;
             }
             
-            // Add user info to checkouts
-            foreach ($checkouts as &$checkout) {
-                $checkout['user_email'] = $users[$checkout['user_id']]['email'] ?? 'Unknown';
+            // Add user info to rentals
+            foreach ($rentals as &$rental) {
+                $rental['user_email'] = $users[$rental['user_id']]['email'] ?? 'Unknown';
             }
         }
         
-        return $checkouts;
+        return $rentals;
     }
 
     /**
@@ -427,17 +426,17 @@ class Inventory {
     public static function getUserCheckouts($userId, $includeReturned = false) {
         $db = Database::getContentDB();
         $sql = "
-            SELECT c.*, i.name as item_name, i.unit
-            FROM inventory_checkouts c
-            JOIN inventory i ON c.item_id = i.id
-            WHERE c.user_id = ?
+            SELECT r.*, i.name as item_name, i.unit
+            FROM rentals r
+            JOIN inventory i ON r.item_id = i.id
+            WHERE r.user_id = ?
         ";
         
         if (!$includeReturned) {
-            $sql .= " AND c.status = 'checked_out'";
+            $sql .= " AND r.actual_return IS NULL";
         }
         
-        $sql .= " ORDER BY c.checkout_date DESC";
+        $sql .= " ORDER BY r.rented_at DESC";
         
         $stmt = $db->prepare($sql);
         $stmt->execute([$userId]);
@@ -447,15 +446,15 @@ class Inventory {
     /**
      * Get checkout by ID
      */
-    public static function getCheckoutById($checkoutId) {
+    public static function getCheckoutById($rentalId) {
         $db = Database::getContentDB();
         $stmt = $db->prepare("
-            SELECT c.*, i.name as item_name, i.unit, i.current_stock
-            FROM inventory_checkouts c
-            JOIN inventory i ON c.item_id = i.id
-            WHERE c.id = ?
+            SELECT r.*, i.name as item_name, i.unit, i.current_stock
+            FROM rentals r
+            JOIN inventory i ON r.item_id = i.id
+            WHERE r.id = ?
         ");
-        $stmt->execute([$checkoutId]);
+        $stmt->execute([$rentalId]);
         return $stmt->fetch();
     }
 
@@ -490,23 +489,23 @@ class Inventory {
     public static function getCheckedOutStats() {
         $db = Database::getContentDB();
         
-        // Get all active checkouts with item details
+        // Get all active rentals with item details (using rentals table)
         $stmt = $db->query("
             SELECT 
-                c.id, c.item_id, c.user_id, c.quantity, c.purpose, c.destination,
-                c.checkout_date, c.expected_return_date,
+                r.id, r.item_id, r.user_id, r.amount, r.expected_return,
+                r.rented_at,
                 i.name as item_name, i.unit
-            FROM inventory_checkouts c
-            JOIN inventory i ON c.item_id = i.id
-            WHERE c.status = 'checked_out'
-            ORDER BY c.checkout_date DESC
+            FROM rentals r
+            JOIN inventory i ON r.item_id = i.id
+            WHERE r.actual_return IS NULL
+            ORDER BY r.rented_at DESC
         ");
-        $checkouts = $stmt->fetchAll();
+        $rentals = $stmt->fetchAll();
         
         // Fetch user information from user database
-        if (!empty($checkouts)) {
+        if (!empty($rentals)) {
             $userDb = Database::getUserDB();
-            $userIds = array_unique(array_column($checkouts, 'user_id'));
+            $userIds = array_unique(array_column($rentals, 'user_id'));
             
             if (!empty($userIds)) {
                 $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
@@ -517,18 +516,18 @@ class Inventory {
                     $users[$user['id']] = $user;
                 }
                 
-                // Add user info to checkouts
-                foreach ($checkouts as &$checkout) {
-                    $checkout['borrower_email'] = $users[$checkout['user_id']]['email'] ?? 'Unbekannt';
+                // Add user info to rentals
+                foreach ($rentals as &$rental) {
+                    $rental['borrower_email'] = $users[$rental['user_id']]['email'] ?? 'Unbekannt';
                 }
             }
         }
         
         // Calculate statistics
         $stats = [
-            'total_checked_out' => count($checkouts),
-            'total_quantity_out' => array_sum(array_column($checkouts, 'quantity')),
-            'checkouts' => $checkouts
+            'total_checked_out' => count($rentals),
+            'total_quantity_out' => array_sum(array_column($rentals, 'amount')),
+            'checkouts' => $rentals
         ];
         
         return $stats;
