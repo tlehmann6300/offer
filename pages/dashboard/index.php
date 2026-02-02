@@ -25,69 +25,132 @@ $title = 'Dashboard - IBC Intranet';
 ob_start();
 ?>
 
-<div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-2">
-        <i class="fas fa-home text-purple-600 mr-2"></i>
-        Dashboard
-    </h1>
-    <p class="text-gray-600">Willkommen zurück, <?php echo htmlspecialchars($user['email']); ?>!</p>
+<!-- Hero Section -->
+<div class="mb-12">
+    <div class="text-center max-w-4xl mx-auto">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-4">
+            Willkommen im IBC Intranet
+        </h1>
+        <p class="text-lg md:text-xl text-gray-600 mb-8">
+            Verwalten Sie Ihr Inventar effizient und behalten Sie alles im Blick
+        </p>
+        
+        <!-- Primary Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <a href="../inventory/index.php" class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl">
+                <i class="fas fa-boxes mr-3 text-xl"></i>
+                Zum Inventar
+            </a>
+            <a href="../auth/profile.php" class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl">
+                <i class="fas fa-user mr-3 text-xl"></i>
+                Mein Profil
+            </a>
+        </div>
+    </div>
 </div>
 
-<!-- Statistics Cards -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <!-- Total Items -->
-    <div class="card p-6 card-hover transition-all">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm font-medium mb-1">Gesamte Artikel</p>
-                <p class="text-3xl font-bold text-gray-800"><?php echo number_format($stats['total_items']); ?></p>
+<!-- Dashboard Teaser - 3 Live Statistics Tiles -->
+<div class="max-w-6xl mx-auto">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+        <i class="fas fa-chart-line text-purple-600 mr-2"></i>
+        Aktuelle Statistiken
+    </h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <!-- Tile 1: Available Items -->
+        <div class="card p-8 card-hover transition-all text-center bg-gradient-to-br from-white to-blue-50">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                <i class="fas fa-box-open text-3xl text-blue-600"></i>
             </div>
-            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <i class="fas fa-boxes text-blue-600 text-xl"></i>
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Verfügbare Artikel</h3>
+            <p class="text-4xl font-bold text-blue-600 mb-2"><?php echo number_format($stats['total_items']); ?></p>
+            <p class="text-sm text-gray-500">Artikel im System</p>
+        </div>
+        
+        <!-- Tile 2: Total Value -->
+        <div class="card p-8 card-hover transition-all text-center bg-gradient-to-br from-white to-green-50">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                <i class="fas fa-euro-sign text-3xl text-green-600"></i>
             </div>
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Gesamtwert</h3>
+            <p class="text-4xl font-bold text-green-600 mb-2"><?php echo number_format($stats['total_value'], 0); ?> €</p>
+            <p class="text-sm text-gray-500">Inventarwert</p>
+        </div>
+        
+        <!-- Tile 3: Recent Activity -->
+        <div class="card p-8 card-hover transition-all text-center bg-gradient-to-br from-white to-purple-50">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
+                <i class="fas fa-clock text-3xl text-purple-600"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Letzte 7 Tage</h3>
+            <p class="text-4xl font-bold text-purple-600 mb-2"><?php echo number_format($stats['recent_moves']); ?></p>
+            <p class="text-sm text-gray-500">Bewegungen</p>
         </div>
     </div>
+</div>
 
-    <!-- Total Value -->
-    <div class="card p-6 card-hover transition-all">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm font-medium mb-1">Gesamtwert</p>
-                <p class="text-3xl font-bold text-gray-800"><?php echo number_format($stats['total_value'], 2); ?> €</p>
-            </div>
-            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <i class="fas fa-euro-sign text-green-600 text-xl"></i>
-            </div>
+<!-- Additional Info Cards -->
+<div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Quick Actions Card -->
+    <div class="card p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">
+            <i class="fas fa-bolt text-yellow-500 mr-2"></i>
+            Schnellaktionen
+        </h3>
+        <div class="space-y-3">
+            <a href="../inventory/index.php" class="block p-4 rounded-lg bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 transition-all duration-300 group">
+                <div class="flex items-center">
+                    <i class="fas fa-boxes text-purple-600 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
+                    <span class="font-semibold text-gray-800">Inventar durchsuchen</span>
+                </div>
+            </a>
+            <?php if (AuthHandler::hasPermission('manager')): ?>
+            <a href="../inventory/add.php" class="block p-4 rounded-lg bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 transition-all duration-300 group">
+                <div class="flex items-center">
+                    <i class="fas fa-plus-circle text-green-600 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
+                    <span class="font-semibold text-gray-800">Neuen Artikel hinzufügen</span>
+                </div>
+            </a>
+            <?php endif; ?>
+            <?php if (AuthHandler::hasPermission('admin')): ?>
+            <a href="../admin/users.php" class="block p-4 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 transition-all duration-300 group">
+                <div class="flex items-center">
+                    <i class="fas fa-users-cog text-blue-600 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
+                    <span class="font-semibold text-gray-800">Benutzerverwaltung</span>
+                </div>
+            </a>
+            <?php endif; ?>
         </div>
     </div>
-
-    <!-- Low Stock -->
-    <div class="card p-6 card-hover transition-all">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm font-medium mb-1">Niedriger Bestand</p>
-                <p class="text-3xl font-bold text-gray-800"><?php echo number_format($stats['low_stock']); ?></p>
+    
+    <!-- Status Overview Card -->
+    <div class="card p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">
+            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+            Status-Übersicht
+        </h3>
+        <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-triangle text-yellow-500 mr-3 text-xl"></i>
+                    <span class="text-gray-700 font-medium">Niedriger Bestand</span>
+                </div>
+                <span class="text-2xl font-bold text-yellow-600"><?php echo number_format($stats['low_stock']); ?></span>
             </div>
-            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
+            <?php if ($hasExtendedAccess && isset($inStockStats)): ?>
+            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
+                <div class="flex items-center">
+                    <i class="fas fa-warehouse text-green-500 mr-3 text-xl"></i>
+                    <span class="text-gray-700 font-medium">Im Lager</span>
+                </div>
+                <span class="text-2xl font-bold text-green-600"><?php echo number_format($inStockStats['total_in_stock']); ?></span>
             </div>
-        </div>
-        <?php if ($stats['low_stock'] > 0): ?>
-        <a href="../inventory/index.php?filter=low_stock" class="text-yellow-600 text-sm mt-2 inline-block hover:underline">
-            Ansehen <i class="fas fa-arrow-right ml-1"></i>
-        </a>
-        <?php endif; ?>
-    </div>
-
-    <!-- Recent Moves -->
-    <div class="card p-6 card-hover transition-all">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-gray-500 text-sm font-medium mb-1">Letzte 7 Tage</p>
-                <p class="text-3xl font-bold text-gray-800"><?php echo number_format($stats['recent_moves']); ?></p>
-            </div>
-            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <i class="fas fa-exchange-alt text-purple-600 text-xl"></i>
+            <?php endif; ?>
+            <div class="p-4 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200">
+                <p class="text-sm text-gray-600">
+                    <i class="fas fa-user-circle mr-2 text-purple-600"></i>
+                    Angemeldet als <strong><?php echo htmlspecialchars($user['email']); ?></strong>
+                </p>
             </div>
         </div>
     </div>
@@ -98,7 +161,7 @@ ob_start();
 
 <!-- Write-off Warning Box (if any this month) -->
 <?php if ($writeOffStats['total_writeoffs'] > 0): ?>
-<div class="mb-8 p-6 bg-red-50 border-l-4 border-red-500 rounded-lg">
+<div class="max-w-6xl mx-auto mt-8 p-6 bg-red-50 border-l-4 border-red-500 rounded-lg">
     <div class="flex items-center mb-4">
         <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
             <i class="fas fa-exclamation-circle text-red-600 text-2xl"></i>
@@ -148,7 +211,7 @@ ob_start();
 <?php endif; ?>
 
 <!-- In Stock and On Route Tiles -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+<div class="max-w-6xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Im Lager (In Stock) -->
     <div class="card p-6">
         <h2 class="text-xl font-bold text-gray-800 mb-4">
@@ -248,48 +311,6 @@ ob_start();
 </div>
 
 <?php endif; ?>
-
-<!-- Quick Actions -->
-<div class="card p-6 mb-8">
-    <h2 class="text-xl font-bold text-gray-800 mb-4">
-        <i class="fas fa-bolt text-yellow-500 mr-2"></i>
-        Schnellaktionen
-    </h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <a href="../inventory/index.php" class="btn-primary text-center block transition-all">
-            <i class="fas fa-boxes mr-2"></i>
-            Inventar anzeigen
-        </a>
-        <?php if (AuthHandler::hasPermission('manager')): ?>
-        <a href="../inventory/add.php" class="btn-primary text-center block transition-all">
-            <i class="fas fa-plus mr-2"></i>
-            Artikel hinzufügen
-        </a>
-        <?php endif; ?>
-        <a href="../auth/profile.php" class="btn-primary text-center block transition-all">
-            <i class="fas fa-user mr-2"></i>
-            Mein Profil
-        </a>
-        <?php if (AuthHandler::hasPermission('admin')): ?>
-        <a href="../admin/users.php" class="btn-primary text-center block transition-all">
-            <i class="fas fa-users mr-2"></i>
-            Benutzerverwaltung
-        </a>
-        <?php endif; ?>
-    </div>
-</div>
-
-<!-- Recent Activity (Placeholder) -->
-<div class="card p-6">
-    <h2 class="text-xl font-bold text-gray-800 mb-4">
-        <i class="fas fa-clock text-blue-500 mr-2"></i>
-        Letzte Aktivitäten
-    </h2>
-    <div class="text-gray-500 text-center py-8">
-        <i class="fas fa-history text-4xl mb-3 text-gray-300"></i>
-        <p>Keine aktuellen Aktivitäten</p>
-    </div>
-</div>
 
 <?php
 $content = ob_get_clean();

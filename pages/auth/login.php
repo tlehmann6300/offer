@@ -63,9 +63,9 @@ ob_start();
 ?>
 
 <div class="flex items-center justify-center min-h-screen p-4">
-    <div class="glass w-full max-w-md p-8 rounded-2xl shadow-2xl">
+    <div class="glass w-full max-w-md p-8 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300">
         <div class="text-center mb-8">
-            <div class="inline-block p-4 bg-white/20 rounded-full mb-4">
+            <div class="inline-block p-4 bg-white/20 rounded-full mb-4 hover:bg-white/30 transition-all duration-300">
                 <i class="fas fa-building text-4xl text-white"></i>
             </div>
             <h1 class="text-3xl font-bold text-white mb-2">IBC Intranet</h1>
@@ -89,7 +89,7 @@ ob_start();
                     type="email" 
                     name="email" 
                     required 
-                    class="w-full px-4 py-3 rounded-lg bg-white/90 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
+                    class="w-full px-4 py-3 rounded-lg bg-white/90 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white transition-all duration-300 hover:bg-white"
                     placeholder="ihre.email@beispiel.de"
                     value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
                 >
@@ -103,7 +103,7 @@ ob_start();
                     type="password" 
                     name="password" 
                     required 
-                    class="w-full px-4 py-3 rounded-lg bg-white/90 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
+                    class="w-full px-4 py-3 rounded-lg bg-white/90 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white transition-all duration-300 hover:bg-white"
                     placeholder="••••••••"
                 >
             </div>
@@ -118,7 +118,7 @@ ob_start();
                     required 
                     maxlength="6"
                     pattern="[0-9]{6}"
-                    class="w-full px-4 py-3 rounded-lg bg-white/90 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 transition text-center text-2xl tracking-widest"
+                    class="w-full px-4 py-3 rounded-lg bg-white/90 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white transition-all duration-300 hover:bg-white text-center text-2xl tracking-widest"
                     placeholder="000000"
                     autofocus
                 >
@@ -128,7 +128,7 @@ ob_start();
 
             <button 
                 type="submit" 
-                class="w-full py-3 px-6 bg-white text-purple-600 rounded-lg font-semibold hover:bg-white/90 transition transform hover:scale-105 shadow-lg"
+                class="w-full py-4 px-6 bg-white text-purple-600 rounded-lg font-semibold hover:bg-white/90 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg active:scale-95"
             >
                 <i class="fas fa-sign-in-alt mr-2"></i>
                 <?php echo $require2FA ? 'Code bestätigen' : 'Anmelden'; ?>
