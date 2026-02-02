@@ -6,6 +6,8 @@
  */
 
 // This component expects to be included in a page that has already done auth checks
+// Also requires CSRFHandler to be loaded
+require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 ?>
 
 <div class="mb-8">
@@ -24,6 +26,7 @@
     </h3>
     
     <form id="invitationForm" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">E-Mail-Adresse</label>
             <input 
@@ -347,6 +350,7 @@
         
         const formData = new FormData();
         formData.append('invitation_id', invitationId);
+        formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
         
         try {
             const response = await fetch('/api/delete_invitation.php', {

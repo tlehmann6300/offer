@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
 
 AuthHandler::startSession();
@@ -26,6 +27,8 @@ $error = '';
 
 // Handle checkout submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['checkout'])) {
+    CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
+    
     $quantity = intval($_POST['quantity'] ?? 0);
     $purpose = trim($_POST['purpose'] ?? '');
     $destination = trim($_POST['destination'] ?? '');
@@ -92,6 +95,7 @@ ob_start();
 
         <!-- Checkout Form -->
         <form method="POST" class="space-y-6">
+            <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
             <input type="hidden" name="checkout" value="1">
 
             <div>
