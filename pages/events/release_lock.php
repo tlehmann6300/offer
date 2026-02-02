@@ -3,11 +3,12 @@
  * Release lock endpoint for sendBeacon API
  * Called when user leaves the edit page
  */
+
+// Set JSON content type before any other output
+header('Content-Type: application/json');
+
 require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
 require_once __DIR__ . '/../../includes/models/Event.php';
-
-// Set JSON content type
-header('Content-Type: application/json');
 
 AuthHandler::startSession();
 
