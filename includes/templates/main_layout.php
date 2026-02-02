@@ -14,6 +14,7 @@
         :root {
             --primary: #667eea;
             --secondary: #764ba2;
+            --mobile-header-offset: 5rem; /* Offset for mobile toggle button */
         }
         .sidebar {
             background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
@@ -54,7 +55,7 @@
             /* Better spacing on mobile - add top padding for better visibility */
             main {
                 padding: 1rem !important;
-                padding-top: 5rem !important; /* Ensure content doesn't hide under toggle button */
+                padding-top: var(--mobile-header-offset) !important; /* Ensure content doesn't hide under toggle button */
             }
             
             /* Prevent horizontal overflow */

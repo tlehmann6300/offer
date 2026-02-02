@@ -211,10 +211,16 @@ ob_start();
                             'overdue' => 'Überfällig',
                             'defective' => 'Defekt'
                         ];
-                        $color = $statusColors[$rental['status']] ?? 'gray';
-                        $label = $statusLabels[$rental['status']] ?? $rental['status'];
+                        $statusClasses = [
+                            'active' => 'bg-green-100 text-green-700',
+                            'returned' => 'bg-blue-100 text-blue-700',
+                            'overdue' => 'bg-red-100 text-red-700',
+                            'defective' => 'bg-red-100 text-red-700'
+                        ];
+                        $statusClass = $statusClasses[$rental['status']] ?? 'bg-gray-100 text-gray-700';
+                        $label = $statusLabels[$rental['status']] ?? htmlspecialchars($rental['status']);
                         ?>
-                        <span class="px-2 py-1 text-xs bg-<?php echo $color; ?>-100 text-<?php echo $color; ?>-700 rounded-full">
+                        <span class="px-2 py-1 text-xs <?php echo $statusClass; ?> rounded-full">
                             <?php echo $label; ?>
                         </span>
                     </td>
