@@ -49,16 +49,16 @@ echo "Test 3: Testing getCheckedOutStats()\n";
 try {
     $checkedOutStats = Inventory::getCheckedOutStats();
     echo "✓ Checked-out statistics retrieved successfully\n";
-    echo "  - Total checkouts: " . $checkedOutStats['total_checked_out'] . "\n";
-    echo "  - Total quantity out: " . $checkedOutStats['total_quantity_out'] . " units\n";
+    echo "  - Total items out: " . $checkedOutStats['total_items_out'] . " units\n";
+    echo "  - Unique users: " . $checkedOutStats['unique_users'] . "\n";
+    echo "  - Overdue: " . $checkedOutStats['overdue'] . "\n";
     
-    if ($checkedOutStats['total_checked_out'] > 0) {
+    if ($checkedOutStats['total_items_out'] > 0 && !empty($checkedOutStats['checkouts'])) {
         echo "  - Sample checkout details:\n";
         $firstCheckout = $checkedOutStats['checkouts'][0];
         echo "    Item: " . $firstCheckout['item_name'] . "\n";
-        echo "    Quantity: " . $firstCheckout['quantity'] . "\n";
+        echo "    Amount: " . $firstCheckout['amount'] . "\n";
         echo "    Borrower: " . $firstCheckout['borrower_email'] . "\n";
-        echo "    Destination: " . ($firstCheckout['destination'] ?? 'Not specified') . "\n";
     }
 } catch (Exception $e) {
     echo "✗ Error: " . $e->getMessage() . "\n";
