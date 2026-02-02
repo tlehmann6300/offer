@@ -448,6 +448,11 @@ class Inventory {
      * This method returns rentals from the rentals table with proper column names
      */
     public static function getRentalsByUser($userId, $includeReturned = false) {
+        // Validate userId
+        if (!is_numeric($userId) || $userId <= 0) {
+            throw new InvalidArgumentException('Invalid user ID provided');
+        }
+        
         $db = Database::getContentDB();
         $sql = "
             SELECT 
