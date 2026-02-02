@@ -6,7 +6,10 @@
 
 require_once __DIR__ . '/../includes/handlers/AuthHandler.php';
 require_once __DIR__ . '/../includes/models/Event.php';
+require_once __DIR__ . '/../includes/models/User.php';
 require_once __DIR__ . '/../includes/database.php';
+require_once __DIR__ . '/../src/CalendarService.php';
+require_once __DIR__ . '/../src/MailService.php';
 
 // Start session and check authentication
 AuthHandler::startSession();
@@ -114,6 +117,57 @@ try {
             
             $result = Event::signup($eventId, $userId, $slotId, $userRole);
             
+            // Send confirmation email ONLY if signing up for a helper slot (not for general event participation)
+            if ($slotId && $result['status'] === 'confirmed') {
+                try {
+                    // Get full event details
+                    $fullEvent = Event::getById($eventId, true);
+                    
+                    // Get user details
+                    $db = Database::getContentDB();
+                    $userDb = Database::getUserDB();
+                    $userStmt = $userDb->prepare("SELECT first_name, last_name, email FROM users WHERE id = ?");
+                    $userStmt->execute([$userId]);
+                    $userDetails = $userStmt->fetch();
+                    
+                    if ($userDetails && $fullEvent) {
+                        // Get slot details
+                        $slotDetails = null;
+                        foreach ($fullEvent['helper_types'] as $helperType) {
+                            foreach ($helperType['slots'] as $slot) {
+                                if ($slot['id'] == $slotId) {
+                                    $slotDetails = $slot;
+                                    $slotDetails['slot_title'] = $helperType['title'];
+                                    break 2;
+                                }
+                            }
+                        }
+                        
+                        if ($slotDetails) {
+                            // Generate ICS content
+                            $icsContent = CalendarService::generateICS($fullEvent, $slotDetails);
+                            
+                            // Generate Google Calendar link
+                            $googleCalendarLink = CalendarService::generateGoogleCalendarLink($fullEvent, $slotDetails);
+                            
+                            // Send email
+                            $userName = $userDetails['first_name'] . ' ' . $userDetails['last_name'];
+                            MailService::sendHelperConfirmation(
+                                $userDetails['email'],
+                                $userName,
+                                $fullEvent,
+                                $slotDetails,
+                                $icsContent,
+                                $googleCalendarLink
+                            );
+                        }
+                    }
+                } catch (Exception $mailError) {
+                    // Log error but don't fail the signup
+                    error_log("Failed to send confirmation email: " . $mailError->getMessage());
+                }
+            }
+            
             echo json_encode([
                 'success' => true,
                 'message' => 'Anmeldung erfolgreich',
@@ -151,7 +205,61 @@ try {
             }
             
             // Cancel signup
-            Event::cancelSignup($signupId, $userId);
+            $cancelResult = Event::cancelSignup($signupId, $userId);
+            
+            // If someone was promoted from waitlist, send them a confirmation email
+            if (!empty($cancelResult['promoted_user_id'])) {
+                try {
+                    $promotedUserId = $cancelResult['promoted_user_id'];
+                    $eventId = $cancelResult['event_id'];
+                    $slotId = $cancelResult['slot_id'];
+                    
+                    // Get full event details
+                    $fullEvent = Event::getById($eventId, true);
+                    
+                    // Get promoted user details
+                    $userDb = Database::getUserDB();
+                    $userStmt = $userDb->prepare("SELECT first_name, last_name, email FROM users WHERE id = ?");
+                    $userStmt->execute([$promotedUserId]);
+                    $promotedUserDetails = $userStmt->fetch();
+                    
+                    if ($promotedUserDetails && $fullEvent) {
+                        // Get slot details
+                        $slotDetails = null;
+                        foreach ($fullEvent['helper_types'] as $helperType) {
+                            foreach ($helperType['slots'] as $slot) {
+                                if ($slot['id'] == $slotId) {
+                                    $slotDetails = $slot;
+                                    $slotDetails['slot_title'] = $helperType['title'];
+                                    break 2;
+                                }
+                            }
+                        }
+                        
+                        if ($slotDetails) {
+                            // Generate ICS content
+                            $icsContent = CalendarService::generateICS($fullEvent, $slotDetails);
+                            
+                            // Generate Google Calendar link
+                            $googleCalendarLink = CalendarService::generateGoogleCalendarLink($fullEvent, $slotDetails);
+                            
+                            // Send email
+                            $userName = $promotedUserDetails['first_name'] . ' ' . $promotedUserDetails['last_name'];
+                            MailService::sendHelperConfirmation(
+                                $promotedUserDetails['email'],
+                                $userName,
+                                $fullEvent,
+                                $slotDetails,
+                                $icsContent,
+                                $googleCalendarLink
+                            );
+                        }
+                    }
+                } catch (Exception $mailError) {
+                    // Log error but don't fail the cancellation
+                    error_log("Failed to send promotion email: " . $mailError->getMessage());
+                }
+            }
             
             echo json_encode([
                 'success' => true,
