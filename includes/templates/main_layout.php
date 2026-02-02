@@ -115,6 +115,10 @@
                     <i class="fas fa-boxes w-5"></i>
                     <span>Inventar</span>
                 </a>
+                <a href="../inventory/my_rentals.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                    <i class="fas fa-clipboard-list w-5"></i>
+                    <span>Meine Ausleihen</span>
+                </a>
                 <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
                 <a href="../admin/users.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                     <i class="fas fa-users w-5"></i>
