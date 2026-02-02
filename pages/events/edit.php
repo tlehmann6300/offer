@@ -126,6 +126,68 @@ $title = $isEdit ? 'Event bearbeiten - ' . htmlspecialchars($event['title'] ?? '
 ob_start();
 ?>
 
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+
+<style>
+/* Custom Flatpickr styling */
+.flatpickr-calendar {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+}
+
+.flatpickr-day.selected {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+}
+
+.flatpickr-time input:hover,
+.flatpickr-time input:focus {
+    background: #f3f4f6;
+}
+
+/* Tab styling improvements */
+.tab-button {
+    transition: all 0.2s ease;
+}
+
+.tab-button.active {
+    border-bottom-width: 3px;
+}
+
+/* Helper card styling */
+.helper-card {
+    transition: all 0.3s ease;
+    border: 2px solid #e5e7eb;
+}
+
+.helper-card:hover {
+    border-color: #9ca3af;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+/* Slot styling */
+.slot-item {
+    transition: all 0.2s ease;
+}
+
+.slot-item:hover {
+    background-color: #f9fafb;
+}
+
+/* Accordion animation */
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.accordion-content.active {
+    max-height: 2000px;
+}
+</style>
+
 <div class="mb-6">
     <a href="manage.php" class="text-purple-600 hover:text-purple-700 inline-flex items-center mb-4">
         <i class="fas fa-arrow-left mr-2"></i>Zurück zur Übersicht
@@ -156,24 +218,34 @@ ob_start();
         <?php echo $isEdit ? 'Event bearbeiten' : 'Neues Event erstellen'; ?>
     </h1>
 
-    <!-- Tab Navigation -->
+    <!-- Modern Tab Navigation -->
     <div class="mb-6">
         <div class="border-b border-gray-200">
             <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                 <button 
                     class="tab-button active border-purple-500 text-purple-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                     data-tab="basic"
+                    type="button"
                 >
                     <i class="fas fa-info-circle mr-2"></i>
                     Basisdaten
                 </button>
                 <button 
+                    class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                    data-tab="time"
+                    type="button"
+                >
+                    <i class="fas fa-clock mr-2"></i>
+                    Zeit & Einstellungen
+                </button>
+                <button 
                     id="helper-tab-button"
                     class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm <?php echo (!$isEdit || !$event['needs_helpers']) ? 'hidden' : ''; ?>"
                     data-tab="helpers"
+                    type="button"
                 >
                     <i class="fas fa-hands-helping mr-2"></i>
-                    Helfer-Konfiguration
+                    Helfer-Planung
                 </button>
             </nav>
         </div>
@@ -183,8 +255,13 @@ ob_start();
         <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
         <input type="hidden" name="helper_types_json" id="helper_types_json" value="">
 
-        <!-- Tab Content: Basic Data -->
+        <!-- Tab 1: Basisdaten -->
         <div id="tab-basic" class="tab-content">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-info-circle text-purple-600 mr-2"></i>
+                Basisdaten
+            </h2>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Title -->
                 <div class="md:col-span-2">
@@ -239,36 +316,48 @@ ob_start();
                         placeholder="Name des Ansprechpartners"
                     >
                 </div>
+            </div>
+        </div>
 
-                <!-- Start Time -->
+        <!-- Tab 2: Zeit & Einstellungen -->
+        <div id="tab-time" class="tab-content hidden">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-clock text-purple-600 mr-2"></i>
+                Zeit & Einstellungen
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Start Time with Flatpickr -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         Startzeit <span class="text-red-500">*</span>
                     </label>
                     <input 
-                        type="datetime-local" 
+                        type="text" 
                         name="start_time"
                         id="start_time"
-                        value="<?php echo $isEdit ? date('Y-m-d\TH:i', strtotime($event['start_time'])) : ''; ?>"
+                        value="<?php echo $isEdit ? date('Y-m-d H:i', strtotime($event['start_time'])) : ''; ?>"
                         required
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        placeholder="Datum und Uhrzeit wählen"
                     >
                 </div>
 
-                <!-- End Time -->
+                <!-- End Time with Flatpickr -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         Endzeit <span class="text-red-500">*</span>
                     </label>
                     <input 
-                        type="datetime-local" 
+                        type="text" 
                         name="end_time"
                         id="end_time"
-                        value="<?php echo $isEdit ? date('Y-m-d\TH:i', strtotime($event['end_time'])) : ''; ?>"
+                        value="<?php echo $isEdit ? date('Y-m-d H:i', strtotime($event['end_time'])) : ''; ?>"
                         required
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        placeholder="Datum und Uhrzeit wählen"
                     >
                 </div>
 
@@ -302,8 +391,8 @@ ob_start();
                 </div>
 
                 <!-- Checkboxes -->
-                <div class="md:col-span-2">
-                    <label class="flex items-center space-x-2 mb-4">
+                <div class="md:col-span-2 space-y-4">
+                    <label class="flex items-center space-x-2">
                         <input 
                             type="checkbox" 
                             name="is_external"
@@ -356,12 +445,17 @@ ob_start();
             </div>
         </div>
 
-        <!-- Tab Content: Helper Configuration -->
+        <!-- Tab 3: Helfer-Planung -->
         <div id="tab-helpers" class="tab-content hidden">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-hands-helping text-purple-600 mr-2"></i>
+                Helfer-Planung
+            </h2>
+            
             <div class="mb-4">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">Helfer-Konfiguration</h3>
-                <p class="text-sm text-gray-600 mb-4">
-                    Definieren Sie die verschiedenen Helfer-Arten und deren Zeitslots für dieses Event.
+                <p class="text-sm text-gray-600">
+                    Definieren Sie die verschiedenen Helfer-Rollen und deren Zeitslots für dieses Event.
+                    Jede Rolle kann mehrere Zeitslots haben, und für jeden Slot können Sie die benötigte Anzahl an Helfern festlegen.
                 </p>
             </div>
 
@@ -373,9 +467,9 @@ ob_start();
             <button 
                 type="button" 
                 id="addHelperTypeBtn"
-                class="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                class="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition inline-flex items-center"
             >
-                <i class="fas fa-plus mr-2"></i>Helfer-Art hinzufügen
+                <i class="fas fa-plus mr-2"></i>Helfer-Rolle hinzufügen
             </button>
             <?php endif; ?>
         </div>
@@ -430,7 +524,42 @@ ob_start();
 </div>
 <?php endif; ?>
 
+<!-- Flatpickr JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
+
 <script>
+// Initialize Flatpickr for datetime inputs
+document.addEventListener('DOMContentLoaded', function() {
+    const flatpickrOptions = {
+        enableTime: true,
+        time_24hr: true,
+        dateFormat: "Y-m-d H:i",
+        locale: "de",
+        minuteIncrement: 15,
+        <?php if ($readOnly): ?>
+        clickOpens: false,
+        <?php endif; ?>
+    };
+
+    // Initialize start time picker
+    const startTimePicker = flatpickr("#start_time", {
+        ...flatpickrOptions,
+        onChange: function(selectedDates, dateStr, instance) {
+            // Update end time picker minDate
+            if (endTimePicker) {
+                endTimePicker.set('minDate', dateStr);
+            }
+        }
+    });
+
+    // Initialize end time picker
+    const endTimePicker = flatpickr("#end_time", {
+        ...flatpickrOptions,
+        minDate: document.getElementById('start_time').value || 'today'
+    });
+});
+
 // Tab switching
 document.querySelectorAll('.tab-button').forEach(button => {
     button.addEventListener('click', function() {
@@ -461,60 +590,82 @@ needsHelpersCheckbox?.addEventListener('change', function() {
         helperTabButton.classList.remove('hidden');
     } else {
         helperTabButton.classList.add('hidden');
-        // Switch to basic tab if currently on helpers tab
+        // Switch to time tab if currently on helpers tab
         if (!document.getElementById('tab-helpers').classList.contains('hidden')) {
-            document.querySelector('[data-tab="basic"]').click();
+            document.querySelector('[data-tab="time"]').click();
         }
     }
 });
 
-// Dynamic helper type management
-let helperTypeCounter = 0;
+// ============================================================================
+// HELPER SLOTS MANAGEMENT - Robust JavaScript Logic
+// ============================================================================
 
+let helperTypeIndex = 0;
+let slotCounters = {}; // Track slot counters for each helper type
+
+/**
+ * Add a new helper type card
+ */
 function addHelperType() {
     const container = document.getElementById('helper-types-container');
-    const typeId = 'helper-type-' + (++helperTypeCounter);
+    const currentIndex = helperTypeIndex++;
+    slotCounters[currentIndex] = 0;
     
     const helperTypeHtml = `
-        <div id="${typeId}" class="p-4 border-2 border-gray-200 rounded-lg bg-white">
+        <div id="helper-type-${currentIndex}" class="helper-card p-6 rounded-lg bg-white" data-index="${currentIndex}">
             <div class="flex items-center justify-between mb-4">
-                <h4 class="text-md font-bold text-gray-800">Helfer-Art #${helperTypeCounter}</h4>
-                <button type="button" class="remove-helper-type-btn text-red-600 hover:text-red-700" data-type-id="${typeId}">
-                    <i class="fas fa-trash"></i>
+                <h4 class="text-lg font-bold text-gray-800">
+                    <i class="fas fa-users mr-2 text-purple-600"></i>
+                    Helfer-Rolle #${currentIndex + 1}
+                </h4>
+                <button 
+                    type="button" 
+                    class="remove-helper-type-btn text-red-600 hover:text-red-700 transition px-3 py-1 rounded hover:bg-red-50"
+                    data-index="${currentIndex}"
+                    title="Rolle entfernen"
+                >
+                    <i class="fas fa-trash mr-1"></i> Entfernen
                 </button>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Titel <span class="text-red-500">*</span>
+                        Titel der Rolle <span class="text-red-500">*</span>
                     </label>
                     <input 
                         type="text" 
                         class="helper-type-title w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder="z.B. Aufbau, Abbau, Catering"
-                        required
+                        placeholder="z.B. Aufbau-Team, Bar-Service, Technik"
+                        data-index="${currentIndex}"
                     >
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Beschreibung</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Beschreibung (optional)</label>
                     <input 
                         type="text" 
                         class="helper-type-description w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder="Optionale Beschreibung"
+                        placeholder="Kurze Beschreibung der Aufgaben"
+                        data-index="${currentIndex}"
                     >
                 </div>
             </div>
             
             <div class="border-t pt-4">
-                <h5 class="text-sm font-bold text-gray-700 mb-3">Zeitslots</h5>
-                <div class="slots-container space-y-3" data-type-id="${typeId}">
+                <div class="flex items-center justify-between mb-3">
+                    <h5 class="text-sm font-bold text-gray-700">
+                        <i class="fas fa-clock mr-2 text-purple-600"></i>
+                        Zeitslots
+                    </h5>
+                </div>
+                <div class="slots-container space-y-3" data-type-index="${currentIndex}">
                     <!-- Slots will be added here -->
                 </div>
                 <button 
                     type="button" 
-                    class="add-slot-btn mt-3 px-3 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition"
-                    data-type-id="${typeId}"
+                    class="add-slot-btn mt-3 px-3 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition inline-flex items-center"
+                    data-type-index="${currentIndex}"
                 >
                     <i class="fas fa-plus mr-1"></i>Zeitslot hinzufügen
                 </button>
@@ -525,55 +676,74 @@ function addHelperType() {
     container.insertAdjacentHTML('beforeend', helperTypeHtml);
 }
 
-function removeHelperType(typeId) {
-    if (confirm('Möchten Sie diese Helfer-Art wirklich entfernen?')) {
-        document.getElementById(typeId).remove();
+/**
+ * Remove a helper type
+ */
+function removeHelperType(typeIndex) {
+    if (confirm('Möchten Sie diese Helfer-Rolle wirklich entfernen? Alle Zeitslots werden ebenfalls gelöscht.')) {
+        const element = document.getElementById(`helper-type-${typeIndex}`);
+        if (element) {
+            element.remove();
+            delete slotCounters[typeIndex];
+        }
     }
 }
 
-function addSlot(typeId) {
-    const slotsContainer = document.querySelector(`[data-type-id="${typeId}"]`);
-    const slotId = 'slot-' + Date.now();
+/**
+ * Add a new slot to a helper type
+ */
+function addSlot(typeIndex) {
+    const slotsContainer = document.querySelector(`[data-type-index="${typeIndex}"]`);
+    if (!slotsContainer) return;
+    
+    const slotIndex = slotCounters[typeIndex]++;
     
     const slotHtml = `
-        <div id="${slotId}" class="grid grid-cols-1 md:grid-cols-4 gap-3 p-3 bg-gray-50 rounded-lg">
+        <div id="slot-${typeIndex}-${slotIndex}" class="slot-item grid grid-cols-1 md:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200" data-type-index="${typeIndex}" data-slot-index="${slotIndex}">
             <div>
                 <label class="block text-xs font-medium text-gray-700 mb-1">
-                    Start <span class="text-red-500">*</span>
+                    Startzeit <span class="text-red-500">*</span>
                 </label>
                 <input 
-                    type="datetime-local" 
-                    class="slot-start w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    required
+                    type="text" 
+                    class="slot-start flatpickr-slot w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Wählen..."
+                    data-type-index="${typeIndex}"
+                    data-slot-index="${slotIndex}"
                 >
             </div>
             <div>
                 <label class="block text-xs font-medium text-gray-700 mb-1">
-                    Ende <span class="text-red-500">*</span>
+                    Endzeit <span class="text-red-500">*</span>
                 </label>
                 <input 
-                    type="datetime-local" 
-                    class="slot-end w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    required
+                    type="text" 
+                    class="slot-end flatpickr-slot w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Wählen..."
+                    data-type-index="${typeIndex}"
+                    data-slot-index="${slotIndex}"
                 >
             </div>
             <div>
                 <label class="block text-xs font-medium text-gray-700 mb-1">
-                    Anzahl <span class="text-red-500">*</span>
+                    Anzahl Helfer <span class="text-red-500">*</span>
                 </label>
                 <input 
                     type="number" 
                     class="slot-quantity w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     min="1"
                     value="1"
-                    required
+                    data-type-index="${typeIndex}"
+                    data-slot-index="${slotIndex}"
                 >
             </div>
             <div class="flex items-end">
                 <button 
                     type="button" 
                     class="remove-slot-btn w-full px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition"
-                    data-slot-id="${slotId}"
+                    data-type-index="${typeIndex}"
+                    data-slot-index="${slotIndex}"
+                    title="Slot entfernen"
                 >
                     <i class="fas fa-trash"></i>
                 </button>
@@ -582,44 +752,118 @@ function addSlot(typeId) {
     `;
     
     slotsContainer.insertAdjacentHTML('beforeend', slotHtml);
+    
+    // Initialize Flatpickr for the new slot inputs
+    initializeSlotFlatpickr(typeIndex, slotIndex);
 }
 
-function removeSlot(slotId) {
-    document.getElementById(slotId).remove();
+/**
+ * Initialize Flatpickr for slot time inputs
+ */
+function initializeSlotFlatpickr(typeIndex, slotIndex) {
+    const startInput = document.querySelector(`.slot-start[data-type-index="${typeIndex}"][data-slot-index="${slotIndex}"]`);
+    const endInput = document.querySelector(`.slot-end[data-type-index="${typeIndex}"][data-slot-index="${slotIndex}"]`);
+    
+    if (startInput && endInput) {
+        const slotFlatpickrOptions = {
+            enableTime: true,
+            time_24hr: true,
+            dateFormat: "Y-m-d H:i",
+            locale: "de",
+            minuteIncrement: 15,
+        };
+        
+        const startPicker = flatpickr(startInput, {
+            ...slotFlatpickrOptions,
+            onChange: function(selectedDates, dateStr) {
+                // Update end picker minDate
+                if (endPicker) {
+                    endPicker.set('minDate', dateStr);
+                }
+            }
+        });
+        
+        const endPicker = flatpickr(endInput, slotFlatpickrOptions);
+    }
 }
 
-// Collect helper types data before form submission and validate
+/**
+ * Remove a slot
+ */
+function removeSlot(typeIndex, slotIndex) {
+    const element = document.getElementById(`slot-${typeIndex}-${slotIndex}`);
+    if (element) {
+        element.remove();
+    }
+}
+
+/**
+ * Collect and validate helper types data before form submission
+ */
 document.getElementById('eventForm')?.addEventListener('submit', function(e) {
     const startTime = document.getElementById('start_time').value;
     const endTime = document.getElementById('end_time').value;
     
     // Validate main event times
-    if (startTime && endTime && new Date(startTime) >= new Date(endTime)) {
-        e.preventDefault();
-        alert('Die Startzeit muss vor der Endzeit liegen!');
-        return false;
+    if (startTime && endTime) {
+        const startDate = new Date(startTime);
+        const endDate = new Date(endTime);
+        
+        if (startDate >= endDate) {
+            e.preventDefault();
+            alert('Die Startzeit muss vor der Endzeit liegen!');
+            return false;
+        }
     }
     
     // Collect helper types data
     const helperTypes = [];
+    const helperTypeElements = document.querySelectorAll('#helper-types-container > .helper-card');
     
-    document.querySelectorAll('#helper-types-container > div').forEach(typeDiv => {
-        const title = typeDiv.querySelector('.helper-type-title')?.value;
-        const description = typeDiv.querySelector('.helper-type-description')?.value;
+    helperTypeElements.forEach(typeDiv => {
+        const typeIndex = typeDiv.getAttribute('data-index');
+        const titleInput = typeDiv.querySelector(`.helper-type-title[data-index="${typeIndex}"]`);
+        const descriptionInput = typeDiv.querySelector(`.helper-type-description[data-index="${typeIndex}"]`);
         
-        if (!title) return;
+        const title = titleInput?.value.trim();
+        const description = descriptionInput?.value.trim();
         
+        if (!title) {
+            e.preventDefault();
+            alert('Bitte geben Sie einen Titel für alle Helfer-Rollen ein!');
+            titleInput?.focus();
+            return false;
+        }
+        
+        // Collect slots for this helper type
         const slots = [];
-        typeDiv.querySelectorAll('.slots-container > div').forEach(slotDiv => {
-            const startTime = slotDiv.querySelector('.slot-start')?.value;
-            const endTime = slotDiv.querySelector('.slot-end')?.value;
-            const quantity = slotDiv.querySelector('.slot-quantity')?.value;
+        const slotElements = typeDiv.querySelectorAll(`.slot-item[data-type-index="${typeIndex}"]`);
+        
+        slotElements.forEach(slotDiv => {
+            const slotIndex = slotDiv.getAttribute('data-slot-index');
+            const startInput = slotDiv.querySelector(`.slot-start[data-slot-index="${slotIndex}"]`);
+            const endInput = slotDiv.querySelector(`.slot-end[data-slot-index="${slotIndex}"]`);
+            const quantityInput = slotDiv.querySelector(`.slot-quantity[data-slot-index="${slotIndex}"]`);
             
-            if (startTime && endTime) {
+            const slotStart = startInput?.value;
+            const slotEnd = endInput?.value;
+            const quantity = parseInt(quantityInput?.value) || 1;
+            
+            if (slotStart && slotEnd) {
+                const slotStartDate = new Date(slotStart);
+                const slotEndDate = new Date(slotEnd);
+                
+                // Validate slot times
+                if (slotStartDate >= slotEndDate) {
+                    e.preventDefault();
+                    alert('Slot-Startzeit muss vor der Endzeit liegen!');
+                    return false;
+                }
+                
                 slots.push({
-                    start_time: startTime,
-                    end_time: endTime,
-                    quantity: parseInt(quantity) || 1
+                    start_time: slotStart,
+                    end_time: slotEnd,
+                    quantity: quantity
                 });
             }
         });
@@ -631,91 +875,109 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
         });
     });
     
+    // Set the JSON data
     document.getElementById('helper_types_json').value = JSON.stringify(helperTypes);
     
-    // Validate slots if helpers are needed
+    // Validate that helpers are configured if checkbox is checked
     if (document.getElementById('needs_helpers')?.checked) {
-        const eventStart = new Date(startTime);
-        const eventEnd = new Date(endTime);
-        let isValid = true;
-        
-        document.querySelectorAll('.slots-container > div').forEach(slotDiv => {
-            const slotStart = new Date(slotDiv.querySelector('.slot-start')?.value);
-            const slotEnd = new Date(slotDiv.querySelector('.slot-end')?.value);
-            
-            if (slotStart && slotEnd) {
-                if (slotStart < eventStart || slotEnd > eventEnd) {
-                    e.preventDefault();
-                    alert('Alle Zeitslots müssen innerhalb des Event-Zeitraums liegen!');
-                    isValid = false;
-                    return false;
-                }
-                if (slotStart >= slotEnd) {
-                    e.preventDefault();
-                    alert('Slot-Startzeit muss vor der Endzeit liegen!');
-                    isValid = false;
-                    return false;
-                }
-            }
-        });
-        
-        if (!isValid) return false;
+        if (helperTypes.length === 0) {
+            e.preventDefault();
+            alert('Bitte fügen Sie mindestens eine Helfer-Rolle hinzu oder deaktivieren Sie die "Helfer benötigt" Option!');
+            return false;
+        }
     }
 });
 
-// Load existing helper types if editing - using JSON data approach
+// Load existing helper types if editing
 <?php if ($isEdit && $event['needs_helpers'] && !empty($event['helper_types'])): ?>
 const existingHelperTypes = <?php echo json_encode($event['helper_types']); ?>;
 
 window.addEventListener('DOMContentLoaded', function() {
-    existingHelperTypes.forEach(helperType => {
-        addHelperType();
-        const lastType = document.querySelector('#helper-types-container > div:last-child');
-        lastType.querySelector('.helper-type-title').value = helperType.title;
-        lastType.querySelector('.helper-type-description').value = helperType.description || '';
-        
-        if (helperType.slots && helperType.slots.length > 0) {
-            helperType.slots.forEach(slot => {
-                addSlot(lastType.id);
-                const lastSlot = lastType.querySelector('.slots-container > div:last-child');
-                const slotStart = new Date(slot.start_time);
-                const slotEnd = new Date(slot.end_time);
-                lastSlot.querySelector('.slot-start').value = slotStart.toISOString().slice(0, 16);
-                lastSlot.querySelector('.slot-end').value = slotEnd.toISOString().slice(0, 16);
-                lastSlot.querySelector('.slot-quantity').value = slot.quantity_needed;
-            });
-        }
-    });
+    // Wait a bit to ensure everything is loaded
+    setTimeout(function() {
+        existingHelperTypes.forEach(helperType => {
+            addHelperType();
+            const lastType = document.querySelector('#helper-types-container > .helper-card:last-child');
+            const typeIndex = lastType.getAttribute('data-index');
+            
+            // Set title and description
+            const titleInput = lastType.querySelector(`.helper-type-title[data-index="${typeIndex}"]`);
+            const descriptionInput = lastType.querySelector(`.helper-type-description[data-index="${typeIndex}"]`);
+            
+            if (titleInput) titleInput.value = helperType.title || '';
+            if (descriptionInput) descriptionInput.value = helperType.description || '';
+            
+            // Add slots
+            if (helperType.slots && helperType.slots.length > 0) {
+                helperType.slots.forEach(slot => {
+                    addSlot(typeIndex);
+                    const lastSlot = lastType.querySelector(`.slot-item[data-type-index="${typeIndex}"]:last-child`);
+                    const slotIndex = lastSlot.getAttribute('data-slot-index');
+                    
+                    // Set slot values
+                    const startInput = lastSlot.querySelector(`.slot-start[data-slot-index="${slotIndex}"]`);
+                    const endInput = lastSlot.querySelector(`.slot-end[data-slot-index="${slotIndex}"]`);
+                    const quantityInput = lastSlot.querySelector(`.slot-quantity[data-slot-index="${slotIndex}"]`);
+                    
+                    if (startInput) {
+                        const slotStart = new Date(slot.start_time);
+                        startInput.value = slotStart.toISOString().slice(0, 16).replace('T', ' ');
+                        // Update flatpickr instance if it exists
+                        if (startInput._flatpickr) {
+                            startInput._flatpickr.setDate(slotStart);
+                        }
+                    }
+                    
+                    if (endInput) {
+                        const slotEnd = new Date(slot.end_time);
+                        endInput.value = slotEnd.toISOString().slice(0, 16).replace('T', ' ');
+                        // Update flatpickr instance if it exists
+                        if (endInput._flatpickr) {
+                            endInput._flatpickr.setDate(slotEnd);
+                        }
+                    }
+                    
+                    if (quantityInput) {
+                        quantityInput.value = slot.quantity_needed || 1;
+                    }
+                });
+            }
+        });
+    }, 100);
 });
 <?php endif; ?>
 
 // Event delegation for dynamically added buttons
-document.getElementById('addHelperTypeBtn')?.addEventListener('click', addHelperType);
-
-// Remove helper type buttons (event delegation)
 document.addEventListener('click', function(e) {
+    // Add helper type button
+    if (e.target.closest('#addHelperTypeBtn')) {
+        e.preventDefault();
+        addHelperType();
+    }
+    
+    // Remove helper type button
     if (e.target.closest('.remove-helper-type-btn')) {
+        e.preventDefault();
         const btn = e.target.closest('.remove-helper-type-btn');
-        const typeId = btn.getAttribute('data-type-id');
-        removeHelperType(typeId);
+        const typeIndex = btn.getAttribute('data-index');
+        removeHelperType(typeIndex);
     }
-});
-
-// Add slot buttons (event delegation)
-document.addEventListener('click', function(e) {
+    
+    // Add slot button
     if (e.target.closest('.add-slot-btn')) {
+        e.preventDefault();
         const btn = e.target.closest('.add-slot-btn');
-        const typeId = btn.getAttribute('data-type-id');
-        addSlot(typeId);
+        const typeIndex = btn.getAttribute('data-type-index');
+        addSlot(typeIndex);
     }
-});
-
-// Remove slot buttons (event delegation)
-document.addEventListener('click', function(e) {
+    
+    // Remove slot button
     if (e.target.closest('.remove-slot-btn')) {
+        e.preventDefault();
         const btn = e.target.closest('.remove-slot-btn');
-        const slotId = btn.getAttribute('data-slot-id');
-        removeSlot(slotId);
+        const typeIndex = btn.getAttribute('data-type-index');
+        const slotIndex = btn.getAttribute('data-slot-index');
+        removeSlot(typeIndex, slotIndex);
     }
 });
 
