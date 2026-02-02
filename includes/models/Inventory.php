@@ -583,7 +583,9 @@ class Inventory {
                 
                 // Add user info to checkouts
                 foreach ($checkouts as &$checkout) {
-                    $checkout['borrower_email'] = $users[$checkout['user_id']]['email'] ?? 'Unbekannt';
+                    $checkout['borrower_email'] = isset($users[$checkout['user_id']]) 
+                        ? $users[$checkout['user_id']]['email'] 
+                        : 'Unbekannt';
                 }
             }
         }

@@ -336,20 +336,32 @@ class Event {
                     
                     // Validate slot times if event times are provided
                     if ($eventStartTime && $eventEndTime) {
+                        // Parse times first
                         $slotStart = strtotime($slot['start_time']);
                         $slotEnd = strtotime($slot['end_time']);
                         $eventStart = strtotime($eventStartTime);
                         $eventEnd = strtotime($eventEndTime);
                         
-                        // Check if time parsing was successful
-                        if ($slotStart === false || $slotEnd === false || $eventStart === false || $eventEnd === false) {
-                            throw new Exception('Ungültige Zeitangaben in Slot oder Event');
+                        // Validate parsing was successful
+                        if ($slotStart === false) {
+                            throw new Exception('Ungültige Slot-Startzeit');
+                        }
+                        if ($slotEnd === false) {
+                            throw new Exception('Ungültige Slot-Endzeit');
+                        }
+                        if ($eventStart === false) {
+                            throw new Exception('Ungültige Event-Startzeit');
+                        }
+                        if ($eventEnd === false) {
+                            throw new Exception('Ungültige Event-Endzeit');
                         }
                         
+                        // Validate slot times are within event timeframe
                         if ($slotStart < $eventStart || $slotEnd > $eventEnd) {
                             throw new Exception('Zeitslots müssen innerhalb des Event-Zeitraums liegen');
                         }
                         
+                        // Validate slot start is before end
                         if ($slotStart >= $slotEnd) {
                             throw new Exception('Slot-Startzeit muss vor der Endzeit liegen');
                         }
