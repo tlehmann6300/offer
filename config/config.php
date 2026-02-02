@@ -35,8 +35,8 @@ function loadEnv($path) {
                 }
             }
             
-            // Remove quotes if present (and value is longer than 2 chars)
-            if (strlen($value) > 2) {
+            // Remove quotes if present (and value is at least 2 chars for quotes)
+            if (strlen($value) >= 2) {
                 if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
                     (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
                     $value = substr($value, 1, -1);

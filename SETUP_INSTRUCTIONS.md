@@ -21,23 +21,25 @@ The `.env` file should already be present in the root directory with the followi
 DB_USER_HOST=db5019508945.hosting-data.io
 DB_USER_NAME=dbs15253086
 DB_USER_USER=dbu4494103
-DB_USER_PASS=your_user_db_password_here
+DB_USER_PASS="<YOUR_USER_DB_PASSWORD>"
 
 # Content Database Configuration
 DB_CONTENT_HOST=db5019375140.hosting-data.io
 DB_CONTENT_NAME=dbs15161271
 DB_CONTENT_USER=dbu2067984
-DB_CONTENT_PASS=your_content_db_password_here
+DB_CONTENT_PASS="<YOUR_CONTENT_DB_PASSWORD>"
 
 # SMTP Configuration
 SMTP_HOST=smtp.ionos.de
-SMTP_USER=mail@test.business-consulting.de
-SMTP_PASS=your_smtp_password_here
-SMTP_FROM=mail@test.business-consulting.de
+SMTP_USER=<YOUR_SMTP_EMAIL>
+SMTP_PASS="<YOUR_SMTP_PASSWORD>"
+SMTP_FROM=<YOUR_SMTP_EMAIL>
 
 # Application Settings
 BASE_URL=https://intra.business-consulting.de
 ```
+
+**Note:** Use quotes around password values that contain special characters like `#`, `$`, `!`, etc.
 
 ### Step 2: Create Admin User
 
