@@ -297,9 +297,6 @@ ob_start();
                     <input 
                         type="text" 
                         name="location"
-                    <input 
-                        type="text" 
-                        name="location"
                         value="<?php echo htmlspecialchars($event['location'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
                         class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
