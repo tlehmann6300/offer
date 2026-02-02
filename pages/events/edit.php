@@ -41,23 +41,27 @@ if ($isEdit) {
 }
 
 $message = '';
-$error = '';
+$errors = [];
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$readOnly) {
-    CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
-    
     try {
+        CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
+    } catch (Exception $e) {
+        $errors[] = $e->getMessage();
+    }
+    
+    if (empty($errors)) {
         // Validate times
         $startTime = $_POST['start_time'] ?? '';
         $endTime = $_POST['end_time'] ?? '';
         
         if (empty($startTime) || empty($endTime)) {
-            throw new Exception('Start- und Endzeit sind erforderlich');
+            $errors[] = 'Start- und Endzeit sind erforderlich';
         }
         
-        if (strtotime($startTime) >= strtotime($endTime)) {
-            throw new Exception('Die Startzeit muss vor der Endzeit liegen');
+        if (empty($errors) && strtotime($startTime) >= strtotime($endTime)) {
+            $errors[] = 'Die Startzeit muss vor der Endzeit liegen';
         }
         
         // Prepare event data
@@ -83,29 +87,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$readOnly) {
         }
         
         if (empty($data['title'])) {
-            throw new Exception('Titel ist erforderlich');
+            $errors[] = 'Titel ist erforderlich';
         }
         
-        if ($isEdit) {
-            // Update existing event (model handles helper types and slots in transaction)
-            Event::update($eventId, $data, $_SESSION['user_id'], $_FILES);
-            
-            $message = 'Event erfolgreich aktualisiert';
-            
-            // Release lock and reload
-            Event::releaseLock($eventId, $_SESSION['user_id']);
-            header('Location: edit.php?id=' . $eventId . '&success=1');
-            exit;
-        } else {
-            // Create new event (model handles helper types and slots in transaction)
-            $newEventId = Event::create($data, $_SESSION['user_id'], $_FILES);
-            
-            $message = 'Event erfolgreich erstellt';
-            header('Location: edit.php?id=' . $newEventId . '&success=1');
-            exit;
+        // If no errors, proceed with save
+        if (empty($errors)) {
+            try {
+                if ($isEdit) {
+                    // Update existing event (model handles helper types and slots in transaction)
+                    Event::update($eventId, $data, $_SESSION['user_id'], $_FILES);
+                    
+                    $message = 'Event erfolgreich aktualisiert';
+                    
+                    // Release lock and reload
+                    Event::releaseLock($eventId, $_SESSION['user_id']);
+                    header('Location: edit.php?id=' . $eventId . '&success=1');
+                    exit;
+                } else {
+                    // Create new event (model handles helper types and slots in transaction)
+                    $newEventId = Event::create($data, $_SESSION['user_id'], $_FILES);
+                    
+                    $message = 'Event erfolgreich erstellt';
+                    header('Location: edit.php?id=' . $newEventId . '&success=1');
+                    exit;
+                }
+            } catch (Exception $e) {
+                $errors[] = $e->getMessage();
+            }
         }
-    } catch (Exception $e) {
-        $error = $e->getMessage();
     }
 }
 
@@ -132,6 +141,7 @@ ob_start();
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <style>
+/* IBC branded colors for this form */
 /* Note: Flatpickr styling is now handled by /assets/css/theme.css with IBC colors */
 
 /* Tab styling improvements */
@@ -193,9 +203,19 @@ ob_start();
 </div>
 <?php endif; ?>
 
-<?php if ($error): ?>
-<div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-    <i class="fas fa-exclamation-circle mr-2"></i><?php echo htmlspecialchars($error); ?>
+<?php if (!empty($errors)): ?>
+<div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-xl shadow-premium">
+    <div class="flex items-start">
+        <i class="fas fa-exclamation-circle text-xl mr-3"></i>
+        <div class="flex-1">
+            <h3 class="font-bold mb-2">Fehler beim Speichern:</h3>
+            <ul class="list-disc list-inside space-y-1">
+                <?php foreach ($errors as $error): ?>
+                <li><?php echo htmlspecialchars($error); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    </div>
 </div>
 <?php endif; ?>
 
@@ -238,7 +258,7 @@ ob_start();
         </div>
     </div>
 
-    <form method="POST" id="eventForm" class="space-y-6">
+    <form method="POST" enctype="multipart/form-data" id="eventForm" class="space-y-6">
         <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
         <input type="hidden" name="helper_types_json" id="helper_types_json" value="">
 
@@ -258,7 +278,7 @@ ob_start();
                     <input 
                         type="text" 
                         name="title" 
-                        value="<?php echo htmlspecialchars($event['title'] ?? ''); ?>"
+                        value="<?php echo htmlspecialchars($_POST['title'] ?? $event['title'] ?? ''); ?>"
                         required 
                         <?php echo $readOnly ? 'readonly' : ''; ?>
                         class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
@@ -275,7 +295,7 @@ ob_start();
                         <?php echo $readOnly ? 'readonly' : ''; ?>
                         class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Event-Beschreibung..."
-                    ><?php echo htmlspecialchars($event['description'] ?? ''); ?></textarea>
+                    ><?php echo htmlspecialchars($_POST['description'] ?? $event['description'] ?? ''); ?></textarea>
                 </div>
 
                 <!-- Contact Person -->
@@ -284,7 +304,7 @@ ob_start();
                     <input 
                         type="text" 
                         name="contact_person"
-                        value="<?php echo htmlspecialchars($event['contact_person'] ?? ''); ?>"
+                        value="<?php echo htmlspecialchars($_POST['contact_person'] ?? $event['contact_person'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
                         class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Name des Ansprechpartners"
@@ -297,7 +317,7 @@ ob_start();
                     <input 
                         type="text" 
                         name="location"
-                        value="<?php echo htmlspecialchars($event['location'] ?? ''); ?>"
+                        value="<?php echo htmlspecialchars($_POST['location'] ?? $event['location'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
                         class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="z.B. H-1.88 Aula"
@@ -317,12 +337,40 @@ ob_start();
                         <input 
                             type="url" 
                             name="maps_link"
-                            value="<?php echo htmlspecialchars($event['maps_link'] ?? ''); ?>"
+                            value="<?php echo htmlspecialchars($_POST['maps_link'] ?? $event['maps_link'] ?? ''); ?>"
                             <?php echo $readOnly ? 'readonly' : ''; ?>
                             class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                             placeholder="https://maps.google.com/..."
                         >
                     </div>
+                </div>
+
+                <!-- Event Image Upload -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Event-Bild
+                        <span class="text-xs text-gray-500 ml-2">(Optional)</span>
+                    </label>
+                    
+                    <?php if ($isEdit && !empty($event['image_path'])): ?>
+                    <div class="mb-3">
+                        <p class="text-sm text-gray-600 mb-2">Aktuelles Bild:</p>
+                        <img 
+                            src="/<?php echo htmlspecialchars($event['image_path']); ?>" 
+                            alt="Event Bild"
+                            class="max-w-xs rounded-xl border border-gray-300 shadow-sm"
+                        >
+                    </div>
+                    <?php endif; ?>
+                    
+                    <input 
+                        type="file" 
+                        name="event_image"
+                        accept="image/*"
+                        <?php echo $readOnly ? 'disabled' : ''; ?>
+                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                    >
+                    <p class="text-xs text-gray-500 mt-1">Unterstützte Formate: JPG, PNG, GIF. Max. 5MB.</p>
                 </div>
             </div>
         </div>
@@ -344,7 +392,13 @@ ob_start();
                         type="text" 
                         name="start_time"
                         id="start_time"
-                        value="<?php echo $isEdit ? date('Y-m-d H:i', strtotime($event['start_time'])) : ''; ?>"
+                        value="<?php 
+                            if (!empty($_POST['start_time'])) {
+                                echo htmlspecialchars($_POST['start_time']);
+                            } elseif ($isEdit && !empty($event['start_time'])) {
+                                echo date('Y-m-d H:i', strtotime($event['start_time']));
+                            }
+                        ?>"
                         required
                         <?php echo $readOnly ? 'readonly' : ''; ?>
                         class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
@@ -361,7 +415,13 @@ ob_start();
                         type="text" 
                         name="end_time"
                         id="end_time"
-                        value="<?php echo $isEdit ? date('Y-m-d H:i', strtotime($event['end_time'])) : ''; ?>"
+                        value="<?php 
+                            if (!empty($_POST['end_time'])) {
+                                echo htmlspecialchars($_POST['end_time']);
+                            } elseif ($isEdit && !empty($event['end_time'])) {
+                                echo date('Y-m-d H:i', strtotime($event['end_time']));
+                            }
+                        ?>"
                         required
                         <?php echo $readOnly ? 'readonly' : ''; ?>
                         class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
@@ -379,7 +439,13 @@ ob_start();
                         type="text" 
                         name="registration_start"
                         id="registration_start"
-                        value="<?php echo $isEdit && !empty($event['registration_start']) ? date('Y-m-d H:i', strtotime($event['registration_start'])) : ''; ?>"
+                        value="<?php 
+                            if (!empty($_POST['registration_start'])) {
+                                echo htmlspecialchars($_POST['registration_start']);
+                            } elseif ($isEdit && !empty($event['registration_start'])) {
+                                echo date('Y-m-d H:i', strtotime($event['registration_start']));
+                            }
+                        ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
                         class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Anmeldebeginn wählen"
@@ -396,7 +462,13 @@ ob_start();
                         type="text" 
                         name="registration_end"
                         id="registration_end"
-                        value="<?php echo $isEdit && !empty($event['registration_end']) ? date('Y-m-d H:i', strtotime($event['registration_end'])) : ''; ?>"
+                        value="<?php 
+                            if (!empty($_POST['registration_end'])) {
+                                echo htmlspecialchars($_POST['registration_end']);
+                            } elseif ($isEdit && !empty($event['registration_end'])) {
+                                echo date('Y-m-d H:i', strtotime($event['registration_end']));
+                            }
+                        ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
                         class="flatpickr-input w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Anmeldeende wählen"
@@ -426,7 +498,7 @@ ob_start();
                     <input 
                         type="url" 
                         name="external_link"
-                        value="<?php echo htmlspecialchars($event['external_link'] ?? ''); ?>"
+                        value="<?php echo htmlspecialchars($_POST['external_link'] ?? $event['external_link'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
                         class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="https://..."
@@ -439,7 +511,13 @@ ob_start();
                         <input 
                             type="checkbox" 
                             name="is_external"
-                            <?php echo ($event['is_external'] ?? false) ? 'checked' : ''; ?>
+                            <?php 
+                            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                                echo isset($_POST['is_external']) ? 'checked' : '';
+                            } else {
+                                echo ($event['is_external'] ?? false) ? 'checked' : '';
+                            }
+                            ?>
                             <?php echo $readOnly ? 'disabled' : ''; ?>
                             class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                         >
@@ -451,7 +529,13 @@ ob_start();
                             type="checkbox" 
                             name="needs_helpers"
                             id="needs_helpers"
-                            <?php echo ($event['needs_helpers'] ?? false) ? 'checked' : ''; ?>
+                            <?php 
+                            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                                echo isset($_POST['needs_helpers']) ? 'checked' : '';
+                            } else {
+                                echo ($event['needs_helpers'] ?? false) ? 'checked' : '';
+                            }
+                            ?>
                             <?php echo $readOnly ? 'disabled' : ''; ?>
                             class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                         >
@@ -468,7 +552,7 @@ ob_start();
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                         <?php 
                         $roles = ['member' => 'Mitglied', 'alumni' => 'Alumni', 'manager' => 'Ressortleiter', 'alumni_board' => 'Alumni-Vorstand', 'board' => 'Vorstand', 'admin' => 'Administrator'];
-                        $allowedRoles = $event['allowed_roles'] ?? [];
+                        $allowedRoles = $_POST['allowed_roles'] ?? $event['allowed_roles'] ?? [];
                         foreach ($roles as $roleValue => $roleLabel): 
                         ?>
                         <label class="flex items-center space-x-2">
