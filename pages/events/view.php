@@ -224,6 +224,11 @@ ob_start();
                                 $occupancy = $slot['signups_count'] . '/' . $slot['quantity_needed'];
                                 $canSignup = !$slot['is_full'] && !$slot['user_in_slot'];
                                 $onWaitlist = $slot['is_full'] && !$slot['user_in_slot'];
+                                
+                                // Prepare slot parameters for onclick handlers
+                                $slotStartFormatted = htmlspecialchars($slotStart->format('Y-m-d H:i:s'), ENT_QUOTES);
+                                $slotEndFormatted = htmlspecialchars($slotEnd->format('Y-m-d H:i:s'), ENT_QUOTES);
+                                $slotSignupHandler = "signupForSlot({$eventId}, {$slot['id']}, '{$slotStartFormatted}', '{$slotEndFormatted}')";
                             ?>
                             
                             <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -253,13 +258,13 @@ ob_start();
                                             <?php endif; ?>
                                         </div>
                                     <?php elseif ($canSignup): ?>
-                                        <button onclick="signupForSlot(<?php echo $eventId; ?>, <?php echo $slot['id']; ?>, '<?php echo htmlspecialchars($slotStart->format('Y-m-d H:i:s'), ENT_QUOTES); ?>', '<?php echo htmlspecialchars($slotEnd->format('Y-m-d H:i:s'), ENT_QUOTES); ?>')" 
+                                        <button onclick="<?php echo $slotSignupHandler; ?>" 
                                                 class="px-6 py-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg font-semibold hover:from-orange-700 hover:to-orange-800 transition-all">
                                             <i class="fas fa-user-plus mr-2"></i>
                                             Eintragen
                                         </button>
                                     <?php elseif ($onWaitlist): ?>
-                                        <button onclick="signupForSlot(<?php echo $eventId; ?>, <?php echo $slot['id']; ?>, '<?php echo htmlspecialchars($slotStart->format('Y-m-d H:i:s'), ENT_QUOTES); ?>', '<?php echo htmlspecialchars($slotEnd->format('Y-m-d H:i:s'), ENT_QUOTES); ?>')" 
+                                        <button onclick="<?php echo $slotSignupHandler; ?>" 
                                                 class="px-6 py-2 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white rounded-lg font-semibold hover:from-yellow-700 hover:to-yellow-800 transition-all">
                                             <i class="fas fa-list mr-2"></i>
                                             Warteliste

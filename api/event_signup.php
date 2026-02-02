@@ -85,8 +85,8 @@ try {
                 $stmt->execute([
                     $userId,
                     $eventId,
-                    $slotEnd,      // Existing slot starts before new slot ends
-                    $slotStart     // Existing slot ends after new slot starts
+                    $slotEnd,      // New slot ends after existing slot starts (es.start_time < slot_end)
+                    $slotStart     // New slot starts before existing slot ends (es.end_time > slot_start)
                 ]);
                 
                 $conflicts = $stmt->fetchAll();
