@@ -59,15 +59,35 @@ php create_admin.php
 
 Folgen Sie den Anweisungen und geben Sie E-Mail und Passwort ein.
 
-**WICHTIG:** Löschen Sie `create_admin.php` nach dem Erstellen!
+**Hinweis:** Diese Datei wird automatisch vom cleanup_system.php Skript gelöscht (siehe Schritt 6).
 
-### 6. Erster Login
+### 6. System bereinigen (Sicherheit)
+
+**WICHTIG:** Nach erfolgreicher Installation und Admin-Erstellung sollten alle Installations-Skripte entfernt werden:
+
+```bash
+php cleanup_system.php
+```
+
+Dieses Skript:
+- ✅ Löscht `create_tom.php` (falls vorhanden)
+- ✅ Löscht `create_admin.php` (falls vorhanden)
+- ✅ Löscht `setup.sh` (Installations-Skript)
+- ✅ Löscht `import_database.sh` (falls vorhanden)
+- ✅ Prüft migrations-Ordner auf sensible Daten und löscht ihn bei Bedarf
+- ✅ Löscht sich selbst nach Ausführung
+
+**Ausgabe:** "System bereinigt. Admin-Skripte gelöscht."
+
+Dies verhindert, dass unbefugte Personen das System neu installieren oder zusätzliche Admins anlegen können.
+
+### 7. Erster Login
 
 1. Öffnen Sie Ihre Website in einem Browser
 2. Sie werden automatisch zur Login-Seite weitergeleitet
 3. Melden Sie sich mit dem Admin-Konto an, das Sie gerade erstellt haben
 
-### 7. Nach dem ersten Login
+### 8. Nach dem ersten Login
 
 1. **2FA aktivieren (empfohlen):**
    - Gehen Sie zu: Profil → 2-Faktor-Authentifizierung
@@ -80,7 +100,7 @@ Folgen Sie den Anweisungen und geben Sie E-Mail und Passwort ein.
    - Geben Sie E-Mail und Rolle des neuen Benutzers ein
    - Kopieren Sie den Einladungslink und senden Sie ihn an den Benutzer
 
-### 8. Inventar einrichten
+### 9. Inventar einrichten
 
 1. **Kategorien anpassen:**
    - Standard-Kategorien sind bereits vorhanden
