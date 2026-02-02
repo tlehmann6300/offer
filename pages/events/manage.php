@@ -46,7 +46,7 @@ if (!empty($_GET['end_date'])) {
 $filters['include_helpers'] = true;
 
 // Get events
-$userRole = $_SESSION['role'] ?? 'member';
+$userRole = $_SESSION['user_role'] ?? 'member';
 $events = Event::getEvents($filters, $userRole);
 
 $title = 'Event-Verwaltung - IBC Intranet';
@@ -263,7 +263,7 @@ ob_start();
 
 <script>
 // Delete button event listeners using data attributes
-document.querySelectorAll('.delete-event-btn').forEach(button => {
+document.querySelectorAll('.delete-event-btn')?.forEach(button => {
     button.addEventListener('click', function() {
         const eventId = this.getAttribute('data-event-id');
         const eventName = this.getAttribute('data-event-name');
@@ -272,13 +272,18 @@ document.querySelectorAll('.delete-event-btn').forEach(button => {
 });
 
 function confirmDelete(eventId, eventName) {
-    document.getElementById('deleteEventId').value = eventId;
-    document.getElementById('deleteEventName').textContent = eventName;
-    document.getElementById('deleteModal').classList.remove('hidden');
+    const deleteEventId = document.getElementById('deleteEventId');
+    const deleteEventName = document.getElementById('deleteEventName');
+    const deleteModal = document.getElementById('deleteModal');
+    
+    if (deleteEventId) deleteEventId.value = eventId;
+    if (deleteEventName) deleteEventName.textContent = eventName;
+    if (deleteModal) deleteModal.classList.remove('hidden');
 }
 
 function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.add('hidden');
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) deleteModal.classList.add('hidden');
 }
 
 // Close modal button

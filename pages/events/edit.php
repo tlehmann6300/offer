@@ -818,7 +818,7 @@ window.addEventListener('beforeunload', function() {
     const formData = new FormData();
     formData.append('event_id', <?php echo $eventId; ?>);
     formData.append('user_id', <?php echo $_SESSION['user_id']; ?>);
-    navigator.sendBeacon('../events/release_lock.php', formData);
+    navigator.sendBeacon('/pages/events/release_lock.php', formData);
 });
 <?php endif; ?>
 </script>
