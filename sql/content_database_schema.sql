@@ -1,6 +1,6 @@
 -- Content Database Schema (dbs15161271)
 -- Inventory, Rentals, Events, System Logs
--- Optimized version with consolidated migrations (Checkout system, Rentals, Events)
+-- MySQL 8.0+ compatible (no integer display width warnings)
 
 -- ============================================
 -- INVENTORY MANAGEMENT TABLES
@@ -15,9 +15,11 @@ CREATE TABLE IF NOT EXISTS categories (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_name (name)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
--- Locations table (includes H-1.87 and H-1.88)
+-- Locations table
 CREATE TABLE IF NOT EXISTS locations (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
@@ -26,7 +28,9 @@ CREATE TABLE IF NOT EXISTS locations (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_name (name)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 -- Inventory table
 CREATE TABLE IF NOT EXISTS inventory (
@@ -47,14 +51,19 @@ CREATE TABLE IF NOT EXISTS inventory (
     FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE SET NULL,
     INDEX idx_category (category_id),
     INDEX idx_location (location_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
--- Inventory history table (audit log) - optimized with TEXT
+-- Inventory history (audit log)
 CREATE TABLE IF NOT EXISTS inventory_history (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     item_id INT UNSIGNED NOT NULL,
     user_id INT UNSIGNED NOT NULL,
-    change_type ENUM('adjustment', 'create', 'update', 'delete', 'checkout', 'checkin', 'writeoff') NOT NULL DEFAULT 'adjustment',
+    change_type ENUM(
+        'adjustment', 'create', 'update', 'delete',
+        'checkout', 'checkin', 'writeoff'
+    ) NOT NULL DEFAULT 'adjustment',
     old_stock INT DEFAULT NULL,
     new_stock INT DEFAULT NULL,
     change_amount INT DEFAULT NULL,
@@ -65,13 +74,14 @@ CREATE TABLE IF NOT EXISTS inventory_history (
     INDEX idx_item_id (item_id),
     INDEX idx_user_id (user_id),
     INDEX idx_timestamp (timestamp)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- RENTALS TABLE
+-- RENTALS
 -- ============================================
 
--- Rentals table (simplified rental tracking)
 CREATE TABLE IF NOT EXISTS rentals (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNSIGNED NOT NULL,
@@ -80,7 +90,8 @@ CREATE TABLE IF NOT EXISTS rentals (
     rented_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expected_return DATE DEFAULT NULL,
     actual_return TIMESTAMP DEFAULT NULL,
-    status ENUM('active', 'returned', 'overdue', 'defective') NOT NULL DEFAULT 'active',
+    status ENUM('active', 'returned', 'overdue', 'defective')
+        NOT NULL DEFAULT 'active',
     defect_notes TEXT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -88,13 +99,15 @@ CREATE TABLE IF NOT EXISTS rentals (
     INDEX idx_user_id (user_id),
     INDEX idx_item_id (item_id),
     INDEX idx_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- EVENT MANAGEMENT TABLES
+-- EVENT MANAGEMENT
 -- ============================================
 
--- Events table (main table for all events)
+-- Events table
 CREATE TABLE IF NOT EXISTS events (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
@@ -103,10 +116,11 @@ CREATE TABLE IF NOT EXISTS events (
     start_time DATETIME NOT NULL,
     end_time DATETIME NOT NULL,
     contact_person VARCHAR(100) DEFAULT NULL,
-    status ENUM('planned', 'open', 'closed', 'running', 'past') NOT NULL DEFAULT 'planned',
-    is_external TINYINT(1) NOT NULL DEFAULT 0,
+    status ENUM('planned', 'open', 'closed', 'running', 'past')
+        NOT NULL DEFAULT 'planned',
+    is_external BOOLEAN NOT NULL DEFAULT FALSE,
     external_link VARCHAR(255) DEFAULT NULL,
-    needs_helpers TINYINT(1) NOT NULL DEFAULT 0,
+    needs_helpers BOOLEAN NOT NULL DEFAULT FALSE,
     locked_by INT UNSIGNED DEFAULT NULL,
     locked_at DATETIME DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -114,9 +128,11 @@ CREATE TABLE IF NOT EXISTS events (
     INDEX idx_status (status),
     INDEX idx_start_time (start_time),
     INDEX idx_needs_helpers (needs_helpers)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
--- Event roles table (links events with allowed roles)
+-- Event roles
 CREATE TABLE IF NOT EXISTS event_roles (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     event_id INT UNSIGNED NOT NULL,
@@ -125,9 +141,11 @@ CREATE TABLE IF NOT EXISTS event_roles (
     FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
     UNIQUE KEY unique_event_role (event_id, role),
     INDEX idx_event_id (event_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
--- Event helper types table (defines types of helpers needed)
+-- Event helper types
 CREATE TABLE IF NOT EXISTS event_helper_types (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     event_id INT UNSIGNED NOT NULL,
@@ -137,9 +155,11 @@ CREATE TABLE IF NOT EXISTS event_helper_types (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
     INDEX idx_event_id (event_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
--- Event slots table (time slots for specific helper types)
+-- Event slots
 CREATE TABLE IF NOT EXISTS event_slots (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     helper_type_id INT UNSIGNED NOT NULL,
@@ -151,15 +171,18 @@ CREATE TABLE IF NOT EXISTS event_slots (
     FOREIGN KEY (helper_type_id) REFERENCES event_helper_types(id) ON DELETE CASCADE,
     INDEX idx_helper_type_id (helper_type_id),
     INDEX idx_start_time (start_time)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
--- Event signups table (tracks user registrations)
+-- Event signups
 CREATE TABLE IF NOT EXISTS event_signups (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     event_id INT UNSIGNED NOT NULL,
     user_id INT UNSIGNED NOT NULL,
     slot_id INT UNSIGNED DEFAULT NULL,
-    status ENUM('confirmed', 'waitlist', 'cancelled') NOT NULL DEFAULT 'confirmed',
+    status ENUM('confirmed', 'waitlist', 'cancelled')
+        NOT NULL DEFAULT 'confirmed',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
@@ -168,9 +191,11 @@ CREATE TABLE IF NOT EXISTS event_signups (
     INDEX idx_event_id (event_id),
     INDEX idx_user_id (user_id),
     INDEX idx_status (status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
--- Event history table (audit log for events) - optimized with TEXT
+-- Event history
 CREATE TABLE IF NOT EXISTS event_history (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     event_id INT UNSIGNED NOT NULL,
@@ -182,13 +207,14 @@ CREATE TABLE IF NOT EXISTS event_history (
     INDEX idx_event_id (event_id),
     INDEX idx_user_id (user_id),
     INDEX idx_timestamp (timestamp)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
--- SYSTEM LOGS TABLE
+-- SYSTEM LOGS
 -- ============================================
 
--- System logs table
 CREATE TABLE IF NOT EXISTS system_logs (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNSIGNED DEFAULT NULL,
@@ -201,56 +227,19 @@ CREATE TABLE IF NOT EXISTS system_logs (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_user_id (user_id),
     INDEX idx_timestamp (timestamp)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
 -- DEFAULT DATA
 -- ============================================
 
--- Insert initial categories
 INSERT IGNORE INTO categories (name, description, color) VALUES 
 ('Technik', 'Computer, Bildschirme, Peripherie', '#8B5CF6'),
 ('Büromaterial', 'Stifte, Papier, Ordner', '#F59E0B'),
 ('Event-Zubehör', 'Equipment für Events', '#EF4444');
 
--- Insert initial locations
 INSERT IGNORE INTO locations (name, description) VALUES 
 ('Furtwangen H-Bau -1.87', 'Lagerraum Furtwangen H-Bau -1.87'),
 ('Furtwangen H-Bau -1.88', 'Lagerraum Furtwangen H-Bau -1.88');
-
--- ============================================
--- OPTIONAL: AUTOMATED CLEANUP PROCEDURE
--- ============================================
--- This procedure deletes old log entries from inventory_history and event_history
--- that are older than 2 years. Uncomment and adjust as needed.
-
-/*
-DELIMITER $$
-
-CREATE PROCEDURE cleanup_old_logs()
-BEGIN
-    -- Delete inventory_history entries older than 2 years
-    DELETE FROM inventory_history 
-    WHERE timestamp < DATE_SUB(NOW(), INTERVAL 2 YEAR);
-    
-    -- Delete event_history entries older than 2 years
-    DELETE FROM event_history 
-    WHERE timestamp < DATE_SUB(NOW(), INTERVAL 2 YEAR);
-    
-    -- Log the cleanup action
-    INSERT INTO system_logs (action, details, timestamp) 
-    VALUES ('cleanup_old_logs', CONCAT('Deleted old history entries. Timestamp: ', NOW()), NOW());
-END$$
-
-DELIMITER ;
-
--- To schedule this procedure to run automatically, create an event:
--- Note: Make sure the event scheduler is enabled: SET GLOBAL event_scheduler = ON;
-
-/*
-CREATE EVENT IF NOT EXISTS cleanup_old_logs_event
-ON SCHEDULE EVERY 1 MONTH
-STARTS CURRENT_TIMESTAMP
-DO
-    CALL cleanup_old_logs();
-*/
