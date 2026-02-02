@@ -78,19 +78,15 @@ try {
                     AND s.status = 'confirmed'
                     AND s.slot_id IS NOT NULL
                     AND s.event_id != ?
-                    AND (
-                        (es.start_time < ? AND es.end_time > ?)
-                        OR (es.start_time < ? AND es.end_time > ?)
-                        OR (es.start_time >= ? AND es.end_time <= ?)
-                    )
+                    AND es.start_time < ?
+                    AND es.end_time > ?
                 ");
                 
                 $stmt->execute([
                     $userId,
                     $eventId,
-                    $slotEnd, $slotStart,    // Slot ends after requested start
-                    $slotEnd, $slotStart,    // Slot starts before requested end
-                    $slotStart, $slotEnd     // Slot is completely within requested time
+                    $slotEnd,      // Existing slot starts before new slot ends
+                    $slotStart     // Existing slot ends after new slot starts
                 ]);
                 
                 $conflicts = $stmt->fetchAll();

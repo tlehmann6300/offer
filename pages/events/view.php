@@ -253,13 +253,13 @@ ob_start();
                                             <?php endif; ?>
                                         </div>
                                     <?php elseif ($canSignup): ?>
-                                        <button onclick="signupForSlot(<?php echo $eventId; ?>, <?php echo $slot['id']; ?>, '<?php echo $slotStart->format('Y-m-d H:i:s'); ?>', '<?php echo $slotEnd->format('Y-m-d H:i:s'); ?>')" 
+                                        <button onclick="signupForSlot(<?php echo $eventId; ?>, <?php echo $slot['id']; ?>, '<?php echo htmlspecialchars($slotStart->format('Y-m-d H:i:s'), ENT_QUOTES); ?>', '<?php echo htmlspecialchars($slotEnd->format('Y-m-d H:i:s'), ENT_QUOTES); ?>')" 
                                                 class="px-6 py-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg font-semibold hover:from-orange-700 hover:to-orange-800 transition-all">
                                             <i class="fas fa-user-plus mr-2"></i>
                                             Eintragen
                                         </button>
                                     <?php elseif ($onWaitlist): ?>
-                                        <button onclick="signupForSlot(<?php echo $eventId; ?>, <?php echo $slot['id']; ?>, '<?php echo $slotStart->format('Y-m-d H:i:s'); ?>', '<?php echo $slotEnd->format('Y-m-d H:i:s'); ?>')" 
+                                        <button onclick="signupForSlot(<?php echo $eventId; ?>, <?php echo $slot['id']; ?>, '<?php echo htmlspecialchars($slotStart->format('Y-m-d H:i:s'), ENT_QUOTES); ?>', '<?php echo htmlspecialchars($slotEnd->format('Y-m-d H:i:s'), ENT_QUOTES); ?>')" 
                                                 class="px-6 py-2 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white rounded-lg font-semibold hover:from-yellow-700 hover:to-yellow-800 transition-all">
                                             <i class="fas fa-list mr-2"></i>
                                             Warteliste
@@ -363,8 +363,8 @@ function signupForSlot(eventId, slotId, slotStart, slotEnd) {
 }
 
 // Cancel signup (general or helper slot)
-function cancelSignup(signupId) {
-    if (!confirm('Möchten Sie Ihre Anmeldung wirklich stornieren?')) {
+function cancelSignup(signupId, message = 'Möchten Sie Ihre Anmeldung wirklich stornieren?', successMessage = 'Abmeldung erfolgreich') {
+    if (!confirm(message)) {
         return;
     }
     
@@ -381,7 +381,7 @@ function cancelSignup(signupId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            showMessage('Abmeldung erfolgreich', 'success');
+            showMessage(successMessage, 'success');
             setTimeout(() => location.reload(), 1500);
         } else {
             showMessage(data.message || 'Fehler bei der Abmeldung', 'error');
@@ -392,34 +392,9 @@ function cancelSignup(signupId) {
     });
 }
 
-// Cancel helper slot
+// Cancel helper slot (wrapper for consistency)
 function cancelHelperSlot(signupId) {
-    if (!confirm('Möchten Sie sich wirklich austragen?')) {
-        return;
-    }
-    
-    fetch('/api/event_signup.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            action: 'cancel',
-            signup_id: signupId
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showMessage('Erfolgreich ausgetragen', 'success');
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showMessage(data.message || 'Fehler beim Austragen', 'error');
-        }
-    })
-    .catch(error => {
-        showMessage('Netzwerkfehler', 'error');
-    });
+    cancelSignup(signupId, 'Möchten Sie sich wirklich austragen?', 'Erfolgreich ausgetragen');
 }
 </script>
 
