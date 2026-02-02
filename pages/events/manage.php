@@ -263,7 +263,7 @@ ob_start();
 
 <script>
 // Delete button event listeners using data attributes
-document.querySelectorAll('.delete-event-btn')?.forEach(button => {
+document.querySelectorAll('.delete-event-btn').forEach(button => {
     button.addEventListener('click', function() {
         const eventId = this.getAttribute('data-event-id');
         const eventName = this.getAttribute('data-event-name');
