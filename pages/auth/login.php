@@ -63,7 +63,7 @@ ob_start();
 ?>
 
 <div class="flex items-center justify-center min-h-screen p-4">
-    <div class="glass w-full max-w-md p-8 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300">
+    <div class="glass w-full max-w-md p-8 rounded-2xl shadow-2xl transition-all duration-300">
         <div class="text-center mb-8">
             <div class="inline-block p-4 bg-white/20 rounded-full mb-4 hover:bg-white/30 transition-all duration-300">
                 <i class="fas fa-building text-4xl text-white"></i>

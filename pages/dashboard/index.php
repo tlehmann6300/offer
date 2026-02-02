@@ -73,7 +73,7 @@ ob_start();
                 <i class="fas fa-euro-sign text-3xl text-green-600"></i>
             </div>
             <h3 class="text-lg font-semibold text-gray-700 mb-2">Gesamtwert</h3>
-            <p class="text-4xl font-bold text-green-600 mb-2"><?php echo number_format($stats['total_value'], 0); ?> €</p>
+            <p class="text-4xl font-bold text-green-600 mb-2"><?php echo number_format($stats['total_value'], 2); ?> €</p>
             <p class="text-sm text-gray-500">Inventarwert</p>
         </div>
         
