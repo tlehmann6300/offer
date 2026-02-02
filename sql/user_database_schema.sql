@@ -1,10 +1,11 @@
 -- User Database Schema (dbs15253086)
 -- Authentication, User Management, Alumni Profiles
+-- Optimized version with consolidated migrations (Alumni roles)
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     role ENUM('admin', 'board', 'alumni_board', 'manager', 'member', 'alumni') NOT NULL DEFAULT 'member',
     tfa_secret VARCHAR(32) DEFAULT NULL,
@@ -15,8 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
     locked_until DATETIME DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_email (email),
-    INDEX idx_role (role)
+    INDEX idx_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Alumni profiles table
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS alumni_profiles (
 CREATE TABLE IF NOT EXISTS invitation_tokens (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     token VARCHAR(64) NOT NULL UNIQUE,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL,
     role ENUM('admin', 'board', 'alumni_board', 'manager', 'member', 'alumni') NOT NULL DEFAULT 'member',
     created_by INT UNSIGNED NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
