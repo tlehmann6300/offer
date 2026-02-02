@@ -118,7 +118,7 @@ class Event {
             
             // Build update query dynamically
             foreach ($data as $key => $value) {
-                if ($key !== 'id' && $key !== 'allowed_roles' && $key !== 'helper_types') {
+                if (!in_array($key, ['id', 'allowed_roles', 'helper_types'], true)) {
                     $fields[] = "$key = ?";
                     $values[] = $value;
                 }
@@ -344,16 +344,16 @@ class Event {
                         
                         // Validate parsing was successful
                         if ($slotStart === false) {
-                            throw new Exception('Ungültige Slot-Startzeit');
+                            throw new Exception('Ungültige Slot-Startzeit: ' . $slot['start_time']);
                         }
                         if ($slotEnd === false) {
-                            throw new Exception('Ungültige Slot-Endzeit');
+                            throw new Exception('Ungültige Slot-Endzeit: ' . $slot['end_time']);
                         }
                         if ($eventStart === false) {
-                            throw new Exception('Ungültige Event-Startzeit');
+                            throw new Exception('Ungültige Event-Startzeit: ' . $eventStartTime);
                         }
                         if ($eventEnd === false) {
-                            throw new Exception('Ungültige Event-Endzeit');
+                            throw new Exception('Ungültige Event-Endzeit: ' . $eventEndTime);
                         }
                         
                         // Validate slot times are within event timeframe
