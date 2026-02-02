@@ -130,24 +130,9 @@ ob_start();
 
 <!-- Flatpickr CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
 
 <style>
-/* Custom Flatpickr styling */
-.flatpickr-calendar {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    border-radius: 8px;
-}
-
-.flatpickr-day.selected {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-color: #667eea;
-}
-
-.flatpickr-time input:hover,
-.flatpickr-time input:focus {
-    background: #f3f4f6;
-}
+/* Note: Flatpickr styling is now handled by /assets/css/theme.css with IBC colors */
 
 /* Tab styling improvements */
 .tab-button {

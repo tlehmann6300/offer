@@ -8,16 +8,41 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/theme.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ibc-green': 'var(--ibc-green)',
+                        'ibc-green-light': 'var(--ibc-green-light)',
+                        'ibc-green-dark': 'var(--ibc-green-dark)',
+                        'ibc-blue': 'var(--ibc-blue)',
+                        'ibc-blue-light': 'var(--ibc-blue-light)',
+                        'ibc-blue-dark': 'var(--ibc-blue-dark)',
+                        'ibc-accent': 'var(--ibc-accent)',
+                        'ibc-accent-light': 'var(--ibc-accent-light)',
+                        'ibc-accent-dark': 'var(--ibc-accent-dark)',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': 'var(--shadow-glow-green)',
+                        'premium': 'var(--shadow-premium)',
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #667eea;
-            --secondary: #764ba2;
-            --mobile-header-offset: 5rem; /* Offset for mobile toggle button */
-        }
         .sidebar {
-            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(180deg, var(--ibc-blue) 0%, var(--ibc-green) 100%);
         }
         .card {
             background: white;
@@ -29,7 +54,7 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--ibc-green) 0%, var(--ibc-blue) 100%);
             color: white;
             padding: 0.5rem 1.5rem;
             border-radius: 0.5rem;
@@ -37,7 +62,7 @@
         }
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: var(--shadow-glow-green);
         }
         
         /* Mobile view improvements */
