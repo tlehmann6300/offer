@@ -22,6 +22,8 @@ If you already have a running IBC Intranet system and want to upgrade to the lat
    ```bash
    mysql -h <host> -u <user> -p < sql/migrations/001_add_alumni_roles_and_locations.sql
    mysql -h <host> -u <user> -p < sql/migrations/002_add_checkout_system.sql
+   mysql -h <host> -u <user> -p < sql/migrations/003_add_rentals_table.sql
+   mysql -h <host> -u <user> -p < sql/migrations/004_add_event_system.sql
    ```
 
 ## Available Migrations
@@ -54,6 +56,42 @@ If you already have a running IBC Intranet system and want to upgrade to the lat
 **Required Actions After Migration:**
 - None - all changes are automatic
 - New features become available immediately in the UI
+
+### 003_add_rentals_table.sql
+**Date:** 2026-02-01
+
+**Changes:**
+- Creates `rentals` table as per requirements
+- Provides simplified rental tracking system
+- Complements existing inventory_checkouts table
+
+**Breaking Changes:** None - fully backward compatible
+
+**Required Actions After Migration:**
+- None - all changes are automatic
+
+### 004_add_event_system.sql
+**Date:** 2026-02-02
+
+**Changes:**
+- Creates complete Event & Helper System infrastructure:
+  - `events` table for event management
+  - `event_roles` table for role-based access control
+  - `event_helper_types` table for helper categories
+  - `event_slots` table for time slot management
+  - `event_signups` table for participation tracking
+  - `event_history` table for audit logging
+- Supports internal and external events
+- Implements locking mechanism for concurrent editing prevention
+- Full integration with existing user role system
+- **IMPORTANT**: Alumni users cannot see or book helper slots (enforced in Event.php model)
+
+**Breaking Changes:** None - fully backward compatible
+
+**Required Actions After Migration:**
+- None - all changes are automatic
+- New Event model available at `includes/models/Event.php`
+- See documentation at `md/EVENT_SYSTEM.md` for usage examples
 
 ## Migration Best Practices
 
