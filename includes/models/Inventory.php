@@ -444,6 +444,46 @@ class Inventory {
     }
 
     /**
+     * Get all rentals for a user
+     * This method returns rentals from the rentals table with proper column names
+     */
+    public static function getRentalsByUser($userId, $includeReturned = false) {
+        // Validate userId
+        if (!is_numeric($userId) || $userId <= 0) {
+            throw new InvalidArgumentException('Invalid user ID provided');
+        }
+        
+        $db = Database::getContentDB();
+        $sql = "
+            SELECT 
+                r.id,
+                r.item_id,
+                r.user_id,
+                r.amount as quantity,
+                r.rented_at,
+                r.expected_return,
+                r.actual_return as returned_at,
+                r.status,
+                r.defect_notes,
+                i.name as item_name,
+                i.unit
+            FROM rentals r
+            JOIN inventory i ON r.item_id = i.id
+            WHERE r.user_id = ?
+        ";
+        
+        if (!$includeReturned) {
+            $sql .= " AND r.actual_return IS NULL";
+        }
+        
+        $sql .= " ORDER BY r.rented_at DESC";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll();
+    }
+
+    /**
      * Get checkout by ID
      */
     public static function getCheckoutById($rentalId) {
@@ -484,53 +524,36 @@ class Inventory {
 
     /**
      * Get checked-out statistics for dashboard
-     * Returns items currently checked out with borrower info and destination
+     * Returns: ['total_items_out' => (int), 'unique_users' => (int), 'overdue' => (int)]
      */
     public static function getCheckedOutStats() {
         $db = Database::getContentDB();
         
-        // Get all active rentals with item details (using rentals table)
+        // Calculate total items out (sum of all amounts from active rentals)
         $stmt = $db->query("
             SELECT 
-                r.id, r.item_id, r.user_id, r.amount, r.expected_return,
-                r.rented_at,
-                i.name as item_name, i.unit
+                COALESCE(SUM(r.amount), 0) as total_items_out,
+                COUNT(DISTINCT r.user_id) as unique_users
             FROM rentals r
-            JOIN inventory i ON r.item_id = i.id
             WHERE r.actual_return IS NULL
-            ORDER BY r.rented_at DESC
         ");
-        $rentals = $stmt->fetchAll();
+        $stats = $stmt->fetch();
         
-        // Fetch user information from user database
-        if (!empty($rentals)) {
-            $userDb = Database::getUserDB();
-            $userIds = array_unique(array_column($rentals, 'user_id'));
-            
-            if (!empty($userIds)) {
-                $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
-                $userStmt = $userDb->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
-                $userStmt->execute($userIds);
-                $users = [];
-                foreach ($userStmt->fetchAll() as $user) {
-                    $users[$user['id']] = $user;
-                }
-                
-                // Add user info to rentals
-                foreach ($rentals as &$rental) {
-                    $rental['borrower_email'] = $users[$rental['user_id']]['email'] ?? 'Unbekannt';
-                }
-            }
-        }
+        // Calculate overdue items (expected_return < current date and not yet returned)
+        $stmt = $db->query("
+            SELECT COUNT(*) as overdue
+            FROM rentals r
+            WHERE r.actual_return IS NULL
+            AND r.expected_return IS NOT NULL
+            AND r.expected_return < CURDATE()
+        ");
+        $overdueResult = $stmt->fetch();
         
-        // Calculate statistics
-        $stats = [
-            'total_checked_out' => count($rentals),
-            'total_quantity_out' => array_sum(array_column($rentals, 'amount')),
-            'checkouts' => $rentals
+        return [
+            'total_items_out' => (int)$stats['total_items_out'],
+            'unique_users' => (int)$stats['unique_users'],
+            'overdue' => (int)$overdueResult['overdue']
         ];
-        
-        return $stats;
     }
 
     /**
