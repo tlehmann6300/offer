@@ -112,9 +112,12 @@ CREATE TABLE IF NOT EXISTS events (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
     description TEXT DEFAULT NULL,
-    location VARCHAR(100) DEFAULT NULL,
+    location VARCHAR(255) DEFAULT NULL,
+    maps_link VARCHAR(255) DEFAULT NULL,
     start_time DATETIME NOT NULL,
     end_time DATETIME NOT NULL,
+    registration_start DATETIME DEFAULT NULL,
+    registration_end DATETIME DEFAULT NULL,
     contact_person VARCHAR(100) DEFAULT NULL,
     status ENUM('planned', 'open', 'closed', 'running', 'past')
         NOT NULL DEFAULT 'planned',
