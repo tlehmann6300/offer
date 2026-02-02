@@ -141,7 +141,7 @@ ob_start();
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <style>
-/* IBC Branded colors for this form */
+/* IBC branded colors for this form */
 /* Note: Flatpickr styling is now handled by /assets/css/theme.css with IBC colors */
 
 /* Tab styling improvements */
@@ -511,7 +511,13 @@ ob_start();
                         <input 
                             type="checkbox" 
                             name="is_external"
-                            <?php echo (isset($_POST['is_external']) || ($event['is_external'] ?? false)) ? 'checked' : ''; ?>
+                            <?php 
+                            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                                echo isset($_POST['is_external']) ? 'checked' : '';
+                            } else {
+                                echo ($event['is_external'] ?? false) ? 'checked' : '';
+                            }
+                            ?>
                             <?php echo $readOnly ? 'disabled' : ''; ?>
                             class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                         >
@@ -523,7 +529,13 @@ ob_start();
                             type="checkbox" 
                             name="needs_helpers"
                             id="needs_helpers"
-                            <?php echo (isset($_POST['needs_helpers']) || ($event['needs_helpers'] ?? false)) ? 'checked' : ''; ?>
+                            <?php 
+                            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                                echo isset($_POST['needs_helpers']) ? 'checked' : '';
+                            } else {
+                                echo ($event['needs_helpers'] ?? false) ? 'checked' : '';
+                            }
+                            ?>
                             <?php echo $readOnly ? 'disabled' : ''; ?>
                             class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                         >
