@@ -104,6 +104,23 @@ ob_start();
                     <?php echo htmlspecialchars($event['title']); ?>
                 </h1>
                 
+                <!-- Status Badge -->
+                <?php 
+                $statusLabels = [
+                    'planned' => ['label' => 'Geplant', 'color' => 'bg-gray-100 text-gray-800'],
+                    'open' => ['label' => 'Anmeldung offen', 'color' => 'bg-green-100 text-green-800'],
+                    'closed' => ['label' => 'Anmeldung geschlossen', 'color' => 'bg-yellow-100 text-yellow-800'],
+                    'running' => ['label' => 'Läuft gerade', 'color' => 'bg-blue-100 text-blue-800'],
+                    'past' => ['label' => 'Beendet', 'color' => 'bg-gray-100 text-gray-600']
+                ];
+                $currentStatus = $event['status'] ?? 'planned';
+                $statusInfo = $statusLabels[$currentStatus] ?? ['label' => $currentStatus, 'color' => 'bg-gray-100 text-gray-800'];
+                ?>
+                <div class="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm <?php echo $statusInfo['color']; ?> mb-4">
+                    <i class="fas fa-circle text-xs mr-2"></i>
+                    <?php echo $statusInfo['label']; ?>
+                </div>
+                
                 <!-- Event Meta -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-600">
                     <div class="flex items-start">
@@ -125,9 +142,18 @@ ob_start();
                     <?php if (!empty($event['location'])): ?>
                         <div class="flex items-start">
                             <i class="fas fa-map-marker-alt w-6 mt-1 text-purple-600"></i>
-                            <div>
-                                <div class="font-semibold">Ort</div>
-                                <div><?php echo htmlspecialchars($event['location']); ?></div>
+                            <div class="flex-1">
+                                <div class="font-semibold">Veranstaltungsort</div>
+                                <div class="text-lg font-medium text-gray-800"><?php echo htmlspecialchars($event['location']); ?></div>
+                                <?php if (!empty($event['maps_link'])): ?>
+                                    <a href="<?php echo htmlspecialchars($event['maps_link']); ?>" 
+                                       target="_blank" 
+                                       rel="noopener noreferrer"
+                                       class="inline-flex items-center mt-2 text-sm text-purple-600 hover:text-purple-700 font-semibold">
+                                        <i class="fas fa-map-marked-alt mr-1"></i>
+                                        Auf Karte anzeigen
+                                    </a>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endif; ?>

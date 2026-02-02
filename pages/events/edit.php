@@ -293,32 +293,6 @@ ob_start();
                     ><?php echo htmlspecialchars($event['description'] ?? ''); ?></textarea>
                 </div>
 
-                <!-- Location -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Ort</label>
-                    <input 
-                        type="text" 
-                        name="location"
-                        value="<?php echo htmlspecialchars($event['location'] ?? ''); ?>"
-                        <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
-                        placeholder="Veranstaltungsort (z. B. H-1.88 Aula)"
-                    >
-                </div>
-
-                <!-- Maps Link -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Google Maps Link</label>
-                    <input 
-                        type="url" 
-                        name="maps_link"
-                        value="<?php echo htmlspecialchars($event['maps_link'] ?? ''); ?>"
-                        <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
-                        placeholder="https://maps.google.com/..."
-                    >
-                </div>
-
                 <!-- Contact Person -->
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Ansprechpartner</label>
@@ -329,6 +303,35 @@ ob_start();
                         <?php echo $readOnly ? 'readonly' : ''; ?>
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Name des Ansprechpartners"
+                    >
+                </div>
+
+                <!-- Location / Room -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Veranstaltungsort / Raum</label>
+                    <input 
+                        type="text" 
+                        name="location"
+                        value="<?php echo htmlspecialchars($event['location'] ?? ''); ?>"
+                        <?php echo $readOnly ? 'readonly' : ''; ?>
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        placeholder="z.B. H-1.88 Aula"
+                    >
+                </div>
+
+                <!-- Google Maps Link -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Google Maps Link
+                        <span class="text-xs text-gray-500 ml-2">(Optional)</span>
+                    </label>
+                    <input 
+                        type="url" 
+                        name="maps_link"
+                        value="<?php echo htmlspecialchars($event['maps_link'] ?? ''); ?>"
+                        <?php echo $readOnly ? 'readonly' : ''; ?>
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        placeholder="https://maps.google.com/..."
                     >
                 </div>
             </div>
@@ -410,28 +413,21 @@ ob_start();
                     >
                 </div>
 
-                <!-- Status (Read-only, automatically calculated) -->
+                <!-- Status Info Badge -->
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Status
-                        <span class="text-xs text-gray-500 ml-2">(Automatisch berechnet)</span>
-                    </label>
-                    <div class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700">
-                        <?php 
-                        $statusLabels = [
-                            'planned' => 'Geplant',
-                            'open' => 'Offen',
-                            'closed' => 'Geschlossen',
-                            'running' => 'Laufend',
-                            'past' => 'Vergangen'
-                        ];
-                        $currentStatus = $event['status'] ?? 'planned';
-                        echo $statusLabels[$currentStatus] ?? $currentStatus;
-                        ?>
+                    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-600 text-lg"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-semibold text-blue-800">Automatischer Status</h4>
+                                <p class="text-sm text-blue-700 mt-1">
+                                    Der Status wird automatisch basierend auf dem Datum gesetzt.
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">
-                        Der Status wird automatisch basierend auf Anmelde- und Event-Zeiten berechnet.
-                    </p>
                 </div>
 
                 <!-- External Link -->
