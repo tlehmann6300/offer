@@ -120,6 +120,12 @@
                     <i class="fas fa-clipboard-list w-5"></i>
                     <span>Meine Ausleihen</span>
                 </a>
+                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board', 'alumni_board', 'manager'])): ?>
+                <a href="../events/manage.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                    <i class="fas fa-calendar-alt w-5"></i>
+                    <span>Event-Verwaltung</span>
+                </a>
+                <?php endif; ?>
                 <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
                 <a href="../admin/users.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                     <i class="fas fa-users w-5"></i>
