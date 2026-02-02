@@ -25,7 +25,7 @@ if (strpos($templateContent, '../events/index.php') !== false) {
 }
 
 // Check if the link has correct text
-if (preg_match('/<span>Events<\/span>/', $templateContent)) {
+if (preg_match('/<span>Events<\\/span>/', $templateContent)) {
     echo "✓ Events link has correct label 'Events'\n";
 } else {
     echo "✗ Events link label is missing or incorrect\n";
@@ -62,7 +62,7 @@ if (strpos($templateContent, '../events/manage.php') !== false) {
 }
 
 // Check for Event-Verwaltung text
-if (preg_match('/<span>Event-Verwaltung<\/span>/', $templateContent)) {
+if (preg_match('/<span>Event-Verwaltung<\\/span>/', $templateContent)) {
     echo "✓ Events Management link has correct label 'Event-Verwaltung'\n";
 } else {
     echo "✗ Events Management link label is missing or incorrect\n";
