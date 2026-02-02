@@ -10,8 +10,8 @@ $lastStatusCheck = $_SESSION['last_event_status_check'] ?? 0;
 $now = time();
 
 if (($now - $lastStatusCheck) > 300) { // 300 seconds = 5 minutes
-    require_once __DIR__ . '/includes/models/Event.php';
-    require_once __DIR__ . '/includes/database.php';
+    require_once __DIR__ . '/models/Event.php';
+    require_once __DIR__ . '/database.php';
     
     try {
         Event::updateEventStatuses();

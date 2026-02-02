@@ -451,11 +451,17 @@ class Event {
         ]);
         
         // If this was a confirmed slot signup, check if someone on waitlist can be promoted
+        $promotedUserId = null;
         if ($signup['slot_id'] && $signup['status'] === 'confirmed') {
-            self::promoteWaitlistUser($signup['event_id'], $signup['slot_id']);
+            $promotedUserId = self::promoteWaitlistUser($signup['event_id'], $signup['slot_id']);
         }
         
-        return true;
+        return [
+            'success' => true,
+            'promoted_user_id' => $promotedUserId,
+            'event_id' => $signup['event_id'],
+            'slot_id' => $signup['slot_id']
+        ];
     }
     
     /**
