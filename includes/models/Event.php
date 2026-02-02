@@ -100,6 +100,9 @@ class Event {
         
         try {
             // Handle image upload
+            // Note: If image upload fails, event creation continues with null image_path.
+            // This allows events to be created even if the image upload fails,
+            // as the image is optional. The error is logged for debugging.
             $imagePath = null;
             if (isset($files['image']) && $files['image']['error'] === UPLOAD_ERR_OK) {
                 $uploadResult = SecureImageUpload::uploadImage($files['image']);
@@ -226,13 +229,12 @@ class Event {
             }
             
             // Handle image upload
+            $oldImagePath = null;
             if (isset($files['image']) && $files['image']['error'] === UPLOAD_ERR_OK) {
                 $uploadResult = SecureImageUpload::uploadImage($files['image']);
                 if ($uploadResult['success']) {
-                    // Delete old image if it exists
-                    if (!empty($currentEvent['image_path'])) {
-                        SecureImageUpload::deleteImage($currentEvent['image_path']);
-                    }
+                    // Store old image path for deletion after transaction
+                    $oldImagePath = $currentEvent['image_path'] ?? null;
                     // Set new image path in data
                     $data['image_path'] = $uploadResult['path'];
                 } else {
@@ -298,6 +300,12 @@ class Event {
             ]);
             
             $db->commit();
+            
+            // Delete old image after successful transaction
+            if (!empty($oldImagePath)) {
+                SecureImageUpload::deleteImage($oldImagePath);
+            }
+            
             return true;
         } catch (Exception $e) {
             $db->rollBack();
