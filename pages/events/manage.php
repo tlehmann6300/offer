@@ -221,8 +221,9 @@ ob_start();
                 <i class="fas fa-edit mr-1"></i>Bearbeiten
             </a>
             <button 
-                onclick="confirmDelete(<?php echo $event['id']; ?>, '<?php echo htmlspecialchars(addslashes($event['title'])); ?>')" 
-                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm"
+                class="delete-event-btn px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm"
+                data-event-id="<?php echo $event['id']; ?>"
+                data-event-name="<?php echo htmlspecialchars($event['title']); ?>"
                 title="Löschen"
             >
                 <i class="fas fa-trash"></i>
@@ -261,6 +262,15 @@ ob_start();
 </div>
 
 <script>
+// Delete button event listeners using data attributes
+document.querySelectorAll('.delete-event-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const eventId = this.getAttribute('data-event-id');
+        const eventName = this.getAttribute('data-event-name');
+        confirmDelete(eventId, eventName);
+    });
+});
+
 function confirmDelete(eventId, eventName) {
     document.getElementById('deleteEventId').value = eventId;
     document.getElementById('deleteEventName').textContent = eventName;

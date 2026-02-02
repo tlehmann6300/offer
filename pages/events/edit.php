@@ -680,8 +680,19 @@ function removeSlot(slotId) {
     document.getElementById(slotId).remove();
 }
 
-// Collect helper types data before form submission
+// Collect helper types data before form submission and validate
 document.getElementById('eventForm')?.addEventListener('submit', function(e) {
+    const startTime = document.getElementById('start_time').value;
+    const endTime = document.getElementById('end_time').value;
+    
+    // Validate main event times
+    if (startTime && endTime && new Date(startTime) >= new Date(endTime)) {
+        e.preventDefault();
+        alert('Die Startzeit muss vor der Endzeit liegen!');
+        return false;
+    }
+    
+    // Collect helper types data
     const helperTypes = [];
     
     document.querySelectorAll('#helper-types-container > div').forEach(typeDiv => {
@@ -713,51 +724,6 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
     });
     
     document.getElementById('helper_types_json').value = JSON.stringify(helperTypes);
-});
-
-// Load existing helper types if editing
-<?php if ($isEdit && $event['needs_helpers'] && !empty($event['helper_types'])): ?>
-window.addEventListener('DOMContentLoaded', function() {
-    <?php foreach ($event['helper_types'] as $helperType): ?>
-    addHelperType();
-    const lastType = document.querySelector('#helper-types-container > div:last-child');
-    lastType.querySelector('.helper-type-title').value = <?php echo json_encode($helperType['title']); ?>;
-    lastType.querySelector('.helper-type-description').value = <?php echo json_encode($helperType['description'] ?? ''); ?>;
-    
-    <?php if (!empty($helperType['slots'])): ?>
-    <?php foreach ($helperType['slots'] as $slot): ?>
-    addSlot(lastType.id);
-    const lastSlot = lastType.querySelector('.slots-container > div:last-child');
-    lastSlot.querySelector('.slot-start').value = '<?php echo date('Y-m-d\TH:i', strtotime($slot['start_time'])); ?>';
-    lastSlot.querySelector('.slot-end').value = '<?php echo date('Y-m-d\TH:i', strtotime($slot['end_time'])); ?>';
-    lastSlot.querySelector('.slot-quantity').value = <?php echo $slot['quantity_needed']; ?>;
-    <?php endforeach; ?>
-    <?php endif; ?>
-    <?php endforeach; ?>
-});
-<?php endif; ?>
-
-// Release lock on page unload (only if we have the lock)
-<?php if ($isEdit && !$readOnly): ?>
-window.addEventListener('beforeunload', function() {
-    // Use sendBeacon for reliable request on page unload
-    const formData = new FormData();
-    formData.append('event_id', <?php echo $eventId; ?>);
-    formData.append('user_id', <?php echo $_SESSION['user_id']; ?>);
-    navigator.sendBeacon('<?php echo dirname($_SERVER['PHP_SELF']); ?>/release_lock.php', formData);
-});
-<?php endif; ?>
-
-// Client-side validation for times
-document.getElementById('eventForm')?.addEventListener('submit', function(e) {
-    const startTime = document.getElementById('start_time').value;
-    const endTime = document.getElementById('end_time').value;
-    
-    if (startTime && endTime && new Date(startTime) >= new Date(endTime)) {
-        e.preventDefault();
-        alert('Die Startzeit muss vor der Endzeit liegen!');
-        return false;
-    }
     
     // Validate slots if helpers are needed
     if (document.getElementById('needs_helpers')?.checked) {
@@ -788,6 +754,43 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
         if (!isValid) return false;
     }
 });
+
+// Load existing helper types if editing - using JSON data approach
+<?php if ($isEdit && $event['needs_helpers'] && !empty($event['helper_types'])): ?>
+const existingHelperTypes = <?php echo json_encode($event['helper_types']); ?>;
+
+window.addEventListener('DOMContentLoaded', function() {
+    existingHelperTypes.forEach(helperType => {
+        addHelperType();
+        const lastType = document.querySelector('#helper-types-container > div:last-child');
+        lastType.querySelector('.helper-type-title').value = helperType.title;
+        lastType.querySelector('.helper-type-description').value = helperType.description || '';
+        
+        if (helperType.slots && helperType.slots.length > 0) {
+            helperType.slots.forEach(slot => {
+                addSlot(lastType.id);
+                const lastSlot = lastType.querySelector('.slots-container > div:last-child');
+                const slotStart = new Date(slot.start_time);
+                const slotEnd = new Date(slot.end_time);
+                lastSlot.querySelector('.slot-start').value = slotStart.toISOString().slice(0, 16);
+                lastSlot.querySelector('.slot-end').value = slotEnd.toISOString().slice(0, 16);
+                lastSlot.querySelector('.slot-quantity').value = slot.quantity_needed;
+            });
+        }
+    });
+});
+<?php endif; ?>
+
+// Release lock on page unload (only if we have the lock)
+<?php if ($isEdit && !$readOnly): ?>
+window.addEventListener('beforeunload', function() {
+    // Use sendBeacon for reliable request on page unload
+    const formData = new FormData();
+    formData.append('event_id', <?php echo $eventId; ?>);
+    formData.append('user_id', <?php echo $_SESSION['user_id']; ?>);
+    navigator.sendBeacon('../events/release_lock.php', formData);
+});
+<?php endif; ?>
 </script>
 
 <?php
