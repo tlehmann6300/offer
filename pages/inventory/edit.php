@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
 require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
+require_once __DIR__ . '/../../includes/utils/SecureImageUpload.php';
 
 AuthHandler::startSession();
 
@@ -52,31 +53,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $imagePath = $item['image_path'];
             
-            // Handle image upload
+            // Handle image upload using secure upload utility
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                $allowedTypes = ALLOWED_IMAGE_TYPES;
-                $fileType = $_FILES['image']['type'];
-                $fileSize = $_FILES['image']['size'];
+                $uploadResult = SecureImageUpload::uploadImage($_FILES['image']);
                 
-                if (!in_array($fileType, $allowedTypes)) {
-                    $error = 'Ungültiger Dateityp. Nur JPG, PNG, GIF und WebP sind erlaubt.';
-                } else if ($fileSize > UPLOAD_MAX_SIZE) {
-                    $error = 'Datei ist zu groß. Maximum: 5MB';
+                if ($uploadResult['success']) {
+                    // Delete old image if it exists
+                    if ($imagePath) {
+                        SecureImageUpload::deleteImage($imagePath);
+                    }
+                    $imagePath = $uploadResult['path'];
                 } else {
-                    // Delete old image
-                    if ($imagePath && file_exists(__DIR__ . '/../../' . $imagePath)) {
-                        unlink(__DIR__ . '/../../' . $imagePath);
-                    }
-                    
-                    $extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-                    $filename = uniqid('item_') . '.' . $extension;
-                    $uploadPath = __DIR__ . '/../../assets/uploads/' . $filename;
-                    
-                    if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadPath)) {
-                        $imagePath = 'assets/uploads/' . $filename;
-                    } else {
-                        $error = 'Fehler beim Hochladen der Datei';
-                    }
+                    $error = $uploadResult['error'];
                 }
             }
             
