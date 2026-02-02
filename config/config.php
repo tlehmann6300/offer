@@ -60,7 +60,7 @@ define('SMTP_HOST', $env['SMTP_HOST'] ?? 'localhost');
 define('SMTP_PORT', $env['SMTP_PORT'] ?? 587);
 define('SMTP_USER', $env['SMTP_USER'] ?? '');
 define('SMTP_PASS', $env['SMTP_PASS'] ?? '');
-define('SMTP_FROM', $env['SMTP_USER'] ?? '');
+define('SMTP_FROM', $env['SMTP_FROM'] ?? $env['SMTP_USER'] ?? '');
 
 // Application Settings
 define('APP_NAME', 'IBC Intranet');
