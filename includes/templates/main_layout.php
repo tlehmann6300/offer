@@ -14,6 +14,7 @@
         :root {
             --primary: #667eea;
             --secondary: #764ba2;
+            --mobile-header-offset: 5rem; /* Offset for mobile toggle button */
         }
         .sidebar {
             background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
@@ -51,9 +52,10 @@
                 overflow-wrap: break-word;
             }
             
-            /* Better spacing on mobile */
+            /* Better spacing on mobile - add top padding for better visibility */
             main {
                 padding: 1rem !important;
+                padding-top: var(--mobile-header-offset) !important; /* Ensure content doesn't hide under toggle button */
             }
             
             /* Prevent horizontal overflow */
@@ -87,6 +89,9 @@
     </style>
 </head>
 <body class="bg-gray-50">
+    <!-- Mobile Menu Overlay -->
+    <div id="sidebar-overlay" class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden transition-opacity duration-300"></div>
+
     <!-- Mobile Menu Toggle -->
     <div class="lg:hidden fixed top-4 left-4 z-50">
         <button id="mobile-menu-btn" class="bg-white p-3 rounded-lg shadow-lg">
@@ -95,7 +100,7 @@
     </div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar fixed left-0 top-0 h-screen w-64 transform -translate-x-full lg:translate-x-0 transition-transform z-40 text-white">
+    <aside id="sidebar" class="sidebar fixed left-0 top-0 h-screen w-64 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-40 text-white shadow-2xl">
         <div class="p-6">
             <h1 class="text-2xl font-bold mb-8">
                 <i class="fas fa-building mr-2"></i>
@@ -110,6 +115,10 @@
                 <a href="../inventory/index.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                     <i class="fas fa-boxes w-5"></i>
                     <span>Inventar</span>
+                </a>
+                <a href="../inventory/my_rentals.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                    <i class="fas fa-clipboard-list w-5"></i>
+                    <span>Meine Ausleihen</span>
                 </a>
                 <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
                 <a href="../admin/users.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
@@ -154,15 +163,30 @@
         // Mobile menu toggle
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarOverlay.classList.toggle('hidden');
+        }
         
         mobileMenuBtn?.addEventListener('click', () => {
-            sidebar.classList.toggle('-translate-x-full');
+            toggleSidebar();
+        });
+
+        // Close sidebar when clicking overlay
+        sidebarOverlay?.addEventListener('click', () => {
+            toggleSidebar();
         });
 
         // Close sidebar when clicking outside on mobile
         document.addEventListener('click', (e) => {
-            if (window.innerWidth < 1024 && !sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+            if (window.innerWidth < 1024 && 
+                !sidebar.contains(e.target) && 
+                !mobileMenuBtn.contains(e.target) &&
+                !sidebar.classList.contains('-translate-x-full')) {
                 sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
             }
         });
     </script>

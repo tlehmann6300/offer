@@ -30,6 +30,17 @@ if (isset($_SESSION['checkout_success'])) {
     unset($_SESSION['checkout_success']);
 }
 
+// Check for rental messages
+if (isset($_SESSION['rental_success'])) {
+    $message = $_SESSION['rental_success'];
+    unset($_SESSION['rental_success']);
+}
+
+if (isset($_SESSION['rental_error'])) {
+    $error = $_SESSION['rental_error'];
+    unset($_SESSION['rental_error']);
+}
+
 // Handle stock adjustment
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['adjust_stock'])) {
     if (!AuthHandler::hasPermission('manager')) {
@@ -106,12 +117,15 @@ ob_start();
                 <?php endif; ?>
             </div>
 
-            <!-- Checkout Button for all users -->
+            <!-- Checkout/Borrow Button for all users -->
             <?php if ($item['current_stock'] > 0): ?>
-            <div class="mb-6">
+            <div class="mb-6 flex gap-3">
                 <a href="checkout.php?id=<?php echo $item['id']; ?>" class="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold">
                     <i class="fas fa-hand-holding-box mr-2"></i>Entnehmen / Ausleihen
                 </a>
+                <button onclick="openRentalModal()" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold">
+                    <i class="fas fa-calendar-alt mr-2"></i>Ausleihen (mit Rückgabedatum)
+                </button>
             </div>
             <?php endif; ?>
 
@@ -380,10 +394,109 @@ ob_start();
     <?php endif; ?>
 </div>
 
+<!-- Rental Modal -->
+<div id="rentalModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-gray-800">
+                <i class="fas fa-calendar-check text-purple-600 mr-2"></i>
+                Artikel ausleihen
+            </h2>
+            <button onclick="closeRentalModal()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <form method="POST" action="rental.php" class="space-y-4">
+            <input type="hidden" name="item_id" value="<?php echo $item['id']; ?>">
+            <input type="hidden" name="create_rental" value="1">
+
+            <div class="bg-gray-50 p-3 rounded-lg mb-4">
+                <p class="font-semibold text-gray-800"><?php echo htmlspecialchars($item['name']); ?></p>
+                <p class="text-sm text-gray-600">Verfügbar: <?php echo $item['current_stock']; ?> <?php echo htmlspecialchars($item['unit']); ?></p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Anzahl <span class="text-red-500">*</span>
+                </label>
+                <input 
+                    type="number" 
+                    name="amount" 
+                    required 
+                    min="1" 
+                    max="<?php echo $item['current_stock']; ?>"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Anzahl eingeben"
+                >
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Voraussichtliches Rückgabedatum <span class="text-red-500">*</span>
+                </label>
+                <input 
+                    type="date" 
+                    name="expected_return" 
+                    required
+                    min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Verwendungszweck <span class="text-red-500">*</span>
+                </label>
+                <textarea 
+                    name="purpose" 
+                    required 
+                    rows="3"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="Wofür benötigen Sie diesen Artikel?"
+                ></textarea>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="button" onclick="closeRentalModal()" class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                    Abbrechen
+                </button>
+                <button type="submit" class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                    <i class="fas fa-check mr-2"></i>Ausleihen
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
 function setAmount(value) {
     document.getElementById('amount').value = value;
 }
+
+function openRentalModal() {
+    document.getElementById('rentalModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+}
+
+function closeRentalModal() {
+    document.getElementById('rentalModal').classList.add('hidden');
+    document.body.style.overflow = 'auto'; // Re-enable scrolling
+}
+
+// Close modal when clicking outside
+document.getElementById('rentalModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeRentalModal();
+    }
+});
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeRentalModal();
+    }
+});
 </script>
 
 <?php

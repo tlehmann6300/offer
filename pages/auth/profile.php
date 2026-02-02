@@ -78,11 +78,21 @@ ob_start();
 ?>
 
 <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-2">
-        <i class="fas fa-user text-purple-600 mr-2"></i>
-        Mein Profil
-    </h1>
-    <p class="text-gray-600">Verwalten Sie Ihre Kontoinformationen und Sicherheitseinstellungen</p>
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-user text-purple-600 mr-2"></i>
+                Mein Profil
+            </h1>
+            <p class="text-gray-600">Verwalten Sie Ihre Kontoinformationen und Sicherheitseinstellungen</p>
+        </div>
+        <div class="mt-4 md:mt-0">
+            <a href="../inventory/my_rentals.php" class="btn-primary inline-block">
+                <i class="fas fa-clipboard-list mr-2"></i>
+                Meine Ausleihen
+            </a>
+        </div>
+    </div>
 </div>
 
 <?php if ($message): ?>
