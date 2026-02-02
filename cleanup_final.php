@@ -242,4 +242,7 @@ echo "</div>
 </div>
 </body>
 </html>";
+
+// Self-delete this script after successful execution
+unlink(__FILE__);
 ?>

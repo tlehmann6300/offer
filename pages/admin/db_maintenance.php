@@ -5,9 +5,11 @@
  * Only accessible by admin and board members
  */
 
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
-require_once __DIR__ . '/../../includes/database.php';
+require_once __DIR__ . '/../../src/Auth.php';
+require_once __DIR__ . '/../../src/Database.php';
 
+// src/Auth.php already creates the alias from AuthHandler to Auth
+// Both class names (Auth and AuthHandler) are now available
 AuthHandler::startSession();
 
 // Check if user has admin or board permission
