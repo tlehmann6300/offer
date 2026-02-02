@@ -30,3 +30,4 @@ cache/
 
 # Setup scripts (should not be in production)
 create_admin.php
+setup_admin.php

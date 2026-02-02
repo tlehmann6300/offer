@@ -1,35 +1,70 @@
 <?php
 /**
- * Database Configuration
+ * Configuration File
+ * Loads settings from .env file
  * Two separate databases for security and structure
- * 
- * IMPORTANT: For production, use environment variables or .env file
- * Do not commit sensitive credentials to version control
  */
 
-// Load from environment variables if available, otherwise fallback to constants
+// Load .env file
+function loadEnv($path) {
+    if (!file_exists($path)) {
+        throw new Exception('.env file not found');
+    }
+    
+    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $env = [];
+    
+    foreach ($lines as $line) {
+        // Skip comments
+        if (strpos(trim($line), '#') === 0) {
+            continue;
+        }
+        
+        // Parse key=value pairs
+        if (strpos($line, '=') !== false) {
+            list($key, $value) = explode('=', $line, 2);
+            $key = trim($key);
+            $value = trim($value);
+            
+            // Remove quotes if present
+            if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
+                (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
+                $value = substr($value, 1, -1);
+            }
+            
+            $env[$key] = $value;
+        }
+    }
+    
+    return $env;
+}
+
+// Load environment variables from .env file
+$envFile = __DIR__ . '/../.env';
+$env = loadEnv($envFile);
+
 // User Database (Authentication, Logins, Passwords, Alumni Profiles)
-define('DB_USER_HOST', getenv('DB_USER_HOST') ?: 'db5019508945.hosting-data.io');
-define('DB_USER_NAME', getenv('DB_USER_NAME') ?: 'dbs15253086');
-define('DB_USER_USER', getenv('DB_USER_USER') ?: 'dbu4494103');
-define('DB_USER_PASS', getenv('DB_USER_PASS') ?: 'Q9!mZ7$A2v#Lr@8x');
+define('DB_USER_HOST', $env['DB_USER_HOST'] ?? 'localhost');
+define('DB_USER_NAME', $env['DB_USER_NAME'] ?? '');
+define('DB_USER_USER', $env['DB_USER_USER'] ?? '');
+define('DB_USER_PASS', $env['DB_USER_PASS'] ?? '');
 
 // Content Database (Projects, Inventory, Events, News, System Logs)
-define('DB_CONTENT_HOST', getenv('DB_CONTENT_HOST') ?: 'db5019375140.hosting-data.io');
-define('DB_CONTENT_NAME', getenv('DB_CONTENT_NAME') ?: 'dbs15161271');
-define('DB_CONTENT_USER', getenv('DB_CONTENT_USER') ?: 'dbu2067984');
-define('DB_CONTENT_PASS', getenv('DB_CONTENT_PASS') ?: 'Wort!Zahl?Wort#41254g');
+define('DB_CONTENT_HOST', $env['DB_CONTENT_HOST'] ?? 'localhost');
+define('DB_CONTENT_NAME', $env['DB_CONTENT_NAME'] ?? '');
+define('DB_CONTENT_USER', $env['DB_CONTENT_USER'] ?? '');
+define('DB_CONTENT_PASS', $env['DB_CONTENT_PASS'] ?? '');
 
 // SMTP Configuration
-define('SMTP_HOST', getenv('SMTP_HOST') ?: 'smtp.ionos.de');
-define('SMTP_PORT', getenv('SMTP_PORT') ?: 587);
-define('SMTP_USER', getenv('SMTP_USER') ?: 'mail@test.business-consulting.de');
-define('SMTP_PASS', getenv('SMTP_PASS') ?: 'Test12345678.');
-define('SMTP_FROM', getenv('SMTP_FROM') ?: 'mail@test.business-consulting.de');
+define('SMTP_HOST', $env['SMTP_HOST'] ?? 'localhost');
+define('SMTP_PORT', $env['SMTP_PORT'] ?? 587);
+define('SMTP_USER', $env['SMTP_USER'] ?? '');
+define('SMTP_PASS', $env['SMTP_PASS'] ?? '');
+define('SMTP_FROM', $env['SMTP_USER'] ?? '');
 
 // Application Settings
 define('APP_NAME', 'IBC Intranet');
-define('BASE_URL', getenv('BASE_URL') ?: ''); // Set this to your domain
+define('BASE_URL', $env['BASE_URL'] ?? '');
 define('SESSION_LIFETIME', 3600); // 1 hour
 define('MAX_LOGIN_ATTEMPTS', 5);
 define('LOGIN_LOCKOUT_TIME', 900); // 15 minutes
@@ -45,7 +80,7 @@ date_default_timezone_set('Europe/Berlin');
 
 // Error Reporting - DISABLE in production!
 // Set to 0 and false for production deployment
-$isProduction = getenv('ENVIRONMENT') === 'production';
+$isProduction = ($env['ENVIRONMENT'] ?? '') === 'production';
 error_reporting($isProduction ? 0 : E_ALL);
 ini_set('display_errors', $isProduction ? '0' : '1');
 
