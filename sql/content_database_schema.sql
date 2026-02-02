@@ -207,22 +207,14 @@ CREATE TABLE IF NOT EXISTS system_logs (
 -- DEFAULT DATA
 -- ============================================
 
--- Insert default categories
-INSERT INTO categories (name, description, color) VALUES 
-('Elektronik', 'Elektronische Geräte und Zubehör', '#3B82F6'),
-('Möbel', 'Tische, Stühle, Schränke', '#10B981'),
-('Büromaterial', 'Stifte, Papier, Ordner', '#F59E0B'),
+-- Insert initial categories
+INSERT IGNORE INTO categories (name, description, color) VALUES 
 ('Technik', 'Computer, Bildschirme, Peripherie', '#8B5CF6'),
-('Veranstaltung', 'Equipment für Events', '#EF4444');
+('Büromaterial', 'Stifte, Papier, Ordner', '#F59E0B'),
+('Event-Zubehör', 'Equipment für Events', '#EF4444');
 
--- Insert default locations (including H-1.87 and H-1.88)
-INSERT INTO locations (name, description) VALUES 
-('Hauptbüro', 'Hauptstandort der Organisation'),
-('Lager', 'Zentrales Warenlager'),
-('Konferenzraum A', 'Konferenzraum im 1. Stock'),
-('Werkstatt', 'Technische Werkstatt'),
-('H-1.87', 'Lagerraum H-1.87'),
-('H-1.88', 'Lagerraum H-1.88'),
+-- Insert initial locations
+INSERT IGNORE INTO locations (name, description) VALUES 
 ('Furtwangen H-Bau -1.87', 'Lagerraum Furtwangen H-Bau -1.87'),
 ('Furtwangen H-Bau -1.88', 'Lagerraum Furtwangen H-Bau -1.88');
 
