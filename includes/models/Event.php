@@ -90,13 +90,23 @@ class Event {
     /**
      * Create new event
      */
-    public static function create($data, $userId) {
+    public static function create($data, $userId, $files = []) {
         $db = Database::getContentDB();
         
         // Begin transaction
         $db->beginTransaction();
         
         try {
+            // Handle image upload
+            $imagePath = null;
+            if (isset($files['image']) && $files['image']['error'] === UPLOAD_ERR_OK) {
+                require_once __DIR__ . '/../utils/SecureImageUpload.php';
+                $uploadResult = SecureImageUpload::uploadImage($files['image']);
+                if ($uploadResult['success']) {
+                    $imagePath = $uploadResult['path'];
+                }
+            }
+            
             // Calculate status automatically based on timestamps
             $calculatedStatus = self::calculateStatus($data);
             
@@ -104,8 +114,8 @@ class Event {
             $stmt = $db->prepare("
                 INSERT INTO events (title, description, location, maps_link, start_time, end_time, 
                                   registration_start, registration_end, contact_person, status, 
-                                  is_external, external_link, needs_helpers)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                  is_external, external_link, needs_helpers, image_path)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             
             $stmt->execute([
@@ -121,7 +131,8 @@ class Event {
                 $calculatedStatus,
                 $data['is_external'] ?? false,
                 $data['external_link'] ?? null,
-                $data['needs_helpers'] ?? false
+                $data['needs_helpers'] ?? false,
+                $imagePath
             ]);
             
             $eventId = $db->lastInsertId();
@@ -189,7 +200,7 @@ class Event {
     /**
      * Update event
      */
-    public static function update($id, $data, $userId) {
+    public static function update($id, $data, $userId, $files = []) {
         $db = Database::getContentDB();
         
         // Check if event is locked by another user
@@ -209,6 +220,20 @@ class Event {
             
             if (!$currentEvent) {
                 throw new Exception("Event not found");
+            }
+            
+            // Handle image upload
+            if (isset($files['image']) && $files['image']['error'] === UPLOAD_ERR_OK) {
+                require_once __DIR__ . '/../utils/SecureImageUpload.php';
+                $uploadResult = SecureImageUpload::uploadImage($files['image']);
+                if ($uploadResult['success']) {
+                    // Delete old image if it exists
+                    if (!empty($currentEvent['image_path'])) {
+                        SecureImageUpload::deleteImage($currentEvent['image_path']);
+                    }
+                    // Set new image path in data
+                    $data['image_path'] = $uploadResult['path'];
+                }
             }
             
             // Merge current data with updates for status calculation
