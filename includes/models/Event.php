@@ -46,6 +46,17 @@ class Event {
                 self::setEventRoles($eventId, $data['allowed_roles']);
             }
             
+            // Process helper types and slots if needs_helpers is enabled
+            if (!empty($data['needs_helpers']) && !empty($data['helper_types'])) {
+                self::processHelperTypesAndSlots(
+                    $eventId, 
+                    $data['helper_types'], 
+                    $data['start_time'], 
+                    $data['end_time'],
+                    $userId
+                );
+            }
+            
             // Log creation
             self::logHistory($eventId, $userId, 'create', [
                 'action' => 'Event created',
@@ -107,26 +118,39 @@ class Event {
             
             // Build update query dynamically
             foreach ($data as $key => $value) {
-                if ($key !== 'id' && $key !== 'allowed_roles') {
+                if ($key !== 'id' && $key !== 'allowed_roles' && $key !== 'helper_types') {
                     $fields[] = "$key = ?";
                     $values[] = $value;
                 }
             }
             
-            if (empty($fields)) {
-                $db->rollBack();
-                return true;
+            if (!empty($fields)) {
+                $values[] = $id;
+                $sql = "UPDATE events SET " . implode(', ', $fields) . " WHERE id = ?";
+                
+                $stmt = $db->prepare($sql);
+                $stmt->execute($values);
             }
-            
-            $values[] = $id;
-            $sql = "UPDATE events SET " . implode(', ', $fields) . " WHERE id = ?";
-            
-            $stmt = $db->prepare($sql);
-            $stmt->execute($values);
             
             // Update allowed roles if provided
             if (isset($data['allowed_roles']) && is_array($data['allowed_roles'])) {
                 self::setEventRoles($id, $data['allowed_roles']);
+            }
+            
+            // Process helper types and slots if needs_helpers is enabled
+            if (!empty($data['needs_helpers']) && isset($data['helper_types'])) {
+                // Delete old helper types and slots (Clean Slate approach)
+                $stmt = $db->prepare("DELETE FROM event_helper_types WHERE event_id = ?");
+                $stmt->execute([$id]);
+                
+                // Process new helper types and slots
+                self::processHelperTypesAndSlots(
+                    $id, 
+                    $data['helper_types'], 
+                    $data['start_time'] ?? null, 
+                    $data['end_time'] ?? null,
+                    $userId
+                );
             }
             
             // Log update
@@ -266,6 +290,76 @@ class Event {
             $stmt = $db->prepare("INSERT INTO event_roles (event_id, role) VALUES (?, ?)");
             foreach ($roles as $role) {
                 $stmt->execute([$eventId, $role]);
+            }
+        }
+    }
+    
+    /**
+     * Process helper types and slots for an event
+     * This method handles creating helper types and their associated time slots
+     * within the same transaction context as the event create/update
+     * 
+     * @param int $eventId Event ID
+     * @param array $helperTypes Array of helper types with their slots
+     * @param string|null $eventStartTime Event start time for validation
+     * @param string|null $eventEndTime Event end time for validation
+     * @param int $userId User ID for logging
+     */
+    private static function processHelperTypesAndSlots($eventId, $helperTypes, $eventStartTime, $eventEndTime, $userId) {
+        if (empty($helperTypes) || !is_array($helperTypes)) {
+            return;
+        }
+        
+        $db = Database::getContentDB();
+        
+        foreach ($helperTypes as $helperType) {
+            // Skip if no title provided
+            if (empty($helperType['title'])) {
+                continue;
+            }
+            
+            // Create helper type
+            $helperTypeId = self::createHelperType(
+                $eventId,
+                $helperType['title'],
+                $helperType['description'] ?? null,
+                $userId
+            );
+            
+            // Process slots for this helper type
+            if (!empty($helperType['slots']) && is_array($helperType['slots'])) {
+                foreach ($helperType['slots'] as $slot) {
+                    // Skip if required fields are missing
+                    if (empty($slot['start_time']) || empty($slot['end_time'])) {
+                        continue;
+                    }
+                    
+                    // Validate slot times if event times are provided
+                    if ($eventStartTime && $eventEndTime) {
+                        $slotStart = strtotime($slot['start_time']);
+                        $slotEnd = strtotime($slot['end_time']);
+                        $eventStart = strtotime($eventStartTime);
+                        $eventEnd = strtotime($eventEndTime);
+                        
+                        if ($slotStart < $eventStart || $slotEnd > $eventEnd) {
+                            throw new Exception('Zeitslots müssen innerhalb des Event-Zeitraums liegen');
+                        }
+                        
+                        if ($slotStart >= $slotEnd) {
+                            throw new Exception('Slot-Startzeit muss vor der Endzeit liegen');
+                        }
+                    }
+                    
+                    // Create slot
+                    self::createSlot(
+                        $helperTypeId,
+                        $slot['start_time'],
+                        $slot['end_time'],
+                        intval($slot['quantity'] ?? 1),
+                        $userId,
+                        $eventId
+                    );
+                }
             }
         }
     }
