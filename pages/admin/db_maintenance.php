@@ -137,27 +137,29 @@ function getTableSizes() {
         $tables = [];
         
         // Get user database tables
-        $stmt = $userDb->query("
+        $stmt = $userDb->prepare("
             SELECT 
                 table_name as 'table',
                 ROUND((data_length + index_length) / 1024 / 1024, 2) as 'size_mb',
                 table_rows as 'rows'
             FROM information_schema.TABLES 
-            WHERE table_schema = '" . DB_USER_NAME . "'
+            WHERE table_schema = ?
             ORDER BY (data_length + index_length) DESC
         ");
+        $stmt->execute([DB_USER_NAME]);
         $userTables = $stmt->fetchAll();
         
         // Get content database tables
-        $stmt = $contentDb->query("
+        $stmt = $contentDb->prepare("
             SELECT 
                 table_name as 'table',
                 ROUND((data_length + index_length) / 1024 / 1024, 2) as 'size_mb',
                 table_rows as 'rows'
             FROM information_schema.TABLES 
-            WHERE table_schema = '" . DB_CONTENT_NAME . "'
+            WHERE table_schema = ?
             ORDER BY (data_length + index_length) DESC
         ");
+        $stmt->execute([DB_CONTENT_NAME]);
         $contentTables = $stmt->fetchAll();
         
         return [

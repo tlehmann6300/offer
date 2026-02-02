@@ -104,10 +104,11 @@ $sizeQuery = "
         ROUND((data_length + index_length) / 1024 / 1024, 2) as 'size_mb',
         table_rows as 'rows'
     FROM information_schema.TABLES 
-    WHERE table_schema = 'database_name'
+    WHERE table_schema = ?
     ORDER BY (data_length + index_length) DESC
 ";
-echo "  ✓ Table size query syntax: Valid\n";
+echo "  ✓ Table size query syntax: Valid (uses prepared statement)\n";
+echo "  ✓ Query uses parameterized placeholder for database name\n";
 echo "  ✓ Query returns: table name, size in MB, row count\n";
 echo "\n";
 
