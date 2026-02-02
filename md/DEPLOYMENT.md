@@ -59,7 +59,7 @@ php create_admin.php
 
 Folgen Sie den Anweisungen und geben Sie E-Mail und Passwort ein.
 
-**WICHTIG:** Löschen Sie `create_admin.php` nach dem Erstellen!
+**Hinweis:** Diese Datei wird automatisch vom cleanup_system.php Skript gelöscht (siehe Schritt 6).
 
 ### 6. System bereinigen (Sicherheit)
 
@@ -71,6 +71,7 @@ php cleanup_system.php
 
 Dieses Skript:
 - ✅ Löscht `create_tom.php` (falls vorhanden)
+- ✅ Löscht `create_admin.php` (falls vorhanden)
 - ✅ Löscht `setup.sh` (Installations-Skript)
 - ✅ Löscht `import_database.sh` (falls vorhanden)
 - ✅ Prüft migrations-Ordner auf sensible Daten und löscht ihn bei Bedarf

@@ -11,6 +11,7 @@
 // List of files to be deleted
 $filesToDelete = [
     'create_tom.php',
+    'create_admin.php',
     'setup.sh',
     'import_database.sh'
 ];
@@ -62,7 +63,7 @@ if (is_dir($migrationsPath)) {
                 if (preg_match($pattern, $line)) {
                     $shouldDeleteMigrations = true;
                     fclose($handle);
-                    break 2; // Break out of both inner loops
+                    break 2; // Break out of while loop and foreach migrations
                 }
             }
         }
