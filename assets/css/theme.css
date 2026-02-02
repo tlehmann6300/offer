@@ -40,6 +40,7 @@
     /* Shadows */
     --shadow-glow-green: 0 0 20px rgba(0, 166, 81, 0.4), 0 4px 12px rgba(0, 166, 81, 0.3);
     --shadow-premium: 0 20px 40px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.1);
+    --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
     
     /* Spacing & Layout */
     --mobile-header-offset: 5rem;
@@ -52,6 +53,64 @@
 
 .shadow-premium {
     box-shadow: var(--shadow-premium);
+}
+
+.shadow-soft {
+    box-shadow: var(--shadow-soft);
+}
+
+/* Transition Utility Classes */
+.ease-premium {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}
+
+/* Glassmorphism Effect */
+.glass-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* IBC Color Utilities */
+.bg-ibc-green {
+    background-color: var(--ibc-green);
+}
+
+.bg-ibc-green-hover:hover {
+    background-color: var(--ibc-green-hover);
+}
+
+.bg-ibc-blue {
+    background-color: var(--ibc-blue);
+}
+
+.bg-ibc-blue-dark {
+    background-color: var(--ibc-blue-dark);
+}
+
+.text-ibc-blue {
+    color: var(--ibc-blue);
+}
+
+.text-ibc-green {
+    color: var(--ibc-green);
+}
+
+.border-ibc-blue {
+    border-color: var(--ibc-blue);
+}
+
+.hover\:shadow-glow-green:hover {
+    box-shadow: var(--shadow-glow-green);
+}
+
+.focus\:ring-ibc-blue:focus {
+    --tw-ring-color: var(--ibc-blue);
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
 
 /* Flatpickr Calendar Overrides - IBC Corporate Identity */
