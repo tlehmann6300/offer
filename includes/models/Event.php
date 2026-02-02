@@ -341,6 +341,11 @@ class Event {
                         $eventStart = strtotime($eventStartTime);
                         $eventEnd = strtotime($eventEndTime);
                         
+                        // Check if time parsing was successful
+                        if ($slotStart === false || $slotEnd === false || $eventStart === false || $eventEnd === false) {
+                            throw new Exception('Ungültige Zeitangaben in Slot oder Event');
+                        }
+                        
                         if ($slotStart < $eventStart || $slotEnd > $eventEnd) {
                             throw new Exception('Zeitslots müssen innerhalb des Event-Zeitraums liegen');
                         }
