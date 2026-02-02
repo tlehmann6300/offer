@@ -41,18 +41,26 @@ if (is_dir($migrationsPath)) {
     // Check if migrations contain sensitive data (passwords, credentials)
     $sensitivePatterns = [
         '/password\s*=\s*["\'][^"\']+["\']/i',
-        '/INSERT\s+INTO.*password.*VALUES.*["\'][^"\']{20,}["\']/i',
-        '/IDENTIFIED\s+BY\s+["\'][^"\']+["\']/i'
+        '/INSERT\s+INTO.*password.*VALUES.*["\'][^"\']{8,}["\']/i',
+        '/IDENTIFIED\s+BY\s+["\'][^"\']+["\']/i',
+        '/CREATE\s+USER.*IDENTIFIED\s+BY/i'
     ];
     
     $migrationsFiles = glob($migrationsPath . '/*.sql');
     foreach ($migrationsFiles as $migrationFile) {
-        $content = file_get_contents($migrationFile);
-        foreach ($sensitivePatterns as $pattern) {
-            if (preg_match($pattern, $content)) {
-                $shouldDeleteMigrations = true;
-                break 2;
+        // Use file() to read line by line for better memory efficiency
+        $handle = fopen($migrationFile, 'r');
+        if ($handle) {
+            while (($line = fgets($handle)) !== false) {
+                foreach ($sensitivePatterns as $pattern) {
+                    if (preg_match($pattern, $line)) {
+                        $shouldDeleteMigrations = true;
+                        fclose($handle);
+                        break 3; // Break out of all loops
+                    }
+                }
             }
+            fclose($handle);
         }
     }
 }
@@ -100,5 +108,3 @@ echo "Dieses Skript wird jetzt gelöscht...\n";
 
 // Self-destruct: Delete this script
 unlink(__FILE__);
-
-echo "Bereinigung abgeschlossen.\n";
