@@ -12,10 +12,11 @@ echo "NOTE: Tests 1, 2, 6, and 7 will show upload failures in CLI mode\n";
 echo "because move_uploaded_file() only works with actual HTTP POST uploads.\n";
 echo "The security validation tests (3, 4, 5) are what matter most.\n\n";
 
-// Create temporary test directory
-$testDir = '/tmp/upload_test_' . time();
+// Create temporary test directory with cryptographically secure random name
+$randomSuffix = bin2hex(random_bytes(8));
+$testDir = sys_get_temp_dir() . '/upload_test_' . $randomSuffix;
 if (!is_dir($testDir)) {
-    mkdir($testDir, 0755, true);
+    mkdir($testDir, 0700, true);
 }
 echo "Created test directory: $testDir\n\n";
 
@@ -213,9 +214,11 @@ if ($result['success']) {
         echo "  ✗ SECURITY WARNING: Original filename components present!\n";
     }
     
-    // Check filename format
-    if (preg_match('/^item_\d+_[a-f0-9]+\.(jpg|png|webp|gif)$/', $filename)) {
+    // Check filename format (32 hex chars from random_bytes(16))
+    if (preg_match('/^item_[a-f0-9]{32}\.(jpg|png|webp|gif)$/', $filename)) {
         echo "  ✓ SECURE: Filename follows secure random pattern\n";
+    } else {
+        echo "  ⚠ WARNING: Filename doesn't match expected pattern: " . $filename . "\n";
     }
     
     $fullPath = __DIR__ . '/../' . $result['path'];

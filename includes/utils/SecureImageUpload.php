@@ -127,8 +127,8 @@ class SecureImageUpload {
         }
         
         // Generate secure random filename
-        // Use uniqid() with more entropy and timestamp for uniqueness
-        $randomFilename = uniqid('item_' . time() . '_', true);
+        // Use cryptographically secure random bytes for unpredictability
+        $randomFilename = 'item_' . bin2hex(random_bytes(16));
         
         // If converting to WebP, always use .webp extension
         // Otherwise, determine extension from MIME type
