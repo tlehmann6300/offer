@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
 
 AuthHandler::startSession();
@@ -26,6 +27,8 @@ $error = '';
 
 // Handle checkin submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['checkin'])) {
+    CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
+    
     $returnedQuantity = intval($_POST['returned_quantity'] ?? 0);
     $isDefective = isset($_POST['is_defective']) && $_POST['is_defective'] === 'yes';
     $defectiveQuantity = $isDefective ? intval($_POST['defective_quantity'] ?? 0) : 0;
@@ -100,6 +103,7 @@ ob_start();
 
         <!-- Checkin Form -->
         <form method="POST" class="space-y-6" id="checkinForm">
+            <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
             <input type="hidden" name="checkin" value="1">
 
             <div>

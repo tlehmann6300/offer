@@ -6,6 +6,7 @@
  */
 
 require_once __DIR__ . '/../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../includes/database.php';
 
 AuthHandler::startSession();
@@ -30,6 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ]);
     exit;
 }
+
+// Verify CSRF token
+CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
 
 // Get POST data
 $email = trim($_POST['email'] ?? '');

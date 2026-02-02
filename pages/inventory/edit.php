@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
 
 AuthHandler::startSession();
@@ -25,6 +26,8 @@ $message = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
+    
     if (isset($_POST['delete'])) {
         // Handle deletion
         if (Inventory::delete($itemId, $_SESSION['user_id'])) {
@@ -134,6 +137,7 @@ ob_start();
     </div>
 
     <form method="POST" enctype="multipart/form-data" class="space-y-6">
+        <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
         <!-- Basic Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="md:col-span-2">
@@ -282,6 +286,7 @@ ob_start();
 
 <!-- Delete confirmation form (hidden) -->
 <form id="deleteForm" method="POST" style="display: none;">
+    <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
     <input type="hidden" name="delete" value="1">
 </form>
 

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
 
 AuthHandler::startSession();
@@ -13,6 +14,8 @@ $message = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
+    
     $name = $_POST['name'] ?? '';
     $description = $_POST['description'] ?? '';
     $category_id = $_POST['category_id'] ?? null;
@@ -104,6 +107,7 @@ ob_start();
     <p class="text-gray-600 mb-6">Erstellen Sie einen neuen Artikel im Inventar</p>
 
     <form method="POST" enctype="multipart/form-data" class="space-y-8">
+        <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
         
         <!-- Basisdaten Section -->
         <div class="bg-gray-50 rounded-lg p-6">

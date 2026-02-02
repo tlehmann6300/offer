@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/models/User.php';
 
 AuthHandler::startSession();
@@ -30,6 +31,8 @@ if (empty($token)) {
 
 // Handle registration
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $invitation) {
+    CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
+    
     $email = $invitation['email'];
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
@@ -88,6 +91,7 @@ ob_start();
 
         <?php if ($invitation): ?>
         <form method="POST" class="space-y-6">
+            <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
             <div class="bg-white/10 p-4 rounded-lg mb-4">
                 <p class="text-white/80 text-sm mb-2">Sie wurden eingeladen als:</p>
                 <p class="text-white font-semibold"><?php echo htmlspecialchars($invitation['email']); ?></p>

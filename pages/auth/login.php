@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 
 AuthHandler::startSession();
 
@@ -13,6 +14,8 @@ $error = '';
 $require2FA = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
+    
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
     $tfaCode = $_POST['tfa_code'] ?? null;
@@ -80,6 +83,7 @@ ob_start();
         <?php endif; ?>
 
         <form method="POST" class="space-y-6">
+            <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
             <?php if (!$require2FA): ?>
             <div>
                 <label class="block text-white mb-2 font-medium">
