@@ -5,8 +5,13 @@
  * Only accessible by admin and board members
  */
 
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
-require_once __DIR__ . '/../../includes/database.php';
+require_once __DIR__ . '/../../src/Auth.php';
+require_once __DIR__ . '/../../src/Database.php';
+
+// Ensure backward compatibility - if Auth class exists, alias it as AuthHandler
+if (class_exists('Auth') && !class_exists('AuthHandler')) {
+    class_alias('Auth', 'AuthHandler');
+}
 
 AuthHandler::startSession();
 
