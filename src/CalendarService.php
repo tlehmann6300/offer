@@ -135,11 +135,14 @@ class CalendarService {
      * @return string Escaped string
      */
     private static function escapeICalString($str) {
+        // First escape backslashes
+        $str = str_replace('\\', '\\\\', $str);
+        
         // Replace line breaks with \n
-        $str = str_replace(["\r\n", "\n", "\r"], "\\n", $str);
+        $str = str_replace(["\r\n", "\n", "\r"], '\\n', $str);
         
         // Escape special characters
-        $str = str_replace([',', ';', '\\'], ['\\,', '\\;', '\\\\'], $str);
+        $str = str_replace([',', ';'], ['\\,', '\\;'], $str);
         
         return $str;
     }
