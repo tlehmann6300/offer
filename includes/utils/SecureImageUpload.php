@@ -162,7 +162,8 @@ class SecureImageUpload {
         chmod($uploadPath, 0644);
         
         // Return relative path for database storage
-        $relativePath = 'assets/uploads/' . $filename;
+        // Use the UPLOAD_DIR constant to maintain single source of truth
+        $relativePath = trim(self::UPLOAD_DIR, '/') . '/' . $filename;
         
         return [
             'success' => true,
@@ -274,5 +275,15 @@ class SecureImageUpload {
         }
         
         return false;
+    }
+    
+    /**
+     * Get the default upload directory path (absolute)
+     * Useful for testing and external access
+     * 
+     * @return string Absolute path to upload directory
+     */
+    public static function getUploadDirectory() {
+        return __DIR__ . '/../../' . self::UPLOAD_DIR;
     }
 }

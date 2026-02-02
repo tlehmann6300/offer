@@ -13,6 +13,8 @@ echo "because move_uploaded_file() only works with actual HTTP POST uploads.\n";
 echo "The security validation tests (3, 4, 5) are what matter most.\n\n";
 
 // Create temporary test directory with cryptographically secure random name
+// Note: Using 0700 (owner-only) for security. In CI/CD environments where
+// web server user differs from script user, may need to adjust permissions.
 $randomSuffix = bin2hex(random_bytes(8));
 $testDir = sys_get_temp_dir() . '/upload_test_' . $randomSuffix;
 if (!is_dir($testDir)) {
@@ -39,7 +41,8 @@ $validFile = [
     'error' => UPLOAD_ERR_OK
 ];
 
-$uploadDir = __DIR__ . '/../assets/uploads/';
+// Use SecureImageUpload's method to get upload directory
+$uploadDir = SecureImageUpload::getUploadDirectory();
 $result = SecureImageUpload::uploadImage($validFile, $uploadDir);
 
 if ($result['success']) {
