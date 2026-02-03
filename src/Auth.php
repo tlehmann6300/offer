@@ -276,6 +276,9 @@ class Auth {
         $stmt = $db->prepare("INSERT INTO invitation_tokens (token, email, role, created_by, expires_at) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([$token, $email, $role, $createdBy, $expiresAt]);
         
+        // Capture last insert ID immediately after insert
+        $invitationId = $db->lastInsertId();
+        
         // Log invitation creation if system_logs table exists
         try {
             $dbContent = Database::getContentDB();
@@ -284,7 +287,7 @@ class Auth {
                 $createdBy,
                 'invitation_created',
                 'invitation',
-                $db->lastInsertId(),
+                $invitationId,
                 "Invitation sent to $email",
                 $_SERVER['REMOTE_ADDR'] ?? null,
                 $_SERVER['HTTP_USER_AGENT'] ?? null
