@@ -40,7 +40,7 @@ echo json_encode([
 PHP;
 
 // Write test script to temp file
-$tempFile = '/tmp/test_session_params.php';
+$tempFile = sys_get_temp_dir() . '/test_session_params.php';
 file_put_contents($tempFile, $testScript);
 
 // Execute in clean PHP process
@@ -131,7 +131,7 @@ require_once '$authPath';
 echo \$domain;
 PHP;
 
-$tempFile2 = '/tmp/test_domain_extract.php';
+$tempFile2 = sys_get_temp_dir() . '/test_domain_extract.php';
 file_put_contents($tempFile2, $testScript2);
 $domain = trim(shell_exec("php $tempFile2 2>&1"));
 

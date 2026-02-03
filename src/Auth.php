@@ -24,6 +24,11 @@ class Auth {
     
     /**
      * Set secure session cookie parameters
+     * Configures session cookies with security flags before session_start().
+     * This ensures cookies are protected against common web vulnerabilities:
+     * - secure: Only transmitted over HTTPS
+     * - httponly: Not accessible via JavaScript (XSS protection)
+     * - samesite: Prevents CSRF attacks
      */
     private static function setSecureSessionParams() {
         if (session_status() === PHP_SESSION_NONE) {
