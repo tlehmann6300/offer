@@ -25,37 +25,61 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
         Einladung erstellen
     </h3>
     
-    <form id="invitationForm" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+    <form id="invitationForm" class="space-y-4 mb-4">
         <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">E-Mail-Adresse</label>
-            <input 
-                type="email" 
-                id="invitationEmail" 
-                name="email" 
-                required 
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="benutzer@beispiel.de"
-            >
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">E-Mail-Adresse</label>
+                <input 
+                    type="email" 
+                    id="invitationEmail" 
+                    name="email" 
+                    required 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="benutzer@beispiel.de"
+                >
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Rolle</label>
+                <select 
+                    id="invitationRole" 
+                    name="role" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                    <option value="member">Mitglied</option>
+                    <option value="alumni">Alumni</option>
+                    <option value="manager">Ressortleiter</option>
+                    <option value="alumni_board">Alumni-Vorstand</option>
+                    <option value="board">Vorstand</option>
+                    <option value="admin">Administrator</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Email Send Option -->
+        <div class="flex items-center space-x-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <div class="flex items-center">
+                <input 
+                    type="checkbox" 
+                    id="sendMailCheckbox" 
+                    name="send_mail" 
+                    value="1"
+                    checked
+                    class="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
+                >
+            </div>
+            <label for="sendMailCheckbox" class="flex-1 cursor-pointer">
+                <span class="text-sm font-medium text-gray-700">Einladung direkt per E-Mail senden</span>
+                <p class="text-xs text-gray-500 mt-1">
+                    <i class="fas fa-envelope text-purple-500 mr-1"></i>
+                    Der Einladungslink wird automatisch per E-Mail an die angegebene Adresse versendet
+                </p>
+            </label>
         </div>
         
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Rolle</label>
-            <select 
-                id="invitationRole" 
-                name="role" 
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-                <option value="member">Mitglied</option>
-                <option value="alumni">Alumni</option>
-                <option value="manager">Ressortleiter</option>
-                <option value="alumni_board">Alumni-Vorstand</option>
-                <option value="board">Vorstand</option>
-                <option value="admin">Administrator</option>
-            </select>
-        </div>
-        
-        <div class="flex items-end">
             <button type="submit" class="w-full btn-primary">
                 <i class="fas fa-magic mr-2"></i>Link erstellen
             </button>
@@ -197,19 +221,24 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
             const data = await response.json();
             
             if (data.success) {
-                // Show generated link
-                generatedLink.value = data.link;
-                generatedEmail.textContent = data.email;
-                generatedRole.textContent = roleNames[data.role] || data.role;
-                generatedLinkContainer.classList.remove('hidden');
+                // Show generated link if available
+                if (data.link) {
+                    generatedLink.value = data.link;
+                    generatedEmail.textContent = data.email;
+                    generatedRole.textContent = roleNames[data.role] || data.role;
+                    generatedLinkContainer.classList.remove('hidden');
+                }
                 
-                // Reset form
+                // Reset form (but keep send_mail checked)
+                const sendMailChecked = document.getElementById('sendMailCheckbox').checked;
                 form.reset();
+                document.getElementById('sendMailCheckbox').checked = sendMailChecked;
                 
                 // Reload invitations list
                 loadInvitations();
                 
-                showMessage('Einladungslink erfolgreich erstellt!', 'success');
+                // Show appropriate success message
+                showMessage(data.message || 'Einladungslink erfolgreich erstellt!', 'success');
             } else {
                 showMessage(data.message || 'Fehler beim Erstellen des Einladungslinks', 'error');
             }
