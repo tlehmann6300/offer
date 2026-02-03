@@ -1029,7 +1029,13 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
                     const formattedSlotStart = formatDateTime(slotStart);
                     const formattedSlotEnd = formatDateTime(slotEnd);
                     
-                    alert(`Helfer-Slot Zeitfenster muss innerhalb der Event-Zeit liegen!\n\nEvent: ${formattedEventStart} bis ${formattedEventEnd}\nSlot: ${formattedSlotStart} bis ${formattedSlotEnd}\n\nBitte passen Sie die Slot-Zeiten an.`);
+                    const errorMessage = 
+                        `Helfer-Slot Zeitfenster muss innerhalb der Event-Zeit liegen!\n\n` +
+                        `Event: ${formattedEventStart} bis ${formattedEventEnd}\n` +
+                        `Slot: ${formattedSlotStart} bis ${formattedSlotEnd}\n\n` +
+                        `Bitte passen Sie die Slot-Zeiten an.`;
+                    
+                    alert(errorMessage);
                     validationFailed = true;
                     break;
                 }
