@@ -37,12 +37,15 @@ CREATE TABLE IF NOT EXISTS inventory (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT DEFAULT NULL,
+    serial_number VARCHAR(100) DEFAULT NULL,
     category_id INT UNSIGNED DEFAULT NULL,
     location_id INT UNSIGNED DEFAULT NULL,
+    status ENUM('available', 'in_use', 'maintenance', 'retired') NOT NULL DEFAULT 'available',
     current_stock INT NOT NULL DEFAULT 0,
     min_stock INT NOT NULL DEFAULT 0,
     unit VARCHAR(50) DEFAULT 'Stück',
     unit_price DECIMAL(10, 2) DEFAULT 0.00,
+    purchase_date DATE DEFAULT NULL,
     image_path VARCHAR(255) DEFAULT NULL,
     notes TEXT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -50,7 +53,8 @@ CREATE TABLE IF NOT EXISTS inventory (
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
     FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE SET NULL,
     INDEX idx_category (category_id),
-    INDEX idx_location (location_id)
+    INDEX idx_location (location_id),
+    INDEX idx_serial_number (serial_number)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci;
