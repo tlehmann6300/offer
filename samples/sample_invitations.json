@@ -1,0 +1,22 @@
+[
+  {
+    "email": "max.mustermann@example.com",
+    "role": "member"
+  },
+  {
+    "email": "erika.musterfrau@example.com",
+    "role": "alumni"
+  },
+  {
+    "email": "john.doe@example.com",
+    "role": "manager"
+  },
+  {
+    "email": "jane.smith@example.com",
+    "role": "member"
+  },
+  {
+    "email": "alumni.test@example.com",
+    "role": "alumni_board"
+  }
+]
