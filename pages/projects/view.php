@@ -30,6 +30,12 @@ if (!$project) {
 // Filter sensitive data based on user role
 $project = Project::filterSensitiveData($project, $userRole, $user['id']);
 
+// Check if user has already applied
+$userApplication = null;
+if ($userRole !== 'alumni') {
+    $userApplication = Project::getUserApplication($projectId, $user['id']);
+}
+
 // Handle application submission
 $message = '';
 $error = '';
@@ -43,17 +49,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply'])) {
         $error = 'Bewerbungen für dieses Projekt sind nicht möglich';
     } else {
         try {
-            $applicationData = [
-                'motivation' => trim($_POST['motivation'] ?? ''),
-                'experience_count' => intval($_POST['experience_count'] ?? 0)
-            ];
-            
-            if (empty($applicationData['motivation'])) {
+            // Validate motivation
+            $motivation = trim($_POST['motivation'] ?? '');
+            if (empty($motivation)) {
                 throw new Exception('Bitte geben Sie Ihre Motivation an');
             }
             
+            // Validate experience count confirmation checkbox
+            if (!isset($_POST['experience_confirmed']) || $_POST['experience_confirmed'] !== '1') {
+                throw new Exception('Bitte bestätigen Sie, dass Sie die Anzahl bisheriger Projekte korrekt angegeben haben');
+            }
+            
+            // Validate GDPR consent checkbox
+            if (!isset($_POST['gdpr_consent']) || $_POST['gdpr_consent'] !== '1') {
+                throw new Exception('Sie müssen der Datenverarbeitung gemäß DSGVO zustimmen');
+            }
+            
+            $applicationData = [
+                'motivation' => $motivation,
+                'experience_count' => intval($_POST['experience_count'] ?? 0)
+            ];
+            
             Project::apply($projectId, $user['id'], $applicationData);
             $message = 'Ihre Bewerbung wurde erfolgreich eingereicht';
+            
+            // Reload application status
+            $userApplication = Project::getUserApplication($projectId, $user['id']);
         } catch (Exception $e) {
             $error = $e->getMessage();
         }
@@ -191,64 +212,144 @@ ob_start();
         </div>
         <?php endif; ?>
         
-        <!-- Application Form -->
-        <?php if (($project['status'] === 'tender' || $project['status'] === 'applying') && $userRole !== 'alumni' && isset($_GET['action']) && $_GET['action'] === 'apply'): ?>
+        <!-- Application Section (Only for members, when status is 'applying' or 'tender') -->
+        <?php if (($project['status'] === 'tender' || $project['status'] === 'applying') && $userRole !== 'alumni'): ?>
         <div class="border-t border-gray-200 pt-6 mt-6">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">
-                <i class="fas fa-paper-plane text-green-600 mr-2"></i>
-                Jetzt bewerben
-            </h2>
-            
-            <form method="POST" class="space-y-4">
-                <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
-                <input type="hidden" name="apply" value="1">
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Motivation <span class="text-red-500">*</span>
-                    </label>
-                    <textarea 
-                        name="motivation" 
-                        rows="5"
-                        required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder="Warum möchten Sie an diesem Projekt teilnehmen?"
-                    ></textarea>
+            <?php if ($userApplication): ?>
+                <!-- Show Application Status -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-check-circle text-blue-600 mr-2"></i>
+                        Ihre Bewerbung
+                    </h2>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <span class="text-sm text-gray-600">Status:</span>
+                            <span class="ml-2 px-3 py-1 text-sm font-semibold rounded-full
+                                <?php 
+                                switch($userApplication['status']) {
+                                    case 'pending': echo 'bg-yellow-100 text-yellow-800'; break;
+                                    case 'reviewing': echo 'bg-blue-100 text-blue-800'; break;
+                                    case 'accepted': echo 'bg-green-100 text-green-800'; break;
+                                    case 'rejected': echo 'bg-red-100 text-red-800'; break;
+                                    default: echo 'bg-gray-100 text-gray-800'; break;
+                                }
+                                ?>">
+                                <?php 
+                                switch($userApplication['status']) {
+                                    case 'pending': echo 'In Prüfung'; break;
+                                    case 'reviewing': echo 'Wird geprüft'; break;
+                                    case 'accepted': echo 'Akzeptiert'; break;
+                                    case 'rejected': echo 'Abgelehnt'; break;
+                                    default: echo ucfirst($userApplication['status']); break;
+                                }
+                                ?>
+                            </span>
+                        </div>
+                        
+                        <div>
+                            <span class="text-sm text-gray-600">Bewerbungsdatum:</span>
+                            <span class="ml-2 font-semibold"><?php echo date('d.m.Y H:i', strtotime($userApplication['created_at'])); ?> Uhr</span>
+                        </div>
+                        
+                        <?php if (!empty($userApplication['motivation'])): ?>
+                        <div class="mt-4">
+                            <span class="text-sm font-semibold text-gray-700">Ihre Motivation:</span>
+                            <div class="mt-2 p-3 bg-white rounded border border-gray-200 text-gray-700 whitespace-pre-line">
+                                <?php echo htmlspecialchars($userApplication['motivation']); ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
+            <?php elseif (isset($_GET['action']) && $_GET['action'] === 'apply'): ?>
+                <!-- Show Application Form -->
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-paper-plane text-green-600 mr-2"></i>
+                    Jetzt bewerben
+                </h2>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Anzahl bisheriger Projekterfahrungen
-                    </label>
-                    <input 
-                        type="number" 
-                        name="experience_count" 
-                        min="0"
-                        value="0"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    >
-                </div>
-                
-                <div class="flex space-x-4">
-                    <a href="view.php?id=<?php echo $project['id']; ?>" 
-                       class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
-                        Abbrechen
-                    </a>
-                    <button type="submit" 
-                            class="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition">
-                        <i class="fas fa-paper-plane mr-2"></i>
-                        Bewerbung absenden
-                    </button>
-                </div>
-            </form>
-        </div>
-        <?php elseif (($project['status'] === 'tender' || $project['status'] === 'applying') && $userRole !== 'alumni'): ?>
-        <div class="border-t border-gray-200 pt-6 mt-6">
-            <a href="view.php?id=<?php echo $project['id']; ?>&action=apply" 
-               class="inline-block px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition">
-                <i class="fas fa-paper-plane mr-2"></i>
-                Jetzt bewerben
-            </a>
+                <form method="POST" class="space-y-4">
+                    <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
+                    <input type="hidden" name="apply" value="1">
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Motivation <span class="text-red-500">*</span>
+                        </label>
+                        <textarea 
+                            name="motivation" 
+                            rows="5"
+                            required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="Warum möchten Sie an diesem Projekt teilnehmen?"
+                        ></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Anzahl bisheriger Projekterfahrungen
+                        </label>
+                        <input 
+                            type="number" 
+                            name="experience_count" 
+                            min="0"
+                            value="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+                    
+                    <!-- Experience Confirmation Checkbox -->
+                    <div class="flex items-start">
+                        <input 
+                            type="checkbox" 
+                            id="experience_confirmed" 
+                            name="experience_confirmed" 
+                            value="1"
+                            required
+                            class="mt-1 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        >
+                        <label for="experience_confirmed" class="ml-3 text-sm text-gray-700">
+                            Ich bestätige, dass ich die Anzahl bisheriger Projekte korrekt angegeben habe <span class="text-red-500">*</span>
+                        </label>
+                    </div>
+                    
+                    <!-- GDPR Consent Checkbox -->
+                    <div class="flex items-start">
+                        <input 
+                            type="checkbox" 
+                            id="gdpr_consent" 
+                            name="gdpr_consent" 
+                            value="1"
+                            required
+                            class="mt-1 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        >
+                        <label for="gdpr_consent" class="ml-3 text-sm text-gray-700">
+                            Ich willige in die Verarbeitung meiner Daten zwecks Projektvergabe ein (DSGVO) <span class="text-red-500">*</span>
+                        </label>
+                    </div>
+                    
+                    <div class="flex space-x-4">
+                        <a href="view.php?id=<?php echo $project['id']; ?>" 
+                           class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                            Abbrechen
+                        </a>
+                        <button type="submit" 
+                                class="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            Bewerbung absenden
+                        </button>
+                    </div>
+                </form>
+            <?php else: ?>
+                <!-- Show "Apply Now" button when user hasn't applied yet -->
+                <a href="view.php?id=<?php echo $project['id']; ?>&action=apply" 
+                   class="inline-block px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition">
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    Jetzt bewerben
+                </a>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
     </div>
