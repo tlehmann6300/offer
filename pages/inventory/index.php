@@ -166,10 +166,10 @@ ob_start();
                     <ul class="list-disc list-inside ml-2">
                         <li><strong>name</strong>: Name des Artikels</li>
                         <li><strong>category</strong>: Kategorie (wird erstellt, falls nicht vorhanden)</li>
-                        <li><strong>status</strong>: Status (available, in_use, maintenance, retired) - Standard: "available"</li>
                     </ul>
                     <p class="font-semibold mt-2">Optionale Felder:</p>
                     <ul class="list-disc list-inside ml-2">
+                        <li><strong>status</strong>: Status (available, in_use, maintenance, retired) - Standard: "available"</li>
                         <li><strong>description</strong>: Beschreibung</li>
                         <li><strong>serial_number</strong>: Seriennummer (muss eindeutig sein)</li>
                         <li><strong>location</strong>: Standort (wird erstellt, falls nicht vorhanden)</li>

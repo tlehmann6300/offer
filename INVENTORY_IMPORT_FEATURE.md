@@ -36,10 +36,10 @@ The import file must be a valid JSON array of objects. Each object represents on
 
 - **name** (string): Name of the item
 - **category** (string): Category name (will be created if doesn't exist)
-- **status** (string): One of: 'available', 'in_use', 'maintenance', 'retired' (default: 'available')
 
 ### Optional Fields
 
+- **status** (string): One of: 'available', 'in_use', 'maintenance', 'retired' (default: 'available' if not provided)
 - **description** (string): Item description
 - **serial_number** (string): Unique serial number (duplicates will be rejected)
 - **location** (string): Location name (will be created if doesn't exist)

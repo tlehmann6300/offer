@@ -69,11 +69,16 @@ if (file_exists($sampleFile)) {
 // Test 2: Validate Required Fields Logic
 echo "Test 2: Test Required Fields Validation\n";
 $testData = [
-    // Valid item
+    // Valid item with status
     [
         'name' => 'Test Item',
         'category' => 'Test Category',
         'status' => 'available'
+    ],
+    // Valid item without status (should default to 'available')
+    [
+        'name' => 'Test Item Without Status',
+        'category' => 'Test Category'
     ],
     // Missing name
     [
@@ -95,6 +100,7 @@ $testData = [
 
 $expectedResults = [
     'valid',
+    'valid_no_status',
     'missing_name',
     'missing_category',
     'invalid_status'
@@ -115,6 +121,7 @@ foreach ($testData as $index => $item) {
     if (!$hasName) $actual = 'missing_name';
     elseif (!$hasCategory) $actual = 'missing_category';
     elseif (!$validStatus) $actual = 'invalid_status';
+    elseif (!isset($item['status'])) $actual = 'valid_no_status';
     
     if ($actual === $expected) {
         echo "✓ Test case $index: Expected '$expected', got '$actual'\n";
