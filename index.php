@@ -19,7 +19,7 @@ if (Auth::check()) {
 </head>
 <body>
     <p>Falls die automatische Weiterleitung nicht funktioniert:</p>
-    <a href="<?php echo BASE_URL; ?>/pages/auth/login.php">
+    <a href="<?php echo htmlspecialchars(BASE_URL, ENT_QUOTES, 'UTF-8'); ?>/pages/auth/login.php">
         <button>Weiter zum Login</button>
     </a>
 </body>
