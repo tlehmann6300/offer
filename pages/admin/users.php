@@ -1,16 +1,14 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/User.php';
 
-AuthHandler::startSession();
-
-if (!AuthHandler::isAuthenticated() || !AuthHandler::hasPermission('admin')) {
+if (!Auth::check() || !Auth::hasPermission('admin')) {
     header('Location: ../auth/login.php');
     exit;
 }
 
 // Check if user has permission for invitation management (board or higher)
-$canManageInvitations = AuthHandler::hasPermission('board');
+$canManageInvitations = Auth::hasPermission('board');
 
 $message = '';
 $error = '';
@@ -24,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $error = 'Ungültige E-Mail-Adresse';
         } else {
-            $token = AuthHandler::generateInvitationToken($email, $role, $_SESSION['user_id']);
+            $token = Auth::generateInvitationToken($email, $role, $_SESSION['user_id']);
             $inviteLink = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/pages/auth/register.php?token=' . $token;
             $message = 'Einladung erstellt! Link: ' . $inviteLink;
         }

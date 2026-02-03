@@ -1,11 +1,9 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
 require_once __DIR__ . '/../../includes/database.php';
 
-AuthHandler::startSession();
-
-if (!AuthHandler::isAuthenticated()) {
+if (!Auth::check()) {
     header('Location: ../auth/login.php');
     exit;
 }

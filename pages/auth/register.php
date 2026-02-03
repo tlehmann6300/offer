@@ -1,12 +1,10 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/models/User.php';
 
-AuthHandler::startSession();
-
 // Redirect if already authenticated
-if (AuthHandler::isAuthenticated()) {
+if (Auth::check()) {
     header('Location: ../dashboard/index.php');
     exit;
 }
@@ -56,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $invitation) {
                 $stmt->execute([$userId, $invitation['id']]);
                 
                 // Auto-login
-                $result = AuthHandler::login($email, $password);
+                $result = Auth::login($email, $password);
                 if ($result['success']) {
                     header('Location: ../dashboard/index.php');
                     exit;

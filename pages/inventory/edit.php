@@ -1,12 +1,10 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
 require_once __DIR__ . '/../../includes/utils/SecureImageUpload.php';
 
-AuthHandler::startSession();
-
-if (!AuthHandler::isAuthenticated() || !AuthHandler::hasPermission('manager')) {
+if (!Auth::check() || !Auth::hasPermission('manager')) {
     header('Location: ../auth/login.php');
     exit;
 }
@@ -117,7 +115,7 @@ ob_start();
             <i class="fas fa-edit text-purple-600 mr-2"></i>
             Artikel bearbeiten
         </h1>
-        <?php if (AuthHandler::hasPermission('admin')): ?>
+        <?php if (Auth::hasPermission('admin')): ?>
         <button onclick="confirmDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
             <i class="fas fa-trash mr-2"></i>Löschen
         </button>

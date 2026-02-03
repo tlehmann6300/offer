@@ -1,10 +1,8 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
 
-AuthHandler::startSession();
-
-if (!AuthHandler::isAuthenticated() || !AuthHandler::hasPermission('manager')) {
+if (!Auth::check() || !Auth::hasPermission('manager')) {
     header('Location: ../dashboard/index.php');
     exit;
 }

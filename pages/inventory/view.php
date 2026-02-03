@@ -1,10 +1,8 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
 
-AuthHandler::startSession();
-
-if (!AuthHandler::isAuthenticated()) {
+if (!Auth::check()) {
     header('Location: ../auth/login.php');
     exit;
 }
@@ -43,7 +41,7 @@ if (isset($_SESSION['rental_error'])) {
 
 // Handle stock adjustment
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['adjust_stock'])) {
-    if (!AuthHandler::hasPermission('manager')) {
+    if (!Auth::hasPermission('manager')) {
         $error = 'Keine Berechtigung';
     } else {
         $amount = intval($_POST['amount'] ?? 0);
@@ -108,7 +106,7 @@ ob_start();
                         <?php endif; ?>
                     </div>
                 </div>
-                <?php if (AuthHandler::hasPermission('manager')): ?>
+                <?php if (Auth::hasPermission('manager')): ?>
                 <div class="flex space-x-2">
                     <a href="edit.php?id=<?php echo $item['id']; ?>" class="btn-primary">
                         <i class="fas fa-edit mr-2"></i>Bearbeiten
@@ -179,7 +177,7 @@ ob_start();
 
     <!-- Stock Adjustment -->
     <div class="lg:col-span-1">
-        <?php if (AuthHandler::hasPermission('manager')): ?>
+        <?php if (Auth::hasPermission('manager')): ?>
         <div class="card p-6 mb-6">
             <h2 class="text-xl font-bold text-gray-800 mb-4">
                 <i class="fas fa-exchange-alt text-purple-600 mr-2"></i>

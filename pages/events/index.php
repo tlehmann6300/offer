@@ -1,19 +1,17 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Event.php';
-
-AuthHandler::startSession();
 
 // Update event statuses (pseudo-cron)
 require_once __DIR__ . '/../../includes/pseudo_cron.php';
 
 // Check authentication
-if (!AuthHandler::isAuthenticated()) {
+if (!Auth::check()) {
     header('Location: ../auth/login.php');
     exit;
 }
 
-$user = AuthHandler::getCurrentUser();
+$user = Auth::user();
 $userRole = $_SESSION['user_role'] ?? 'member';
 
 // Get filter from query parameters

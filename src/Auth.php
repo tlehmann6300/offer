@@ -103,9 +103,10 @@ class Auth {
      * 
      * @param string $email User email
      * @param string $password User password
+     * @param string|null $tfaCode Optional 2FA code
      * @return array Result with 'success' and 'message' keys
      */
-    public static function login($email, $password) {
+    public static function login($email, $password, $tfaCode = null) {
         $db = Database::getUserDB();
         
         // Find user by email
@@ -138,6 +139,21 @@ class Auth {
             $stmt->execute([$failedAttempts, $lockedUntil, $user['id']]);
             
             return ['success' => false, 'message' => 'Ungültige Anmeldedaten'];
+        }
+        
+        // Check 2FA if enabled
+        if ($user['tfa_enabled']) {
+            if ($tfaCode === null) {
+                return ['success' => false, 'require_2fa' => true, 'user_id' => $user['id']];
+            }
+            
+            // Verify 2FA code
+            require_once __DIR__ . '/../includes/handlers/GoogleAuthenticator.php';
+            $ga = new PHPGangsta_GoogleAuthenticator();
+            
+            if (!$ga->verifyCode($user['tfa_secret'], $tfaCode, 2)) {
+                return ['success' => false, 'message' => 'Ungültiger 2FA-Code'];
+            }
         }
         
         // Reset failed attempts and update last login
@@ -242,6 +258,45 @@ class Auth {
             header('Location: ' . $loginUrl);
             exit;
         }
+    }
+    
+    /**
+     * Generate invitation token for new user registration
+     * 
+     * @param string $email User email
+     * @param string $role User role
+     * @param int $createdBy ID of user creating the invitation
+     * @return string Generated token
+     */
+    public static function generateInvitationToken($email, $role, $createdBy) {
+        $db = Database::getUserDB();
+        $token = bin2hex(random_bytes(32));
+        $expiresAt = date('Y-m-d H:i:s', time() + (7 * 24 * 60 * 60)); // 7 days
+        
+        $stmt = $db->prepare("INSERT INTO invitation_tokens (token, email, role, created_by, expires_at) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$token, $email, $role, $createdBy, $expiresAt]);
+        
+        // Capture last insert ID immediately after insert
+        $invitationId = $db->lastInsertId();
+        
+        // Log invitation creation if system_logs table exists
+        try {
+            $dbContent = Database::getContentDB();
+            $stmt = $dbContent->prepare("INSERT INTO system_logs (user_id, action, entity_type, entity_id, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $createdBy,
+                'invitation_created',
+                'invitation',
+                $invitationId,
+                "Invitation sent to $email",
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null
+            ]);
+        } catch (Exception $e) {
+            error_log("Failed to log invitation creation: " . $e->getMessage());
+        }
+        
+        return $token;
     }
     
     /**

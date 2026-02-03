@@ -1,10 +1,8 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
 
-AuthHandler::startSession();
-
-if (!AuthHandler::isAuthenticated()) {
+if (!Auth::check()) {
     header('Location: ../auth/login.php');
     exit;
 }
@@ -41,7 +39,7 @@ ob_start();
             </h1>
             <p class="text-gray-600"><?php echo count($items); ?> Artikel gefunden</p>
         </div>
-        <?php if (AuthHandler::hasPermission('manager')): ?>
+        <?php if (Auth::hasPermission('manager')): ?>
         <div class="mt-4 md:mt-0">
             <a href="add.php" class="btn-primary inline-block">
                 <i class="fas fa-plus mr-2"></i>
@@ -110,7 +108,7 @@ ob_start();
     <div class="col-span-full card p-12 text-center">
         <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
         <p class="text-gray-500 text-lg">Keine Artikel gefunden</p>
-        <?php if (AuthHandler::hasPermission('manager')): ?>
+        <?php if (Auth::hasPermission('manager')): ?>
         <a href="add.php" class="btn-primary inline-block mt-4">
             <i class="fas fa-plus mr-2"></i>Ersten Artikel hinzufügen
         </a>
@@ -167,7 +165,7 @@ ob_start();
                 <a href="view.php?id=<?php echo $item['id']; ?>" class="flex-1 text-center px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm">
                     <i class="fas fa-eye mr-1"></i>Details
                 </a>
-                <?php if (AuthHandler::hasPermission('manager')): ?>
+                <?php if (Auth::hasPermission('manager')): ?>
                 <a href="edit.php?id=<?php echo $item['id']; ?>" class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
                     <i class="fas fa-edit"></i>
                 </a>

@@ -1,16 +1,14 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Event.php';
 
-AuthHandler::startSession();
-
 // Check authentication
-if (!AuthHandler::isAuthenticated()) {
+if (!Auth::check()) {
     header('Location: ../auth/login.php');
     exit;
 }
 
-$user = AuthHandler::getCurrentUser();
+$user = Auth::user();
 $userRole = $_SESSION['user_role'] ?? 'member';
 
 // Get event ID
