@@ -5,6 +5,10 @@
  */
 
 require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class MailService {
     
@@ -149,6 +153,104 @@ class MailService {
     }
     
     /**
+     * Create and configure PHPMailer instance with SMTP settings
+     * 
+     * @param bool $enableDebug Enable SMTP debug output (default: false)
+     * @return PHPMailer Configured PHPMailer instance
+     */
+    private static function createMailer($enableDebug = false) {
+        $mail = new PHPMailer(true);
+        
+        try {
+            // SMTP configuration
+            $mail->isSMTP();
+            $mail->Host = SMTP_HOST;
+            $mail->SMTPAuth = true;
+            $mail->Username = SMTP_USER;
+            $mail->Password = SMTP_PASS;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = SMTP_PORT;
+            
+            // Set sender
+            $mail->setFrom(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
+            
+            // Character encoding
+            $mail->CharSet = 'UTF-8';
+            $mail->Encoding = 'base64';
+            
+            // Enable debug output if requested
+            if ($enableDebug) {
+                $mail->SMTPDebug = 2;
+                $mail->Debugoutput = 'html';
+            }
+            
+        } catch (Exception $e) {
+            error_log("Failed to configure PHPMailer: " . $e->getMessage());
+            throw $e;
+        }
+        
+        return $mail;
+    }
+    
+    /**
+     * Send test email with SMTP debug output enabled
+     * 
+     * @param string $toEmail Recipient email address
+     * @return bool Success status
+     */
+    public static function sendTestMail($toEmail) {
+        try {
+            $mail = self::createMailer(true); // Enable debug output
+            
+            // Set recipient
+            $mail->addAddress($toEmail);
+            
+            // Email content
+            $mail->isHTML(true);
+            $mail->Subject = 'Test Email - SMTP Configuration';
+            
+            // Build simple test email body
+            $bodyContent = '<p class="email-text">Dies ist eine Test-E-Mail zur Überprüfung der SMTP-Konfiguration.</p>
+            <p class="email-text">Wenn Sie diese E-Mail erhalten, funktioniert die SMTP-Verbindung korrekt.</p>
+            <p class="email-text">Konfiguration:</p>
+            <table class="info-table">
+                <tr>
+                    <td>SMTP Host</td>
+                    <td>' . htmlspecialchars(SMTP_HOST) . '</td>
+                </tr>
+                <tr>
+                    <td>SMTP Port</td>
+                    <td>' . htmlspecialchars(SMTP_PORT) . '</td>
+                </tr>
+                <tr>
+                    <td>Von</td>
+                    <td>' . htmlspecialchars(SMTP_FROM_EMAIL) . '</td>
+                </tr>
+            </table>';
+            
+            $mail->Body = self::getTemplate('SMTP Test', $bodyContent);
+            
+            // Embed logo
+            $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.webp';
+            if (!file_exists($imagePath)) {
+                $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.png';
+            }
+            if (file_exists($imagePath)) {
+                $mail->addEmbeddedImage($imagePath, 'ibc_logo');
+            }
+            
+            // Send
+            $mail->send();
+            error_log("Test email sent successfully to {$toEmail}");
+            return true;
+            
+        } catch (Exception $e) {
+            error_log("Failed to send test email: " . $mail->ErrorInfo);
+            return false;
+        }
+    }
+    
+    /**
      * Send helper confirmation email with ICS attachment (Updated with new template)
      * 
      * @param string $toEmail Recipient email address
@@ -282,7 +384,7 @@ class MailService {
     }
     
     /**
-     * Send email with attachment and embedded logo using PHP mail function with SMTP
+     * Send email with attachment and embedded logo using PHPMailer with SMTP
      * 
      * @param string $toEmail Recipient email
      * @param string $toName Recipient name
@@ -293,90 +395,36 @@ class MailService {
      * @return bool Success status
      */
     private static function sendEmailWithAttachment($toEmail, $toName, $subject, $htmlBody, $attachmentFilename, $attachmentContent) {
-        // Generate email boundaries
-        $mixedBoundary = md5(time() . 'mixed');
-        $relatedBoundary = md5(time() . 'related');
-        
-        // Load logo file with robust path handling
-        $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.webp';
-        if (!file_exists($imagePath)) {
-            // Try png version
-            $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.png';
-        }
-        
-        $logoContent = '';
-        $logoMimeType = 'image/webp'; // Default to webp since we check it first
-        
-        if (file_exists($imagePath)) {
-            $logoContent = file_get_contents($imagePath);
-            // Update MIME type based on actual file
-            if (strpos($imagePath, '.webp') !== false) {
-                $logoMimeType = 'image/webp';
-            } else {
-                $logoMimeType = 'image/png';
-            }
-        }
-        
-        // Prepare headers
-        $headers = [];
-        $headers[] = 'MIME-Version: 1.0';
-        $headers[] = 'Content-Type: multipart/mixed; boundary="' . $mixedBoundary . '"';
-        $headers[] = 'From: ' . SMTP_FROM;
-        $headers[] = 'Reply-To: ' . SMTP_FROM;
-        $headers[] = 'X-Mailer: PHP/' . phpversion();
-        
-        // Build email body with multipart/mixed (for attachment) and multipart/related (for embedded image)
-        $message = '';
-        
-        // Start mixed boundary (outer)
-        $message .= '--' . $mixedBoundary . "\r\n";
-        $message .= 'Content-Type: multipart/related; boundary="' . $relatedBoundary . '"' . "\r\n\r\n";
-        
-        // HTML part (inside related boundary)
-        $message .= '--' . $relatedBoundary . "\r\n";
-        $message .= 'Content-Type: text/html; charset=UTF-8' . "\r\n";
-        $message .= 'Content-Transfer-Encoding: 8bit' . "\r\n\r\n";
-        $message .= $htmlBody . "\r\n\r\n";
-        
-        // Embedded logo (inside related boundary)
-        if (!empty($logoContent)) {
-            $message .= '--' . $relatedBoundary . "\r\n";
-            $message .= 'Content-Type: ' . $logoMimeType . '; name="logo.png"' . "\r\n";
-            $message .= 'Content-Transfer-Encoding: base64' . "\r\n";
-            $message .= 'Content-ID: <ibc_logo>' . "\r\n";
-            $message .= 'Content-Disposition: inline; filename="logo.png"' . "\r\n\r\n";
-            $message .= chunk_split(base64_encode($logoContent)) . "\r\n";
-        }
-        
-        // Close related boundary
-        $message .= '--' . $relatedBoundary . '--' . "\r\n\r\n";
-        
-        // Attachment part (inside mixed boundary)
-        $message .= '--' . $mixedBoundary . "\r\n";
-        $message .= 'Content-Type: text/calendar; charset=UTF-8; name="' . $attachmentFilename . '"' . "\r\n";
-        $message .= 'Content-Transfer-Encoding: base64' . "\r\n";
-        $message .= 'Content-Disposition: attachment; filename="' . $attachmentFilename . '"' . "\r\n\r\n";
-        $message .= chunk_split(base64_encode($attachmentContent)) . "\r\n";
-        
-        // Close mixed boundary
-        $message .= '--' . $mixedBoundary . '--';
-        
-        // Set additional mail parameters for SMTP
-        $additionalParameters = '-f ' . SMTP_FROM;
-        
-        // Send email
         try {
-            $success = mail($toEmail, $subject, $message, implode("\r\n", $headers), $additionalParameters);
+            $mail = self::createMailer();
             
-            if (!$success) {
-                error_log("Failed to send email to {$toEmail}: mail() returned false");
-                return false;
+            // Set recipient
+            $mail->addAddress($toEmail, $toName);
+            
+            // Email content
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body = $htmlBody;
+            
+            // Embed logo
+            $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.webp';
+            if (!file_exists($imagePath)) {
+                $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.png';
+            }
+            if (file_exists($imagePath)) {
+                $mail->addEmbeddedImage($imagePath, 'ibc_logo');
             }
             
+            // Add ICS attachment
+            $mail->addStringAttachment($attachmentContent, $attachmentFilename, 'base64', 'text/calendar');
+            
+            // Send
+            $mail->send();
             error_log("Successfully sent helper confirmation email to {$toEmail}");
             return true;
+            
         } catch (Exception $e) {
-            error_log("Error sending email to {$toEmail}: " . $e->getMessage());
+            error_log("Error sending email to {$toEmail}: " . $mail->ErrorInfo);
             return false;
         }
     }
@@ -390,75 +438,33 @@ class MailService {
      * @return bool Success status
      */
     private static function sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody) {
-        // Generate email boundary
-        $relatedBoundary = md5(time() . 'related');
-        
-        // Load logo file with robust path handling
-        $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.webp';
-        if (!file_exists($imagePath)) {
-            // Try png version
-            $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.png';
-        }
-        
-        $logoContent = '';
-        $logoMimeType = 'image/webp'; // Default to webp since we check it first
-        
-        if (file_exists($imagePath)) {
-            $logoContent = file_get_contents($imagePath);
-            // Update MIME type based on actual file
-            if (strpos($imagePath, '.webp') !== false) {
-                $logoMimeType = 'image/webp';
-            } else {
-                $logoMimeType = 'image/png';
-            }
-        }
-        
-        // Prepare headers
-        $headers = [];
-        $headers[] = 'MIME-Version: 1.0';
-        $headers[] = 'Content-Type: multipart/related; boundary="' . $relatedBoundary . '"';
-        $headers[] = 'From: ' . SMTP_FROM;
-        $headers[] = 'Reply-To: ' . SMTP_FROM;
-        $headers[] = 'X-Mailer: PHP/' . phpversion();
-        
-        // Build email body with multipart/related (for embedded image)
-        $message = '';
-        
-        // HTML part
-        $message .= '--' . $relatedBoundary . "\r\n";
-        $message .= 'Content-Type: text/html; charset=UTF-8' . "\r\n";
-        $message .= 'Content-Transfer-Encoding: 8bit' . "\r\n\r\n";
-        $message .= $htmlBody . "\r\n\r\n";
-        
-        // Embedded logo
-        if (!empty($logoContent)) {
-            $message .= '--' . $relatedBoundary . "\r\n";
-            $message .= 'Content-Type: ' . $logoMimeType . '; name="logo.png"' . "\r\n";
-            $message .= 'Content-Transfer-Encoding: base64' . "\r\n";
-            $message .= 'Content-ID: <ibc_logo>' . "\r\n";
-            $message .= 'Content-Disposition: inline; filename="logo.png"' . "\r\n\r\n";
-            $message .= chunk_split(base64_encode($logoContent)) . "\r\n";
-        }
-        
-        // Close related boundary
-        $message .= '--' . $relatedBoundary . '--';
-        
-        // Set additional mail parameters for SMTP
-        $additionalParameters = '-f ' . SMTP_FROM;
-        
-        // Send email
         try {
-            $success = mail($toEmail, $subject, $message, implode("\r\n", $headers), $additionalParameters);
+            $mail = self::createMailer();
             
-            if (!$success) {
-                error_log("Failed to send email to {$toEmail}: mail() returned false");
-                return false;
+            // Set recipient
+            $mail->addAddress($toEmail);
+            
+            // Email content
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body = $htmlBody;
+            
+            // Embed logo
+            $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.webp';
+            if (!file_exists($imagePath)) {
+                $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.png';
+            }
+            if (file_exists($imagePath)) {
+                $mail->addEmbeddedImage($imagePath, 'ibc_logo');
             }
             
+            // Send
+            $mail->send();
             error_log("Successfully sent invitation email to {$toEmail}");
             return true;
+            
         } catch (Exception $e) {
-            error_log("Error sending email to {$toEmail}: " . $e->getMessage());
+            error_log("Error sending email to {$toEmail}: " . $mail->ErrorInfo);
             return false;
         }
     }
@@ -472,26 +478,23 @@ class MailService {
      * @return bool Success status
      */
     public static function sendEmail($toEmail, $subject, $htmlBody) {
-        $headers = [];
-        $headers[] = 'MIME-Version: 1.0';
-        $headers[] = 'Content-Type: text/html; charset=UTF-8';
-        $headers[] = 'From: ' . SMTP_FROM;
-        $headers[] = 'Reply-To: ' . SMTP_FROM;
-        $headers[] = 'X-Mailer: PHP/' . phpversion();
-        
-        $additionalParameters = '-f ' . SMTP_FROM;
-        
         try {
-            $success = mail($toEmail, $subject, $htmlBody, implode("\r\n", $headers), $additionalParameters);
+            $mail = self::createMailer();
             
-            if (!$success) {
-                error_log("Failed to send email to {$toEmail}: mail() returned false");
-                return false;
-            }
+            // Set recipient
+            $mail->addAddress($toEmail);
             
+            // Email content
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body = $htmlBody;
+            
+            // Send
+            $mail->send();
             return true;
+            
         } catch (Exception $e) {
-            error_log("Error sending email to {$toEmail}: " . $e->getMessage());
+            error_log("Error sending email to {$toEmail}: " . $mail->ErrorInfo);
             return false;
         }
     }
