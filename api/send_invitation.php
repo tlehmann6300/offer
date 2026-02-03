@@ -8,6 +8,7 @@
 require_once __DIR__ . '/../includes/handlers/AuthHandler.php';
 require_once __DIR__ . '/../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../includes/database.php';
+require_once __DIR__ . '/../src/MailService.php';
 
 AuthHandler::startSession();
 
@@ -38,6 +39,7 @@ CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
 // Get POST data
 $email = trim($_POST['email'] ?? '');
 $role = $_POST['role'] ?? 'member';
+$sendMail = isset($_POST['send_mail']) && $_POST['send_mail'] === '1';
 
 // Validate input
 if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -87,10 +89,36 @@ $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' :
 $host = $_SERVER['HTTP_HOST'];
 $invitationLink = $protocol . '://' . $host . '/pages/auth/register.php?token=' . $token;
 
-// Return success response
-echo json_encode([
-    'success' => true,
-    'link' => $invitationLink,
-    'email' => $email,
-    'role' => $role
-]);
+// Check if we should send email
+if ($sendMail) {
+    // Send invitation email
+    $emailSent = MailService::sendInvitation($email, $token, $role);
+    
+    if ($emailSent) {
+        // Return success response with email sent confirmation
+        echo json_encode([
+            'success' => true,
+            'message' => 'Einladung per E-Mail versendet.',
+            'email' => $email,
+            'role' => $role
+        ]);
+    } else {
+        // Email sending failed, but token was created - return link as fallback
+        echo json_encode([
+            'success' => true,
+            'link' => $invitationLink,
+            'message' => 'E-Mail konnte nicht gesendet werden. Einladungslink wurde erstellt und kann manuell versendet werden.',
+            'email' => $email,
+            'role' => $role
+        ]);
+    }
+} else {
+    // Return success response with link only
+    echo json_encode([
+        'success' => true,
+        'link' => $invitationLink,
+        'message' => 'Link generiert.',
+        'email' => $email,
+        'role' => $role
+    ]);
+}
