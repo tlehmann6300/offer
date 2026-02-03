@@ -974,6 +974,10 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
     const helperTypeElements = document.querySelectorAll('#helper-types-container > .helper-card');
     let validationFailed = false;
     
+    // Parse event dates once for reuse in slot validation
+    const eventStartDate = startTime ? new Date(startTime) : null;
+    const eventEndDate = endTime ? new Date(endTime) : null;
+    
     for (let typeDiv of helperTypeElements) {
         const typeIndex = typeDiv.getAttribute('data-index');
         const titleInput = typeDiv.querySelector(`.helper-type-title[data-index="${typeIndex}"]`);
@@ -1017,10 +1021,7 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
                 }
                 
                 // Validate that slot times are within event time range
-                const eventStartDate = new Date(startTime);
-                const eventEndDate = new Date(endTime);
-                
-                if (slotStartDate < eventStartDate || slotEndDate > eventEndDate) {
+                if (eventStartDate && eventEndDate && (slotStartDate < eventStartDate || slotEndDate > eventEndDate)) {
                     e.preventDefault();
                     
                     const formattedEventStart = formatDateTime(startTime);
