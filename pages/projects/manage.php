@@ -230,19 +230,19 @@ ob_start();
 
         <!-- Project Info -->
         <div class="space-y-2 mb-4 text-sm text-gray-600">
-            <?php if ($project['client_name']): ?>
+            <?php if (!empty($project['client_name'])): ?>
             <div class="flex items-center">
                 <i class="fas fa-user-tie w-5 text-purple-600"></i>
                 <span><?php echo htmlspecialchars($project['client_name']); ?></span>
             </div>
             <?php endif; ?>
-            <?php if ($project['start_date']): ?>
+            <?php if (!empty($project['start_date'])): ?>
             <div class="flex items-center">
                 <i class="fas fa-calendar-start w-5 text-purple-600"></i>
                 <span>Start: <?php echo date('d.m.Y', strtotime($project['start_date'])); ?></span>
             </div>
             <?php endif; ?>
-            <?php if ($project['end_date']): ?>
+            <?php if (!empty($project['end_date'])): ?>
             <div class="flex items-center">
                 <i class="fas fa-calendar-check w-5 text-purple-600"></i>
                 <span>Ende: <?php echo date('d.m.Y', strtotime($project['end_date'])); ?></span>
