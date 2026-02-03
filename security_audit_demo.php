@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Audit Demo - IBC Intranet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <div class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Security Audit Demo</h1>
+            <p class="text-gray-600">Visualisierung der Sicherheitswarnung im Admin-Dashboard</p>
+        </div>
+
+        <!-- Security Warning (wie es im Dashboard erscheint) -->
+        <?php
+        require_once __DIR__ . '/security_audit.php';
+        echo SecurityAudit::getDashboardWarning(__DIR__);
+        ?>
+
+        <!-- Hero Section (Dashboard Preview) -->
+        <div class="mb-12">
+            <div class="text-center max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">
+                    Willkommen im IBC Intranet
+                </h2>
+                <p class="text-lg text-gray-600 mb-8">
+                    Verwalten Sie Ihr Inventar effizient und behalten Sie alles im Blick
+                </p>
+                
+                <!-- Primary Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+                    <a href="#" class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-boxes mr-3 text-xl"></i>
+                        Zum Inventar
+                    </a>
+                    <a href="#" class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-user mr-3 text-xl"></i>
+                        Mein Profil
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                Über diese Demo
+            </h3>
+            <div class="space-y-3 text-gray-700">
+                <p>
+                    Diese Seite demonstriert die <strong>Security Audit Warnung</strong>, die automatisch 
+                    im Admin-Dashboard erscheint, wenn sensible Installationsdateien auf dem Server gefunden werden.
+                </p>
+                <p>
+                    Die Warnung wird nur für Benutzer mit <span class="px-2 py-1 bg-red-100 text-red-700 rounded font-mono text-sm">admin</span> 
+                    Berechtigung angezeigt und prüft automatisch bei jedem Dashboard-Aufruf, ob kritische 
+                    Dateien noch vorhanden sind.
+                </p>
+                
+                <div class="bg-gray-50 rounded-lg p-4 mt-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">Geprüfte Dateien:</h4>
+                    <ul class="text-sm space-y-1">
+                        <li>• <code class="bg-white px-2 py-0.5 rounded">setup_admin.php</code> - Admin-Setup-Skript</li>
+                        <li>• <code class="bg-white px-2 py-0.5 rounded">create_admin.php</code> - Admin-Erstellungsskript</li>
+                        <li>• <code class="bg-white px-2 py-0.5 rounded">cleanup_*.php</code> - Cleanup-Skripte</li>
+                        <li>• <code class="bg-white px-2 py-0.5 rounded">sql/migrations/</code> - SQL-Migrations-Verzeichnis</li>
+                        <li>• Weitere Debug- und Wartungsskripte</li>
+                    </ul>
+                </div>
+
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mt-4">
+                    <p class="text-sm">
+                        <i class="fas fa-lightbulb text-blue-600 mr-2"></i>
+                        <strong>Tipp:</strong> Im Produktivbetrieb sollten alle diese Dateien entfernt werden, 
+                        um unbefugten Zugriff zu verhindern.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Example -->
+        <div class="bg-gray-800 rounded-lg shadow-lg p-6 mb-8 text-white">
+            <h3 class="text-xl font-bold mb-4">
+                <i class="fas fa-code mr-2"></i>
+                Integration Code
+            </h3>
+            <pre class="text-sm overflow-x-auto"><code>&lt;?php
+// In pages/dashboard/index.php
+
+// Security Audit - nur für Admins
+if (AuthHandler::hasPermission('admin')) {
+    require_once __DIR__ . '/../../security_audit.php';
+    $securityWarning = SecurityAudit::getDashboardWarning(__DIR__ . '/../..');
+}
+
+// Im Template ausgeben
+if (!empty($securityWarning)) {
+    echo $securityWarning;
+}
+?&gt;</code></pre>
+        </div>
+
+        <!-- Features -->
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-3xl text-green-600"></i>
+                </div>
+                <h4 class="font-bold text-gray-800 mb-2">Automatische Prüfung</h4>
+                <p class="text-sm text-gray-600">
+                    Prüft bei jedem Dashboard-Aufruf automatisch auf sensible Dateien
+                </p>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-exclamation-triangle text-3xl text-blue-600"></i>
+                </div>
+                <h4 class="font-bold text-gray-800 mb-2">Severity-Level</h4>
+                <p class="text-sm text-gray-600">
+                    Unterscheidet zwischen hohen und mittleren Sicherheitsrisiken
+                </p>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-lg p-6 text-center">
+                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-shield text-3xl text-purple-600"></i>
+                </div>
+                <h4 class="font-bold text-gray-800 mb-2">Nur für Admins</h4>
+                <p class="text-sm text-gray-600">
+                    Warnung wird nur Benutzern mit Admin-Rolle angezeigt
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-gray-500 text-sm">
+            <p>Security Audit System v1.0 - IBC Intranet</p>
+        </div>
+    </div>
+</body>
+</html>
