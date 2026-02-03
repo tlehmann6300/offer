@@ -525,4 +525,96 @@ class MailService {
         // Send email
         return self::sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody);
     }
+    
+    /**
+     * Send project application status email (accepted or rejected)
+     * 
+     * @param string $userEmail Recipient email address
+     * @param string $projectTitle Project title
+     * @param string $status Status: 'accepted' or 'rejected'
+     * @param array|null $clientData Client data with 'name' and 'contact' keys (only for accepted status)
+     * @return bool Success status
+     */
+    public static function sendProjectApplicationStatus($userEmail, $projectTitle, $status, $clientData = null) {
+        if ($status === 'accepted') {
+            $subject = "Projektzusage: " . $projectTitle;
+            $htmlBody = self::buildProjectApplicationAcceptedBody($projectTitle, $clientData);
+            return self::sendEmailWithEmbeddedImage($userEmail, $subject, $htmlBody);
+        } elseif ($status === 'rejected') {
+            $subject = "Projektbewerbung: " . $projectTitle;
+            $htmlBody = self::buildProjectApplicationRejectedBody($projectTitle);
+            return self::sendEmailWithEmbeddedImage($userEmail, $subject, $htmlBody);
+        }
+        
+        error_log("Invalid status '{$status}' for sendProjectApplicationStatus");
+        return false;
+    }
+    
+    /**
+     * Build HTML body for project application acceptance email
+     * 
+     * @param string $projectTitle Project title
+     * @param array|null $clientData Client data with 'name' and 'contact' keys
+     * @return string HTML email body
+     */
+    private static function buildProjectApplicationAcceptedBody($projectTitle, $clientData) {
+        // Build body content
+        $bodyContent = '<p class="email-text">Hallo,</p>
+        <p class="email-text">wir freuen uns, dir mitteilen zu können, dass deine Bewerbung für das Projekt "<strong>' . htmlspecialchars($projectTitle) . '</strong>" <strong>angenommen</strong> wurde!</p>';
+        
+        // Add client data if provided
+        if ($clientData !== null && is_array($clientData)) {
+            $bodyContent .= '<p class="email-text">Nachfolgend findest du die Kontaktdaten des Auftraggebers:</p>
+            <table class="info-table">
+                <tr>
+                    <td>Name</td>
+                    <td>' . htmlspecialchars($clientData['name'] ?? 'N/A') . '</td>
+                </tr>
+                <tr>
+                    <td>Kontakt</td>
+                    <td>' . htmlspecialchars($clientData['contact'] ?? 'N/A') . '</td>
+                </tr>
+            </table>';
+        }
+        
+        // Add confidentiality notice
+        $bodyContent .= '<p class="email-text" style="margin-top: 25px; padding: 15px; background-color: #fff3cd; border-left: 4px solid #ffc107; color: #856404;">
+            <strong>⚠️ Vertraulichkeit:</strong><br>
+            Bitte behandle alle Informationen zu diesem Projekt und insbesondere die Kundendaten streng vertraulich. 
+            Diese Informationen dürfen nicht an Dritte weitergegeben werden.
+        </p>';
+        
+        $bodyContent .= '<p class="email-text">Weitere Details zum Projekt findest du im IBC Intranet.</p>';
+        
+        // Create call-to-action button
+        $projectLink = BASE_URL . '/pages/projects/manage.php';
+        $callToAction = '<a href="' . htmlspecialchars($projectLink) . '" class="button">Zum Projekt</a>';
+        
+        // Get complete HTML template
+        return self::getTemplate('Projektzusage', $bodyContent, $callToAction);
+    }
+    
+    /**
+     * Build HTML body for project application rejection email
+     * 
+     * @param string $projectTitle Project title
+     * @return string HTML email body
+     */
+    private static function buildProjectApplicationRejectedBody($projectTitle) {
+        // Build body content
+        $bodyContent = '<p class="email-text">Hallo,</p>
+        <p class="email-text">vielen Dank für dein Interesse am Projekt "<strong>' . htmlspecialchars($projectTitle) . '</strong>".</p>
+        <p class="email-text">Leider müssen wir dir mitteilen, dass wir uns diesmal für andere Bewerber entschieden haben.</p>
+        <p class="email-text">Diese Entscheidung war nicht einfach und bedeutet keine Bewertung deiner Fähigkeiten. 
+        Wir ermutigen dich, dich auch in Zukunft auf weitere interessante Projekte zu bewerben.</p>
+        <p class="email-text">Bei Fragen stehen wir dir gerne zur Verfügung.</p>
+        <p class="email-text">Wir wünschen dir weiterhin viel Erfolg!</p>';
+        
+        // Create call-to-action button
+        $projectsLink = BASE_URL . '/pages/projects/index.php';
+        $callToAction = '<a href="' . htmlspecialchars($projectsLink) . '" class="button">Weitere Projekte ansehen</a>';
+        
+        // Get complete HTML template
+        return self::getTemplate('Projektbewerbung', $bodyContent, $callToAction);
+    }
 }
