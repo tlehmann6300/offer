@@ -78,6 +78,7 @@ define('SMTP_FROM_NAME', $env['SMTP_FROM_NAME'] ?? 'IBC Intranet');
 // Application Settings
 define('APP_NAME', 'IBC Intranet');
 define('BASE_URL', $env['BASE_URL'] ?? '');
+define('ENVIRONMENT', $env['ENVIRONMENT'] ?? 'development');
 define('SESSION_LIFETIME', 3600); // 1 hour
 define('MAX_LOGIN_ATTEMPTS', 5);
 define('LOGIN_LOCKOUT_TIME', 900); // 15 minutes

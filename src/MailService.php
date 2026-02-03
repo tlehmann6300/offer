@@ -155,33 +155,39 @@ class MailService {
     /**
      * Create and configure PHPMailer instance with SMTP settings
      * 
-     * @param bool $enableDebug Enable SMTP debug output (default: false)
+     * @param bool $enableDebug Enable SMTP debug output (default: false, overridden by environment)
      * @return PHPMailer Configured PHPMailer instance
      */
     private static function createMailer($enableDebug = false) {
         $mail = new PHPMailer(true);
         
         try {
-            // SMTP configuration
+            // SMTP configuration - load dynamically from constants or $_ENV
             $mail->isSMTP();
-            $mail->Host = SMTP_HOST;
+            $mail->Host = defined('SMTP_HOST') ? SMTP_HOST : ($_ENV['SMTP_HOST'] ?? 'localhost');
             $mail->SMTPAuth = true;
-            $mail->Username = SMTP_USER;
-            $mail->Password = SMTP_PASS;
+            $mail->Username = defined('SMTP_USER') ? SMTP_USER : ($_ENV['SMTP_USER'] ?? '');
+            $mail->Password = defined('SMTP_PASS') ? SMTP_PASS : ($_ENV['SMTP_PASS'] ?? '');
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = SMTP_PORT;
+            $mail->Port = defined('SMTP_PORT') ? SMTP_PORT : ($_ENV['SMTP_PORT'] ?? 587);
             
             // Set sender
-            $mail->setFrom(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
+            $mail->setFrom(
+                defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : ($_ENV['SMTP_FROM_EMAIL'] ?? ''),
+                defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : ($_ENV['SMTP_FROM_NAME'] ?? 'IBC Intranet')
+            );
             
             // Character encoding
             $mail->CharSet = 'UTF-8';
             $mail->Encoding = 'base64';
             
-            // Enable debug output if requested
-            if ($enableDebug) {
+            // Set SMTPDebug based on environment
+            $environment = defined('ENVIRONMENT') ? ENVIRONMENT : ($_ENV['ENVIRONMENT'] ?? 'development');
+            if ($enableDebug || $environment !== 'production') {
                 $mail->SMTPDebug = 2;
                 $mail->Debugoutput = 'html';
+            } else {
+                $mail->SMTPDebug = 0;
             }
             
         } catch (Exception $e) {
@@ -216,15 +222,15 @@ class MailService {
             <table class="info-table">
                 <tr>
                     <td>SMTP Host</td>
-                    <td>' . htmlspecialchars(SMTP_HOST) . '</td>
+                    <td>' . htmlspecialchars(defined('SMTP_HOST') ? SMTP_HOST : ($_ENV['SMTP_HOST'] ?? 'N/A')) . '</td>
                 </tr>
                 <tr>
                     <td>SMTP Port</td>
-                    <td>' . htmlspecialchars(SMTP_PORT) . '</td>
+                    <td>' . htmlspecialchars(defined('SMTP_PORT') ? SMTP_PORT : ($_ENV['SMTP_PORT'] ?? 'N/A')) . '</td>
                 </tr>
                 <tr>
                     <td>Von</td>
-                    <td>' . htmlspecialchars(SMTP_FROM_EMAIL) . '</td>
+                    <td>' . htmlspecialchars(defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : ($_ENV['SMTP_FROM_EMAIL'] ?? 'N/A')) . '</td>
                 </tr>
             </table>';
             
@@ -245,7 +251,7 @@ class MailService {
             return true;
             
         } catch (Exception $e) {
-            error_log("Failed to send test email: " . $mail->ErrorInfo);
+            error_log("Failed to send test email to {$toEmail}: " . $e->getMessage());
             return false;
         }
     }
@@ -262,23 +268,28 @@ class MailService {
      * @return bool Success status
      */
     public static function sendHelperConfirmation($toEmail, $toName, $event, $slot, $icsContent, $googleCalendarLink) {
-        $subject = "Einsatzbestätigung: " . $event['title'];
-        
-        // Build email body with new template
-        $body = self::buildHelperConfirmationBody($toName, $event, $slot, $googleCalendarLink);
-        
-        // Create filename for ICS attachment
-        $icsFilename = 'event_' . $event['id'] . ($slot ? '_slot_' . $slot['id'] : '') . '.ics';
-        
-        // Send email with attachment
-        return self::sendEmailWithAttachment(
-            $toEmail,
-            $toName,
-            $subject,
-            $body,
-            $icsFilename,
-            $icsContent
-        );
+        try {
+            $subject = "Einsatzbestätigung: " . $event['title'];
+            
+            // Build email body with new template
+            $body = self::buildHelperConfirmationBody($toName, $event, $slot, $googleCalendarLink);
+            
+            // Create filename for ICS attachment
+            $icsFilename = 'event_' . $event['id'] . ($slot ? '_slot_' . $slot['id'] : '') . '.ics';
+            
+            // Send email with attachment
+            return self::sendEmailWithAttachment(
+                $toEmail,
+                $toName,
+                $subject,
+                $body,
+                $icsFilename,
+                $icsContent
+            );
+        } catch (Exception $e) {
+            error_log("Failed to send helper confirmation to {$toEmail}: " . $e->getMessage());
+            return false;
+        }
     }
     
     /**
@@ -361,26 +372,31 @@ class MailService {
      * @return bool Success status
      */
     public static function sendInvitation($email, $token, $role) {
-        $subject = "Einladung zum IBC Intranet";
-        
-        // Build registration link
-        $registrationLink = BASE_URL . '/pages/auth/register.php?token=' . urlencode($token);
-        
-        // Build body content
-        $bodyContent = '<p class="email-text">Hallo,</p>
-        <p class="email-text">du wurdest als <strong>' . htmlspecialchars(ucfirst($role)) . '</strong> zum IBC Intranet eingeladen.</p>
-        <p class="email-text">Um dein Konto zu erstellen und Zugang zum System zu erhalten, klicke bitte auf den folgenden Button:</p>';
-        
-        // Create call-to-action button
-        $callToAction = '<a href="' . htmlspecialchars($registrationLink) . '" class="button">Jetzt registrieren</a>';
-        
-        $bodyContent .= '<p class="email-text" style="margin-top: 20px; font-size: 14px; color: #6b7280;">Dieser Einladungslink ist nur einmal verwendbar. Falls du Probleme beim Registrieren hast, wende dich bitte an den Administrator.</p>';
-        
-        // Get complete HTML template
-        $htmlBody = self::getTemplate('Einladung zum IBC Intranet', $bodyContent, $callToAction);
-        
-        // Send email without attachment but with embedded logo
-        return self::sendEmailWithEmbeddedImage($email, $subject, $htmlBody);
+        try {
+            $subject = "Einladung zum IBC Intranet";
+            
+            // Build registration link
+            $registrationLink = BASE_URL . '/pages/auth/register.php?token=' . urlencode($token);
+            
+            // Build body content
+            $bodyContent = '<p class="email-text">Hallo,</p>
+            <p class="email-text">du wurdest als <strong>' . htmlspecialchars(ucfirst($role)) . '</strong> zum IBC Intranet eingeladen.</p>
+            <p class="email-text">Um dein Konto zu erstellen und Zugang zum System zu erhalten, klicke bitte auf den folgenden Button:</p>';
+            
+            // Create call-to-action button
+            $callToAction = '<a href="' . htmlspecialchars($registrationLink) . '" class="button">Jetzt registrieren</a>';
+            
+            $bodyContent .= '<p class="email-text" style="margin-top: 20px; font-size: 14px; color: #6b7280;">Dieser Einladungslink ist nur einmal verwendbar. Falls du Probleme beim Registrieren hast, wende dich bitte an den Administrator.</p>';
+            
+            // Get complete HTML template
+            $htmlBody = self::getTemplate('Einladung zum IBC Intranet', $bodyContent, $callToAction);
+            
+            // Send email without attachment but with embedded logo
+            return self::sendEmailWithEmbeddedImage($email, $subject, $htmlBody);
+        } catch (Exception $e) {
+            error_log("Failed to send invitation to {$email}: " . $e->getMessage());
+            return false;
+        }
     }
     
     /**
@@ -424,7 +440,7 @@ class MailService {
             return true;
             
         } catch (Exception $e) {
-            error_log("Error sending email to {$toEmail}: " . $mail->ErrorInfo);
+            error_log("Error sending email to {$toEmail}: " . $e->getMessage());
             return false;
         }
     }
@@ -464,7 +480,7 @@ class MailService {
             return true;
             
         } catch (Exception $e) {
-            error_log("Error sending email to {$toEmail}: " . $mail->ErrorInfo);
+            error_log("Error sending email to {$toEmail}: " . $e->getMessage());
             return false;
         }
     }
@@ -494,7 +510,7 @@ class MailService {
             return true;
             
         } catch (Exception $e) {
-            error_log("Error sending email to {$toEmail}: " . $mail->ErrorInfo);
+            error_log("Error sending email to {$toEmail}: " . $e->getMessage());
             return false;
         }
     }
@@ -508,25 +524,29 @@ class MailService {
      * @return bool Success status
      */
     public static function sendProjectAcceptance($toEmail, $project, $role) {
-        
-        $subject = "Projektzusage: " . $project['title'];
-        
-        // Build body content
-        $roleName = ($role === 'lead') ? 'Projektleitung' : 'Projektmitglied';
-        $bodyContent = '<p class="email-text">Hallo,</p>
-        <p class="email-text">deine Bewerbung für das Projekt "<strong>' . htmlspecialchars($project['title']) . '</strong>" wurde akzeptiert!</p>
-        <p class="email-text">Du wurdest als <strong>' . htmlspecialchars($roleName) . '</strong> zum Projekt hinzugefügt.</p>
-        <p class="email-text">Weitere Details zum Projekt findest du im IBC Intranet.</p>';
-        
-        // Create call-to-action button
-        $projectLink = BASE_URL . '/pages/projects/manage.php';
-        $callToAction = '<a href="' . htmlspecialchars($projectLink) . '" class="button">Zum Projekt</a>';
-        
-        // Get complete HTML template
-        $htmlBody = self::getTemplate('Projektzusage', $bodyContent, $callToAction);
-        
-        // Send email
-        return self::sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody);
+        try {
+            $subject = "Projektzusage: " . $project['title'];
+            
+            // Build body content
+            $roleName = ($role === 'lead') ? 'Projektleitung' : 'Projektmitglied';
+            $bodyContent = '<p class="email-text">Hallo,</p>
+            <p class="email-text">deine Bewerbung für das Projekt "<strong>' . htmlspecialchars($project['title']) . '</strong>" wurde akzeptiert!</p>
+            <p class="email-text">Du wurdest als <strong>' . htmlspecialchars($roleName) . '</strong> zum Projekt hinzugefügt.</p>
+            <p class="email-text">Weitere Details zum Projekt findest du im IBC Intranet.</p>';
+            
+            // Create call-to-action button
+            $projectLink = BASE_URL . '/pages/projects/manage.php';
+            $callToAction = '<a href="' . htmlspecialchars($projectLink) . '" class="button">Zum Projekt</a>';
+            
+            // Get complete HTML template
+            $htmlBody = self::getTemplate('Projektzusage', $bodyContent, $callToAction);
+            
+            // Send email
+            return self::sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody);
+        } catch (Exception $e) {
+            error_log("Failed to send project acceptance to {$toEmail}: " . $e->getMessage());
+            return false;
+        }
     }
     
     /**
@@ -539,18 +559,23 @@ class MailService {
      * @return bool Success status
      */
     public static function sendProjectApplicationStatus($userEmail, $projectTitle, $status, $clientData = null) {
-        if ($status === 'accepted') {
-            $subject = "Projektzusage: " . $projectTitle;
-            $htmlBody = self::buildProjectApplicationAcceptedBody($projectTitle, $clientData);
-            return self::sendEmailWithEmbeddedImage($userEmail, $subject, $htmlBody);
-        } elseif ($status === 'rejected') {
-            $subject = "Projektbewerbung: " . $projectTitle;
-            $htmlBody = self::buildProjectApplicationRejectedBody($projectTitle);
-            return self::sendEmailWithEmbeddedImage($userEmail, $subject, $htmlBody);
+        try {
+            if ($status === 'accepted') {
+                $subject = "Projektzusage: " . $projectTitle;
+                $htmlBody = self::buildProjectApplicationAcceptedBody($projectTitle, $clientData);
+                return self::sendEmailWithEmbeddedImage($userEmail, $subject, $htmlBody);
+            } elseif ($status === 'rejected') {
+                $subject = "Projektbewerbung: " . $projectTitle;
+                $htmlBody = self::buildProjectApplicationRejectedBody($projectTitle);
+                return self::sendEmailWithEmbeddedImage($userEmail, $subject, $htmlBody);
+            }
+            
+            error_log("Invalid status '{$status}' for sendProjectApplicationStatus");
+            return false;
+        } catch (Exception $e) {
+            error_log("Failed to send project application status to {$userEmail}: " . $e->getMessage());
+            return false;
         }
-        
-        error_log("Invalid status '{$status}' for sendProjectApplicationStatus");
-        return false;
     }
     
     /**
