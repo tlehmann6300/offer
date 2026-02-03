@@ -297,19 +297,23 @@ class MailService {
         $mixedBoundary = md5(time() . 'mixed');
         $relatedBoundary = md5(time() . 'related');
         
-        // Load logo file
-        $logoPath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.png';
-        if (!file_exists($logoPath)) {
-            // Try webp version
-            $logoPath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.webp';
+        // Load logo file with robust path handling
+        $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.webp';
+        if (!file_exists($imagePath)) {
+            // Try png version
+            $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.png';
         }
         
         $logoContent = '';
-        $logoMimeType = 'image/png';
-        if (file_exists($logoPath)) {
-            $logoContent = file_get_contents($logoPath);
-            if (strpos($logoPath, '.webp') !== false) {
+        $logoMimeType = 'image/webp'; // Default to webp since we check it first
+        
+        if (file_exists($imagePath)) {
+            $logoContent = file_get_contents($imagePath);
+            // Update MIME type based on actual file
+            if (strpos($imagePath, '.webp') !== false) {
                 $logoMimeType = 'image/webp';
+            } else {
+                $logoMimeType = 'image/png';
             }
         }
         
@@ -389,19 +393,23 @@ class MailService {
         // Generate email boundary
         $relatedBoundary = md5(time() . 'related');
         
-        // Load logo file
-        $logoPath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.png';
-        if (!file_exists($logoPath)) {
-            // Try webp version
-            $logoPath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.webp';
+        // Load logo file with robust path handling
+        $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.webp';
+        if (!file_exists($imagePath)) {
+            // Try png version
+            $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.png';
         }
         
         $logoContent = '';
-        $logoMimeType = 'image/png';
-        if (file_exists($logoPath)) {
-            $logoContent = file_get_contents($logoPath);
-            if (strpos($logoPath, '.webp') !== false) {
+        $logoMimeType = 'image/webp'; // Default to webp since we check it first
+        
+        if (file_exists($imagePath)) {
+            $logoContent = file_get_contents($imagePath);
+            // Update MIME type based on actual file
+            if (strpos($imagePath, '.webp') !== false) {
                 $logoMimeType = 'image/webp';
+            } else {
+                $logoMimeType = 'image/png';
             }
         }
         

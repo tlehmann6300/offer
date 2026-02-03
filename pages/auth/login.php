@@ -75,6 +75,13 @@ ob_start();
             <p class="text-white/80">Melden Sie sich an, um fortzufahren</p>
         </div>
 
+        <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 1): ?>
+        <div class="mb-6 p-4 bg-yellow-500/20 border border-yellow-500/50 rounded-lg text-white">
+            <i class="fas fa-clock mr-2"></i>
+            Du wurdest nach 30 Minuten Inaktivität automatisch ausgeloggt.
+        </div>
+        <?php endif; ?>
+
         <?php if ($error): ?>
         <div class="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-white">
             <i class="fas fa-exclamation-circle mr-2"></i>
