@@ -92,7 +92,7 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
             <div class="flex-1">
                 <p class="text-sm font-medium text-green-800 mb-1">
                     <i class="fas fa-check-circle mr-1"></i>
-                    Einladungslink erfolgreich erstellt!
+                    <span id="generatedSuccessMessage">Einladungslink erfolgreich erstellt!</span>
                 </p>
                 <p class="text-xs text-green-600 mb-2">
                     E-Mail: <span id="generatedEmail" class="font-semibold"></span> | 
@@ -100,7 +100,7 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
                 </p>
             </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div id="generatedLinkSection" class="flex items-center gap-2">
             <input 
                 type="text" 
                 id="generatedLink" 
@@ -178,6 +178,8 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
     const generatedLink = document.getElementById('generatedLink');
     const generatedEmail = document.getElementById('generatedEmail');
     const generatedRole = document.getElementById('generatedRole');
+    const generatedSuccessMessage = document.getElementById('generatedSuccessMessage');
+    const generatedLinkSection = document.getElementById('generatedLinkSection');
     const copyLinkBtn = document.getElementById('copyLinkBtn');
     const refreshBtn = document.getElementById('refreshInvitationsBtn');
     const invitationsLoader = document.getElementById('invitationsLoader');
@@ -232,6 +234,9 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
                 // Reset form
                 form.reset();
                 // Restore default state of send_mail checkbox
+                document.getElementById('sendMailCheckbox').checked = true;
+                
+                // Reset checkbox to checked (default state)
                 document.getElementById('sendMailCheckbox').checked = true;
                 
                 // Reload invitations list
