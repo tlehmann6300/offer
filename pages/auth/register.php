@@ -72,94 +72,92 @@ $title = 'Registrierung - IBC Intranet';
 ob_start();
 ?>
 
-<div class="flex items-center justify-center min-h-screen p-4">
-    <div class="glass w-full max-w-md p-8 rounded-2xl shadow-2xl">
-        <div class="text-center mb-8">
-            <div class="inline-block p-4 bg-white/20 rounded-full mb-4">
-                <i class="fas fa-user-plus text-4xl text-white"></i>
+<div class="w-full max-w-md p-8 bg-white rounded-2xl shadow-2xl">
+    <div class="text-center mb-8">
+        <div class="inline-block p-4 bg-gradient-to-br from-blue-500 to-green-500 rounded-full mb-4">
+            <i class="fas fa-user-plus text-4xl text-white"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Registrierung</h1>
+        <p class="text-gray-600">Erstellen Sie Ihr Konto</p>
+    </div>
+
+    <?php if ($error): ?>
+    <div class="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg text-red-800">
+        <i class="fas fa-exclamation-circle mr-2"></i>
+        <?php echo htmlspecialchars($error); ?>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($invitation): ?>
+    <form method="POST" class="space-y-6">
+        <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
+        <div class="bg-gray-50 p-4 rounded-lg mb-4 border border-gray-200">
+            <p class="text-gray-600 text-sm mb-2">Sie wurden eingeladen als:</p>
+            <p class="text-gray-800 font-semibold"><?php echo htmlspecialchars($invitation['email']); ?></p>
+            <p class="text-gray-500 text-xs mt-1">
+                Rolle: <?php 
+                $roleNames = [
+                    'admin' => 'Administrator',
+                    'board' => 'Vorstand',
+                    'alumni_board' => 'Alumni-Vorstand',
+                    'manager' => 'Ressortleiter',
+                    'member' => 'Mitglied',
+                    'alumni' => 'Alumni'
+                ];
+                echo $roleNames[$invitation['role']] ?? ucfirst($invitation['role']);
+                ?>
+            </p>
+            <?php if ($invitation['role'] === 'alumni'): ?>
+            <div class="mt-3 p-2 bg-yellow-50 border border-yellow-300 rounded text-xs text-yellow-800">
+                <i class="fas fa-info-circle mr-1"></i>
+                <strong>Hinweis für Alumni:</strong> Ihr Profil wird nach der Registrierung vom Vorstand manuell geprüft und freigeschaltet, bevor Sie Zugriff auf interne Alumni-Netzwerkdaten erhalten.
             </div>
-            <h1 class="text-3xl font-bold text-white mb-2">Registrierung</h1>
-            <p class="text-white/80">Erstellen Sie Ihr Konto</p>
+            <?php endif; ?>
         </div>
 
-        <?php if ($error): ?>
-        <div class="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-white">
-            <i class="fas fa-exclamation-circle mr-2"></i>
-            <?php echo htmlspecialchars($error); ?>
-        </div>
-        <?php endif; ?>
-
-        <?php if ($invitation): ?>
-        <form method="POST" class="space-y-6">
-            <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
-            <div class="bg-white/10 p-4 rounded-lg mb-4">
-                <p class="text-white/80 text-sm mb-2">Sie wurden eingeladen als:</p>
-                <p class="text-white font-semibold"><?php echo htmlspecialchars($invitation['email']); ?></p>
-                <p class="text-white/60 text-xs mt-1">
-                    Rolle: <?php 
-                    $roleNames = [
-                        'admin' => 'Administrator',
-                        'board' => 'Vorstand',
-                        'alumni_board' => 'Alumni-Vorstand',
-                        'manager' => 'Ressortleiter',
-                        'member' => 'Mitglied',
-                        'alumni' => 'Alumni'
-                    ];
-                    echo $roleNames[$invitation['role']] ?? ucfirst($invitation['role']);
-                    ?>
-                </p>
-                <?php if ($invitation['role'] === 'alumni'): ?>
-                <div class="mt-3 p-2 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-white/90">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    <strong>Hinweis für Alumni:</strong> Ihr Profil wird nach der Registrierung vom Vorstand manuell geprüft und freigeschaltet, bevor Sie Zugriff auf interne Alumni-Netzwerkdaten erhalten.
-                </div>
-                <?php endif; ?>
-            </div>
-
-            <div>
-                <label class="block text-white mb-2 font-medium">
-                    <i class="fas fa-lock mr-2"></i>Passwort
-                </label>
-                <input 
-                    type="password" 
-                    name="password" 
-                    required 
-                    minlength="8"
-                    class="w-full px-4 py-3 rounded-lg bg-white/90 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
-                    placeholder="Mindestens 8 Zeichen"
-                >
-            </div>
-
-            <div>
-                <label class="block text-white mb-2 font-medium">
-                    <i class="fas fa-lock mr-2"></i>Passwort bestätigen
-                </label>
-                <input 
-                    type="password" 
-                    name="confirm_password" 
-                    required 
-                    minlength="8"
-                    class="w-full px-4 py-3 rounded-lg bg-white/90 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
-                    placeholder="Passwort wiederholen"
-                >
-            </div>
-
-            <button 
-                type="submit" 
-                class="w-full py-3 px-6 bg-white text-purple-600 rounded-lg font-semibold hover:bg-white/90 transition transform hover:scale-105 shadow-lg"
+        <div>
+            <label class="block text-gray-700 mb-2 font-medium">
+                <i class="fas fa-lock mr-2"></i>Passwort
+            </label>
+            <input 
+                type="password" 
+                name="password" 
+                required 
+                minlength="8"
+                class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                placeholder="Mindestens 8 Zeichen"
             >
-                <i class="fas fa-user-check mr-2"></i>
-                Konto erstellen
-            </button>
-        </form>
-        <?php endif; ?>
-
-        <div class="mt-6 text-center">
-            <a href="login.php" class="text-white/70 text-sm hover:text-white transition">
-                <i class="fas fa-arrow-left mr-1"></i>
-                Zurück zum Login
-            </a>
         </div>
+
+        <div>
+            <label class="block text-gray-700 mb-2 font-medium">
+                <i class="fas fa-lock mr-2"></i>Passwort bestätigen
+            </label>
+            <input 
+                type="password" 
+                name="confirm_password" 
+                required 
+                minlength="8"
+                class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                placeholder="Passwort wiederholen"
+            >
+        </div>
+
+        <button 
+            type="submit" 
+            class="w-full py-3 px-6 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-green-600 transition transform hover:scale-105 shadow-lg"
+        >
+            <i class="fas fa-user-check mr-2"></i>
+            Konto erstellen
+        </button>
+    </form>
+    <?php endif; ?>
+
+    <div class="mt-6 text-center">
+        <a href="login.php" class="text-gray-600 text-sm hover:text-gray-800 transition">
+            <i class="fas fa-arrow-left mr-1"></i>
+            Zurück zum Login
+        </a>
     </div>
 </div>
 

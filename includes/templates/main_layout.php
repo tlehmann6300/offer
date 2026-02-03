@@ -124,10 +124,10 @@
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar fixed left-0 top-0 h-screen w-64 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-40 text-white shadow-2xl">
         <div class="p-6">
-            <h1 class="text-2xl font-bold mb-8">
-                <i class="fas fa-building mr-2"></i>
-                IBC Intranet
-            </h1>
+            <!-- IBC Logo in Navbar -->
+            <div class="mb-8">
+                <img src="/intra/assets/img/ibc_logo_original_navbar.webp" alt="IBC Logo" class="w-full h-auto">
+            </div>
             
             <nav class="space-y-2">
                 <a href="../dashboard/index.php" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
