@@ -41,3 +41,6 @@ setup_admin.php
 
 # Test-generated sample HTML files
 tests/sample_*.html
+
+# Test scripts
+test_smtp.php
