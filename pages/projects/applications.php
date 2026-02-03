@@ -72,17 +72,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accept_application'])
                 // Get user details for email
                 $user = User::getById($application['user_id']);
                 
-                // Send acceptance email
+                // Prepare client data for the email (only for accepted status)
+                $clientData = null;
+                if (!empty($project['client_name']) || !empty($project['client_contact_details'])) {
+                    $clientData = [
+                        'name' => $project['client_name'] ?? '',
+                        'contact' => $project['client_contact_details'] ?? ''
+                    ];
+                }
+                
+                // Send acceptance email with client data
+                $emailSent = false;
                 if ($user) {
                     try {
-                        MailService::sendProjectAcceptance($user['email'], $project, $role);
+                        $emailSent = MailService::sendProjectApplicationStatus(
+                            $user['email'], 
+                            $project['title'], 
+                            'accepted', 
+                            $clientData
+                        );
                     } catch (Exception $emailError) {
                         error_log("Failed to send project acceptance email: " . $emailError->getMessage());
                         // Don't fail the whole operation if email fails
                     }
                 }
                 
-                $message = 'Bewerbung erfolgreich akzeptiert';
+                $message = $emailSent ? 'Status aktualisiert und E-Mail versendet' : 'Status aktualisiert';
                 
             } catch (Exception $e) {
                 $db->rollBack();
@@ -117,7 +132,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reject_application'])
         $stmt = $db->prepare("UPDATE project_applications SET status = 'rejected' WHERE id = ?");
         $stmt->execute([$applicationId]);
         
-        $message = 'Bewerbung abgelehnt';
+        // Get user details for email
+        $user = User::getById($application['user_id']);
+        
+        // Send rejection email
+        $emailSent = false;
+        if ($user) {
+            try {
+                $emailSent = MailService::sendProjectApplicationStatus(
+                    $user['email'], 
+                    $project['title'], 
+                    'rejected'
+                );
+            } catch (Exception $emailError) {
+                error_log("Failed to send project rejection email: " . $emailError->getMessage());
+                // Don't fail the whole operation if email fails
+            }
+        }
+        
+        $message = $emailSent ? 'Status aktualisiert und E-Mail versendet' : 'Status aktualisiert';
         
     } catch (Exception $e) {
         $error = 'Fehler beim Ablehnen: ' . $e->getMessage();
