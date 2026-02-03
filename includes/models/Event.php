@@ -86,8 +86,9 @@ class Event {
             
             // Default fallback
             return 'planned';
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // Error resilience: Log error and fall back to 'planned'
+            // Catches both Exception and PHP 8.3+ DateMalformedStringException
             error_log("calculateStatus failed: " . $e->getMessage());
             return 'planned';
         }
@@ -138,6 +139,9 @@ class Event {
                     throw $e;
                 }
                 throw new Exception("Invalid date format for start_time or end_time");
+            } catch (Throwable $e) {
+                // Catch DateMalformedStringException and other Throwables in PHP 8.3+
+                throw new Exception("Invalid date format for start_time or end_time");
             }
         }
         
@@ -154,6 +158,9 @@ class Event {
                 if (strpos($e->getMessage(), 'Registration end time') !== false) {
                     throw $e;
                 }
+                throw new Exception("Invalid date format for registration_end or end_time");
+            } catch (Throwable $e) {
+                // Catch DateMalformedStringException and other Throwables in PHP 8.3+
                 throw new Exception("Invalid date format for registration_end or end_time");
             }
         }
