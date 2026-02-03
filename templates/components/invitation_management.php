@@ -27,6 +27,7 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
     
     <form id="invitationForm" class="space-y-4 mb-4">
         <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
+        
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">E-Mail-Adresse</label>
@@ -57,8 +58,9 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
             </div>
         </div>
         
-        <div class="flex items-center">
-            <label class="flex items-center cursor-pointer">
+        <!-- Email Send Option -->
+        <div class="flex items-center space-x-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <div class="flex items-center">
                 <input 
                     type="checkbox" 
                     id="sendMailCheckbox" 
@@ -67,10 +69,13 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
                     checked
                     class="w-5 h-5 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 focus:ring-2"
                 >
-                <span class="ml-3 text-sm font-medium text-gray-700">
-                    <i class="fas fa-envelope mr-1 text-purple-600"></i>
-                    Einladung direkt per E-Mail senden
-                </span>
+            </div>
+            <label for="sendMailCheckbox" class="flex-1 cursor-pointer">
+                <span class="text-sm font-medium text-gray-700">Einladung direkt per E-Mail senden</span>
+                <p class="text-xs text-gray-500 mt-1">
+                    <i class="fas fa-envelope text-purple-500 mr-1"></i>
+                    Der Einladungslink wird automatisch per E-Mail an die angegebene Adresse versendet
+                </p>
             </label>
         </div>
         
@@ -218,26 +223,18 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
             const data = await response.json();
             
             if (data.success) {
-                // Update email and role display
-                generatedEmail.textContent = data.email;
-                generatedRole.textContent = roleNames[data.role] || data.role;
-                
-                // Check if link is present (only when email was not sent)
+                // Show generated link if available
                 if (data.link) {
-                    // Link was generated
                     generatedLink.value = data.link;
-                    generatedSuccessMessage.textContent = data.message || 'Einladungslink erfolgreich erstellt!';
-                    generatedLinkSection.classList.remove('hidden');
-                } else {
-                    // Email was sent
-                    generatedSuccessMessage.textContent = data.message || 'Einladung per E-Mail versendet.';
-                    generatedLinkSection.classList.add('hidden');
+                    generatedEmail.textContent = data.email;
+                    generatedRole.textContent = roleNames[data.role] || data.role;
+                    generatedLinkContainer.classList.remove('hidden');
                 }
-                
-                generatedLinkContainer.classList.remove('hidden');
                 
                 // Reset form
                 form.reset();
+                // Restore default state of send_mail checkbox
+                document.getElementById('sendMailCheckbox').checked = true;
                 
                 // Reset checkbox to checked (default state)
                 document.getElementById('sendMailCheckbox').checked = true;
@@ -245,7 +242,8 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
                 // Reload invitations list
                 loadInvitations();
                 
-                showMessage(data.message || 'Erfolgreich!', 'success');
+                // Show appropriate success message
+                showMessage(data.message || 'Einladungslink erfolgreich erstellt!', 'success');
             } else {
                 showMessage(data.message || 'Fehler beim Erstellen des Einladungslinks', 'error');
             }

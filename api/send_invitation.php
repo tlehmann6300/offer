@@ -39,7 +39,7 @@ CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
 // Get POST data
 $email = trim($_POST['email'] ?? '');
 $role = $_POST['role'] ?? 'member';
-$sendMail = isset($_POST['send_mail']) && $_POST['send_mail'] === '1';
+$sendMail = isset($_POST['send_mail']) && $_POST['send_mail'] == '1';
 
 // Validate input
 if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -92,28 +92,29 @@ $invitationLink = $protocol . '://' . $host . '/pages/auth/register.php?token=' 
 // Check if we should send email
 if ($sendMail) {
     // Send invitation email
-    $emailSent = MailService::sendInvitation($email, $token, $role);
+    $mailSent = MailService::sendInvitation($email, $token, $role);
     
-    if ($emailSent) {
-        // Return success response with email sent confirmation
+    if ($mailSent) {
+        // Return success response with message about sent email
         echo json_encode([
             'success' => true,
             'message' => 'Einladung per E-Mail versendet.',
             'email' => $email,
-            'role' => $role
+            'role' => $role,
+            'link' => $invitationLink
         ]);
     } else {
-        // Email sending failed, but token was created - return link as fallback
+        // Email failed, but still return link
         echo json_encode([
             'success' => true,
+            'message' => 'Link generiert, aber E-Mail konnte nicht versendet werden.',
             'link' => $invitationLink,
-            'message' => 'E-Mail konnte nicht gesendet werden. Einladungslink wurde erstellt und kann manuell versendet werden.',
             'email' => $email,
             'role' => $role
         ]);
     }
 } else {
-    // Return success response with link only
+    // Return success response with just the link
     echo json_encode([
         'success' => true,
         'link' => $invitationLink,
