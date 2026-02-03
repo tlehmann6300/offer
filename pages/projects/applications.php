@@ -351,7 +351,7 @@ ob_start();
 </div>
 
 <!-- Accept Modal -->
-<div id="acceptModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+<div id="acceptModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-lg p-6 max-w-md w-full">
         <h3 class="text-xl font-bold text-gray-800 mb-4">
             <i class="fas fa-check-circle text-green-600 mr-2"></i>
@@ -388,7 +388,7 @@ ob_start();
 </div>
 
 <!-- Reject Modal -->
-<div id="rejectModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+<div id="rejectModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-lg p-6 max-w-md w-full">
         <h3 class="text-xl font-bold text-gray-800 mb-4">
             <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
@@ -439,12 +439,18 @@ function showAcceptModal(applicationId, userEmail) {
     
     if (acceptApplicationId) acceptApplicationId.value = applicationId;
     if (acceptUserEmail) acceptUserEmail.textContent = userEmail;
-    if (acceptModal) acceptModal.classList.remove('hidden');
+    if (acceptModal) {
+        acceptModal.classList.remove('hidden');
+        acceptModal.classList.add('flex');
+    }
 }
 
 function closeAcceptModal() {
     const acceptModal = document.getElementById('acceptModal');
-    if (acceptModal) acceptModal.classList.add('hidden');
+    if (acceptModal) {
+        acceptModal.classList.add('hidden');
+        acceptModal.classList.remove('flex');
+    }
 }
 
 function showRejectModal(applicationId, userEmail) {
@@ -454,12 +460,18 @@ function showRejectModal(applicationId, userEmail) {
     
     if (rejectApplicationId) rejectApplicationId.value = applicationId;
     if (rejectUserEmail) rejectUserEmail.textContent = userEmail;
-    if (rejectModal) rejectModal.classList.remove('hidden');
+    if (rejectModal) {
+        rejectModal.classList.remove('hidden');
+        rejectModal.classList.add('flex');
+    }
 }
 
 function closeRejectModal() {
     const rejectModal = document.getElementById('rejectModal');
-    if (rejectModal) rejectModal.classList.add('hidden');
+    if (rejectModal) {
+        rejectModal.classList.add('hidden');
+        rejectModal.classList.remove('flex');
+    }
 }
 
 // Close modal buttons

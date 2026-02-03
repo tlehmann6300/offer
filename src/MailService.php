@@ -497,7 +497,7 @@ class MailService {
     }
     
     /**
-     * Send project acceptance notification email (Placeholder)
+     * Send project acceptance notification email
      * 
      * @param string $toEmail Recipient email address
      * @param array $project Project data
@@ -505,8 +505,6 @@ class MailService {
      * @return bool Success status
      */
     public static function sendProjectAcceptance($toEmail, $project, $role) {
-        // TODO: Implement project acceptance email
-        // This is a placeholder method that will be implemented in the future
         
         $subject = "Projektzusage: " . $project['title'];
         
