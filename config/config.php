@@ -2,9 +2,6 @@
 // Start output buffering to catch any accidental output
 ob_start();
 
-// Set error display for production (0) or debugging (1)
-ini_set('display_errors', 0);
-
 // Set timezone
 date_default_timezone_set('Europe/Berlin');
 
@@ -79,6 +76,7 @@ define('SMTP_FROM_EMAIL', $env['SMTP_FROM_EMAIL'] ?? $env['SMTP_FROM'] ?? $env['
 define('SMTP_FROM_NAME', $env['SMTP_FROM_NAME'] ?? 'IBC Intranet');
 
 // Define BASE_URL dynamically
+// Note: Using exact formula from requirements: (isset($_SERVER['HTTPS']) ? "https" : "http")
 $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 define('BASE_URL', $protocol . '://' . $host . '/intra');
@@ -96,10 +94,10 @@ define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'image/we
 define('HASH_ALGO', PASSWORD_ARGON2ID);
 define('SESSION_NAME', 'IBC_SESSION');
 
-// Error Reporting
+// Set error display for production (0) or debugging (1)
 $isProduction = ($env['ENVIRONMENT'] ?? '') === 'production';
-error_reporting($isProduction ? 0 : E_ALL);
 ini_set('display_errors', $isProduction ? '0' : '1');
+error_reporting($isProduction ? 0 : E_ALL);
 
 // Start session only if not already started
 if (session_status() === PHP_SESSION_NONE) {
