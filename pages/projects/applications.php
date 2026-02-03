@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accept_application'])
                     }
                 }
                 
-                $message = $emailSent ? 'Status aktualisiert und E-Mail versendet' : 'Status aktualisiert';
+                $message = $emailSent ? 'Status aktualisiert und Benachrichtigung versendet' : 'Status aktualisiert';
                 
             } catch (Exception $e) {
                 $db->rollBack();
@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reject_application'])
             }
         }
         
-        $message = $emailSent ? 'Status aktualisiert und E-Mail versendet' : 'Status aktualisiert';
+        $message = $emailSent ? 'Status aktualisiert und Benachrichtigung versendet' : 'Status aktualisiert';
         
     } catch (Exception $e) {
         $error = 'Fehler beim Ablehnen: ' . $e->getMessage();
