@@ -68,6 +68,11 @@ ob_start();
 <div class="flex items-center justify-center min-h-screen p-4">
     <div class="glass w-full max-w-md p-8 rounded-2xl shadow-2xl transition-all duration-300">
         <div class="text-center mb-8">
+            <!-- IBC Logo -->
+            <div class="mb-6">
+                <img src="/intra/assets/img/ibc_logo_original.webp" alt="IBC Logo" class="mx-auto max-w-xs w-full h-auto">
+            </div>
+            
             <div class="inline-block p-4 bg-white/20 rounded-full mb-4 hover:bg-white/30 transition-all duration-300">
                 <i class="fas fa-building text-4xl text-white"></i>
             </div>
@@ -78,7 +83,14 @@ ob_start();
         <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 1): ?>
         <div class="mb-6 p-4 bg-yellow-500/20 border border-yellow-500/50 rounded-lg text-white">
             <i class="fas fa-clock mr-2"></i>
-            Du wurdest nach 30 Minuten Inaktivität automatisch ausgeloggt.
+            Aus Sicherheitsgründen wurdest du automatisch ausgeloggt.
+        </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['logout']) && $_GET['logout'] == 1): ?>
+        <div class="mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-white">
+            <i class="fas fa-check-circle mr-2"></i>
+            Erfolgreich abgemeldet.
         </div>
         <?php endif; ?>
 
