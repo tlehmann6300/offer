@@ -76,7 +76,8 @@ define('SMTP_FROM_EMAIL', $env['SMTP_FROM_EMAIL'] ?? $env['SMTP_FROM'] ?? $env['
 define('SMTP_FROM_NAME', $env['SMTP_FROM_NAME'] ?? 'IBC Intranet');
 
 // Define BASE_URL dynamically
-// Note: Using exact formula from requirements: (isset($_SERVER['HTTPS']) ? "https" : "http")
+// Note: Using formula from requirements with standard 'off' check
+// (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http"
 $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 define('BASE_URL', $protocol . '://' . $host . '/intra');
