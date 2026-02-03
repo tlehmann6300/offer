@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../helpers.php';
+require_once __DIR__ . '/../../src/Auth.php';
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -153,22 +154,32 @@ require_once __DIR__ . '/../helpers.php';
                     <i class="fas fa-briefcase w-5"></i>
                     <span>Projekte</span>
                 </a>
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board', 'alumni_board', 'manager'])): ?>
-                <a href="<?php echo asset('pages/events/manage.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                    <i class="fas fa-calendar-alt w-5"></i>
-                    <span>Event-Verwaltung</span>
-                </a>
+                
+                <?php if (Auth::hasPermission('manager')): ?>
+                <!-- Management Section -->
+                <div class="pt-4 mt-4 border-t border-white/20">
+                    <h3 class="text-xs font-semibold text-gray-300 uppercase tracking-wider px-3 mb-2">Verwaltung</h3>
+                    <a href="<?php echo asset('pages/events/manage.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                        <i class="fas fa-calendar-alt w-5"></i>
+                        <span>Event-Verwaltung</span>
+                    </a>
+                    <a href="<?php echo asset('pages/projects/manage.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                        <i class="fas fa-tasks w-5"></i>
+                        <span>Projekt-Verwaltung</span>
+                    </a>
+                    <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
+                    <a href="<?php echo asset('pages/admin/users.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                        <i class="fas fa-users w-5"></i>
+                        <span>Benutzerverwaltung</span>
+                    </a>
+                    <a href="<?php echo asset('pages/admin/audit.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                        <i class="fas fa-clipboard-list w-5"></i>
+                        <span>Audit-Logs</span>
+                    </a>
+                    <?php endif; ?>
+                </div>
                 <?php endif; ?>
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
-                <a href="<?php echo asset('pages/admin/users.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                    <i class="fas fa-users w-5"></i>
-                    <span>Benutzerverwaltung</span>
-                </a>
-                <a href="<?php echo asset('pages/admin/audit.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                    <i class="fas fa-clipboard-list w-5"></i>
-                    <span>Audit-Logs</span>
-                </a>
-                <?php endif; ?>
+                
                 <a href="<?php echo asset('pages/auth/profile.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                     <i class="fas fa-user w-5"></i>
                     <span>Profil</span>
