@@ -78,3 +78,18 @@ function e($text) {
 function isActive($page) {
     return strpos($_SERVER['REQUEST_URI'], $page) !== false ? 'active' : '';
 }
+
+/**
+ * Generate asset URL with BASE_URL
+ * Ensures exactly one slash between BASE_URL and path
+ */
+function asset_url($path) {
+    // Remove trailing slashes from BASE_URL
+    $baseUrl = rtrim(BASE_URL, '/');
+    
+    // Remove leading slashes from path
+    $path = ltrim($path, '/');
+    
+    // Combine with exactly one slash
+    return $baseUrl . '/' . $path;
+}
