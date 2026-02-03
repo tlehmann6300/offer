@@ -1,5 +1,6 @@
 <?php
 // Temporarily enable error display for diagnosis
+// TODO: Remove these lines after debugging or use environment-based config
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
@@ -15,6 +16,11 @@ require_once 'src/Auth.php';
  * @param string $url Target URL for redirection
  */
 function redirectWithFallback($url) {
+    // Validate URL doesn't contain newline characters (header injection protection)
+    if (strpos($url, "\n") !== false || strpos($url, "\r") !== false) {
+        die('Invalid redirect URL');
+    }
+    
     // Try to redirect with header
     if (!headers_sent()) {
         header('Location: ' . $url);
@@ -22,7 +28,9 @@ function redirectWithFallback($url) {
     }
     
     // Fallback if headers already sent
-    $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+    $safeUrlHtml = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+    $safeUrlJs = json_encode($url, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    
     echo '<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -30,11 +38,11 @@ function redirectWithFallback($url) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weiterleitung...</title>
     <script>
-        window.location.href = "' . $safeUrl . '";
+        window.location.href = ' . $safeUrlJs . ';
     </script>
 </head>
 <body>
-    <p>Leite weiter... Falls nichts passiert, klicke <a href="' . $safeUrl . '">hier</a>.</p>
+    <p>Leite weiter... Falls nichts passiert, klicke <a href="' . $safeUrlHtml . '">hier</a>.</p>
 </body>
 </html>';
     exit;
