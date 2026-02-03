@@ -11,11 +11,24 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 ?>
 
 <div class="mb-8">
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">
-        <i class="fas fa-envelope text-purple-600 mr-2"></i>
-        Einladungs-Management
-    </h2>
-    <p class="text-gray-600">Erstellen Sie Einladungslinks für neue Mitglieder und Alumni</p>
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-envelope text-purple-600 mr-2"></i>
+                Einladungs-Management
+            </h2>
+            <p class="text-gray-600">Erstellen Sie Einladungslinks für neue Mitglieder und Alumni</p>
+        </div>
+        <button 
+            type="button" 
+            id="openImportModalBtn" 
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+            title="JSON Import"
+        >
+            <i class="fas fa-file-import"></i>
+            JSON Import
+        </button>
+    </div>
 </div>
 
 <!-- Invitation Creation Card -->
@@ -170,6 +183,95 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
     </div>
 </div>
 
+<!-- JSON Import Modal -->
+<div id="importModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="bg-blue-600 text-white p-6 rounded-t-lg">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold">
+                    <i class="fas fa-file-import mr-2"></i>
+                    JSON Massenimport
+                </h3>
+                <button type="button" id="closeImportModalBtn" class="text-white hover:text-gray-200">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="p-6">
+            <div class="mb-4">
+                <p class="text-gray-700 mb-3">
+                    Laden Sie eine JSON-Datei hoch, um mehrere Einladungen gleichzeitig zu erstellen.
+                </p>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <p class="text-sm font-semibold text-blue-800 mb-2">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        JSON-Format:
+                    </p>
+                    <pre class="text-xs bg-white p-3 rounded border border-blue-300 overflow-x-auto"><code>[
+  {
+    "email": "user1@example.com",
+    "role": "member"
+  },
+  {
+    "email": "user2@example.com",
+    "role": "alumni"
+  }
+]</code></pre>
+                    <p class="text-xs text-blue-700 mt-2">
+                        <strong>Verfügbare Rollen:</strong> member, alumni, manager, alumni_board, board, admin
+                    </p>
+                </div>
+            </div>
+            
+            <form id="importForm" class="space-y-4">
+                <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        JSON-Datei auswählen
+                    </label>
+                    <input 
+                        type="file" 
+                        id="jsonFileInput" 
+                        name="json_file" 
+                        accept=".json,application/json"
+                        required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+                
+                <div class="flex gap-3">
+                    <button 
+                        type="submit" 
+                        class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
+                    >
+                        <i class="fas fa-upload"></i>
+                        Importieren
+                    </button>
+                    <button 
+                        type="button" 
+                        id="cancelImportBtn"
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+                    >
+                        Abbrechen
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Import Results -->
+            <div id="importResults" class="hidden mt-6">
+                <div class="border-t border-gray-200 pt-4">
+                    <h4 class="text-lg font-semibold mb-3">Import-Ergebnisse</h4>
+                    <div id="importResultsContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 // Invitation Management JavaScript
 (function() {
@@ -186,6 +288,15 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
     const invitationsContainer = document.getElementById('invitationsContainer');
     const noInvitationsMessage = document.getElementById('noInvitationsMessage');
     const invitationsList = document.getElementById('invitationsList');
+    
+    // Import modal elements
+    const openImportModalBtn = document.getElementById('openImportModalBtn');
+    const closeImportModalBtn = document.getElementById('closeImportModalBtn');
+    const cancelImportBtn = document.getElementById('cancelImportBtn');
+    const importModal = document.getElementById('importModal');
+    const importForm = document.getElementById('importForm');
+    const importResults = document.getElementById('importResults');
+    const importResultsContent = document.getElementById('importResultsContent');
     
     // Role name mapping
     const roleNames = {
@@ -289,6 +400,121 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
     refreshBtn.addEventListener('click', function() {
         loadInvitations();
     });
+    
+    // Import modal handlers
+    openImportModalBtn.addEventListener('click', function() {
+        importModal.classList.remove('hidden');
+        importResults.classList.add('hidden');
+        importForm.reset();
+    });
+    
+    closeImportModalBtn.addEventListener('click', function() {
+        importModal.classList.add('hidden');
+    });
+    
+    cancelImportBtn.addEventListener('click', function() {
+        importModal.classList.add('hidden');
+    });
+    
+    // Close modal when clicking outside
+    importModal.addEventListener('click', function(e) {
+        if (e.target === importModal) {
+            importModal.classList.add('hidden');
+        }
+    });
+    
+    // Import form submission handler
+    importForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitBtn = importForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Importiere...';
+        
+        // Hide previous results
+        importResults.classList.add('hidden');
+        
+        const formData = new FormData(importForm);
+        
+        try {
+            const response = await fetch('/api/import_invitations.php', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Show results
+                displayImportResults(data);
+                
+                // Reload invitations list
+                loadInvitations();
+                
+                // Show success message
+                showMessage(data.message, 'success');
+                
+                // Reset form
+                importForm.reset();
+            } else {
+                showMessage(data.message || 'Fehler beim Importieren der Einladungen', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('Netzwerkfehler beim Importieren der Einladungen', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        }
+    });
+    
+    // Display import results
+    function displayImportResults(data) {
+        let html = '';
+        
+        // Summary
+        html += '<div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">';
+        html += '<div class="flex items-center justify-between">';
+        html += '<div>';
+        html += '<p class="text-lg font-semibold text-blue-900">';
+        html += '<i class="fas fa-info-circle mr-2"></i>Zusammenfassung';
+        html += '</p>';
+        html += '</div>';
+        html += '</div>';
+        html += '<div class="mt-3 grid grid-cols-3 gap-4">';
+        html += '<div class="text-center">';
+        html += '<p class="text-2xl font-bold text-gray-700">' + data.total + '</p>';
+        html += '<p class="text-sm text-gray-600">Gesamt</p>';
+        html += '</div>';
+        html += '<div class="text-center">';
+        html += '<p class="text-2xl font-bold text-green-600">' + data.success_count + '</p>';
+        html += '<p class="text-sm text-gray-600">Erfolgreich</p>';
+        html += '</div>';
+        html += '<div class="text-center">';
+        html += '<p class="text-2xl font-bold text-red-600">' + data.failed_count + '</p>';
+        html += '<p class="text-sm text-gray-600">Fehlgeschlagen</p>';
+        html += '</div>';
+        html += '</div>';
+        html += '</div>';
+        
+        // Errors
+        if (data.errors && data.errors.length > 0) {
+            html += '<div class="p-4 bg-red-50 border border-red-200 rounded-lg">';
+            html += '<p class="font-semibold text-red-900 mb-2">';
+            html += '<i class="fas fa-exclamation-triangle mr-2"></i>Fehler:';
+            html += '</p>';
+            html += '<ul class="list-disc list-inside text-sm text-red-800 space-y-1">';
+            data.errors.forEach(error => {
+                html += '<li>' + escapeHtml(error) + '</li>';
+            });
+            html += '</ul>';
+            html += '</div>';
+        }
+        
+        importResultsContent.innerHTML = html;
+        importResults.classList.remove('hidden');
+    }
     
     // Load invitations function
     async function loadInvitations() {
