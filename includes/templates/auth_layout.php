@@ -51,7 +51,7 @@
     <div class="flex flex-col items-center justify-center min-h-screen p-4">
         <!-- IBC Logo above content -->
         <div class="mb-6">
-            <img src="<?php echo asset('assets/img/ibc_logo_original.webp'); ?>" alt="IBC Logo" class="mx-auto w-30 h-auto">
+            <img src="<?php echo asset('assets/img/ibc_logo_original.webp'); ?>" alt="IBC Logo" class="mx-auto w-48 h-auto object-contain">
         </div>
         
         <!-- Content area -->
