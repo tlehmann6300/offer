@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../helpers.php';
+require_once __DIR__ . '/../../src/Auth.php';
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -154,10 +155,7 @@ require_once __DIR__ . '/../helpers.php';
                     <span>Projekte</span>
                 </a>
                 
-                <?php 
-                require_once __DIR__ . '/../../src/Auth.php';
-                if (Auth::hasPermission('manager')): 
-                ?>
+                <?php if (Auth::hasPermission('manager')): ?>
                 <!-- Management Section -->
                 <div class="pt-4 mt-4 border-t border-white/20">
                     <h3 class="text-xs font-semibold text-gray-300 uppercase tracking-wider px-3 mb-2">Verwaltung</h3>
@@ -175,7 +173,7 @@ require_once __DIR__ . '/../helpers.php';
                         <span>Benutzerverwaltung</span>
                     </a>
                     <a href="<?php echo asset('pages/admin/audit.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                        <i class="fas fa-clipboard-check w-5"></i>
+                        <i class="fas fa-clipboard-list w-5"></i>
                         <span>Audit-Logs</span>
                     </a>
                     <?php endif; ?>
