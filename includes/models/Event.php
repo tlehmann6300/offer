@@ -134,13 +134,11 @@ class Event {
                 if ($endTime <= $startTime) {
                     throw new Exception("Event end time must be after start time");
                 }
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
+                // Re-throw validation errors, convert date parsing errors
                 if (strpos($e->getMessage(), 'end time must be after') !== false) {
                     throw $e;
                 }
-                throw new Exception("Invalid date format for start_time or end_time");
-            } catch (Throwable $e) {
-                // Catch DateMalformedStringException and other Throwables in PHP 8.3+
                 throw new Exception("Invalid date format for start_time or end_time");
             }
         }
@@ -154,13 +152,11 @@ class Event {
                 if ($registrationEnd >= $endTime) {
                     throw new Exception("Registration end time must be before event end time");
                 }
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
+                // Re-throw validation errors, convert date parsing errors
                 if (strpos($e->getMessage(), 'Registration end time') !== false) {
                     throw $e;
                 }
-                throw new Exception("Invalid date format for registration_end or end_time");
-            } catch (Throwable $e) {
-                // Catch DateMalformedStringException and other Throwables in PHP 8.3+
                 throw new Exception("Invalid date format for registration_end or end_time");
             }
         }
