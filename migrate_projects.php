@@ -9,12 +9,20 @@ require_once __DIR__ . '/includes/database.php';
 try {
     $db = Database::getContentDB();
     
-    // Check if projects table already exists
-    $stmt = $db->query("SHOW TABLES LIKE 'projects'");
-    $tableExists = $stmt->fetch() !== false;
+    // Check if any of the project module tables already exist
+    $tablesToCheck = ['projects', 'project_applications', 'project_assignments'];
+    $existingTables = [];
     
-    if ($tableExists) {
-        echo "Tabelle 'projects' existiert bereits. Migration wird übersprungen.\n";
+    foreach ($tablesToCheck as $table) {
+        $stmt = $db->query("SHOW TABLES LIKE '$table'");
+        if ($stmt->fetch() !== false) {
+            $existingTables[] = $table;
+        }
+    }
+    
+    if (!empty($existingTables)) {
+        echo "Tabellen existieren bereits: " . implode(', ', $existingTables) . "\n";
+        echo "Migration wird übersprungen.\n";
         echo "Erfolgreich migriert\n";
         exit(0);
     }
