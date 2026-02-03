@@ -38,3 +38,6 @@ setup_admin.php
 
 # Backup files
 *_backup.php
+
+# Test-generated sample HTML files
+tests/sample_*.html
