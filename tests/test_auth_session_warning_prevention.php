@@ -3,12 +3,18 @@
  * Test to verify Auth.php prevents session already started warnings
  * This test validates the requirements from the issue
  * 
- * Run with: php tests/test_auth_session_warning_prevention.php
+ * Run from repository root with: php tests/test_auth_session_warning_prevention.php
  */
 
 echo "Testing Auth.php Session Warning Prevention...\n\n";
 
 $authPath = realpath(__DIR__ . '/../src/Auth.php');
+
+if ($authPath === false || !file_exists($authPath)) {
+    echo "✗ Error: Could not find Auth.php file\n";
+    echo "  Expected location: " . __DIR__ . "/../src/Auth.php\n";
+    exit(1);
+}
 
 // Test 1: Verify file structure
 echo "=== Test 1: Verify file starts correctly ===\n";
@@ -67,6 +73,10 @@ if ($checkMethodStart === false) {
 
 // Find the session_start call within check()
 $nextMethodStart = strpos($content, 'public static function login(', $checkMethodStart);
+if ($nextMethodStart === false) {
+    echo "✗ Could not find login() method after check() method\n";
+    exit(1);
+}
 $checkMethodBody = substr($content, $checkMethodStart, $nextMethodStart - $checkMethodStart);
 
 // Verify the conditional check exists
@@ -102,6 +112,10 @@ foreach ($methodsToCheck as $method) {
     // Find next method to get method body
     $nextMethod = $method === 'login' ? 'logout' : 'hasPermission';
     $nextMethodStart = strpos($content, "public static function $nextMethod(", $methodStart + 1);
+    if ($nextMethodStart === false) {
+        echo "✗ Could not find $nextMethod() method after $method() method\n";
+        continue;
+    }
     $methodBody = substr($content, $methodStart, $nextMethodStart - $methodStart);
     
     if (preg_match('/if\s*\(\s*session_status\(\)\s*===\s*PHP_SESSION_NONE\s*\)/', $methodBody)) {
