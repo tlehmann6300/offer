@@ -197,6 +197,13 @@ class Event {
                 }
             }
             
+            // If image_path is provided in $data but is empty, set it explicitly to NULL
+            if (isset($data['image_path']) && empty($data['image_path'])) {
+                $imagePath = null;
+            } elseif (isset($data['image_path'])) {
+                $imagePath = $data['image_path'];
+            }
+            
             // Calculate status automatically based on timestamps
             $calculatedStatus = self::calculateStatus($data);
             
@@ -324,6 +331,11 @@ class Event {
                 } else {
                     error_log("Failed to upload event image for event ID $id: " . $uploadResult['error']);
                 }
+            }
+            
+            // If image_path is provided in $data but is empty, remove it to preserve the old value
+            if (isset($data['image_path']) && empty($data['image_path'])) {
+                unset($data['image_path']);
             }
             
             // Merge current data with updates for status calculation
