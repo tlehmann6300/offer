@@ -93,3 +93,12 @@ function asset_url($path) {
     // Combine with exactly one slash
     return $baseUrl . '/' . $path;
 }
+
+/**
+ * Generate asset path with BASE_URL
+ * Ensures no double slash by using rtrim on BASE_URL
+ * This is an alias for asset_url() for convenience
+ */
+function asset($path) {
+    return asset_url($path);
+}

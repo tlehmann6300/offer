@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $title ?? 'IBC Intranet'; ?></title>
-    <link rel="icon" type="image/webp" href="<?php echo asset_url('assets/img/cropped_maskottchen_32x32.webp'); ?>">
+    <link rel="icon" type="image/webp" href="<?php echo asset('assets/img/cropped_maskottchen_32x32.webp'); ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo asset_url('assets/css/theme.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset('assets/css/theme.css'); ?>">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -51,7 +51,7 @@
     <div class="flex flex-col items-center justify-center min-h-screen p-4">
         <!-- IBC Logo above content -->
         <div class="mb-6">
-            <img src="<?php echo asset_url('assets/img/ibc_logo_original.webp'); ?>" alt="IBC Logo" class="mx-auto w-30 h-auto">
+            <img src="<?php echo asset('assets/img/ibc_logo_original.webp'); ?>" alt="IBC Logo" class="mx-auto w-30 h-auto">
         </div>
         
         <!-- Content area -->
