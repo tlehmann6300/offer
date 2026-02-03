@@ -4,6 +4,16 @@
 
 After deploying this update to your live server, you **must** run the database migration to add the required new columns to the events table.
 
+### Step 0: Verify Current Database Schema (Optional)
+
+Before making changes, you can verify what's missing:
+1. Navigate to: `https://your-domain.de/verify_db_schema.php`
+2. This will show you:
+   - Which columns exist and which are missing
+   - Whether the uploads directory is properly configured
+   - A complete list of all event table columns
+3. This script is safe to run and only reads data (no modifications)
+
 ### Step 1: Execute Database Migration
 
 The PHP code now uses new database columns (`maps_link`, `registration_start`, `registration_end`) that need to be added to your database.
@@ -64,6 +74,11 @@ These colors are already configured in `assets/css/theme.css`. No action needed 
 
 ### Security Note
 
-After running the migration scripts successfully, you may want to:
-1. Delete or move the migration scripts out of the web-accessible directory for security
-2. Or protect them with .htaccess rules
+After running the migration scripts successfully, you should:
+1. **Delete these files from production** for security:
+   - `verify_db_schema.php`
+   - `sql/migrate_add_event_fields.php` 
+   - `fix_event_db.php`
+2. Or protect them with .htaccess rules to prevent unauthorized access
+
+These scripts are safe to delete after successful migration as they're only needed once.
