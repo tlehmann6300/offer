@@ -155,33 +155,48 @@ class MailService {
     /**
      * Create and configure PHPMailer instance with SMTP settings
      * 
-     * @param bool $enableDebug Enable SMTP debug output (default: false)
+     * @param bool $enableDebug Enable SMTP debug output (default: false, overridden by environment)
      * @return PHPMailer Configured PHPMailer instance
+     * @throws Exception If SMTP credentials are missing
      */
     private static function createMailer($enableDebug = false) {
         $mail = new PHPMailer(true);
         
         try {
-            // SMTP configuration
+            // SMTP configuration - load dynamically from constants or $_ENV
             $mail->isSMTP();
-            $mail->Host = SMTP_HOST;
+            $mail->Host = defined('SMTP_HOST') ? SMTP_HOST : ($_ENV['SMTP_HOST'] ?? 'localhost');
             $mail->SMTPAuth = true;
-            $mail->Username = SMTP_USER;
-            $mail->Password = SMTP_PASS;
+            $mail->Username = defined('SMTP_USER') ? SMTP_USER : ($_ENV['SMTP_USER'] ?? '');
+            $mail->Password = defined('SMTP_PASS') ? SMTP_PASS : ($_ENV['SMTP_PASS'] ?? '');
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = SMTP_PORT;
+            $mail->Port = defined('SMTP_PORT') ? SMTP_PORT : ($_ENV['SMTP_PORT'] ?? 587);
+            
+            // Validate SMTP credentials are configured
+            if (empty($mail->Username) || empty($mail->Password)) {
+                error_log("Warning: SMTP credentials are not configured. Email sending may fail.");
+            }
             
             // Set sender
-            $mail->setFrom(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
+            $mail->setFrom(
+                defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : ($_ENV['SMTP_FROM_EMAIL'] ?? ''),
+                defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : ($_ENV['SMTP_FROM_NAME'] ?? 'IBC Intranet')
+            );
             
             // Character encoding
             $mail->CharSet = 'UTF-8';
             $mail->Encoding = 'base64';
             
-            // Enable debug output if requested
-            if ($enableDebug) {
+            // Set SMTPDebug based on environment and explicit parameter
+            // Priority: explicit $enableDebug parameter overrides environment setting
+            $environment = defined('ENVIRONMENT') ? ENVIRONMENT : ($_ENV['ENVIRONMENT'] ?? 'development');
+            if ($enableDebug || $environment !== 'production') {
+                // Enable debug output: explicitly requested OR non-production environment
                 $mail->SMTPDebug = 2;
                 $mail->Debugoutput = 'html';
+            } else {
+                // Disable debug output: production environment and not explicitly enabled
+                $mail->SMTPDebug = 0;
             }
             
         } catch (Exception $e) {
@@ -216,15 +231,15 @@ class MailService {
             <table class="info-table">
                 <tr>
                     <td>SMTP Host</td>
-                    <td>' . htmlspecialchars(SMTP_HOST) . '</td>
+                    <td>' . htmlspecialchars(defined('SMTP_HOST') ? SMTP_HOST : ($_ENV['SMTP_HOST'] ?? 'N/A')) . '</td>
                 </tr>
                 <tr>
                     <td>SMTP Port</td>
-                    <td>' . htmlspecialchars(SMTP_PORT) . '</td>
+                    <td>' . htmlspecialchars(defined('SMTP_PORT') ? SMTP_PORT : ($_ENV['SMTP_PORT'] ?? 'N/A')) . '</td>
                 </tr>
                 <tr>
                     <td>Von</td>
-                    <td>' . htmlspecialchars(SMTP_FROM_EMAIL) . '</td>
+                    <td>' . htmlspecialchars(defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : ($_ENV['SMTP_FROM_EMAIL'] ?? 'N/A')) . '</td>
                 </tr>
             </table>';
             
@@ -245,7 +260,7 @@ class MailService {
             return true;
             
         } catch (Exception $e) {
-            error_log("Failed to send test email: " . $mail->ErrorInfo);
+            error_log("Failed to send test email to {$toEmail}: " . $e->getMessage());
             return false;
         }
     }
@@ -270,7 +285,7 @@ class MailService {
         // Create filename for ICS attachment
         $icsFilename = 'event_' . $event['id'] . ($slot ? '_slot_' . $slot['id'] : '') . '.ics';
         
-        // Send email with attachment
+        // Send email with attachment (has its own exception handling)
         return self::sendEmailWithAttachment(
             $toEmail,
             $toName,
@@ -379,7 +394,7 @@ class MailService {
         // Get complete HTML template
         $htmlBody = self::getTemplate('Einladung zum IBC Intranet', $bodyContent, $callToAction);
         
-        // Send email without attachment but with embedded logo
+        // Send email without attachment but with embedded logo (has its own exception handling)
         return self::sendEmailWithEmbeddedImage($email, $subject, $htmlBody);
     }
     
@@ -424,7 +439,7 @@ class MailService {
             return true;
             
         } catch (Exception $e) {
-            error_log("Error sending email to {$toEmail}: " . $mail->ErrorInfo);
+            error_log("Error sending email to {$toEmail}: " . $e->getMessage());
             return false;
         }
     }
@@ -464,7 +479,7 @@ class MailService {
             return true;
             
         } catch (Exception $e) {
-            error_log("Error sending email to {$toEmail}: " . $mail->ErrorInfo);
+            error_log("Error sending email to {$toEmail}: " . $e->getMessage());
             return false;
         }
     }
@@ -494,7 +509,7 @@ class MailService {
             return true;
             
         } catch (Exception $e) {
-            error_log("Error sending email to {$toEmail}: " . $mail->ErrorInfo);
+            error_log("Error sending email to {$toEmail}: " . $e->getMessage());
             return false;
         }
     }
@@ -508,7 +523,6 @@ class MailService {
      * @return bool Success status
      */
     public static function sendProjectAcceptance($toEmail, $project, $role) {
-        
         $subject = "Projektzusage: " . $project['title'];
         
         // Build body content
@@ -525,7 +539,7 @@ class MailService {
         // Get complete HTML template
         $htmlBody = self::getTemplate('Projektzusage', $bodyContent, $callToAction);
         
-        // Send email
+        // Send email (has its own exception handling)
         return self::sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody);
     }
     
