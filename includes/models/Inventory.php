@@ -649,4 +649,154 @@ class Inventory {
         
         return $stats;
     }
+
+    /**
+     * Import inventory items from JSON data
+     * 
+     * @param array $data Array of inventory items from JSON
+     * @param int $userId User ID performing the import
+     * @return array Result with 'success', 'imported', 'skipped', and 'errors' keys
+     */
+    public static function importFromJson($data, $userId) {
+        $db = Database::getContentDB();
+        $imported = 0;
+        $skipped = 0;
+        $errors = [];
+        
+        // Validate that data is an array
+        if (!is_array($data)) {
+            return [
+                'success' => false,
+                'imported' => 0,
+                'skipped' => 0,
+                'errors' => ['Invalid JSON format: expected array of items']
+            ];
+        }
+        
+        // Process each item
+        foreach ($data as $index => $item) {
+            // Validate required fields
+            if (empty($item['name'])) {
+                $errors[] = "Item at index $index: 'name' is required";
+                $skipped++;
+                continue;
+            }
+            
+            if (empty($item['category'])) {
+                $errors[] = "Item at index $index: 'category' is required";
+                $skipped++;
+                continue;
+            }
+            
+            // Get status with default
+            $status = $item['status'] ?? 'available';
+            $validStatuses = ['available', 'in_use', 'maintenance', 'retired'];
+            if (!in_array($status, $validStatuses)) {
+                $errors[] = "Item at index $index: Invalid status '$status'. Must be one of: " . implode(', ', $validStatuses);
+                $skipped++;
+                continue;
+            }
+            
+            // Check if serial_number exists and is duplicate
+            if (!empty($item['serial_number'])) {
+                $stmt = $db->prepare("SELECT id, name FROM inventory WHERE serial_number = ?");
+                $stmt->execute([$item['serial_number']]);
+                $existing = $stmt->fetch();
+                
+                if ($existing) {
+                    $errors[] = "Item at index $index ('{$item['name']}'): Serial number '{$item['serial_number']}' already exists for item '{$existing['name']}' (ID: {$existing['id']})";
+                    $skipped++;
+                    continue;
+                }
+            }
+            
+            try {
+                // Get or create category
+                $categoryId = null;
+                $stmt = $db->prepare("SELECT id FROM categories WHERE name = ?");
+                $stmt->execute([$item['category']]);
+                $category = $stmt->fetch();
+                
+                if ($category) {
+                    $categoryId = $category['id'];
+                } else {
+                    // Create new category
+                    $categoryId = self::createCategory($item['category']);
+                }
+                
+                // Get or create location if provided
+                $locationId = null;
+                if (!empty($item['location'])) {
+                    $stmt = $db->prepare("SELECT id FROM locations WHERE name = ?");
+                    $stmt->execute([$item['location']]);
+                    $location = $stmt->fetch();
+                    
+                    if ($location) {
+                        $locationId = $location['id'];
+                    } else {
+                        // Create new location
+                        $locationId = self::createLocation($item['location']);
+                    }
+                }
+                
+                // Validate and format purchase_date if provided
+                $purchaseDate = null;
+                if (!empty($item['purchase_date'])) {
+                    // Try to parse the date
+                    $timestamp = strtotime($item['purchase_date']);
+                    if ($timestamp === false) {
+                        $errors[] = "Item at index $index ('{$item['name']}'): Invalid purchase_date format '{$item['purchase_date']}'";
+                        $skipped++;
+                        continue;
+                    }
+                    $purchaseDate = date('Y-m-d', $timestamp);
+                }
+                
+                // Insert item
+                $stmt = $db->prepare("
+                    INSERT INTO inventory (
+                        name, description, serial_number, category_id, location_id, 
+                        status, current_stock, purchase_date
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ");
+                
+                $stmt->execute([
+                    $item['name'],
+                    $item['description'] ?? null,
+                    $item['serial_number'] ?? null,
+                    $categoryId,
+                    $locationId,
+                    $status,
+                    1, // Default stock of 1 for imported items
+                    $purchaseDate
+                ]);
+                
+                $itemId = $db->lastInsertId();
+                
+                // Log creation
+                self::logHistory(
+                    $itemId, 
+                    $userId, 
+                    'create', 
+                    null, 
+                    1, 
+                    null, 
+                    'Imported from JSON', 
+                    json_encode(['original_data' => $item])
+                );
+                
+                $imported++;
+            } catch (Exception $e) {
+                $errors[] = "Item at index $index ('{$item['name']}'): " . $e->getMessage();
+                $skipped++;
+            }
+        }
+        
+        return [
+            'success' => $imported > 0,
+            'imported' => $imported,
+            'skipped' => $skipped,
+            'errors' => $errors
+        ];
+    }
 }

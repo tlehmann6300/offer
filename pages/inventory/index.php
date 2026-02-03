@@ -7,6 +7,46 @@ if (!Auth::check()) {
     exit;
 }
 
+// Handle JSON import
+$importMessage = null;
+$importSuccess = false;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['import_json']) && Auth::hasPermission('manager')) {
+    if (isset($_FILES['json_file']) && $_FILES['json_file']['error'] === UPLOAD_ERR_OK) {
+        $jsonContent = file_get_contents($_FILES['json_file']['tmp_name']);
+        $data = json_decode($jsonContent, true);
+        
+        if ($data === null) {
+            $importMessage = 'Fehler: Ungültiges JSON-Format';
+            $importSuccess = false;
+        } else {
+            $result = Inventory::importFromJson($data, $_SESSION['user_id']);
+            
+            if ($result['success']) {
+                $importMessage = "Import erfolgreich! {$result['imported']} Artikel importiert";
+                if ($result['skipped'] > 0) {
+                    $importMessage .= ", {$result['skipped']} übersprungen";
+                }
+                $importSuccess = true;
+            } else {
+                $importMessage = "Import fehlgeschlagen";
+                $importSuccess = false;
+            }
+            
+            // Store errors in session for display
+            if (!empty($result['errors'])) {
+                $_SESSION['import_errors'] = $result['errors'];
+            }
+        }
+    } else {
+        $importMessage = 'Fehler: Keine Datei hochgeladen oder Upload-Fehler';
+        $importSuccess = false;
+    }
+}
+
+// Get import errors from session and clear them
+$importErrors = $_SESSION['import_errors'] ?? [];
+unset($_SESSION['import_errors']);
+
 // Get filters
 $filters = [];
 if (!empty($_GET['category_id'])) {
@@ -40,15 +80,125 @@ ob_start();
             <p class="text-gray-600"><?php echo count($items); ?> Artikel gefunden</p>
         </div>
         <?php if (Auth::hasPermission('manager')): ?>
-        <div class="mt-4 md:mt-0">
+        <div class="mt-4 md:mt-0 flex gap-2">
             <a href="add.php" class="btn-primary inline-block">
                 <i class="fas fa-plus mr-2"></i>
                 Neuer Artikel
             </a>
+            <button type="button" onclick="document.getElementById('importModal').classList.remove('hidden')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                <i class="fas fa-file-import mr-2"></i>
+                Massenimport
+            </button>
         </div>
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Import Success/Error Messages -->
+<?php if ($importMessage): ?>
+<div class="mb-6 p-4 rounded-lg <?php echo $importSuccess ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700'; ?>">
+    <div class="flex items-start">
+        <i class="fas <?php echo $importSuccess ? 'fa-check-circle' : 'fa-exclamation-circle'; ?> mr-3 mt-1"></i>
+        <div class="flex-1">
+            <p class="font-semibold"><?php echo htmlspecialchars($importMessage); ?></p>
+            <?php if (!empty($importErrors)): ?>
+            <details class="mt-2">
+                <summary class="cursor-pointer text-sm underline">Details anzeigen (<?php echo count($importErrors); ?> Fehler)</summary>
+                <ul class="mt-2 list-disc list-inside text-sm">
+                    <?php foreach ($importErrors as $error): ?>
+                    <li><?php echo htmlspecialchars($error); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </details>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- Import Modal -->
+<?php if (Auth::hasPermission('manager')): ?>
+<div id="importModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">
+                <i class="fas fa-file-import text-green-600 mr-2"></i>
+                Inventar Massenimport
+            </h2>
+            <button type="button" onclick="document.getElementById('importModal').classList.add('hidden')" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+        
+        <form method="POST" enctype="multipart/form-data" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">JSON-Datei auswählen</label>
+                <input 
+                    type="file" 
+                    name="json_file" 
+                    accept=".json,application/json"
+                    required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                <p class="mt-2 text-sm text-gray-500">
+                    Laden Sie eine JSON-Datei mit Inventar-Artikeln hoch
+                </p>
+            </div>
+            
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 class="font-semibold text-blue-900 mb-2">
+                    <i class="fas fa-info-circle mr-2"></i>JSON-Format
+                </h3>
+                <p class="text-sm text-blue-800 mb-2">Die JSON-Datei sollte ein Array von Objekten enthalten:</p>
+                <pre class="text-xs bg-white p-3 rounded border border-blue-200 overflow-x-auto"><code>[
+  {
+    "name": "Laptop Dell XPS 15",
+    "category": "IT-Equipment",
+    "status": "available",
+    "description": "15 Zoll Laptop",
+    "serial_number": "DXPS123456",
+    "location": "Büro München",
+    "purchase_date": "2024-01-15"
+  }
+]</code></pre>
+                <div class="mt-3 text-sm text-blue-800">
+                    <p class="font-semibold">Pflichtfelder:</p>
+                    <ul class="list-disc list-inside ml-2">
+                        <li><strong>name</strong>: Name des Artikels</li>
+                        <li><strong>category</strong>: Kategorie (wird erstellt, falls nicht vorhanden)</li>
+                    </ul>
+                    <p class="font-semibold mt-2">Optionale Felder:</p>
+                    <ul class="list-disc list-inside ml-2">
+                        <li><strong>status</strong>: Status (available, in_use, maintenance, retired) - Standard: "available"</li>
+                        <li><strong>description</strong>: Beschreibung</li>
+                        <li><strong>serial_number</strong>: Seriennummer (muss eindeutig sein)</li>
+                        <li><strong>location</strong>: Standort (wird erstellt, falls nicht vorhanden)</li>
+                        <li><strong>purchase_date</strong>: Kaufdatum (Format: YYYY-MM-DD)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="flex justify-end gap-3 mt-6">
+                <button 
+                    type="button" 
+                    onclick="document.getElementById('importModal').classList.add('hidden')"
+                    class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                >
+                    Abbrechen
+                </button>
+                <button 
+                    type="submit" 
+                    name="import_json"
+                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                >
+                    <i class="fas fa-upload mr-2"></i>
+                    Importieren
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<?php endif; ?>
 
 <!-- Filters -->
 <div class="card p-6 mb-6">

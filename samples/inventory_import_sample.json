@@ -1,0 +1,43 @@
+[
+  {
+    "name": "Laptop Dell XPS 15",
+    "category": "IT-Equipment",
+    "status": "available",
+    "description": "15 Zoll Laptop mit i7 Prozessor und 16GB RAM",
+    "serial_number": "DXPS123456",
+    "location": "Büro München",
+    "purchase_date": "2024-01-15"
+  },
+  {
+    "name": "Monitor Samsung 27\"",
+    "category": "IT-Equipment",
+    "status": "available",
+    "description": "27 Zoll 4K Monitor",
+    "serial_number": "SAM27-001",
+    "location": "Büro München",
+    "purchase_date": "2024-02-20"
+  },
+  {
+    "name": "Projektor Epson EB-2250U",
+    "category": "Präsentation",
+    "status": "available",
+    "description": "Full HD Projektor mit 5000 Lumen",
+    "serial_number": "EP2250-789",
+    "location": "Konferenzraum 1",
+    "purchase_date": "2023-11-10"
+  },
+  {
+    "name": "Whiteboard mobil",
+    "category": "Büromöbel",
+    "status": "available",
+    "description": "Mobiles Whiteboard 180x120cm",
+    "location": "Konferenzraum 2"
+  },
+  {
+    "name": "USB-C Hub Anker",
+    "category": "IT-Zubehör",
+    "status": "available",
+    "description": "7-in-1 USB-C Hub mit HDMI und Ethernet",
+    "purchase_date": "2024-03-05"
+  }
+]
