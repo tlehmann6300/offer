@@ -1,3 +1,6 @@
+<?php
+require_once __DIR__ . '/../helpers.php';
+?>
 <!DOCTYPE html>
 <html lang="de">
 <head>
