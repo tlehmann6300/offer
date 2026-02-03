@@ -103,10 +103,13 @@ if ($sendMail) {
             'role' => $role
         ]);
     } else {
-        // Email sending failed, return error
+        // Email sending failed, but token was created - return link as fallback
         echo json_encode([
-            'success' => false,
-            'message' => 'Fehler beim Senden der E-Mail. Bitte versuchen Sie es erneut.'
+            'success' => true,
+            'link' => $invitationLink,
+            'message' => 'E-Mail konnte nicht gesendet werden. Einladungslink wurde erstellt und kann manuell versendet werden.',
+            'email' => $email,
+            'role' => $role
         ]);
     }
 } else {
