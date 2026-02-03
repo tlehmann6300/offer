@@ -262,4 +262,31 @@ class Project {
         $stmt->execute([$projectId]);
         return $stmt->fetchAll();
     }
+    
+    /**
+     * Get user's application for a specific project
+     * 
+     * @param int $projectId Project ID
+     * @param int $userId User ID
+     * @return array|false Application data or false if not found
+     */
+    public static function getUserApplication($projectId, $userId) {
+        $db = Database::getContentDB();
+        
+        $stmt = $db->prepare("
+            SELECT 
+                id,
+                project_id,
+                user_id,
+                motivation,
+                experience_count,
+                status,
+                created_at
+            FROM project_applications
+            WHERE project_id = ? AND user_id = ?
+        ");
+        
+        $stmt->execute([$projectId, $userId]);
+        return $stmt->fetch();
+    }
 }
