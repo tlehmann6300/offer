@@ -5,6 +5,14 @@
  * Two separate databases for security and structure
  */
 
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Set timezone
+date_default_timezone_set('Europe/Berlin');
+
 // Load .env file
 function loadEnv($path) {
     if (!file_exists($path)) {
@@ -66,6 +74,12 @@ define('DB_CONTENT_NAME', $env['DB_CONTENT_NAME'] ?? '');
 define('DB_CONTENT_USER', $env['DB_CONTENT_USER'] ?? '');
 define('DB_CONTENT_PASS', $env['DB_CONTENT_PASS'] ?? '');
 
+// Generic Database Constants (from .env if available, defaults to user DB)
+define('DB_HOST', $env['DB_HOST'] ?? $env['DB_USER_HOST'] ?? 'localhost');
+define('DB_NAME', $env['DB_NAME'] ?? $env['DB_USER_NAME'] ?? '');
+define('DB_USER', $env['DB_USER'] ?? $env['DB_USER_USER'] ?? '');
+define('DB_PASS', $env['DB_PASS'] ?? $env['DB_USER_PASS'] ?? '');
+
 // SMTP Configuration
 define('SMTP_HOST', $env['SMTP_HOST'] ?? 'localhost');
 define('SMTP_PORT', $env['SMTP_PORT'] ?? 587);
@@ -77,7 +91,21 @@ define('SMTP_FROM_NAME', $env['SMTP_FROM_NAME'] ?? 'IBC Intranet');
 
 // Application Settings
 define('APP_NAME', 'IBC Intranet');
-define('BASE_URL', $env['BASE_URL'] ?? '');
+
+// BASE_URL: Use from .env if set, otherwise generate dynamically
+if (!empty($env['BASE_URL'])) {
+    define('BASE_URL', $env['BASE_URL']);
+} else {
+    // Generate BASE_URL dynamically
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || 
+                ($_SERVER['SERVER_PORT'] ?? 80) == 443 ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+    $scriptPath = dirname($_SERVER['SCRIPT_NAME'] ?? '');
+    // Remove trailing slash from path
+    $scriptPath = rtrim($scriptPath, '/');
+    define('BASE_URL', $protocol . '://' . $host . $scriptPath);
+}
+
 define('ENVIRONMENT', $env['ENVIRONMENT'] ?? 'development');
 define('SESSION_LIFETIME', 3600); // 1 hour
 define('MAX_LOGIN_ATTEMPTS', 5);
@@ -88,9 +116,6 @@ define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'image/we
 // Security
 define('HASH_ALGO', PASSWORD_ARGON2ID);
 define('SESSION_NAME', 'IBC_SESSION');
-
-// Timezone
-date_default_timezone_set('Europe/Berlin');
 
 // Error Reporting - DISABLE in production!
 // Set to 0 and false for production deployment
