@@ -305,12 +305,15 @@ class MailService {
         }
         
         $logoContent = '';
-        $logoMimeType = 'image/png';
+        $logoMimeType = 'image/webp'; // Default to webp since we check it first
         
         if (file_exists($imagePath)) {
             $logoContent = file_get_contents($imagePath);
+            // Update MIME type based on actual file
             if (strpos($imagePath, '.webp') !== false) {
                 $logoMimeType = 'image/webp';
+            } else {
+                $logoMimeType = 'image/png';
             }
         }
         
@@ -398,12 +401,15 @@ class MailService {
         }
         
         $logoContent = '';
-        $logoMimeType = 'image/png';
+        $logoMimeType = 'image/webp'; // Default to webp since we check it first
         
         if (file_exists($imagePath)) {
             $logoContent = file_get_contents($imagePath);
+            // Update MIME type based on actual file
             if (strpos($imagePath, '.webp') !== false) {
                 $logoMimeType = 'image/webp';
+            } else {
+                $logoMimeType = 'image/png';
             }
         }
         

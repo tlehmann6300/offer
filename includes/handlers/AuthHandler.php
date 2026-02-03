@@ -58,7 +58,9 @@ class AuthHandler {
                 session_destroy();
                 
                 // Redirect to login page with timeout parameter
-                header('Location: /pages/auth/login.php?timeout=1');
+                // Use BASE_URL for portability across environments
+                $loginUrl = (defined('BASE_URL') && BASE_URL) ? BASE_URL . '/pages/auth/login.php?timeout=1' : '/pages/auth/login.php?timeout=1';
+                header('Location: ' . $loginUrl);
                 exit;
             }
         }
