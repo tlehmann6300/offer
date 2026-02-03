@@ -25,7 +25,7 @@ try {
     
     // Execute ALTER TABLE only if column doesn't exist
     if (!in_array('image_path', $existingColumns)) {
-        $db->exec("ALTER TABLE events ADD COLUMN image_path VARCHAR(255) DEFAULT NULL");
+        $db->exec("ALTER TABLE `events` ADD COLUMN `image_path` VARCHAR(255) DEFAULT NULL");
         echo "✓ Spalte image_path erfolgreich angelegt\n";
     } else {
         echo "ℹ Spalte image_path existiert bereits\n";
