@@ -7,10 +7,8 @@
 // Set JSON content type before any other output
 header('Content-Type: application/json');
 
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Event.php';
-
-AuthHandler::startSession();
 
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -20,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Must be authenticated
-if (!AuthHandler::isAuthenticated()) {
+if (!Auth::check()) {
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Not authenticated']);
     exit;

@@ -1,16 +1,14 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/handlers/GoogleAuthenticator.php';
 require_once __DIR__ . '/../../includes/models/User.php';
 
-AuthHandler::startSession();
-
-if (!AuthHandler::isAuthenticated()) {
+if (!Auth::check()) {
     header('Location: login.php');
     exit;
 }
 
-$user = AuthHandler::getCurrentUser();
+$user = Auth::user();
 $message = '';
 $error = '';
 $showQRCode = false;
@@ -32,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($ga->verifyCode($secret, $code, 2)) {
             if (User::enable2FA($user['id'], $secret)) {
                 $message = '2FA erfolgreich aktiviert';
-                $user = AuthHandler::getCurrentUser(); // Reload user
+                $user = Auth::user(); // Reload user
             } else {
                 $error = 'Fehler beim Aktivieren von 2FA';
             }
@@ -46,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else if (isset($_POST['disable_2fa'])) {
         if (User::disable2FA($user['id'])) {
             $message = '2FA erfolgreich deaktiviert';
-            $user = AuthHandler::getCurrentUser(); // Reload user
+            $user = Auth::user(); // Reload user
         } else {
             $error = 'Fehler beim Deaktivieren von 2FA';
         }

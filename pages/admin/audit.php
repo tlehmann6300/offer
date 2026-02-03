@@ -1,9 +1,7 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 
-AuthHandler::startSession();
-
-if (!AuthHandler::isAuthenticated() || !AuthHandler::hasPermission('admin')) {
+if (!Auth::check() || !Auth::hasPermission('admin')) {
     header('Location: ../auth/login.php');
     exit;
 }

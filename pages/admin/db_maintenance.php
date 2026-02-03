@@ -8,12 +8,8 @@
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../src/Database.php';
 
-// src/Auth.php already creates the alias from AuthHandler to Auth
-// Both class names (Auth and AuthHandler) are now available
-AuthHandler::startSession();
-
 // Check if user has admin or board permission
-if (!AuthHandler::isAuthenticated() || !AuthHandler::hasPermission('board')) {
+if (!Auth::check() || !Auth::hasPermission('board')) {
     header('Location: ../auth/login.php');
     exit;
 }

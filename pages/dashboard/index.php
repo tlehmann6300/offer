@@ -1,23 +1,21 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
-
-AuthHandler::startSession();
 
 // Update event statuses (pseudo-cron)
 require_once __DIR__ . '/../../includes/pseudo_cron.php';
 
 // Check authentication
-if (!AuthHandler::isAuthenticated()) {
+if (!Auth::check()) {
     header('Location: ../auth/login.php');
     exit;
 }
 
-$user = AuthHandler::getCurrentUser();
+$user = Auth::user();
 $stats = Inventory::getDashboardStats();
 
 // Get extended statistics for board/managers
-$hasExtendedAccess = AuthHandler::hasPermission('manager');
+$hasExtendedAccess = Auth::hasPermission('manager');
 if ($hasExtendedAccess) {
     $inStockStats = Inventory::getInStockStats();
     $checkedOutStats = Inventory::getCheckedOutStats();
@@ -26,7 +24,7 @@ if ($hasExtendedAccess) {
 
 // Security Audit - nur für Admins
 $securityWarning = '';
-if (AuthHandler::hasPermission('admin')) {
+if (Auth::hasPermission('admin')) {
     require_once __DIR__ . '/../../security_audit.php';
     $securityWarning = SecurityAudit::getDashboardWarning(__DIR__ . '/../..');
 }
@@ -118,7 +116,7 @@ ob_start();
                     <span class="font-semibold text-gray-800">Inventar durchsuchen</span>
                 </div>
             </a>
-            <?php if (AuthHandler::hasPermission('manager')): ?>
+            <?php if (Auth::hasPermission('manager')): ?>
             <a href="../inventory/add.php" class="block p-4 rounded-lg bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 transition-all duration-300 group">
                 <div class="flex items-center">
                     <i class="fas fa-plus-circle text-green-600 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
@@ -126,7 +124,7 @@ ob_start();
                 </div>
             </a>
             <?php endif; ?>
-            <?php if (AuthHandler::hasPermission('admin')): ?>
+            <?php if (Auth::hasPermission('admin')): ?>
             <a href="../admin/users.php" class="block p-4 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 transition-all duration-300 group">
                 <div class="flex items-center">
                     <i class="fas fa-users-cog text-blue-600 mr-3 text-xl group-hover:scale-110 transition-transform"></i>

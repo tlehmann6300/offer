@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 
-AuthHandler::logout();
+Auth::logout();
 header('Location: login.php?logout=1');
 exit;

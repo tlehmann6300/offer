@@ -1,14 +1,12 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/User.php';
-
-AuthHandler::startSession();
 
 // Set JSON response header
 header('Content-Type: application/json');
 
 // Check authentication and permission
-if (!AuthHandler::isAuthenticated() || !AuthHandler::hasPermission('admin')) {
+if (!Auth::check() || !Auth::hasPermission('admin')) {
     echo json_encode([
         'success' => false,
         'message' => 'Nicht autorisiert'

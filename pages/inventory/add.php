@@ -1,12 +1,10 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
 require_once __DIR__ . '/../../includes/utils/SecureImageUpload.php';
 
-AuthHandler::startSession();
-
-if (!AuthHandler::isAuthenticated() || !AuthHandler::hasPermission('manager')) {
+if (!Auth::check() || !Auth::hasPermission('manager')) {
     header('Location: ../auth/login.php');
     exit;
 }

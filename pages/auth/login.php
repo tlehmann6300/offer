@@ -1,11 +1,9 @@
 <?php
-require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
+require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 
-AuthHandler::startSession();
-
 // Redirect if already authenticated
-if (AuthHandler::isAuthenticated()) {
+if (Auth::check()) {
     header('Location: ../dashboard/index.php');
     exit;
 }
@@ -26,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $_SESSION['pending_2fa']['password'];
     }
     
-    $result = AuthHandler::login($email, $password, $tfaCode);
+    $result = Auth::login($email, $password, $tfaCode);
     
     if ($result['success']) {
         // Clear pending 2FA data
