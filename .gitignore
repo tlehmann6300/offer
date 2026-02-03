@@ -6,6 +6,10 @@
 assets/uploads/*
 !assets/uploads/.gitkeep
 
+# Event uploads directory - keep structure, ignore uploaded files
+uploads/events/*
+!uploads/events/.gitkeep
+
 # Composer
 vendor/
 composer.lock
