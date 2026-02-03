@@ -1011,7 +1011,24 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
                 
                 if (slotStartDate < eventStartDate || slotEndDate > eventEndDate) {
                     e.preventDefault();
-                    alert(`Helfer-Slot Zeitfenster muss innerhalb der Event-Zeit liegen!\n\nEvent: ${startTime} bis ${endTime}\nSlot: ${slotStart} bis ${slotEnd}\n\nBitte passen Sie die Slot-Zeiten an.`);
+                    
+                    // Format dates for user-friendly display
+                    const formatDateTime = (dateStr) => {
+                        const date = new Date(dateStr);
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = date.getFullYear();
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                        return `${day}.${month}.${year} ${hours}:${minutes}`;
+                    };
+                    
+                    const formattedEventStart = formatDateTime(startTime);
+                    const formattedEventEnd = formatDateTime(endTime);
+                    const formattedSlotStart = formatDateTime(slotStart);
+                    const formattedSlotEnd = formatDateTime(slotEnd);
+                    
+                    alert(`Helfer-Slot Zeitfenster muss innerhalb der Event-Zeit liegen!\n\nEvent: ${formattedEventStart} bis ${formattedEventEnd}\nSlot: ${formattedSlotStart} bis ${formattedSlotEnd}\n\nBitte passen Sie die Slot-Zeiten an.`);
                     validationFailed = true;
                     break;
                 }
