@@ -45,11 +45,10 @@ if (!isset($_FILES['json_file']) || $_FILES['json_file']['error'] !== UPLOAD_ERR
     exit;
 }
 
-// Validate file type
-$fileType = $_FILES['json_file']['type'];
+// Validate file extension (don't trust client-provided MIME type)
 $fileExtension = strtolower(pathinfo($_FILES['json_file']['name'], PATHINFO_EXTENSION));
 
-if ($fileExtension !== 'json' && $fileType !== 'application/json') {
+if ($fileExtension !== 'json') {
     echo json_encode([
         'success' => false,
         'message' => 'Ungültiger Dateityp. Bitte laden Sie eine JSON-Datei hoch.'

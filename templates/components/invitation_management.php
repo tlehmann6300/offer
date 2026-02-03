@@ -237,7 +237,7 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
                         type="file" 
                         id="jsonFileInput" 
                         name="json_file" 
-                        accept=".json,application/json"
+                        accept=".json"
                         required
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
