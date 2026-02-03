@@ -946,6 +946,17 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
     const startTime = document.getElementById('start_time').value;
     const endTime = document.getElementById('end_time').value;
     
+    // Helper function to format dates for user-friendly display
+    const formatDateTime = (dateStr) => {
+        const date = new Date(dateStr);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${day}.${month}.${year} ${hours}:${minutes}`;
+    };
+    
     // Validate main event times
     if (startTime && endTime) {
         const startDate = new Date(startTime);
@@ -1011,17 +1022,6 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
                 
                 if (slotStartDate < eventStartDate || slotEndDate > eventEndDate) {
                     e.preventDefault();
-                    
-                    // Format dates for user-friendly display
-                    const formatDateTime = (dateStr) => {
-                        const date = new Date(dateStr);
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const year = date.getFullYear();
-                        const hours = String(date.getHours()).padStart(2, '0');
-                        const minutes = String(date.getMinutes()).padStart(2, '0');
-                        return `${day}.${month}.${year} ${hours}:${minutes}`;
-                    };
                     
                     const formattedEventStart = formatDateTime(startTime);
                     const formattedEventEnd = formatDateTime(endTime);
