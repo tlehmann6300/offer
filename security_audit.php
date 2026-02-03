@@ -174,9 +174,3 @@ class SecurityAudit {
         return self::performAudit($baseDir);
     }
 }
-
-// Wenn das Skript direkt aufgerufen wird, zeige die Ergebnisse als JSON
-if (php_sapi_name() === 'cli' || (isset($_SERVER['SCRIPT_FILENAME']) && basename($_SERVER['SCRIPT_FILENAME']) === 'security_audit.php')) {
-    header('Content-Type: application/json');
-    echo json_encode(SecurityAudit::getAuditResults(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-}
