@@ -9,14 +9,6 @@ require_once __DIR__ . '/Database.php';
 class Auth {
     
     /**
-     * Constructor
-     */
-    public function __construct() {
-        // Set timezone to Europe/Berlin
-        date_default_timezone_set('Europe/Berlin');
-    }
-    
-    /**
      * Check if user is authenticated and handle session timeout
      * 
      * @return bool True if authenticated
@@ -199,9 +191,9 @@ class Auth {
     }
     
     /**
-     * Get singleton instance
+     * Create new Auth instance (for compatibility)
      * 
-     * @return Database Database instance
+     * @return Auth New Auth instance
      */
     public static function getInstance() {
         return new self();
