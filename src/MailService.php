@@ -495,4 +495,36 @@ class MailService {
             return false;
         }
     }
+    
+    /**
+     * Send project acceptance notification email (Placeholder)
+     * 
+     * @param string $toEmail Recipient email address
+     * @param array $project Project data
+     * @param string $role Assigned role (lead or member)
+     * @return bool Success status
+     */
+    public static function sendProjectAcceptance($toEmail, $project, $role) {
+        // TODO: Implement project acceptance email
+        // This is a placeholder method that will be implemented in the future
+        
+        $subject = "Projektzusage: " . $project['title'];
+        
+        // Build body content
+        $roleName = ($role === 'lead') ? 'Projektleitung' : 'Projektmitglied';
+        $bodyContent = '<p class="email-text">Hallo,</p>
+        <p class="email-text">deine Bewerbung für das Projekt "<strong>' . htmlspecialchars($project['title']) . '</strong>" wurde akzeptiert!</p>
+        <p class="email-text">Du wurdest als <strong>' . htmlspecialchars($roleName) . '</strong> zum Projekt hinzugefügt.</p>
+        <p class="email-text">Weitere Details zum Projekt findest du im IBC Intranet.</p>';
+        
+        // Create call-to-action button
+        $projectLink = BASE_URL . '/pages/projects/manage.php';
+        $callToAction = '<a href="' . htmlspecialchars($projectLink) . '" class="button">Zum Projekt</a>';
+        
+        // Get complete HTML template
+        $htmlBody = self::getTemplate('Projektzusage', $bodyContent, $callToAction);
+        
+        // Send email
+        return self::sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody);
+    }
 }

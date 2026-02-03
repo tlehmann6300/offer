@@ -252,9 +252,10 @@ ob_start();
 
         <!-- Application Count -->
         <div class="mb-4 p-3 bg-purple-50 rounded-lg">
-            <div class="text-sm text-gray-700">
+            <a href="applications.php?project_id=<?php echo $project['id']; ?>" class="text-sm text-gray-700 hover:text-purple-600 transition">
+                <i class="fas fa-users mr-1"></i>
                 <strong><?php echo $project['application_count']; ?></strong> Bewerbung(en)
-            </div>
+            </a>
         </div>
 
         <!-- Actions -->
