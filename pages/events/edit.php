@@ -946,6 +946,17 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
     const startTime = document.getElementById('start_time').value;
     const endTime = document.getElementById('end_time').value;
     
+    // Helper function to format dates for user-friendly display
+    const formatDateTime = (dateStr) => {
+        const date = new Date(dateStr);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${day}.${month}.${year} ${hours}:${minutes}`;
+    };
+    
     // Validate main event times
     if (startTime && endTime) {
         const startDate = new Date(startTime);
@@ -962,6 +973,10 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
     const helperTypes = [];
     const helperTypeElements = document.querySelectorAll('#helper-types-container > .helper-card');
     let validationFailed = false;
+    
+    // Parse event dates once for reuse in slot validation
+    const eventStartDate = startTime ? new Date(startTime) : null;
+    const eventEndDate = endTime ? new Date(endTime) : null;
     
     for (let typeDiv of helperTypeElements) {
         const typeIndex = typeDiv.getAttribute('data-index');
@@ -1001,6 +1016,26 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
                 if (slotStartDate >= slotEndDate) {
                     e.preventDefault();
                     alert('Slot-Startzeit muss vor der Endzeit liegen!');
+                    validationFailed = true;
+                    break;
+                }
+                
+                // Validate that slot times are within event time range
+                if (eventStartDate && eventEndDate && (slotStartDate < eventStartDate || slotEndDate > eventEndDate)) {
+                    e.preventDefault();
+                    
+                    const formattedEventStart = formatDateTime(startTime);
+                    const formattedEventEnd = formatDateTime(endTime);
+                    const formattedSlotStart = formatDateTime(slotStart);
+                    const formattedSlotEnd = formatDateTime(slotEnd);
+                    
+                    const errorMessage = 
+                        `Helfer-Slot Zeitfenster muss innerhalb der Event-Zeit liegen!\n\n` +
+                        `Event: ${formattedEventStart} bis ${formattedEventEnd}\n` +
+                        `Slot: ${formattedSlotStart} bis ${formattedSlotEnd}\n\n` +
+                        `Bitte passen Sie die Slot-Zeiten an.`;
+                    
+                    alert(errorMessage);
                     validationFailed = true;
                     break;
                 }
