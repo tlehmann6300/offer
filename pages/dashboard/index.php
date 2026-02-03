@@ -24,9 +24,20 @@ if ($hasExtendedAccess) {
     $writeOffStats = Inventory::getWriteOffStatsThisMonth();
 }
 
+// Security Audit - nur für Admins
+$securityWarning = '';
+if (AuthHandler::hasPermission('admin')) {
+    require_once __DIR__ . '/../../security_audit.php';
+    $securityWarning = SecurityAudit::getDashboardWarning(__DIR__ . '/../..');
+}
+
 $title = 'Dashboard - IBC Intranet';
 ob_start();
 ?>
+
+<?php if (!empty($securityWarning)): ?>
+<?php echo $securityWarning; ?>
+<?php endif; ?>
 
 <!-- Hero Section -->
 <div class="mb-12">
