@@ -1,6 +1,8 @@
 <?php
+require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
+require_once __DIR__ . '/../../includes/helpers.php';
 
 // Redirect if already authenticated
 if (Auth::check()) {
