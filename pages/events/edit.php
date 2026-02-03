@@ -1005,6 +1005,17 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
                     break;
                 }
                 
+                // Validate that slot times are within event time range
+                const eventStartDate = new Date(startTime);
+                const eventEndDate = new Date(endTime);
+                
+                if (slotStartDate < eventStartDate || slotEndDate > eventEndDate) {
+                    e.preventDefault();
+                    alert(`Helfer-Slot Zeitfenster muss innerhalb der Event-Zeit liegen!\n\nEvent: ${startTime} bis ${endTime}\nSlot: ${slotStart} bis ${slotEnd}\n\nBitte passen Sie die Slot-Zeiten an.`);
+                    validationFailed = true;
+                    break;
+                }
+                
                 slots.push({
                     start_time: slotStart,
                     end_time: slotEnd,
