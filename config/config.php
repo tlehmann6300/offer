@@ -1,26 +1,19 @@
 <?php
-/**
- * Configuration File
- * Loads settings from .env file
- * Two separate databases for security and structure
- */
+// Start output buffering to catch any accidental output
+ob_start();
 
-// Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Set error display for production (0) or debugging (1)
+ini_set('display_errors', 0);
 
 // Set timezone
 date_default_timezone_set('Europe/Berlin');
 
-// Load .env file
-function loadEnv($path) {
-    if (!file_exists($path)) {
-        throw new Exception('.env file not found');
-    }
-    
-    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    $env = [];
+// Manually parse .env file
+$envFile = __DIR__ . '/../.env';
+$env = [];
+
+if (file_exists($envFile)) {
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     
     foreach ($lines as $line) {
         // Skip comments
@@ -54,13 +47,9 @@ function loadEnv($path) {
             $env[$key] = $value;
         }
     }
-    
-    return $env;
 }
 
-// Load environment variables from .env file
-$envFile = __DIR__ . '/../.env';
-$env = loadEnv($envFile);
+// Define all DB constants from .env
 
 // User Database (Authentication, Logins, Passwords, Alumni Profiles)
 define('DB_USER_HOST', $env['DB_USER_HOST'] ?? 'localhost');
@@ -89,26 +78,13 @@ define('SMTP_FROM', $env['SMTP_FROM'] ?? $env['SMTP_USER'] ?? '');
 define('SMTP_FROM_EMAIL', $env['SMTP_FROM_EMAIL'] ?? $env['SMTP_FROM'] ?? $env['SMTP_USER'] ?? '');
 define('SMTP_FROM_NAME', $env['SMTP_FROM_NAME'] ?? 'IBC Intranet');
 
+// Define BASE_URL dynamically
+$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+define('BASE_URL', $protocol . '://' . $host . '/intra');
+
 // Application Settings
 define('APP_NAME', 'IBC Intranet');
-
-// BASE_URL: Use from .env if set, otherwise generate dynamically
-if (!empty($env['BASE_URL'])) {
-    define('BASE_URL', $env['BASE_URL']);
-} else {
-    // Generate BASE_URL dynamically
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || 
-                ((int)($_SERVER['SERVER_PORT'] ?? 80)) === 443 ? 'https' : 'http';
-    // Prefer SERVER_NAME over HTTP_HOST to avoid Host header injection attacks
-    $host = $_SERVER['SERVER_NAME'] ?? $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-    $scriptPath = $scriptName ? dirname($scriptName) : '';
-    // Remove trailing slash and filter out '.' from path
-    $scriptPath = rtrim($scriptPath, '/');
-    $scriptPath = ($scriptPath === '.' || $scriptPath === '') ? '' : $scriptPath;
-    define('BASE_URL', $protocol . '://' . $host . $scriptPath);
-}
-
 define('ENVIRONMENT', $env['ENVIRONMENT'] ?? 'development');
 define('SESSION_LIFETIME', 3600); // 1 hour
 define('MAX_LOGIN_ATTEMPTS', 5);
@@ -120,9 +96,12 @@ define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'image/we
 define('HASH_ALGO', PASSWORD_ARGON2ID);
 define('SESSION_NAME', 'IBC_SESSION');
 
-// Error Reporting - DISABLE in production!
-// Set to 0 and false for production deployment
+// Error Reporting
 $isProduction = ($env['ENVIRONMENT'] ?? '') === 'production';
 error_reporting($isProduction ? 0 : E_ALL);
 ini_set('display_errors', $isProduction ? '0' : '1');
 
+// Start session only if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
