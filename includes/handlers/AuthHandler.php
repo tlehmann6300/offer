@@ -13,6 +13,9 @@ class AuthHandler {
      * Start secure session
      */
     public static function startSession() {
+        // Set timezone at the very beginning
+        date_default_timezone_set('Europe/Berlin');
+        
         if (session_status() === PHP_SESSION_NONE) {
             ini_set('session.cookie_httponly', 1);
             ini_set('session.use_only_cookies', 1);
@@ -29,6 +32,39 @@ class AuthHandler {
                 $_SESSION['created'] = time();
             }
         }
+        
+        // Check for session timeout (30 minutes of inactivity)
+        self::checkSessionTimeout();
+    }
+    
+    /**
+     * Check if session has timed out due to inactivity
+     */
+    private static function checkSessionTimeout() {
+        // Skip timeout check if user is not authenticated
+        if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
+            return;
+        }
+        
+        // Check if last_activity is set
+        if (isset($_SESSION['last_activity'])) {
+            // Calculate time difference
+            $inactiveTime = time() - $_SESSION['last_activity'];
+            
+            // If inactive for more than 30 minutes (1800 seconds)
+            if ($inactiveTime > 1800) {
+                // Destroy the session
+                session_unset();
+                session_destroy();
+                
+                // Redirect to login page with timeout parameter
+                header('Location: /pages/auth/login.php?timeout=1');
+                exit;
+            }
+        }
+        
+        // Update last activity timestamp
+        $_SESSION['last_activity'] = time();
     }
 
     /**
@@ -95,6 +131,7 @@ class AuthHandler {
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_role'] = $user['role'];
         $_SESSION['authenticated'] = true;
+        $_SESSION['last_activity'] = time(); // Initialize activity timestamp
         
         self::logSystemAction($user['id'], 'login_success', 'user', $user['id'], 'Successful login');
         
