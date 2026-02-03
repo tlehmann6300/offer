@@ -82,9 +82,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accept_application'])
                 }
                 
                 // Send acceptance email with client data
+                $emailSent = false;
                 if ($user) {
                     try {
-                        MailService::sendProjectApplicationStatus(
+                        $emailSent = MailService::sendProjectApplicationStatus(
                             $user['email'], 
                             $project['title'], 
                             'accepted', 
@@ -96,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accept_application'])
                     }
                 }
                 
-                $message = 'Status aktualisiert und E-Mail versendet';
+                $message = $emailSent ? 'Status aktualisiert und E-Mail versendet' : 'Status aktualisiert';
                 
             } catch (Exception $e) {
                 $db->rollBack();
@@ -135,9 +136,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reject_application'])
         $user = User::getById($application['user_id']);
         
         // Send rejection email
+        $emailSent = false;
         if ($user) {
             try {
-                MailService::sendProjectApplicationStatus(
+                $emailSent = MailService::sendProjectApplicationStatus(
                     $user['email'], 
                     $project['title'], 
                     'rejected'
@@ -148,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reject_application'])
             }
         }
         
-        $message = 'Status aktualisiert und E-Mail versendet';
+        $message = $emailSent ? 'Status aktualisiert und E-Mail versendet' : 'Status aktualisiert';
         
     } catch (Exception $e) {
         $error = 'Fehler beim Ablehnen: ' . $e->getMessage();
