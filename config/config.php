@@ -98,11 +98,14 @@ if (!empty($env['BASE_URL'])) {
 } else {
     // Generate BASE_URL dynamically
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || 
-                ($_SERVER['SERVER_PORT'] ?? 80) == 443 ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
-    $scriptPath = dirname($_SERVER['SCRIPT_NAME'] ?? '');
-    // Remove trailing slash from path
+                ((int)($_SERVER['SERVER_PORT'] ?? 80)) === 443 ? 'https' : 'http';
+    // Prefer SERVER_NAME over HTTP_HOST to avoid Host header injection attacks
+    $host = $_SERVER['SERVER_NAME'] ?? $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $scriptPath = $scriptName ? dirname($scriptName) : '';
+    // Remove trailing slash and filter out '.' from path
     $scriptPath = rtrim($scriptPath, '/');
+    $scriptPath = ($scriptPath === '.' || $scriptPath === '') ? '' : $scriptPath;
     define('BASE_URL', $protocol . '://' . $host . $scriptPath);
 }
 
