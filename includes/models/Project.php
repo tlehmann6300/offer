@@ -236,7 +236,8 @@ class Project {
     
     /**
      * Get applications for a project
-     * Only accessible to admins and board members
+     * Note: Access control must be enforced at the API/controller layer.
+     * This method should only be called after verifying the user has admin/board privileges.
      * 
      * @param int $projectId Project ID
      * @return array Applications with user information
