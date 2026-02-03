@@ -21,50 +21,77 @@ class Event {
      * @return string Status: 'planned', 'open', 'closed', 'running', or 'past'
      */
     private static function calculateStatus($data) {
-        $now = time();
-        
-        // Parse timestamps
-        $registrationStart = !empty($data['registration_start']) ? strtotime($data['registration_start']) : null;
-        $registrationEnd = !empty($data['registration_end']) ? strtotime($data['registration_end']) : null;
-        $startTime = strtotime($data['start_time']);
-        $endTime = strtotime($data['end_time']);
-        
-        // Status logic based on timestamps
-        // 1. If event has ended -> past
-        if ($now > $endTime) {
-            return 'past';
-        }
-        
-        // 2. If event is running -> running
-        if ($now >= $startTime && $now <= $endTime) {
-            return 'running';
-        }
-        
-        // 3. If registration dates are set, use them
-        if ($registrationStart !== null && $registrationEnd !== null) {
-            // Before registration starts -> planned
-            if ($now < $registrationStart) {
+        try {
+            // Use Berlin timezone for consistent time handling
+            $timezone = new DateTimeZone('Europe/Berlin');
+            $now = new DateTime('now', $timezone);
+            
+            // Parse timestamps relative to Berlin timezone
+            $registrationStart = null;
+            $registrationEnd = null;
+            $startTime = null;
+            $endTime = null;
+            
+            if (!empty($data['registration_start'])) {
+                $registrationStart = new DateTime($data['registration_start'], $timezone);
+            }
+            if (!empty($data['registration_end'])) {
+                $registrationEnd = new DateTime($data['registration_end'], $timezone);
+            }
+            if (!empty($data['start_time'])) {
+                $startTime = new DateTime($data['start_time'], $timezone);
+            }
+            if (!empty($data['end_time'])) {
+                $endTime = new DateTime($data['end_time'], $timezone);
+            }
+            
+            // Validate that we have the required dates
+            if ($startTime === null || $endTime === null) {
                 return 'planned';
             }
             
-            // During registration period -> open
-            if ($now >= $registrationStart && $now <= $registrationEnd) {
-                return 'open';
+            // Status logic based on timestamps
+            // 1. If event has ended -> past
+            if ($now > $endTime) {
+                return 'past';
             }
             
-            // After registration ends but before event starts -> closed
-            if ($now > $registrationEnd && $now < $startTime) {
-                return 'closed';
+            // 2. If event is running -> running
+            if ($now >= $startTime && $now <= $endTime) {
+                return 'running';
             }
-        } else {
-            // No registration dates: if event hasn't started yet -> open
-            if ($now < $startTime) {
-                return 'open';
+            
+            // 3. If registration dates are set, use them
+            if ($registrationStart !== null && $registrationEnd !== null) {
+                // Before registration starts -> planned
+                if ($now < $registrationStart) {
+                    return 'planned';
+                }
+                
+                // During registration period -> open
+                if ($now >= $registrationStart && $now <= $registrationEnd) {
+                    return 'open';
+                }
+                
+                // After registration ends but before event starts -> closed
+                if ($now > $registrationEnd && $now < $startTime) {
+                    return 'closed';
+                }
+            } else {
+                // No registration dates: if event hasn't started yet -> open
+                if ($now < $startTime) {
+                    return 'open';
+                }
             }
+            
+            // Default fallback
+            return 'planned';
+        } catch (Throwable $e) {
+            // Error resilience: Log error and fall back to 'planned'
+            // Catches both Exception and PHP 8.3+ DateMalformedStringException
+            error_log("calculateStatus failed: " . $e->getMessage());
+            return 'planned';
         }
-        
-        // Default fallback
-        return 'planned';
     }
     
     /**
@@ -90,10 +117,67 @@ class Event {
     }
     
     /**
+     * Validate event data for logical consistency
+     * 
+     * @param array $data Event data to validate
+     * @throws Exception If validation fails
+     */
+    private static function validateEventData($data) {
+        $timezone = new DateTimeZone('Europe/Berlin');
+        
+        // Validate that end_time > start_time
+        if (!empty($data['start_time']) && !empty($data['end_time'])) {
+            try {
+                $startTime = new DateTime($data['start_time'], $timezone);
+                $endTime = new DateTime($data['end_time'], $timezone);
+                
+                if ($endTime <= $startTime) {
+                    throw new Exception("Event end time must be after start time");
+                }
+            } catch (Throwable $e) {
+                // Re-throw validation errors, convert date parsing errors
+                if (strpos($e->getMessage(), 'end time must be after') !== false) {
+                    throw $e;
+                }
+                throw new Exception("Invalid date format for start_time or end_time");
+            }
+        }
+        
+        // Validate that registration_end < end_time
+        if (!empty($data['registration_end']) && !empty($data['end_time'])) {
+            try {
+                $registrationEnd = new DateTime($data['registration_end'], $timezone);
+                $endTime = new DateTime($data['end_time'], $timezone);
+                
+                if ($registrationEnd >= $endTime) {
+                    throw new Exception("Registration end time must be before event end time");
+                }
+            } catch (Throwable $e) {
+                // Re-throw validation errors, convert date parsing errors
+                if (strpos($e->getMessage(), 'Registration end time') !== false) {
+                    throw $e;
+                }
+                throw new Exception("Invalid date format for registration_end or end_time");
+            }
+        }
+        
+        // Validate maps_link if provided
+        if (!empty($data['maps_link'])) {
+            $mapsLink = trim($data['maps_link']);
+            if ($mapsLink !== '' && filter_var($mapsLink, FILTER_VALIDATE_URL) === false) {
+                throw new Exception("Maps link must be a valid URL");
+            }
+        }
+    }
+    
+    /**
      * Create new event
      */
     public static function create($data, $userId, $files = []) {
         $db = Database::getContentDB();
+        
+        // Validate event data
+        self::validateEventData($data);
         
         // Begin transaction
         $db->beginTransaction();
@@ -244,6 +328,9 @@ class Event {
             
             // Merge current data with updates for status calculation
             $mergedData = array_merge($currentEvent, $data);
+            
+            // Validate merged event data
+            self::validateEventData($mergedData);
             
             // Calculate status automatically based on timestamps
             $calculatedStatus = self::calculateStatus($mergedData);
