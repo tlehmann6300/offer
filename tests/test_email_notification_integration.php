@@ -94,9 +94,9 @@ $structureChecks = [
     '<style>' => 'Includes CSS styling',
     'font-family' => 'Has font styling',
     'background-color' => 'Has color styling',
-    '<div class="header">' => 'Has header section',
-    '<div class="content">' => 'Has content section',
-    '<div class="footer">' => 'Has footer section',
+    '<div class="email-header">' => 'Has header section',
+    '<div class="email-body">' => 'Has content section',
+    '<div class="email-footer">' => 'Has footer section',
     '<a href=' => 'Has clickable links'
 ];
 

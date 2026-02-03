@@ -1,7 +1,7 @@
 <?php
 /**
  * Mail Service
- * Handles email sending using SMTP configuration
+ * Handles email sending using SMTP configuration with IBC Corporate Design
  */
 
 require_once __DIR__ . '/../config/config.php';
@@ -9,7 +9,147 @@ require_once __DIR__ . '/../config/config.php';
 class MailService {
     
     /**
-     * Send helper confirmation email with ICS attachment
+     * Get the professional HTML email template with IBC corporate design
+     * 
+     * @param string $title Email title/heading
+     * @param string $bodyContent Main body content (HTML)
+     * @param string|null $callToAction Optional call-to-action button HTML
+     * @return string Complete HTML email template
+     */
+    private static function getTemplate($title, $bodyContent, $callToAction = null) {
+        $html = '<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6;
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .email-wrapper {
+            width: 100%;
+            background-color: #f3f4f6;
+            padding: 20px 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .email-header {
+            background-color: #20234A;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .email-header img {
+            max-width: 200px;
+            height: auto;
+        }
+        .email-body {
+            padding: 30px 40px;
+        }
+        .email-title {
+            color: #6D9744;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 0 20px 0;
+        }
+        .email-text {
+            color: #333;
+            font-size: 16px;
+            margin: 15px 0;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #f9fafb;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .info-table tr {
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .info-table tr:last-child {
+            border-bottom: none;
+        }
+        .info-table td {
+            padding: 12px 15px;
+            font-size: 15px;
+        }
+        .info-table td:first-child {
+            font-weight: bold;
+            color: #6D9744;
+            width: 35%;
+        }
+        .button-container {
+            text-align: center;
+            margin: 25px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 14px 30px;
+            background-color: #6D9744;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .button:hover {
+            background-color: #5d8038;
+        }
+        .email-footer {
+            background-color: #f3f4f6;
+            padding: 20px 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .email-footer a {
+            color: #6D9744;
+            text-decoration: none;
+        }
+        .email-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-container">
+            <div class="email-header">
+                <img src="cid:ibc_logo" alt="IBC Logo" />
+            </div>
+            <div class="email-body">
+                <h1 class="email-title">' . htmlspecialchars($title) . '</h1>
+                ' . $bodyContent . '
+                ' . ($callToAction ? '<div class="button-container">' . $callToAction . '</div>' : '') . '
+            </div>
+            <div class="email-footer">
+                <p>Diese E-Mail wurde automatisch vom IBC Intranet generiert.</p>
+                <p><a href="' . BASE_URL . '">IBC Intranet</a> | <a href="' . BASE_URL . '/pages/impressum.php">Impressum</a></p>
+                <p>&copy; ' . date('Y') . ' IBC - Alle Rechte vorbehalten.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>';
+        
+        return $html;
+    }
+    
+    /**
+     * Send helper confirmation email with ICS attachment (Updated with new template)
      * 
      * @param string $toEmail Recipient email address
      * @param string $toName Recipient name
@@ -22,7 +162,7 @@ class MailService {
     public static function sendHelperConfirmation($toEmail, $toName, $event, $slot, $icsContent, $googleCalendarLink) {
         $subject = "Einsatzbestätigung: " . $event['title'];
         
-        // Build email body
+        // Build email body with new template
         $body = self::buildHelperConfirmationBody($toName, $event, $slot, $googleCalendarLink);
         
         // Create filename for ICS attachment
@@ -40,7 +180,7 @@ class MailService {
     }
     
     /**
-     * Build HTML email body for helper confirmation
+     * Build HTML email body for helper confirmation using new template
      * 
      * @param string $userName User name
      * @param array $event Event data
@@ -53,79 +193,96 @@ class MailService {
         if ($slot !== null) {
             $start = new DateTime($slot['start_time']);
             $end = new DateTime($slot['end_time']);
-            $shiftInfo = $start->format('d.m.Y H:i') . ' - ' . $end->format('H:i');
+            $when = $start->format('d.m.Y H:i') . ' - ' . $end->format('H:i');
+            $role = 'Helfer';
         } else {
             $start = new DateTime($event['start_time']);
             $end = new DateTime($event['end_time']);
-            $shiftInfo = $start->format('d.m.Y H:i') . ' - ' . $end->format('d.m.Y H:i');
+            $when = $start->format('d.m.Y H:i') . ' - ' . $end->format('d.m.Y H:i');
+            $role = 'Helfer';
         }
         
-        $html = '<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background-color: #3B82F6; color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; background-color: #f9f9f9; }
-        .info-box { background-color: white; padding: 15px; margin: 15px 0; border-left: 4px solid #3B82F6; }
-        .info-label { font-weight: bold; color: #3B82F6; }
-        .button { display: inline-block; padding: 10px 20px; margin: 10px 0; background-color: #3B82F6; color: white; text-decoration: none; border-radius: 5px; }
-        .footer { padding: 20px; text-align: center; font-size: 12px; color: #666; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Einsatzbestätigung</h1>
-        </div>
-        <div class="content">
-            <p>Hallo ' . htmlspecialchars($userName) . ',</p>
-            <p>vielen Dank für deine Anmeldung als Helfer! Hier sind die Details zu deinem Einsatz:</p>
-            
-            <div class="info-box">
-                <p><span class="info-label">Event:</span> ' . htmlspecialchars($event['title']) . '</p>
-                <p><span class="info-label">Deine Schicht:</span> ' . htmlspecialchars($shiftInfo) . '</p>';
+        // Build body content
+        $bodyContent = '<p class="email-text">Hallo ' . htmlspecialchars($userName) . ',</p>
+        <p class="email-text">vielen Dank für deine Anmeldung! Hier sind die Details zu deinem Einsatz:</p>
+        
+        <table class="info-table">
+            <tr>
+                <td>Event</td>
+                <td>' . htmlspecialchars($event['title']) . '</td>
+            </tr>
+            <tr>
+                <td>Wann</td>
+                <td>' . htmlspecialchars($when) . '</td>
+            </tr>';
         
         if (!empty($event['location'])) {
-            $html .= '<p><span class="info-label">Ort:</span> ' . htmlspecialchars($event['location']) . '</p>';
+            $bodyContent .= '<tr>
+                <td>Wo</td>
+                <td>' . htmlspecialchars($event['location']) . '</td>
+            </tr>';
         }
+        
+        $bodyContent .= '<tr>
+                <td>Rolle</td>
+                <td>' . htmlspecialchars($role) . '</td>
+            </tr>';
         
         if (!empty($event['contact_person'])) {
-            $html .= '<p><span class="info-label">Kontaktperson:</span> ' . htmlspecialchars($event['contact_person']) . '</p>';
+            $bodyContent .= '<tr>
+                <td>Kontaktperson</td>
+                <td>' . htmlspecialchars($event['contact_person']) . '</td>
+            </tr>';
         }
+        
+        $bodyContent .= '</table>';
         
         if (!empty($event['description'])) {
-            $html .= '<p><span class="info-label">Beschreibung:</span><br>' . nl2br(htmlspecialchars($event['description'])) . '</p>';
+            $bodyContent .= '<p class="email-text"><strong>Beschreibung:</strong><br>' . nl2br(htmlspecialchars($event['description'])) . '</p>';
         }
         
-        $html .= '    </div>
-            
-            <p>Du kannst diesen Termin direkt zu deinem Kalender hinzufügen:</p>
-            <p style="text-align: center;">
-                <a href="' . htmlspecialchars($googleCalendarLink) . '" class="button" target="_blank">
-                    Zu Google Calendar hinzufügen
-                </a>
-            </p>
-            <p style="font-size: 12px; color: #666;">
-                Die angehängte .ics-Datei kann in allen gängigen Kalender-Anwendungen (Outlook, Apple Calendar, etc.) verwendet werden.
-            </p>
-            
-            <p>Wir freuen uns auf deinen Einsatz!</p>
-        </div>
-        <div class="footer">
-            <p>Diese E-Mail wurde automatisch vom IBC Intranet Event-System generiert.</p>
-        </div>
-    </div>
-</body>
-</html>';
+        $bodyContent .= '<p class="email-text">Die angehängte .ics-Datei kann in allen gängigen Kalender-Anwendungen (Outlook, Apple Calendar, etc.) verwendet werden.</p>
+        <p class="email-text">Wir freuen uns auf deinen Einsatz!</p>';
         
-        return $html;
+        // Create call-to-action button for Google Calendar
+        $callToAction = '<a href="' . htmlspecialchars($googleCalendarLink) . '" class="button" target="_blank">In Kalender speichern</a>';
+        
+        return self::getTemplate('Einsatzbestätigung', $bodyContent, $callToAction);
     }
     
     /**
-     * Send email with attachment using PHP mail function with SMTP
+     * Send invitation email with registration token (New method)
+     * 
+     * @param string $email Recipient email address
+     * @param string $token Registration token
+     * @param string $role User role (e.g., 'helper', 'admin', etc.)
+     * @return bool Success status
+     */
+    public static function sendInvitation($email, $token, $role) {
+        $subject = "Einladung zum IBC Intranet";
+        
+        // Build registration link
+        $registrationLink = BASE_URL . '/pages/auth/register.php?token=' . urlencode($token);
+        
+        // Build body content
+        $bodyContent = '<p class="email-text">Hallo,</p>
+        <p class="email-text">du wurdest als <strong>' . htmlspecialchars(ucfirst($role)) . '</strong> zum IBC Intranet eingeladen.</p>
+        <p class="email-text">Um dein Konto zu erstellen und Zugang zum System zu erhalten, klicke bitte auf den folgenden Button:</p>';
+        
+        // Create call-to-action button
+        $callToAction = '<a href="' . htmlspecialchars($registrationLink) . '" class="button">Jetzt registrieren</a>';
+        
+        $bodyContent .= '<p class="email-text" style="margin-top: 20px; font-size: 14px; color: #6b7280;">Dieser Einladungslink ist nur einmal verwendbar. Falls du Probleme beim Registrieren hast, wende dich bitte an den Administrator.</p>';
+        
+        // Get complete HTML template
+        $htmlBody = self::getTemplate('Einladung zum IBC Intranet', $bodyContent, $callToAction);
+        
+        // Send email without attachment but with embedded logo
+        return self::sendEmailWithEmbeddedImage($email, $subject, $htmlBody);
+    }
+    
+    /**
+     * Send email with attachment and embedded logo using PHP mail function with SMTP
      * 
      * @param string $toEmail Recipient email
      * @param string $toName Recipient name
@@ -136,33 +293,69 @@ class MailService {
      * @return bool Success status
      */
     private static function sendEmailWithAttachment($toEmail, $toName, $subject, $htmlBody, $attachmentFilename, $attachmentContent) {
-        // Generate email boundary
-        $boundary = md5(time());
+        // Generate email boundaries
+        $mixedBoundary = md5(time() . 'mixed');
+        $relatedBoundary = md5(time() . 'related');
+        
+        // Load logo file
+        $logoPath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.png';
+        if (!file_exists($logoPath)) {
+            // Try webp version
+            $logoPath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.webp';
+        }
+        
+        $logoContent = '';
+        $logoMimeType = 'image/png';
+        if (file_exists($logoPath)) {
+            $logoContent = file_get_contents($logoPath);
+            if (strpos($logoPath, '.webp') !== false) {
+                $logoMimeType = 'image/webp';
+            }
+        }
         
         // Prepare headers
         $headers = [];
         $headers[] = 'MIME-Version: 1.0';
-        $headers[] = 'Content-Type: multipart/mixed; boundary="' . $boundary . '"';
+        $headers[] = 'Content-Type: multipart/mixed; boundary="' . $mixedBoundary . '"';
         $headers[] = 'From: ' . SMTP_FROM;
         $headers[] = 'Reply-To: ' . SMTP_FROM;
         $headers[] = 'X-Mailer: PHP/' . phpversion();
         
-        // Build email body with multipart
+        // Build email body with multipart/mixed (for attachment) and multipart/related (for embedded image)
         $message = '';
         
-        // HTML part
-        $message .= '--' . $boundary . "\r\n";
+        // Start mixed boundary (outer)
+        $message .= '--' . $mixedBoundary . "\r\n";
+        $message .= 'Content-Type: multipart/related; boundary="' . $relatedBoundary . '"' . "\r\n\r\n";
+        
+        // HTML part (inside related boundary)
+        $message .= '--' . $relatedBoundary . "\r\n";
         $message .= 'Content-Type: text/html; charset=UTF-8' . "\r\n";
         $message .= 'Content-Transfer-Encoding: 8bit' . "\r\n\r\n";
         $message .= $htmlBody . "\r\n\r\n";
         
-        // Attachment part
-        $message .= '--' . $boundary . "\r\n";
+        // Embedded logo (inside related boundary)
+        if (!empty($logoContent)) {
+            $message .= '--' . $relatedBoundary . "\r\n";
+            $message .= 'Content-Type: ' . $logoMimeType . '; name="logo.png"' . "\r\n";
+            $message .= 'Content-Transfer-Encoding: base64' . "\r\n";
+            $message .= 'Content-ID: <ibc_logo>' . "\r\n";
+            $message .= 'Content-Disposition: inline; filename="logo.png"' . "\r\n\r\n";
+            $message .= chunk_split(base64_encode($logoContent)) . "\r\n";
+        }
+        
+        // Close related boundary
+        $message .= '--' . $relatedBoundary . '--' . "\r\n\r\n";
+        
+        // Attachment part (inside mixed boundary)
+        $message .= '--' . $mixedBoundary . "\r\n";
         $message .= 'Content-Type: text/calendar; charset=UTF-8; name="' . $attachmentFilename . '"' . "\r\n";
         $message .= 'Content-Transfer-Encoding: base64' . "\r\n";
         $message .= 'Content-Disposition: attachment; filename="' . $attachmentFilename . '"' . "\r\n\r\n";
         $message .= chunk_split(base64_encode($attachmentContent)) . "\r\n";
-        $message .= '--' . $boundary . '--';
+        
+        // Close mixed boundary
+        $message .= '--' . $mixedBoundary . '--';
         
         // Set additional mail parameters for SMTP
         $additionalParameters = '-f ' . SMTP_FROM;
@@ -177,6 +370,84 @@ class MailService {
             }
             
             error_log("Successfully sent helper confirmation email to {$toEmail}");
+            return true;
+        } catch (Exception $e) {
+            error_log("Error sending email to {$toEmail}: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Send email with embedded logo (no attachment)
+     * 
+     * @param string $toEmail Recipient email
+     * @param string $subject Email subject
+     * @param string $htmlBody HTML email body
+     * @return bool Success status
+     */
+    private static function sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody) {
+        // Generate email boundary
+        $relatedBoundary = md5(time() . 'related');
+        
+        // Load logo file
+        $logoPath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.png';
+        if (!file_exists($logoPath)) {
+            // Try webp version
+            $logoPath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.webp';
+        }
+        
+        $logoContent = '';
+        $logoMimeType = 'image/png';
+        if (file_exists($logoPath)) {
+            $logoContent = file_get_contents($logoPath);
+            if (strpos($logoPath, '.webp') !== false) {
+                $logoMimeType = 'image/webp';
+            }
+        }
+        
+        // Prepare headers
+        $headers = [];
+        $headers[] = 'MIME-Version: 1.0';
+        $headers[] = 'Content-Type: multipart/related; boundary="' . $relatedBoundary . '"';
+        $headers[] = 'From: ' . SMTP_FROM;
+        $headers[] = 'Reply-To: ' . SMTP_FROM;
+        $headers[] = 'X-Mailer: PHP/' . phpversion();
+        
+        // Build email body with multipart/related (for embedded image)
+        $message = '';
+        
+        // HTML part
+        $message .= '--' . $relatedBoundary . "\r\n";
+        $message .= 'Content-Type: text/html; charset=UTF-8' . "\r\n";
+        $message .= 'Content-Transfer-Encoding: 8bit' . "\r\n\r\n";
+        $message .= $htmlBody . "\r\n\r\n";
+        
+        // Embedded logo
+        if (!empty($logoContent)) {
+            $message .= '--' . $relatedBoundary . "\r\n";
+            $message .= 'Content-Type: ' . $logoMimeType . '; name="logo.png"' . "\r\n";
+            $message .= 'Content-Transfer-Encoding: base64' . "\r\n";
+            $message .= 'Content-ID: <ibc_logo>' . "\r\n";
+            $message .= 'Content-Disposition: inline; filename="logo.png"' . "\r\n\r\n";
+            $message .= chunk_split(base64_encode($logoContent)) . "\r\n";
+        }
+        
+        // Close related boundary
+        $message .= '--' . $relatedBoundary . '--';
+        
+        // Set additional mail parameters for SMTP
+        $additionalParameters = '-f ' . SMTP_FROM;
+        
+        // Send email
+        try {
+            $success = mail($toEmail, $subject, $message, implode("\r\n", $headers), $additionalParameters);
+            
+            if (!$success) {
+                error_log("Failed to send email to {$toEmail}: mail() returned false");
+                return false;
+            }
+            
+            error_log("Successfully sent invitation email to {$toEmail}");
             return true;
         } catch (Exception $e) {
             error_log("Error sending email to {$toEmail}: " . $e->getMessage());

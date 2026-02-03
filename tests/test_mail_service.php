@@ -89,10 +89,10 @@ if (strpos($emailBodyFull, '15.07.2024 10:00 - 15.07.2024 18:00') !== false) {
 
 echo "\n=== Test 3: HTML structure validation ===\n";
 
-// Check for proper HTML structure
-$hasHeader = strpos($emailBody, '<div class="header">') !== false;
-$hasContent = strpos($emailBody, '<div class="content">') !== false;
-$hasFooter = strpos($emailBody, '<div class="footer">') !== false;
+// Check for proper HTML structure (updated for new IBC design)
+$hasHeader = strpos($emailBody, '<div class="email-header">') !== false;
+$hasContent = strpos($emailBody, '<div class="email-body">') !== false;
+$hasFooter = strpos($emailBody, '<div class="email-footer">') !== false;
 
 if ($hasHeader && $hasContent && $hasFooter) {
     echo "✓ Email has proper structure (header, content, footer)\n";
@@ -105,6 +105,46 @@ if (strpos($emailBody, '<style>') !== false) {
     echo "✓ Email includes CSS styling\n";
 } else {
     echo "✗ Email lacks CSS styling\n";
+}
+
+// Check for IBC corporate design colors
+if (strpos($emailBody, '#20234A') !== false) {
+    echo "✓ IBC dark blue header color present\n";
+} else {
+    echo "✗ IBC dark blue header color missing\n";
+}
+
+if (strpos($emailBody, '#6D9744') !== false) {
+    echo "✓ IBC green accent color present\n";
+} else {
+    echo "✗ IBC green accent color missing\n";
+}
+
+if (strpos($emailBody, '#f3f4f6') !== false) {
+    echo "✓ Light gray background color present\n";
+} else {
+    echo "✗ Light gray background color missing\n";
+}
+
+// Check for embedded logo
+if (strpos($emailBody, 'cid:ibc_logo') !== false) {
+    echo "✓ Embedded logo (CID) present\n";
+} else {
+    echo "✗ Embedded logo (CID) missing\n";
+}
+
+// Check for info table structure (Wann, Wo, Rolle)
+if (strpos($emailBody, '<table class="info-table">') !== false) {
+    echo "✓ Info table structure present\n";
+} else {
+    echo "✗ Info table structure missing\n";
+}
+
+// Check for button styling
+if (strpos($emailBody, 'class="button"') !== false) {
+    echo "✓ Button styling present\n";
+} else {
+    echo "✗ Button styling missing\n";
 }
 
 // Check for proper XSS prevention
