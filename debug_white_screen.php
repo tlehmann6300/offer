@@ -9,6 +9,13 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+// Security Note: This diagnostic script should only be used temporarily for debugging.
+// Remove or restrict access to this file in production environments.
+// For added security, you can uncomment the following lines to require a secret key:
+// if (!isset($_GET['debug_key']) || $_GET['debug_key'] !== 'your_secret_key_here') {
+//     die('Access denied. Please provide a valid debug key.');
+// }
+
 // Initialize results array
 $results = [];
 $allOk = true;
