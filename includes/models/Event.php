@@ -200,7 +200,7 @@ class Event {
             // If no file was uploaded, check if image_path is provided in $data
             // If image_path is empty, set it explicitly to NULL for the INSERT
             if ($imagePath === null) {
-                if (isset($data['image_path']) && !empty($data['image_path'])) {
+                if (!empty($data['image_path'])) {
                     $imagePath = $data['image_path'];
                 }
                 // If image_path is not set or empty, $imagePath remains null
