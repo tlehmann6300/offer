@@ -1,9 +1,5 @@
 <?php
-// Start output buffering to catch any accidental output
 ob_start();
-
-// Set timezone
-date_default_timezone_set('Europe/Berlin');
 
 // Manually parse .env file
 $envFile = __DIR__ . '/../.env';
@@ -46,8 +42,6 @@ if (file_exists($envFile)) {
     }
 }
 
-// Define all DB constants from .env
-
 // User Database (Authentication, Logins, Passwords, Alumni Profiles)
 define('DB_USER_HOST', $env['DB_USER_HOST'] ?? 'localhost');
 define('DB_USER_NAME', $env['DB_USER_NAME'] ?? '');
@@ -75,20 +69,22 @@ define('SMTP_FROM', $env['SMTP_FROM'] ?? $env['SMTP_USER'] ?? '');
 define('SMTP_FROM_EMAIL', $env['SMTP_FROM_EMAIL'] ?? $env['SMTP_FROM'] ?? $env['SMTP_USER'] ?? '');
 define('SMTP_FROM_NAME', $env['SMTP_FROM_NAME'] ?? 'IBC Intranet');
 
-// Define BASE_URL dynamically
-// Note: Using formula from requirements with standard 'off' check
-// (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http"
-$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-define('BASE_URL', $protocol . '://' . $host . '/intra');
+// Define BASE_URL dynamically if not in .env
+if (isset($env['BASE_URL'])) {
+    define('BASE_URL', $env['BASE_URL']);
+} else {
+    $protocol = (isset($_SERVER['HTTPS']) ? 'https' : 'http');
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    define('BASE_URL', $protocol . '://' . $host . '/intra');
+}
 
 // Application Settings
 define('APP_NAME', 'IBC Intranet');
 define('ENVIRONMENT', $env['ENVIRONMENT'] ?? 'development');
-define('SESSION_LIFETIME', 3600); // 1 hour
+define('SESSION_LIFETIME', 3600);
 define('MAX_LOGIN_ATTEMPTS', 5);
-define('LOGIN_LOCKOUT_TIME', 900); // 15 minutes
-define('UPLOAD_MAX_SIZE', 5242880); // 5MB
+define('LOGIN_LOCKOUT_TIME', 900);
+define('UPLOAD_MAX_SIZE', 5242880);
 define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
 
 // Security
@@ -99,6 +95,9 @@ define('SESSION_NAME', 'IBC_SESSION');
 $isProduction = ($env['ENVIRONMENT'] ?? '') === 'production';
 ini_set('display_errors', $isProduction ? '0' : '1');
 error_reporting($isProduction ? 0 : E_ALL);
+
+// Set timezone
+date_default_timezone_set('Europe/Berlin');
 
 // Start session only if not already started
 if (session_status() === PHP_SESSION_NONE) {
