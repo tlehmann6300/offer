@@ -39,12 +39,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background: linear-gradient(135deg, var(--ibc-blue) 0%, var(--ibc-green) 100%);
+            background-color: #f3f4f6; /* bg-gray-100 */
         }
         .glass {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
         .card-hover:hover {
             transform: translateY(-2px);
@@ -52,7 +52,15 @@
         }
     </style>
 </head>
-<body class="min-h-screen">
-    <?php echo $content ?? ''; ?>
+<body class="min-h-screen bg-gray-100">
+    <div class="flex flex-col items-center justify-center min-h-screen p-4">
+        <!-- IBC Logo above content -->
+        <div class="mb-6">
+            <img src="/intra/assets/img/ibc_logo_original.webp" alt="IBC Logo" class="mx-auto" style="width: 120px; height: auto;">
+        </div>
+        
+        <!-- Content area -->
+        <?php echo $content ?? ''; ?>
+    </div>
 </body>
 </html>
