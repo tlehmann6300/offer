@@ -107,7 +107,7 @@ if ($sendMail) {
         // Email failed, but still return link
         echo json_encode([
             'success' => true,
-            'message' => 'Link generiert, aber E-Mail konnte nicht versendet werden. Bitte Link manuell teilen.',
+            'message' => 'Link generiert, aber E-Mail konnte nicht versendet werden.',
             'link' => $invitationLink,
             'email' => $email,
             'role' => $role

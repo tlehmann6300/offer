@@ -229,10 +229,10 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
                     generatedLinkContainer.classList.remove('hidden');
                 }
                 
-                // Reset form (but keep send_mail checked)
-                const sendMailChecked = document.getElementById('sendMailCheckbox').checked;
+                // Reset form
                 form.reset();
-                document.getElementById('sendMailCheckbox').checked = sendMailChecked;
+                // Restore default state of send_mail checkbox
+                document.getElementById('sendMailCheckbox').checked = true;
                 
                 // Reload invitations list
                 loadInvitations();
