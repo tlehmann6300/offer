@@ -162,4 +162,4 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
-include __DIR__ . '/../../includes/templates/auth_layout.php';
+require __DIR__ . '/../../includes/templates/auth_layout.php';
