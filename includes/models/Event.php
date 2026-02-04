@@ -188,8 +188,8 @@ class Event {
             // This allows events to be created even if the image upload fails,
             // as the image is optional. The error is logged for debugging.
             $imagePath = null;
-            if (isset($files['image']) && $files['image']['error'] === UPLOAD_ERR_OK) {
-                $uploadResult = SecureImageUpload::uploadImage($files['image']);
+            if (isset($files['event_image']) && $files['event_image']['error'] === UPLOAD_ERR_OK) {
+                $uploadResult = SecureImageUpload::uploadImage($files['event_image']);
                 if ($uploadResult['success']) {
                     $imagePath = $uploadResult['path'];
                 } else {
@@ -318,10 +318,19 @@ class Event {
                 throw new Exception("Event not found");
             }
             
-            // Handle image upload
+            // Handle image deletion
             $oldImagePath = null;
-            if (isset($files['image']) && $files['image']['error'] === UPLOAD_ERR_OK) {
-                $uploadResult = SecureImageUpload::uploadImage($files['image']);
+            if (!empty($data['delete_image'])) {
+                // Store old image path for deletion after transaction
+                $oldImagePath = $currentEvent['image_path'] ?? null;
+                // Set image_path to NULL in database
+                $data['image_path'] = null;
+                // Remove delete_image from data array (not a database field)
+                unset($data['delete_image']);
+            } 
+            // Handle image upload (only if not deleting)
+            elseif (isset($files['event_image']) && $files['event_image']['error'] === UPLOAD_ERR_OK) {
+                $uploadResult = SecureImageUpload::uploadImage($files['event_image']);
                 if ($uploadResult['success']) {
                     // Store old image path for deletion after transaction
                     $oldImagePath = $currentEvent['image_path'] ?? null;
@@ -333,7 +342,6 @@ class Event {
             }
             
             // If image_path is provided in $data but is empty string, remove it to preserve the old value
-            // Note: NULL is allowed to explicitly clear the image
             if (isset($data['image_path']) && $data['image_path'] === '') {
                 unset($data['image_path']);
             }

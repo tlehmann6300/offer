@@ -79,6 +79,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$readOnly) {
             'allowed_roles' => $_POST['allowed_roles'] ?? []
         ];
         
+        // Handle image deletion
+        if (isset($_POST['delete_image']) && $_POST['delete_image'] === '1') {
+            $data['delete_image'] = true;
+        }
+        
         // Add helper types if needs_helpers is enabled
         if ($data['needs_helpers']) {
             $data['helper_types'] = json_decode($_POST['helper_types_json'] ?? '[]', true);
@@ -358,6 +363,18 @@ ob_start();
                             alt="Event Bild"
                             class="max-w-xs rounded-xl border border-gray-300 shadow-sm"
                         >
+                        <div class="mt-2">
+                            <label class="inline-flex items-center">
+                                <input 
+                                    type="checkbox" 
+                                    name="delete_image" 
+                                    value="1"
+                                    <?php echo $readOnly ? 'disabled' : ''; ?>
+                                    class="form-checkbox h-4 w-4 text-red-600 transition duration-150 ease-in-out"
+                                >
+                                <span class="ml-2 text-sm text-gray-700">Bild löschen</span>
+                            </label>
+                        </div>
                     </div>
                     <?php endif; ?>
                     
