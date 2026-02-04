@@ -23,8 +23,9 @@ class Project {
                 max_consultants,
                 start_date, 
                 end_date, 
-                image_path
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                image_path,
+                documentation
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         
         $stmt->execute([
@@ -37,7 +38,8 @@ class Project {
             $data['max_consultants'] ?? 1,
             $data['start_date'] ?? null,
             $data['end_date'] ?? null,
-            $data['image_path'] ?? null
+            $data['image_path'] ?? null,
+            $data['documentation'] ?? null
         ]);
         
         return $db->lastInsertId();
@@ -53,7 +55,7 @@ class Project {
         
         $allowedFields = [
             'title', 'description', 'client_name', 'client_contact_details',
-            'priority', 'status', 'max_consultants', 'start_date', 'end_date', 'image_path'
+            'priority', 'status', 'max_consultants', 'start_date', 'end_date', 'image_path', 'documentation'
         ];
         
         foreach ($data as $key => $value) {
@@ -331,5 +333,26 @@ class Project {
         
         $stmt->execute([$projectId]);
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+    
+    /**
+     * Get the current team size for a project
+     * 
+     * @param int $projectId Project ID
+     * @return int Number of assigned team members
+     */
+    public static function getTeamSize($projectId) {
+        $db = Database::getContentDB();
+        
+        $stmt = $db->prepare("
+            SELECT COUNT(*) as count
+            FROM project_assignments
+            WHERE project_id = ?
+        ");
+        
+        $stmt->execute([$projectId]);
+        $result = $stmt->fetch();
+        
+        return $result ? intval($result['count']) : 0;
     }
 }

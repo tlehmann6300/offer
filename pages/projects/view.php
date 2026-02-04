@@ -36,9 +36,49 @@ if ($userRole !== 'alumni') {
     $userApplication = Project::getUserApplication($projectId, $user['id']);
 }
 
+// Check if user is project lead or admin/board
+$isLead = Project::isLead($projectId, $user['id']);
+$canComplete = $isLead || $userRole === 'board' || $userRole === 'manager';
+
+// Get team size info
+$teamSize = Project::getTeamSize($projectId);
+$maxConsultants = intval($project['max_consultants'] ?? 1);
+
 // Handle application submission
 $message = '';
 $error = '';
+
+// Handle project completion
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_project'])) {
+    CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
+    
+    if (!$canComplete) {
+        $error = 'Sie haben keine Berechtigung, dieses Projekt abzuschließen';
+    } elseif ($project['status'] !== 'running') {
+        $error = 'Nur laufende Projekte können abgeschlossen werden';
+    } else {
+        try {
+            $documentation = trim($_POST['documentation'] ?? '');
+            if (empty($documentation)) {
+                throw new Exception('Bitte geben Sie eine Projektdokumentation an');
+            }
+            
+            Project::update($projectId, [
+                'status' => 'completed',
+                'documentation' => $documentation
+            ]);
+            
+            $message = 'Projekt wurde erfolgreich abgeschlossen';
+            
+            // Reload project data
+            $project = Project::getById($projectId);
+            $project = Project::filterSensitiveData($project, $userRole, $user['id']);
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply'])) {
     CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
     
@@ -122,17 +162,19 @@ ob_start();
             <span class="px-4 py-2 text-sm font-semibold rounded-full
                 <?php 
                 switch($project['status']) {
-                    case 'tender': echo 'bg-blue-100 text-blue-800'; break;
+                    case 'draft': echo 'bg-gray-100 text-gray-800'; break;
+                    case 'tender': echo 'bg-yellow-100 text-yellow-800'; break;
                     case 'applying': echo 'bg-yellow-100 text-yellow-800'; break;
-                    case 'assigned': echo 'bg-green-100 text-green-800'; break;
-                    case 'running': echo 'bg-purple-100 text-purple-800'; break;
-                    case 'completed': echo 'bg-teal-100 text-teal-800'; break;
+                    case 'assigned': echo 'bg-blue-100 text-blue-800'; break;
+                    case 'running': echo 'bg-blue-100 text-blue-800'; break;
+                    case 'completed': echo 'bg-green-100 text-green-800'; break;
                     case 'archived': echo 'bg-gray-200 text-gray-600'; break;
                     default: echo 'bg-gray-100 text-gray-800'; break;
                 }
                 ?>">
                 <?php 
                 switch($project['status']) {
+                    case 'draft': echo 'Entwurf'; break;
                     case 'tender': echo 'Ausschreibung'; break;
                     case 'applying': echo 'Bewerbungsphase'; break;
                     case 'assigned': echo 'Vergeben'; break;
@@ -202,6 +244,29 @@ ob_start();
             <?php endif; ?>
         </div>
         
+        <!-- Team Progress Bar -->
+        <div class="mb-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-100">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-bold text-gray-800">
+                    <i class="fas fa-users text-purple-600 mr-2"></i>
+                    Team
+                </h3>
+                <span class="text-xl font-bold text-purple-600">
+                    <?php echo $teamSize; ?> / <?php echo $maxConsultants; ?> besetzt
+                </span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                <div class="bg-gradient-to-r from-purple-500 to-blue-500 h-4 rounded-full transition-all duration-300 flex items-center justify-end pr-2"
+                     style="width: <?php echo $maxConsultants > 0 ? min(100, ($teamSize / $maxConsultants) * 100) : 0; ?>%">
+                    <?php if ($teamSize > 0): ?>
+                    <span class="text-xs font-semibold text-white">
+                        <?php echo round(($teamSize / $maxConsultants) * 100); ?>%
+                    </span>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        
         <!-- Description -->
         <?php if (!empty($project['description'])): ?>
         <div class="mb-6">
@@ -209,6 +274,76 @@ ob_start();
             <div class="text-gray-700 leading-relaxed whitespace-pre-line">
                 <?php echo htmlspecialchars($project['description']); ?>
             </div>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Project Documentation (Only for completed projects) -->
+        <?php if ($project['status'] === 'completed' && !empty($project['documentation'])): ?>
+        <div class="mb-6 p-6 bg-gradient-to-r from-green-50 to-teal-50 rounded-lg border border-green-200">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-file-alt text-green-600 mr-2"></i>
+                Projekt-Dokumentation
+            </h2>
+            <div class="text-gray-700 leading-relaxed whitespace-pre-line bg-white p-4 rounded-lg shadow-sm">
+                <?php echo htmlspecialchars($project['documentation']); ?>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Complete Project Button (Only for leads/admins when status is running) -->
+        <?php if ($canComplete && $project['status'] === 'running'): ?>
+        <div class="mb-6">
+            <?php if (isset($_GET['action']) && $_GET['action'] === 'complete'): ?>
+                <!-- Show Completion Form -->
+                <div class="bg-gradient-to-r from-green-50 to-teal-50 border border-green-200 rounded-xl p-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                        Projekt abschließen
+                    </h2>
+                    
+                    <p class="text-gray-600 mb-6">
+                        Bitte geben Sie einen Abschlussbericht für das Projekt ein. Dieser wird nach dem Abschluss für alle Teammitglieder sichtbar sein.
+                    </p>
+                    
+                    <form method="POST" class="space-y-6">
+                        <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
+                        <input type="hidden" name="complete_project" value="1">
+                        
+                        <div>
+                            <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-file-alt text-green-600 mr-2"></i>
+                                Abschlussbericht / Dokumentation <span class="text-red-500 ml-1">*</span>
+                            </label>
+                            <textarea 
+                                name="documentation" 
+                                rows="8"
+                                required
+                                class="w-full bg-white border border-gray-300 rounded-lg p-4 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200"
+                                placeholder="Beschreiben Sie die Ergebnisse des Projekts, wichtige Erkenntnisse und weitere relevante Informationen..."
+                            ></textarea>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button type="submit" 
+                                    class="flex-1 bg-gradient-to-r from-green-600 to-teal-600 text-white font-bold py-4 rounded-lg shadow-md hover:shadow-xl transform hover:-translate-y-1 transition duration-200">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                Projekt abschließen
+                            </button>
+                            <a href="view.php?id=<?php echo $project['id']; ?>" 
+                               class="flex-1 text-center px-6 py-4 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-bold">
+                                Abbrechen
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            <?php else: ?>
+                <!-- Show Complete Button -->
+                <a href="view.php?id=<?php echo $project['id']; ?>&action=complete" 
+                   class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg font-semibold hover:from-green-700 hover:to-teal-700 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition duration-200">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Projekt abschließen
+                </a>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
         
