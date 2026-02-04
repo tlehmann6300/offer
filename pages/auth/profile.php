@@ -34,9 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Catch exceptions like 'E-Mail vergeben' or validation errors
                 $error = $e->getMessage();
             }
-        } else {
-            $error = 'Die E-Mail-Adresse wurde nicht geändert';
         }
+        // If email hasn't changed, just do nothing (user will see no message)
     } else if (isset($_POST['enable_2fa'])) {
         $ga = new PHPGangsta_GoogleAuthenticator();
         $secret = $ga->createSecret();

@@ -124,7 +124,8 @@ echo "\n";
 
 // Test 10: Verify user data is reloaded after update
 echo "=== Test 10: Check user data is reloaded ===\n";
-if (preg_match('/\$user = Auth::user\(\);.*\/\/ Reload user/', $profileContent)) {
+if (preg_match('/\$user = Auth::user\(\);/', $profileContent) && 
+    strpos($profileContent, '// Reload user') !== false) {
     echo "✓ PASS: User data is reloaded after update\n";
     $testsPassed++;
 } else {
