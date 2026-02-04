@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accept_application'])
                             $user['email'], 
                             $project['title'], 
                             'accepted', 
-                            $projectId,
+                            $application['project_id'],
                             $clientData
                         );
                     } catch (Exception $emailError) {
@@ -198,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reject_application'])
                     $user['email'], 
                     $project['title'], 
                     'rejected',
-                    $projectId
+                    $application['project_id']
                 );
             } catch (Exception $emailError) {
                 error_log("Failed to send project rejection email: " . $emailError->getMessage());
