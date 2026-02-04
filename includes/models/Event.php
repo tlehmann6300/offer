@@ -990,12 +990,12 @@ class Event {
         // Extract user IDs
         $userIds = array_column($signups, 'user_id');
         
-        // Get user names from user database
+        // Get user names from user database, including email for fallback
         // Build placeholders for IN clause
         $placeholders = implode(',', array_fill(0, count($userIds), '?'));
         
         $stmt = $userDb->prepare("
-            SELECT u.id as user_id, ap.first_name, ap.last_name
+            SELECT u.id as user_id, u.email, ap.first_name, ap.last_name
             FROM users u
             LEFT JOIN alumni_profiles ap ON u.id = ap.user_id
             WHERE u.id IN ($placeholders)
@@ -1004,16 +1004,14 @@ class Event {
         $stmt->execute($userIds);
         $attendees = $stmt->fetchAll();
         
-        // For users without alumni profiles, set name to email or placeholder
+        // For users without alumni profiles, use email as fallback
         foreach ($attendees as &$attendee) {
             if (empty($attendee['first_name']) && empty($attendee['last_name'])) {
-                // Get email from users table as fallback
-                $stmt = $userDb->prepare("SELECT email FROM users WHERE id = ?");
-                $stmt->execute([$attendee['user_id']]);
-                $user = $stmt->fetch();
-                $attendee['first_name'] = $user['email'] ?? 'User';
+                $attendee['first_name'] = $attendee['email'] ?? 'User';
                 $attendee['last_name'] = '';
             }
+            // Remove email from the output as it's only needed for fallback
+            unset($attendee['email']);
         }
         
         return $attendees;
