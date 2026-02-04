@@ -7,10 +7,125 @@
 class Project {
     
     /**
+     * Upload directory for project documentation
+     */
+    private const DOCUMENTATION_UPLOAD_DIR = '/uploads/projects/';
+    
+    /**
+     * Allowed MIME types for documentation uploads (PDF)
+     */
+    private const ALLOWED_DOC_MIME_TYPES = [
+        'application/pdf'
+    ];
+    
+    /**
+     * Maximum file size for documentation (10MB)
+     */
+    private const MAX_DOC_FILE_SIZE = 10485760;
+    
+    /**
+     * Handle PDF documentation upload
+     * 
+     * @param array $file The $_FILES array element
+     * @return array ['success' => bool, 'path' => string|null, 'error' => string|null]
+     */
+    public static function handleDocumentationUpload($file) {
+        // Check if file was uploaded
+        if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
+            return [
+                'success' => false,
+                'path' => null,
+                'error' => 'Keine Datei hochgeladen oder Upload-Fehler'
+            ];
+        }
+        
+        // Validate file size
+        if ($file['size'] > self::MAX_DOC_FILE_SIZE) {
+            return [
+                'success' => false,
+                'path' => null,
+                'error' => 'Datei ist zu groß. Maximum: 10MB'
+            ];
+        }
+        
+        // Validate MIME type using finfo_file() - NOT $_FILES['type'] which can be faked
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+        
+        if (!in_array($mimeType, self::ALLOWED_DOC_MIME_TYPES)) {
+            return [
+                'success' => false,
+                'path' => null,
+                'error' => 'Ungültiger Dateityp. Nur PDF-Dateien sind erlaubt. Erkannt: ' . $mimeType
+            ];
+        }
+        
+        // Determine upload directory
+        $uploadDir = __DIR__ . '/../../' . self::DOCUMENTATION_UPLOAD_DIR;
+        
+        // Ensure upload directory exists and is writable
+        if (!is_dir($uploadDir)) {
+            if (!mkdir($uploadDir, 0755, true)) {
+                return [
+                    'success' => false,
+                    'path' => null,
+                    'error' => 'Upload-Verzeichnis konnte nicht erstellt werden'
+                ];
+            }
+        }
+        
+        if (!is_writable($uploadDir)) {
+            return [
+                'success' => false,
+                'path' => null,
+                'error' => 'Upload-Verzeichnis ist nicht beschreibbar'
+            ];
+        }
+        
+        // Generate secure random filename
+        $randomFilename = 'project_doc_' . bin2hex(random_bytes(16)) . '.pdf';
+        $uploadPath = $uploadDir . $randomFilename;
+        
+        // Move uploaded file to destination
+        if (!move_uploaded_file($file['tmp_name'], $uploadPath)) {
+            return [
+                'success' => false,
+                'path' => null,
+                'error' => 'Fehler beim Hochladen der Datei'
+            ];
+        }
+        
+        // Set proper permissions
+        chmod($uploadPath, 0644);
+        
+        // Return relative path for database storage
+        $relativePath = trim(self::DOCUMENTATION_UPLOAD_DIR, '/') . '/' . $randomFilename;
+        
+        return [
+            'success' => true,
+            'path' => $relativePath,
+            'error' => null
+        ];
+    }
+    
+    /**
      * Create a new project
+     * 
+     * Note: The 'tender' status is deprecated. New projects should use 'draft' or 'open'.
      */
     public static function create($data) {
         $db = Database::getContentDB();
+        
+        // Handle documentation upload if provided in $_FILES
+        if (isset($_FILES['documentation']) && $_FILES['documentation']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $uploadResult = self::handleDocumentationUpload($_FILES['documentation']);
+            if ($uploadResult['success']) {
+                $data['documentation'] = $uploadResult['path'];
+            } else {
+                throw new Exception($uploadResult['error']);
+            }
+        }
         
         $stmt = $db->prepare("
             INSERT INTO projects (
@@ -47,9 +162,22 @@ class Project {
     
     /**
      * Update an existing project
+     * 
+     * Note: The 'tender' status is deprecated. Use 'open' for new active projects.
      */
     public static function update($id, $data) {
         $db = Database::getContentDB();
+        
+        // Handle documentation upload if provided in $_FILES
+        if (isset($_FILES['documentation']) && $_FILES['documentation']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $uploadResult = self::handleDocumentationUpload($_FILES['documentation']);
+            if ($uploadResult['success']) {
+                $data['documentation'] = $uploadResult['path'];
+            } else {
+                throw new Exception($uploadResult['error']);
+            }
+        }
+        
         $fields = [];
         $values = [];
         
@@ -77,11 +205,50 @@ class Project {
     }
     
     /**
-     * Get all projects
+     * Get all projects with status filtering and permission checks
+     * 
+     * @param string|null $status Optional status filter. If null, excludes 'draft' by default
+     * @param string|null $userRole User role for permission checks
+     * @return array List of projects
      */
-    public static function getAll() {
+    public static function getAll($status = null, $userRole = null) {
         $db = Database::getContentDB();
-        $stmt = $db->query("SELECT * FROM projects ORDER BY created_at DESC");
+        
+        // Determine if user has manage_projects permission (manager level or higher)
+        $hasManagePermission = false;
+        if ($userRole !== null) {
+            $roleHierarchy = [
+                'alumni' => 1,
+                'member' => 1,
+                'manager' => 2,
+                'alumni_board' => 3,
+                'board' => 3,
+                'admin' => 4
+            ];
+            $hasManagePermission = isset($roleHierarchy[$userRole]) && $roleHierarchy[$userRole] >= 2;
+        }
+        
+        // Build query based on status and permissions
+        if ($status !== null) {
+            // Specific status requested
+            // Only allow draft status if user has manage_projects permission
+            if ($status === 'draft' && !$hasManagePermission) {
+                return []; // Return empty array if trying to access draft without permission
+            }
+            
+            $stmt = $db->prepare("SELECT * FROM projects WHERE status = ? ORDER BY created_at DESC");
+            $stmt->execute([$status]);
+        } else {
+            // No specific status - default behavior
+            if ($hasManagePermission) {
+                // Manager+ can see all projects including drafts
+                $stmt = $db->query("SELECT * FROM projects ORDER BY created_at DESC");
+            } else {
+                // Regular users see everything except drafts
+                $stmt = $db->query("SELECT * FROM projects WHERE status != 'draft' ORDER BY created_at DESC");
+            }
+        }
+        
         return $stmt->fetchAll();
     }
     
