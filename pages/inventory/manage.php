@@ -9,6 +9,9 @@ if (!Auth::check() || !Auth::hasPermission('manager')) {
     exit;
 }
 
+// Constants
+define('DEFAULT_LOW_STOCK_THRESHOLD', 5);
+
 $message = '';
 $error = '';
 
@@ -200,7 +203,7 @@ ob_start();
 
         <!-- Stock Warning -->
         <?php 
-        $lowStockThreshold = $item['low_stock_threshold'] ?? 5;
+        $lowStockThreshold = $item['low_stock_threshold'] ?? DEFAULT_LOW_STOCK_THRESHOLD;
         if ($item['available_quantity'] <= $lowStockThreshold): 
         ?>
         <div class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -234,9 +237,9 @@ ob_start();
 <?php endif; ?>
 
 <!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
     <div class="bg-white rounded-lg p-6 max-w-md w-full">
-        <h3 class="text-xl font-bold text-gray-800 mb-4">
+        <h3 id="deleteModalTitle" class="text-xl font-bold text-gray-800 mb-4">
             <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
             Artikel löschen
         </h3>
