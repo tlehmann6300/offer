@@ -198,9 +198,15 @@ ob_start();
         <?php if (!empty($event['image_path'])): ?>
             <div class="mt-6 pt-6 border-t border-gray-200">
                 <h2 class="text-xl font-bold text-gray-800 mb-3">Event-Bild</h2>
-                <?php if (file_exists(__DIR__ . '/../../' . $event['image_path'])): ?>
+                <?php 
+                    // Check if image file exists before displaying
+                    $imagePath = $event['image_path'];
+                    $fullImagePath = __DIR__ . '/../../' . $imagePath;
+                    $imageExists = file_exists($fullImagePath);
+                ?>
+                <?php if ($imageExists): ?>
                     <img 
-                        src="<?php echo htmlspecialchars(BASE_URL . '/' . $event['image_path']); ?>" 
+                        src="<?php echo htmlspecialchars(BASE_URL . '/' . $imagePath); ?>" 
                         alt="<?php echo htmlspecialchars($event['title']); ?>"
                         class="w-full max-w-2xl rounded-xl border border-gray-300 shadow-soft"
                     >
