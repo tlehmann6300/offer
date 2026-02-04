@@ -171,8 +171,9 @@ ob_start();
         // Check if PDF file exists with security validation
         $showPdfButton = false;
         if (!empty($project['file_path'])) {
-            $baseDir = realpath(__DIR__ . '/../../');
-            $filePath = realpath(__DIR__ . '/../../' . $project['file_path']);
+            $baseDirPath = __DIR__ . '/../../';
+            $baseDir = realpath($baseDirPath);
+            $filePath = realpath($baseDirPath . $project['file_path']);
             // Verify file exists and is within allowed directory
             if ($filePath && strpos($filePath, $baseDir) === 0 && file_exists($filePath)) {
                 $showPdfButton = true;
