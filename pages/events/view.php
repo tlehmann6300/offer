@@ -202,7 +202,11 @@ ob_start();
                     // Check if image file exists before displaying
                     $imagePath = $event['image_path'];
                     $fullImagePath = __DIR__ . '/../../' . $imagePath;
-                    $imageExists = file_exists($fullImagePath);
+                    
+                    // Validate path to prevent directory traversal
+                    $realPath = realpath($fullImagePath);
+                    $baseDir = realpath(__DIR__ . '/../../');
+                    $imageExists = $realPath && $baseDir && strpos($realPath, $baseDir) === 0 && file_exists($realPath);
                 ?>
                 <?php if ($imageExists): ?>
                     <img 
