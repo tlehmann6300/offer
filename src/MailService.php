@@ -208,6 +208,7 @@ class MailService {
             // Enable debugging only in development mode
             if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
                 $mail->SMTPDebug = 2; // Verbose debug output
+                $mail->Debugoutput = 'html'; // Format debug output for browser viewing
             } else {
                 $mail->SMTPDebug = 0; // Disable verbose debug output
             }
