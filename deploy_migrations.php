@@ -45,24 +45,55 @@ foreach ($scripts as $script) {
     }
     
     // Execute the script with output buffering
+    // Use a subprocess to avoid exit() calls terminating the main script
     try {
         ob_start();
-        include $scriptPath;
-        $output = ob_get_clean();
         
-        $result['status'] = 'Erfolg';
-        $result['icon'] = '✅';
-        $result['output'] = $output;
+        // Capture output from the included script
+        // Note: Some scripts may call exit() which would normally terminate execution
+        // We handle this by checking the output for error indicators
+        $outputFile = tempnam(sys_get_temp_dir(), 'migration_');
+        $errorFile = tempnam(sys_get_temp_dir(), 'migration_err_');
+        
+        // Run script in subprocess to isolate exit() calls
+        $cmd = sprintf(
+            'php %s > %s 2> %s',
+            escapeshellarg($scriptPath),
+            escapeshellarg($outputFile),
+            escapeshellarg($errorFile)
+        );
+        
+        exec($cmd, $execOutput, $returnCode);
+        
+        $output = file_get_contents($outputFile);
+        $errorOutput = file_get_contents($errorFile);
+        
+        // Clean up temp files
+        unlink($outputFile);
+        unlink($errorFile);
+        
+        ob_end_clean();
+        
+        // Determine status based on return code and output
+        if ($returnCode === 0 && (strpos($output, 'Fehler') === false || strpos($output, 'erfolgreich') !== false)) {
+            $result['status'] = 'Erfolg';
+            $result['icon'] = '✅';
+            $result['output'] = $output;
+        } else {
+            $result['status'] = 'Fehler';
+            $result['icon'] = '❌';
+            $result['output'] = $output . ($errorOutput ? "\n\nErrors:\n" . $errorOutput : '');
+        }
     } catch (Error $e) {
-        $output = ob_get_clean();
+        ob_end_clean();
         $result['status'] = 'Fehler';
         $result['icon'] = '❌';
-        $result['output'] = $output . "\n\nError: " . $e->getMessage() . "\n" . $e->getTraceAsString();
+        $result['output'] = "Error: " . $e->getMessage() . "\n" . $e->getTraceAsString();
     } catch (Exception $e) {
-        $output = ob_get_clean();
+        ob_end_clean();
         $result['status'] = 'Fehler';
         $result['icon'] = '❌';
-        $result['output'] = $output . "\n\nException: " . $e->getMessage() . "\n" . $e->getTraceAsString();
+        $result['output'] = "Exception: " . $e->getMessage() . "\n" . $e->getTraceAsString();
     }
     
     $results[] = $result;
