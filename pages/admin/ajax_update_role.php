@@ -1,18 +1,22 @@
 <?php
-require_once __DIR__ . '/../../src/Auth.php';
-require_once __DIR__ . '/../../includes/models/User.php';
-
 // Set JSON response header
 header('Content-Type: application/json');
 
-// Check authentication and permission
-if (!Auth::check() || !Auth::hasPermission('admin')) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Nicht autorisiert'
-    ]);
-    exit;
-}
+// Disable error output in body
+ini_set('display_errors', 0);
+
+require_once __DIR__ . '/../../src/Auth.php';
+require_once __DIR__ . '/../../includes/models/User.php';
+
+try {
+    // Check authentication and permission
+    if (!Auth::check() || !Auth::hasPermission('admin')) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Nicht autorisiert'
+        ]);
+        exit;
+    }
 
 // Check if it's a POST request
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -53,15 +57,25 @@ if ($userId === $_SESSION['user_id']) {
     exit;
 }
 
-// Update the role
-if (User::update($userId, ['role' => $newRole])) {
-    echo json_encode([
-        'success' => true,
-        'message' => 'Rolle erfolgreich geändert'
-    ]);
-} else {
+    // Update the role
+    if (User::update($userId, ['role' => $newRole])) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Rolle erfolgreich geändert'
+        ]);
+    } else {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Fehler beim Ändern der Rolle'
+        ]);
+    }
+} catch (Exception $e) {
+    // Log the full error details
+    error_log('Error in ajax_update_role.php: ' . $e->getMessage() . ' | File: ' . $e->getFile() . ' | Line: ' . $e->getLine());
+    
+    // Return generic JSON error response (don't expose internal details)
     echo json_encode([
         'success' => false,
-        'message' => 'Fehler beim Ändern der Rolle'
+        'message' => 'Server Fehler: Es ist ein interner Fehler aufgetreten. Bitte versuchen Sie es später erneut.'
     ]);
 }
