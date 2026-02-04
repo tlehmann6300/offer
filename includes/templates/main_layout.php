@@ -168,26 +168,26 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <nav id="verwaltung-dropdown" 
                          class="hidden bg-black/40 rounded-lg mt-2 ml-2 border-l-2 border-gray-600 overflow-hidden"
                          aria-labelledby="verwaltung-button">
-                        <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
+                        <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" class="flex items-center pr-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
                             <i class="fas fa-clipboard-list w-5 mr-2"></i>
                             <span>Meine Ausleihen</span>
                         </a>
                         <?php if (Auth::hasPermission('manager')): ?>
-                        <a href="<?php echo asset('pages/events/manage.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
+                        <a href="<?php echo asset('pages/events/manage.php'); ?>" class="flex items-center pr-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
                             <i class="fas fa-calendar-alt w-5 mr-2"></i>
                             <span>Event-Verwaltung</span>
                         </a>
-                        <a href="<?php echo asset('pages/projects/manage.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
+                        <a href="<?php echo asset('pages/projects/manage.php'); ?>" class="flex items-center pr-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
                             <i class="fas fa-tasks w-5 mr-2"></i>
                             <span>Projekt-Verwaltung</span>
                         </a>
-                        <a href="<?php echo asset('pages/inventory/manage.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
+                        <a href="<?php echo asset('pages/inventory/manage.php'); ?>" class="flex items-center pr-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
                             <i class="fas fa-cogs w-5 mr-2"></i>
                             <span>Inventar-Verwaltung</span>
                         </a>
                         <?php endif; ?>
                         <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
-                        <a href="<?php echo asset('pages/admin/users.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
+                        <a href="<?php echo asset('pages/admin/users.php'); ?>" class="flex items-center pr-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
                             <i class="fas fa-users w-5 mr-2"></i>
                             <span>Benutzerverwaltung</span>
                         </a>
