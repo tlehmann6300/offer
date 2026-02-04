@@ -55,6 +55,10 @@ foreach ($scripts as $script) {
         $outputFile = tempnam(sys_get_temp_dir(), 'migration_');
         $errorFile = tempnam(sys_get_temp_dir(), 'migration_err_');
         
+        // Secure the temp files
+        chmod($outputFile, 0600);
+        chmod($errorFile, 0600);
+        
         // Run script in subprocess to isolate exit() calls
         $cmd = sprintf(
             'php %s > %s 2> %s',
@@ -63,7 +67,7 @@ foreach ($scripts as $script) {
             escapeshellarg($errorFile)
         );
         
-        exec($cmd, $execOutput, $returnCode);
+        exec($cmd, $_, $returnCode);
         
         $output = file_get_contents($outputFile);
         $errorOutput = file_get_contents($errorFile);
@@ -75,7 +79,8 @@ foreach ($scripts as $script) {
         ob_end_clean();
         
         // Determine status based on return code and output
-        if ($returnCode === 0 && (strpos($output, 'Fehler') === false || strpos($output, 'erfolgreich') !== false)) {
+        // Success if: return code is 0 AND no error indicators in output
+        if ($returnCode === 0 && strpos(strtolower($output . $errorOutput), 'fehler') === false) {
             $result['status'] = 'Erfolg';
             $result['icon'] = '✅';
             $result['output'] = $output;
