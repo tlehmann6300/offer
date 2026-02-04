@@ -167,7 +167,12 @@ ob_start();
         <?php endif; ?>
         
         <!-- PDF Download Button -->
-        <?php if (!empty($project['file_path']) && file_exists(__DIR__ . '/../../' . $project['file_path'])): ?>
+        <?php 
+        // Check if PDF file exists - prevent directory traversal
+        if (!empty($project['file_path']) && 
+            strpos($project['file_path'], '..') === false &&
+            file_exists(__DIR__ . '/../../' . $project['file_path'])): 
+        ?>
         <div class="mb-6">
             <a href="/<?php echo htmlspecialchars($project['file_path']); ?>" 
                class="inline-flex items-center px-5 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-semibold hover:from-red-700 hover:to-red-800 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition duration-200"
