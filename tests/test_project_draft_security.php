@@ -47,6 +47,14 @@ try {
         echo "✗ Member incorrectly granted manager permission\n";
     }
     
+    $hasMemberProjectPermission = Auth::hasPermission('manage_projects');
+    echo "Member has manage_projects permission: " . ($hasMemberProjectPermission ? "YES" : "NO") . " (expected: NO)\n";
+    if (!$hasMemberProjectPermission) {
+        echo "✓ Member correctly denied manage_projects permission\n";
+    } else {
+        echo "✗ Member incorrectly granted manage_projects permission\n";
+    }
+    
     // Test manager role (should have manager permission)
     $_SESSION['user_role'] = 'manager';
     $hasManagerPermission = Auth::hasPermission('manager');
@@ -55,6 +63,14 @@ try {
         echo "✓ Manager correctly granted manager permission\n";
     } else {
         echo "✗ Manager incorrectly denied manager permission\n";
+    }
+    
+    $hasManagerProjectPermission = Auth::hasPermission('manage_projects');
+    echo "Manager has manage_projects permission: " . ($hasManagerProjectPermission ? "YES" : "NO") . " (expected: YES)\n";
+    if ($hasManagerProjectPermission) {
+        echo "✓ Manager correctly granted manage_projects permission\n";
+    } else {
+        echo "✗ Manager incorrectly denied manage_projects permission\n";
     }
     
     // Test board role (should have manager permission)
@@ -67,6 +83,14 @@ try {
         echo "✗ Board incorrectly denied manager permission\n";
     }
     
+    $hasBoardProjectPermission = Auth::hasPermission('manage_projects');
+    echo "Board has manage_projects permission: " . ($hasBoardProjectPermission ? "YES" : "NO") . " (expected: YES)\n";
+    if ($hasBoardProjectPermission) {
+        echo "✓ Board correctly granted manage_projects permission\n";
+    } else {
+        echo "✗ Board incorrectly denied manage_projects permission\n";
+    }
+    
     echo "\n";
     
     // Test 3: Verify draft project visibility logic
@@ -76,9 +100,9 @@ try {
     if ($project && $project['status'] === 'draft') {
         echo "✓ Draft project retrieved successfully\n";
         
-        // Simulate the security check
+        // Simulate the security check using manage_projects permission
         $_SESSION['user_role'] = 'member';
-        $canViewAsMember = !($project['status'] === 'draft' && !Auth::hasPermission('manager'));
+        $canViewAsMember = !(isset($project['status']) && $project['status'] === 'draft' && !Auth::hasPermission('manage_projects'));
         echo "Member can view draft: " . ($canViewAsMember ? "YES" : "NO") . " (expected: NO)\n";
         if (!$canViewAsMember) {
             echo "✓ Member correctly blocked from viewing draft\n";
@@ -87,7 +111,7 @@ try {
         }
         
         $_SESSION['user_role'] = 'manager';
-        $canViewAsManager = !($project['status'] === 'draft' && !Auth::hasPermission('manager'));
+        $canViewAsManager = !(isset($project['status']) && $project['status'] === 'draft' && !Auth::hasPermission('manage_projects'));
         echo "Manager can view draft: " . ($canViewAsManager ? "YES" : "NO") . " (expected: YES)\n";
         if ($canViewAsManager) {
             echo "✓ Manager correctly allowed to view draft\n";

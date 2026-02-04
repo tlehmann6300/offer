@@ -31,6 +31,21 @@ ob_start();
 ?>
 
 <div class="max-w-7xl mx-auto">
+    <!-- Error/Success Messages -->
+    <?php if (isset($_SESSION['error'])): ?>
+    <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+        <i class="fas fa-exclamation-circle mr-2"></i><?php echo htmlspecialchars($_SESSION['error']); ?>
+    </div>
+    <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
+    
+    <?php if (isset($_SESSION['success'])): ?>
+    <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+        <i class="fas fa-check-circle mr-2"></i><?php echo htmlspecialchars($_SESSION['success']); ?>
+    </div>
+    <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+    
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-4xl font-bold text-gray-800 mb-2">
