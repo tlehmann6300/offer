@@ -27,17 +27,9 @@ if (!$project) {
     exit;
 }
 
-// Security Gate: Drafts sind privat!
-if (
-    isset($project['status']) && 
-    $project['status'] === 'draft' && 
-    !Auth::hasPermission('manage_projects')
-) {
-    // Optional: Loggen, wer es versucht hat
-    error_log('Unauthorized access attempt to draft project ID ' . $projectId . ' by User ' . $user['id']);
-    
-    // Redirect zur Übersicht mit Fehler
-    $_SESSION['error'] = 'Zugriff verweigert. Dieses Projekt ist noch nicht veröffentlicht.';
+// SECURITY: Zugriff auf Entwürfe verweigern für Nicht-Manager
+if (isset($project['status']) && $project['status'] === 'draft' && !Auth::hasPermission('manage_projects')) {
+    $_SESSION['error'] = 'Zugriff verweigert. Dieses Projekt ist noch im Entwurf.';
     header('Location: index.php');
     exit;
 }
