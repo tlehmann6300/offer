@@ -199,7 +199,7 @@ ob_start();
             <div class="mt-6 pt-6 border-t border-gray-200">
                 <h2 class="text-xl font-bold text-gray-800 mb-3">Event-Bild</h2>
                 <img 
-                    src="<?php echo htmlspecialchars(BASE_URL . '/' . $event['image_path']); ?>" 
+                    src="<?php echo htmlspecialchars(rtrim(BASE_URL, '/') . '/' . ltrim($event['image_path'], '/')); ?>" 
                     alt="<?php echo htmlspecialchars($event['title']); ?>"
                     class="w-full max-w-2xl rounded-xl border border-gray-300 shadow-soft"
                 >
