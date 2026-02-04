@@ -218,7 +218,7 @@ class MailService {
             }
             
         } catch (\Exception $e) {
-            // Catch both PHPMailer exceptions and general exceptions (e.g., from isVendorMissing check)
+            // Catch both PHPMailer exceptions and the vendor missing exception thrown when PHPMailer is unavailable
             error_log("Failed to configure PHPMailer: " . $e->getMessage());
             throw $e;
         }
