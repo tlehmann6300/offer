@@ -117,4 +117,41 @@ class User {
         $stmt = $db->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
         return $stmt->execute([$passwordHash, $userId]);
     }
+
+    /**
+     * Update user email
+     * @param int $userId The ID of the user whose email should be updated
+     * @param string $newEmail The new email address
+     * @return bool Returns true on success
+     * @throws Exception If the email is already in use by another user or invalid
+     */
+    public static function updateEmail($userId, $newEmail) {
+        $db = Database::getUserDB();
+        
+        // Validate email format
+        if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+            throw new Exception('Ungültige E-Mail-Adresse');
+        }
+        
+        // Check if email is already used by another user
+        $stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE email = ? AND id != ?");
+        $stmt->execute([$newEmail, $userId]);
+        $count = $stmt->fetchColumn();
+        
+        if ($count > 0) {
+            throw new Exception('E-Mail bereits vergeben');
+        }
+        
+        // Update the email
+        $stmt = $db->prepare("UPDATE users SET email = ? WHERE id = ?");
+        $result = $stmt->execute([$newEmail, $userId]);
+        
+        // Check if the update actually affected a row
+        if ($result && $stmt->rowCount() > 0) {
+            return true;
+        }
+        
+        // If no rows were affected, the user ID doesn't exist
+        throw new Exception('Benutzer nicht gefunden');
+    }
 }
