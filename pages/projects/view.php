@@ -267,7 +267,7 @@ ob_start();
                 <!-- Show Application Form -->
                 <div class="bg-white rounded-xl shadow-lg p-8">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                        <i class="fas fa-paper-plane text-blue-600 mr-2"></i>
+                        <i class="fas fa-paper-plane text-blue-600 mr-2" aria-hidden="true"></i>
                         Jetzt bewerben
                     </h2>
                     
@@ -277,7 +277,7 @@ ob_start();
                         
                         <div>
                             <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-comment-dots text-blue-600 mr-2"></i>
+                                <i class="fas fa-comment-dots text-blue-600 mr-2" aria-hidden="true"></i>
                                 Motivation <span class="text-red-500 ml-1">*</span>
                             </label>
                             <textarea 
@@ -291,7 +291,7 @@ ob_start();
                         
                         <div>
                             <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-briefcase text-blue-600 mr-2"></i>
+                                <i class="fas fa-briefcase text-blue-600 mr-2" aria-hidden="true"></i>
                                 Anzahl bisheriger Projekterfahrungen
                             </label>
                             <input 
@@ -340,7 +340,7 @@ ob_start();
                             </a>
                             <button type="submit" 
                                     class="flex-1 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-bold text-lg hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 transition shadow-lg hover:shadow-xl">
-                                <i class="fas fa-paper-plane mr-2"></i>
+                                <i class="fas fa-paper-plane mr-2" aria-hidden="true"></i>
                                 Bewerbung absenden
                             </button>
                         </div>
