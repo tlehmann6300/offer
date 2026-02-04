@@ -166,29 +166,29 @@ require_once __DIR__ . '/../../src/Auth.php';
                         <i id="verwaltung-arrow" class="fas fa-chevron-down text-sm transition-transform duration-300"></i>
                     </button>
                     <nav id="verwaltung-dropdown" 
-                         class="hidden pl-4 mt-1 space-y-1 bg-gray-800 rounded-lg transition-all duration-300"
+                         class="hidden bg-gray-800 rounded-md mt-1 border-l-4 border-gray-600 ml-2 overflow-hidden transition-all duration-300 ease-in-out"
                          aria-labelledby="verwaltung-button">
-                        <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                            <i class="fas fa-clipboard-list w-5"></i>
+                        <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white hover:pl-6 transition-all duration-200">
+                            <i class="fas fa-clipboard-list w-5 mr-2"></i>
                             <span>Meine Ausleihen</span>
                         </a>
                         <?php if (Auth::hasPermission('manager')): ?>
-                        <a href="<?php echo asset('pages/events/manage.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                            <i class="fas fa-calendar-alt w-5"></i>
+                        <a href="<?php echo asset('pages/events/manage.php'); ?>" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white hover:pl-6 transition-all duration-200">
+                            <i class="fas fa-calendar-alt w-5 mr-2"></i>
                             <span>Event-Verwaltung</span>
                         </a>
-                        <a href="<?php echo asset('pages/projects/manage.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                            <i class="fas fa-tasks w-5"></i>
+                        <a href="<?php echo asset('pages/projects/manage.php'); ?>" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white hover:pl-6 transition-all duration-200">
+                            <i class="fas fa-tasks w-5 mr-2"></i>
                             <span>Projekt-Verwaltung</span>
                         </a>
-                        <a href="<?php echo asset('pages/inventory/manage.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                            <i class="fas fa-cogs w-5"></i>
+                        <a href="<?php echo asset('pages/inventory/manage.php'); ?>" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white hover:pl-6 transition-all duration-200">
+                            <i class="fas fa-cogs w-5 mr-2"></i>
                             <span>Inventar-Verwaltung</span>
                         </a>
                         <?php endif; ?>
                         <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
-                        <a href="<?php echo asset('pages/admin/users.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                            <i class="fas fa-users w-5"></i>
+                        <a href="<?php echo asset('pages/admin/users.php'); ?>" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white hover:pl-6 transition-all duration-200">
+                            <i class="fas fa-users w-5 mr-2"></i>
                             <span>Benutzerverwaltung</span>
                         </a>
                         <?php endif; ?>
