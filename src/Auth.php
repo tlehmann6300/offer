@@ -213,7 +213,7 @@ class Auth {
             'alumni' => 1,
             'member' => 1,
             'manager' => 2,
-            'manage_projects' => 2,  // Permission alias for manager-level project access
+            'manage_projects' => 2,  // Permission for manager-level project access
             'alumni_board' => 3,
             'board' => 3,
             'admin' => 4
