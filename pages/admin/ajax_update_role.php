@@ -70,12 +70,12 @@ if ($userId === $_SESSION['user_id']) {
         ]);
     }
 } catch (Exception $e) {
-    // Log the error
-    error_log('Error in ajax_update_role.php: ' . $e->getMessage());
+    // Log the full error details
+    error_log('Error in ajax_update_role.php: ' . $e->getMessage() . ' | File: ' . $e->getFile() . ' | Line: ' . $e->getLine());
     
-    // Return JSON error response
+    // Return generic JSON error response (don't expose internal details)
     echo json_encode([
         'success' => false,
-        'message' => 'Server Fehler: ' . $e->getMessage()
+        'message' => 'Server Fehler: Es ist ein interner Fehler aufgetreten. Bitte versuchen Sie es später erneut.'
     ]);
 }
