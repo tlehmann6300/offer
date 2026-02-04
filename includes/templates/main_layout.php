@@ -166,7 +166,7 @@ require_once __DIR__ . '/../../src/Auth.php';
                         <i id="verwaltung-arrow" class="fas fa-chevron-down text-sm transition-transform duration-300"></i>
                     </button>
                     <nav id="verwaltung-dropdown" 
-                         class="hidden bg-slate-900/50 rounded-md mt-1 border-l-2 border-blue-500 ml-3 pl-2 overflow-hidden transition-all duration-300 ease-in-out"
+                         class="hidden bg-slate-900/50 rounded-md mt-1 border-l-2 border-blue-500 ml-3 pl-2 overflow-hidden transition-opacity duration-300 ease-in-out"
                          aria-labelledby="verwaltung-button">
                         <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white hover:translate-x-1 transition-transform duration-200">
                             <i class="fas fa-clipboard-list w-5 mr-2"></i>
