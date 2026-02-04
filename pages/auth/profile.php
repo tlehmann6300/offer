@@ -17,7 +17,27 @@ $secret = '';
 
 // Handle 2FA setup
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['enable_2fa'])) {
+    if (isset($_POST['update_email'])) {
+        $newEmail = trim($_POST['email'] ?? '');
+        
+        // Check if email has changed
+        if ($newEmail !== $user['email']) {
+            try {
+                // Call User::updateEmail() to update the email
+                if (User::updateEmail($user['id'], $newEmail)) {
+                    // Update session with new email to prevent logout
+                    $_SESSION['user_email'] = $newEmail;
+                    $message = 'E-Mail-Adresse erfolgreich aktualisiert';
+                    $user = Auth::user(); // Reload user data
+                }
+            } catch (Exception $e) {
+                // Catch exceptions like 'E-Mail vergeben' or validation errors
+                $error = $e->getMessage();
+            }
+        } else {
+            $error = 'Die E-Mail-Adresse wurde nicht geändert';
+        }
+    } else if (isset($_POST['enable_2fa'])) {
         $ga = new PHPGangsta_GoogleAuthenticator();
         $secret = $ga->createSecret();
         $qrCodeUrl = $ga->getQRCodeGoogleUrl($user['email'], $secret, 'IBC Intranet');
@@ -144,6 +164,29 @@ ob_start();
                 <p class="text-lg text-gray-800"><?php echo date('d.m.Y', strtotime($user['created_at'])); ?></p>
             </div>
         </div>
+    </div>
+
+    <!-- Update Email -->
+    <div class="card p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">
+            <i class="fas fa-envelope text-blue-600 mr-2"></i>
+            E-Mail-Adresse ändern
+        </h2>
+        <form method="POST" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">E-Mail-Adresse</label>
+                <input 
+                    type="email" 
+                    name="email" 
+                    required 
+                    value="<?php echo htmlspecialchars($user['email']); ?>"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+            </div>
+            <button type="submit" name="update_email" class="w-full btn-primary">
+                <i class="fas fa-save mr-2"></i>E-Mail-Adresse aktualisieren
+            </button>
+        </form>
     </div>
 
     <!-- Change Password -->
