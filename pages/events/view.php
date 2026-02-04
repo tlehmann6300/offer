@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Event.php';
+require_once __DIR__ . '/../../src/CalendarService.php';
 
 // Check authentication
 if (!Auth::check()) {
@@ -208,6 +209,31 @@ ob_start();
                 </div>
             </div>
         <?php endif; ?>
+
+        <!-- Calendar Export Buttons -->
+        <div class="mt-6 pt-6 border-t border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                <i class="fas fa-calendar-plus mr-2 text-ibc-blue"></i>
+                In Kalender eintragen
+            </h3>
+            <div class="flex flex-wrap gap-3">
+                <!-- Google Calendar Button -->
+                <a href="<?php echo htmlspecialchars(CalendarService::getGoogleLink($event)); ?>" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="inline-flex items-center px-5 py-2.5 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:border-ibc-blue hover:text-ibc-blue ease-premium shadow-sm">
+                    <i class="fab fa-google mr-2 text-lg"></i>
+                    Google Kalender
+                </a>
+                
+                <!-- iCal Download Button -->
+                <a href="../../api/download_ics.php?event_id=<?php echo htmlspecialchars($eventId, ENT_QUOTES, 'UTF-8'); ?>" 
+                   class="inline-flex items-center px-5 py-2.5 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:border-ibc-blue hover:text-ibc-blue ease-premium shadow-sm">
+                    <i class="fas fa-download mr-2"></i>
+                    iCal herunterladen
+                </a>
+            </div>
+        </div>
 
         <!-- Participation Button -->
         <div class="flex gap-4 mt-6 pt-6 border-t border-gray-200">
