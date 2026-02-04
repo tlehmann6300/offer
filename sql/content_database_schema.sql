@@ -235,6 +235,7 @@ CREATE TABLE IF NOT EXISTS projects (
     start_date DATE DEFAULT NULL,
     end_date DATE DEFAULT NULL,
     image_path VARCHAR(255) DEFAULT NULL,
+    documentation TEXT DEFAULT NULL COMMENT 'Project completion documentation/report',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_status (status),
