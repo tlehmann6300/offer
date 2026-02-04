@@ -5,15 +5,19 @@
  * Required permissions: admin, board, or alumni_board
  */
 
+// Set JSON response header
+header('Content-Type: application/json');
+
+// Disable error output in body
+ini_set('display_errors', 0);
+
 require_once __DIR__ . '/../includes/handlers/AuthHandler.php';
 require_once __DIR__ . '/../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../includes/database.php';
 require_once __DIR__ . '/../src/MailService.php';
 
-AuthHandler::startSession();
-
-// Set JSON response header
-header('Content-Type: application/json');
+try {
+    AuthHandler::startSession();
 
 // Check authentication and permission
 if (!AuthHandler::isAuthenticated() || !AuthHandler::hasPermission('board')) {
@@ -89,37 +93,47 @@ $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' :
 $host = $_SERVER['HTTP_HOST'];
 $invitationLink = $protocol . '://' . $host . '/pages/auth/register.php?token=' . $token;
 
-// Check if we should send email
-if ($sendMail) {
-    // Send invitation email
-    $mailSent = MailService::sendInvitation($email, $token, $role);
-    
-    if ($mailSent) {
-        // Return success response with message about sent email
-        echo json_encode([
-            'success' => true,
-            'message' => 'Einladung per E-Mail versendet.',
-            'email' => $email,
-            'role' => $role,
-            'link' => $invitationLink
-        ]);
+    // Check if we should send email
+    if ($sendMail) {
+        // Send invitation email
+        $mailSent = MailService::sendInvitation($email, $token, $role);
+        
+        if ($mailSent === true) {
+            // Return success response with message about sent email
+            echo json_encode([
+                'success' => true,
+                'message' => 'Einladung per E-Mail versendet.',
+                'email' => $email,
+                'role' => $role,
+                'link' => $invitationLink
+            ]);
+        } else {
+            // Email failed, but still return link
+            echo json_encode([
+                'success' => true,
+                'message' => 'Link generiert, aber E-Mail konnte nicht versendet werden.',
+                'link' => $invitationLink,
+                'email' => $email,
+                'role' => $role
+            ]);
+        }
     } else {
-        // Email failed, but still return link
+        // Return success response with just the link
         echo json_encode([
             'success' => true,
-            'message' => 'Link generiert, aber E-Mail konnte nicht versendet werden.',
             'link' => $invitationLink,
+            'message' => 'Link generiert.',
             'email' => $email,
             'role' => $role
         ]);
     }
-} else {
-    // Return success response with just the link
+} catch (Exception $e) {
+    // Log the error
+    error_log('Error in send_invitation.php: ' . $e->getMessage());
+    
+    // Return JSON error response
     echo json_encode([
-        'success' => true,
-        'link' => $invitationLink,
-        'message' => 'Link generiert.',
-        'email' => $email,
-        'role' => $role
+        'success' => false,
+        'message' => 'Server Fehler: ' . $e->getMessage()
     ]);
 }
