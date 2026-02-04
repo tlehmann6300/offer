@@ -43,3 +43,4 @@ tests/sample_*.html
 
 # Test scripts
 test_smtp.php
+layout_preview.html
