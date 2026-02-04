@@ -129,6 +129,28 @@ class CalendarService {
     }
     
     /**
+     * Generate Google Calendar link (alias for generateGoogleCalendarLink for compatibility)
+     * 
+     * @param array $event Event data from database
+     * @param array|null $slot Optional slot data
+     * @return string Google Calendar URL
+     */
+    public static function getGoogleLink($event, $slot = null) {
+        return self::generateGoogleCalendarLink($event, $slot);
+    }
+    
+    /**
+     * Generate ICS file content (alias for generateICS for compatibility)
+     * 
+     * @param array $event Event data from database
+     * @param array|null $slot Optional slot data
+     * @return string ICS formatted string
+     */
+    public static function generateIcsFile($event, $slot = null) {
+        return self::generateICS($event, $slot);
+    }
+    
+    /**
      * Escape special characters for iCal format
      * 
      * @param string $str String to escape
