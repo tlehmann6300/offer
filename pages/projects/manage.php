@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_project'])) {
             'client_contact_details' => trim($_POST['client_contact_details'] ?? ''),
             'priority' => $_POST['priority'] ?? 'medium',
             'status' => $_POST['status'] ?? 'draft',
+            'max_consultants' => max(1, intval($_POST['max_consultants'] ?? 1)),
             'start_date' => !empty($_POST['start_date']) ? $_POST['start_date'] : null,
             'end_date' => !empty($_POST['end_date']) ? $_POST['end_date'] : null,
         ];
@@ -490,6 +491,22 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
             </div>
+        </div>
+
+        <!-- Required Consultants -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                Benötigte Berater <span class="text-red-500">*</span>
+            </label>
+            <input 
+                type="number" 
+                name="max_consultants" 
+                value="<?php echo htmlspecialchars($editProject['max_consultants'] ?? '1'); ?>"
+                min="1"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Anzahl benötigter Berater"
+            >
         </div>
 
         <!-- Image Upload -->
