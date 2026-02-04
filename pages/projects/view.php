@@ -340,12 +340,12 @@ ob_start();
                         
                         <div class="flex flex-col space-y-4 pt-4">
                             <button type="submit" 
-                                    class="w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white font-bold py-4 rounded-lg shadow-md hover:shadow-xl transform hover:-translate-y-1 transition duration-200">
+                                    class="w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white font-bold py-4 rounded-lg shadow-md hover:shadow-xl transform hover:-translate-y-1 focus:scale-105 focus:ring-4 focus:ring-blue-300 transition duration-200">
                                 <i class="fas fa-paper-plane mr-2" aria-hidden="true"></i>
                                 Bewerbung absenden
                             </button>
                             <a href="view.php?id=<?php echo $project['id']; ?>" 
-                               class="w-full text-center px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
+                               class="w-full text-center px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:ring-2 focus:ring-gray-400 focus:outline-none transition font-medium">
                                 Abbrechen
                             </a>
                         </div>
