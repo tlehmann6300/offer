@@ -265,11 +265,16 @@ ob_start();
                 </div>
             <?php elseif (isset($_GET['action']) && $_GET['action'] === 'apply'): ?>
                 <!-- Show Application Form -->
-                <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="bg-white shadow-lg rounded-xl p-8 border border-gray-100">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">
                         <i class="fas fa-paper-plane text-blue-600 mr-2" aria-hidden="true"></i>
                         Jetzt bewerben
                     </h2>
+                    
+                    <!-- Motivational Text -->
+                    <p class="text-gray-600 mb-6">
+                        Möchtest du Teil dieses Projekts sein? Bewirb dich jetzt in wenigen Schritten.
+                    </p>
                     
                     <form method="POST" class="space-y-6">
                         <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
@@ -284,7 +289,7 @@ ob_start();
                                 name="motivation" 
                                 rows="5"
                                 required
-                                class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                                class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                                 placeholder="Warum möchten Sie an diesem Projekt teilnehmen?"
                             ></textarea>
                         </div>
@@ -299,7 +304,7 @@ ob_start();
                                 name="experience_count" 
                                 min="0"
                                 value="0"
-                                class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                                class="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                             >
                         </div>
                         
@@ -333,16 +338,16 @@ ob_start();
                             </label>
                         </div>
                         
-                        <div class="flex space-x-4 pt-4">
-                            <a href="view.php?id=<?php echo $project['id']; ?>" 
-                               class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
-                                Abbrechen
-                            </a>
+                        <div class="flex flex-col space-y-4 pt-4">
                             <button type="submit" 
-                                    class="flex-1 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-bold text-lg hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 transition shadow-lg hover:shadow-xl">
+                                    class="w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white font-bold py-4 rounded-lg shadow-md hover:shadow-xl transform hover:-translate-y-1 focus:scale-105 focus:ring-4 focus:ring-blue-300 transition duration-200">
                                 <i class="fas fa-paper-plane mr-2" aria-hidden="true"></i>
                                 Bewerbung absenden
                             </button>
+                            <a href="view.php?id=<?php echo $project['id']; ?>" 
+                               class="w-full text-center px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:ring-2 focus:ring-gray-400 focus:outline-none transition font-medium">
+                                Abbrechen
+                            </a>
                         </div>
                     </form>
                 </div>
