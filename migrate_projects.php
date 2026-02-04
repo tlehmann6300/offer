@@ -24,7 +24,7 @@ try {
         echo "Tabellen existieren bereits: " . implode(', ', $existingTables) . "\n";
         echo "Migration wird übersprungen.\n";
         echo "Erfolgreich migriert\n";
-        exit(0);
+        return;
     }
     
     // Read migration file
@@ -63,5 +63,5 @@ try {
     
 } catch (Exception $e) {
     echo "Fehler: " . $e->getMessage() . "\n";
-    exit(1);
+    return;
 }
