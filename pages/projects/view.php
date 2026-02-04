@@ -168,10 +168,17 @@ ob_start();
         
         <!-- PDF Download Button -->
         <?php 
-        // Check if PDF file exists - prevent directory traversal
-        if (!empty($project['file_path']) && 
-            strpos($project['file_path'], '..') === false &&
-            file_exists(__DIR__ . '/../../' . $project['file_path'])): 
+        // Check if PDF file exists with security validation
+        $showPdfButton = false;
+        if (!empty($project['file_path'])) {
+            $baseDir = realpath(__DIR__ . '/../../');
+            $filePath = realpath(__DIR__ . '/../../' . $project['file_path']);
+            // Verify file exists and is within allowed directory
+            if ($filePath && strpos($filePath, $baseDir) === 0 && file_exists($filePath)) {
+                $showPdfButton = true;
+            }
+        }
+        if ($showPdfButton): 
         ?>
         <div class="mb-6">
             <a href="/<?php echo htmlspecialchars($project['file_path']); ?>" 
