@@ -756,7 +756,7 @@ class MailService {
         $bodyContent .= '<p class="email-text">Weitere Details zum Projekt findest du im IBC Intranet.</p>';
         
         // Create call-to-action button
-        $projectLink = BASE_URL . '/pages/projects/view.php?id=' . $projectId;
+        $projectLink = BASE_URL . '/pages/projects/view.php?id=' . intval($projectId);
         $callToAction = '<a href="' . htmlspecialchars($projectLink) . '" class="button">Zum Projekt</a>';
         
         // Get complete HTML template
