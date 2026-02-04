@@ -73,9 +73,11 @@ try {
                 $newValues[] = 'open';
             }
             
-            // Rebuild ENUM with all values (properly escape single quotes)
-            $escapedValues = array_map(function($value) {
-                return str_replace("'", "''", $value);
+            // Rebuild ENUM with all values (use PDO quote for proper escaping)
+            $escapedValues = array_map(function($value) use ($db) {
+                $quoted = $db->quote($value);
+                // Remove the outer quotes added by PDO::quote
+                return substr($quoted, 1, -1);
             }, $newValues);
             $enumValues = "'" . implode("','", $escapedValues) . "'";
             $db->exec("ALTER TABLE projects MODIFY COLUMN status ENUM({$enumValues}) NOT NULL DEFAULT 'draft'");
