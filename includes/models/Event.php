@@ -320,7 +320,7 @@ class Event {
             
             // Handle image deletion
             $oldImagePath = null;
-            if (!empty($data['delete_image'])) {
+            if (isset($data['delete_image']) && $data['delete_image'] === true) {
                 // Store old image path for deletion after transaction
                 $oldImagePath = $currentEvent['image_path'] ?? null;
                 // Set image_path to NULL in database
@@ -342,6 +342,8 @@ class Event {
             }
             
             // If image_path is provided in $data but is empty string, remove it to preserve the old value
+            // This handles the case where image_path might be set to '' in the data array but we want to keep the existing image
+            // Note: NULL is intentionally allowed to explicitly clear the image (via delete_image flag)
             if (isset($data['image_path']) && $data['image_path'] === '') {
                 unset($data['image_path']);
             }
