@@ -205,7 +205,7 @@ class MailService {
             $mail->CharSet = 'UTF-8';
             $mail->Encoding = 'base64';
             
-            // Debugging nur im Development-Modus oder wenn explizit gefordert
+            // Enable debugging only in development mode
             if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
                 $mail->SMTPDebug = 2; // Verbose debug output
             } else {
