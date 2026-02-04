@@ -175,6 +175,70 @@ try {
 }
 echo "\n";
 
+// Test 5: Validate email format
+echo "=== Test 5: Throw exception for invalid email format ===\n";
+try {
+    $userId1 = createTestUser('valid@test.com');
+    
+    // Try to update to an invalid email
+    $exceptionThrown = false;
+    $exceptionMessage = '';
+    
+    try {
+        User::updateEmail($userId1, 'not-a-valid-email');
+    } catch (Exception $e) {
+        $exceptionThrown = true;
+        $exceptionMessage = $e->getMessage();
+    }
+    
+    if ($exceptionThrown && $exceptionMessage === 'Ungültige E-Mail-Adresse') {
+        echo "✓ PASS: Exception thrown for invalid email format\n";
+        $testsPassed++;
+    } else {
+        echo "✗ FAIL: Expected exception for invalid email\n";
+        echo "  Expected: 'Ungültige E-Mail-Adresse'\n";
+        echo "  Got: '$exceptionMessage'\n";
+        $testsFailed++;
+    }
+    
+    // Cleanup
+    deleteTestUser($userId1);
+} catch (Exception $e) {
+    echo "✗ FAIL: Unexpected exception: " . $e->getMessage() . "\n";
+    $testsFailed++;
+}
+echo "\n";
+
+// Test 6: Throw exception for non-existent user
+echo "=== Test 6: Throw exception when user ID doesn't exist ===\n";
+try {
+    $nonExistentUserId = 99999999;
+    
+    $exceptionThrown = false;
+    $exceptionMessage = '';
+    
+    try {
+        User::updateEmail($nonExistentUserId, 'newemail@test.com');
+    } catch (Exception $e) {
+        $exceptionThrown = true;
+        $exceptionMessage = $e->getMessage();
+    }
+    
+    if ($exceptionThrown && $exceptionMessage === 'Benutzer nicht gefunden') {
+        echo "✓ PASS: Exception thrown for non-existent user\n";
+        $testsPassed++;
+    } else {
+        echo "✗ FAIL: Expected exception for non-existent user\n";
+        echo "  Expected: 'Benutzer nicht gefunden'\n";
+        echo "  Got: '$exceptionMessage'\n";
+        $testsFailed++;
+    }
+} catch (Exception $e) {
+    echo "✗ FAIL: Unexpected exception: " . $e->getMessage() . "\n";
+    $testsFailed++;
+}
+echo "\n";
+
 // Summary
 echo "=====================================\n";
 echo "Test Results:\n";
