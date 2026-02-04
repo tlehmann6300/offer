@@ -31,7 +31,9 @@ try {
     echo "Test 2: Verify Auth::hasPermission for different roles\n";
     
     // Mock session for testing different roles
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     
     // Test member role (should not have manager permission)
     $_SESSION['user_role'] = 'member';
