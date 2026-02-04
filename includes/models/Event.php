@@ -938,6 +938,23 @@ class Event {
     }
     
     /**
+     * Get registration count for an event
+     * Returns the number of confirmed registrations (excluding cancelled and waitlist)
+     */
+    public static function getRegistrationCount($eventId) {
+        $db = Database::getContentDB();
+        
+        $stmt = $db->prepare("
+            SELECT COUNT(*) as count
+            FROM event_signups
+            WHERE event_id = ? AND status = 'confirmed'
+        ");
+        $stmt->execute([$eventId]);
+        $result = $stmt->fetch();
+        return (int)($result['count'] ?? 0);
+    }
+    
+    /**
      * Check if event is locked
      * Returns: ['is_locked' => bool, 'locked_by' => user_id or null, 'locked_at' => timestamp or null]
      */
