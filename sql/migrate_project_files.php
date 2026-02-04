@@ -73,8 +73,11 @@ try {
                 $newValues[] = 'open';
             }
             
-            // Rebuild ENUM with all values
-            $enumValues = "'" . implode("','", $newValues) . "'";
+            // Rebuild ENUM with all values (properly escape single quotes)
+            $escapedValues = array_map(function($value) {
+                return str_replace("'", "''", $value);
+            }, $newValues);
+            $enumValues = "'" . implode("','", $escapedValues) . "'";
             $db->exec("ALTER TABLE projects MODIFY COLUMN status ENUM({$enumValues}) NOT NULL DEFAULT 'draft'");
             echo "✓ Status ENUM updated successfully\n\n";
         } else {
