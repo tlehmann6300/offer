@@ -80,7 +80,7 @@ try {
     echo "3. You can optionally set registration_start and registration_end for existing events\n\n";
     
 } catch (Exception $e) {
-    echo "\n✗ Migration failed: " . $e->getMessage() . "\n";
+    echo "\n✗ Fehler bei Migration: " . $e->getMessage() . "\n";
     echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
     return;
 }
