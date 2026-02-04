@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => '__root__',
-        'pretty_version' => 'dev-main',
-        'version' => 'dev-main',
-        'reference' => '7bca23eb9766f0e6d38670626f2d9d3dcf581e9b',
+        'pretty_version' => 'dev-copilot/fix-smtpdebug-mode',
+        'version' => 'dev-copilot/fix-smtpdebug-mode',
+        'reference' => '16eaf77915007e4043b37fa4ca2150676a606ac6',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => '7bca23eb9766f0e6d38670626f2d9d3dcf581e9b',
+            'pretty_version' => 'dev-copilot/fix-smtpdebug-mode',
+            'version' => 'dev-copilot/fix-smtpdebug-mode',
+            'reference' => '16eaf77915007e4043b37fa4ca2150676a606ac6',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

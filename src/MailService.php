@@ -205,16 +205,12 @@ class MailService {
             $mail->CharSet = 'UTF-8';
             $mail->Encoding = 'base64';
             
-            // Set SMTPDebug based on environment and explicit parameter
-            // Priority: explicit $enableDebug parameter overrides environment setting
-            $environment = defined('ENVIRONMENT') ? ENVIRONMENT : ($_ENV['ENVIRONMENT'] ?? 'development');
-            if ($enableDebug || $environment !== 'production') {
-                // Enable debug output: explicitly requested OR non-production environment
-                $mail->SMTPDebug = 2;
-                $mail->Debugoutput = 'html';
+            // Enable debugging only in development mode
+            if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
+                $mail->SMTPDebug = 2; // Verbose debug output
+                $mail->Debugoutput = 'html'; // Format debug output for browser viewing
             } else {
-                // Disable debug output: production environment and not explicitly enabled
-                $mail->SMTPDebug = 0;
+                $mail->SMTPDebug = 0; // Disable verbose debug output
             }
             
         } catch (\Exception $e) {
@@ -278,8 +274,10 @@ class MailService {
                 $mail->addEmbeddedImage($imagePath, 'ibc_logo');
             }
             
-            // Send
+            // Send (with output buffering to capture any debug output)
+            ob_start();
             $mail->send();
+            ob_end_clean();
             error_log("Test email sent successfully to {$toEmail}");
             return true;
             
@@ -559,8 +557,10 @@ class MailService {
             // Add ICS attachment
             $mail->addStringAttachment($attachmentContent, $attachmentFilename, 'base64', 'text/calendar');
             
-            // Send
+            // Send (with output buffering to capture any debug output)
+            ob_start();
             $mail->send();
+            ob_end_clean();
             error_log("Successfully sent helper confirmation email to {$toEmail}");
             return true;
             
@@ -604,8 +604,10 @@ class MailService {
                 $mail->addEmbeddedImage($imagePath, 'ibc_logo');
             }
             
-            // Send
+            // Send (with output buffering to capture any debug output)
+            ob_start();
             $mail->send();
+            ob_end_clean();
             error_log("Successfully sent invitation email to {$toEmail}");
             return true;
             
@@ -640,8 +642,10 @@ class MailService {
             $mail->Subject = $subject;
             $mail->Body = $htmlBody;
             
-            // Send
+            // Send (with output buffering to capture any debug output)
+            ob_start();
             $mail->send();
+            ob_end_clean();
             return true;
             
         } catch (\Exception $e) {
