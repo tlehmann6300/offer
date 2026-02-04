@@ -126,8 +126,8 @@ require_once __DIR__ . '/../../src/Auth.php';
     </div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar fixed left-0 top-0 h-screen w-64 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-40 text-white shadow-2xl">
-        <div class="p-6">
+    <aside id="sidebar" class="sidebar fixed left-0 top-0 h-screen w-64 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-40 text-white shadow-2xl flex flex-col">
+        <div class="p-6 flex-1 overflow-y-auto">
             <!-- IBC Logo in Navbar -->
             <div class="mb-8">
                 <img src="<?php echo asset('assets/img/ibc_logo_original_navbar.webp'); ?>" alt="IBC Logo" class="w-full h-auto">
@@ -163,10 +163,10 @@ require_once __DIR__ . '/../../src/Auth.php';
                             <i class="fas fa-cog w-5"></i>
                             <span>Verwaltung</span>
                         </div>
-                        <i id="verwaltung-arrow" class="fas fa-chevron-down text-sm transition-transform"></i>
+                        <i id="verwaltung-arrow" class="fas fa-chevron-down text-sm transition-transform duration-300"></i>
                     </button>
                     <nav id="verwaltung-dropdown" 
-                         class="hidden ml-4 mt-1 space-y-1"
+                         class="hidden pl-4 mt-1 space-y-1 bg-gray-800 rounded-lg transition-all duration-300"
                          aria-labelledby="verwaltung-button">
                         <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                             <i class="fas fa-clipboard-list w-5"></i>
@@ -212,7 +212,7 @@ require_once __DIR__ . '/../../src/Auth.php';
             </nav>
         </div>
 
-        <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-white/20">
+        <div class="p-6 border-t border-white/20">
             <div class="flex items-center space-x-3 mb-4">
                 <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                     <i class="fas fa-user"></i>
@@ -222,8 +222,8 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <div class="text-xs text-white/70"><?php echo htmlspecialchars(ucfirst($_SESSION['user_role'] ?? 'guest')); ?></div>
                 </div>
             </div>
-            <a href="<?php echo asset('pages/auth/logout.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition text-red-300">
-                <i class="fas fa-sign-out-alt w-5"></i>
+            <a href="<?php echo asset('pages/auth/logout.php'); ?>" class="w-full mt-auto bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-2 flex items-center justify-center transition">
+                <i class="fas fa-sign-out-alt mr-2"></i>
                 <span>Abmelden</span>
             </a>
         </div>
