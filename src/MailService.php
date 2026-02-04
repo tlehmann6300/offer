@@ -784,4 +784,36 @@ class MailService {
         // Get complete HTML template
         return self::getTemplate('Projektbewerbung', $bodyContent, $callToAction);
     }
+    
+    /**
+     * Send team completion notification to project leads
+     * 
+     * @param string $toEmail Recipient email address
+     * @param string $projectTitle Project title
+     * @return bool Success status
+     */
+    public static function sendTeamCompletionNotification($toEmail, $projectTitle) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send team completion notification: Composer vendor missing");
+            return false;
+        }
+        
+        $subject = "Team vollständig: " . $projectTitle;
+        
+        // Build body content
+        $bodyContent = '<p class="email-text">Hallo,</p>
+        <p class="email-text">das Team für das Projekt "<strong>' . htmlspecialchars($projectTitle) . '</strong>" ist jetzt vollständig besetzt.</p>
+        <p class="email-text">Der Projektstatus wurde automatisch aktualisiert.</p>
+        <p class="email-text">Weitere Details zum Projekt findest du im IBC Intranet.</p>';
+        
+        // Create call-to-action button
+        $projectLink = BASE_URL . '/pages/projects/manage.php';
+        $callToAction = '<a href="' . htmlspecialchars($projectLink) . '" class="button">Zum Projekt</a>';
+        
+        // Get complete HTML template
+        $htmlBody = self::getTemplate('Team vollständig', $bodyContent, $callToAction);
+        
+        // Send email (has its own exception handling)
+        return self::sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody);
+    }
 }

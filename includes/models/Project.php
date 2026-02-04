@@ -289,4 +289,45 @@ class Project {
         $stmt->execute([$projectId, $userId]);
         return $stmt->fetch();
     }
+    
+    /**
+     * Check if a user has the 'lead' role in a project
+     * 
+     * @param int $projectId Project ID
+     * @param int $userId User ID
+     * @return bool True if user is a lead, false otherwise
+     */
+    public static function isLead($projectId, $userId) {
+        $db = Database::getContentDB();
+        
+        $stmt = $db->prepare("
+            SELECT COUNT(*) as count
+            FROM project_assignments
+            WHERE project_id = ? AND user_id = ? AND role = 'lead'
+        ");
+        
+        $stmt->execute([$projectId, $userId]);
+        $result = $stmt->fetch();
+        
+        return $result && $result['count'] > 0;
+    }
+    
+    /**
+     * Get all lead user IDs for a project
+     * 
+     * @param int $projectId Project ID
+     * @return array Array of user IDs who are leads
+     */
+    public static function getProjectLeads($projectId) {
+        $db = Database::getContentDB();
+        
+        $stmt = $db->prepare("
+            SELECT user_id
+            FROM project_assignments
+            WHERE project_id = ? AND role = 'lead'
+        ");
+        
+        $stmt->execute([$projectId]);
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
 }
