@@ -27,6 +27,12 @@ if (!$project) {
     exit;
 }
 
+// Sicherheits-Check: Entwürfe nur für Manager sichtbar
+if ($project['status'] === 'draft' && !Auth::hasPermission('manager')) {
+    header('Location: index.php');
+    exit;
+}
+
 // Filter sensitive data based on user role
 $project = Project::filterSensitiveData($project, $userRole, $user['id']);
 
@@ -136,10 +142,9 @@ ob_start();
     </div>
     
     <!-- Draft Warning -->
-    <?php if ($project['status'] === 'draft'): ?>
-    <div class="mb-6 p-4 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-lg">
-        <i class="fas fa-exclamation-triangle mr-2"></i>
-        <strong>Dieses Projekt ist ein Entwurf und für normale Mitglieder noch nicht sichtbar.</strong>
+    <?php if ($project['status'] === 'draft' && Auth::hasPermission('manager')): ?>
+    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
+        Status: ENTWURF - Für Mitglieder noch nicht sichtbar.
     </div>
     <?php endif; ?>
     
