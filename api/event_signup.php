@@ -277,7 +277,7 @@ try {
             
             // Get user details
             $userEmail = $user['email'];
-            $userName = ($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '');
+            $userName = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''));
             
             // Get database connection
             $db = Database::getContentDB();
