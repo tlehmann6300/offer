@@ -694,10 +694,11 @@ class MailService {
      * @param string $userEmail Recipient email address
      * @param string $projectTitle Project title
      * @param string $status Status: 'accepted' or 'rejected'
+     * @param int $projectId Project ID for linking to project view page
      * @param array|null $clientData Client data with 'name' and 'contact' keys (only for accepted status)
      * @return bool Success status
      */
-    public static function sendProjectApplicationStatus($userEmail, $projectTitle, $status, $clientData = null) {
+    public static function sendProjectApplicationStatus($userEmail, $projectTitle, $status, $projectId, $clientData = null) {
         if (self::isVendorMissing()) {
             error_log("Cannot send project application status: Composer vendor missing");
             return false;
@@ -705,7 +706,7 @@ class MailService {
         
         if ($status === 'accepted') {
             $subject = "Projektzusage: " . $projectTitle;
-            $htmlBody = self::buildProjectApplicationAcceptedBody($projectTitle, $clientData);
+            $htmlBody = self::buildProjectApplicationAcceptedBody($projectTitle, $projectId, $clientData);
             return self::sendEmailWithEmbeddedImage($userEmail, $subject, $htmlBody);
         } elseif ($status === 'rejected') {
             $subject = "Projektbewerbung: " . $projectTitle;
@@ -721,10 +722,11 @@ class MailService {
      * Build HTML body for project application acceptance email
      * 
      * @param string $projectTitle Project title
+     * @param int $projectId Project ID for linking to project view page
      * @param array|null $clientData Client data with 'name' and 'contact' keys
      * @return string HTML email body
      */
-    private static function buildProjectApplicationAcceptedBody($projectTitle, $clientData) {
+    private static function buildProjectApplicationAcceptedBody($projectTitle, $projectId, $clientData) {
         // Build body content
         $bodyContent = '<p class="email-text">Hallo,</p>
         <p class="email-text">wir freuen uns, dir mitteilen zu können, dass deine Bewerbung für das Projekt "<strong>' . htmlspecialchars($projectTitle) . '</strong>" <strong>angenommen</strong> wurde!</p>';
@@ -754,7 +756,7 @@ class MailService {
         $bodyContent .= '<p class="email-text">Weitere Details zum Projekt findest du im IBC Intranet.</p>';
         
         // Create call-to-action button
-        $projectLink = BASE_URL . '/pages/projects/manage.php';
+        $projectLink = BASE_URL . '/pages/projects/view.php?id=' . intval($projectId);
         $callToAction = '<a href="' . htmlspecialchars($projectLink) . '" class="button">Zum Projekt</a>';
         
         // Get complete HTML template

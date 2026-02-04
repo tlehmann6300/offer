@@ -89,6 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accept_application'])
                             $user['email'], 
                             $project['title'], 
                             'accepted', 
+                            $projectId,
                             $clientData
                         );
                     } catch (Exception $emailError) {
@@ -196,7 +197,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reject_application'])
                 $emailSent = MailService::sendProjectApplicationStatus(
                     $user['email'], 
                     $project['title'], 
-                    'rejected'
+                    'rejected',
+                    $projectId
                 );
             } catch (Exception $emailError) {
                 error_log("Failed to send project rejection email: " . $emailError->getMessage());
