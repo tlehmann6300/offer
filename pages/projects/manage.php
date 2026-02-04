@@ -11,7 +11,7 @@ Auth::requireRole('manager');
 $message = '';
 $error = '';
 $showForm = isset($_GET['new']) || isset($_GET['edit']);
-$editProject = null;
+$project = null;
 
 // Handle POST request for creating/updating project
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_project'])) {
@@ -135,8 +135,8 @@ if (isset($_GET['success']) && isset($_GET['msg'])) {
 // Get project for editing
 if (isset($_GET['edit'])) {
     $editId = intval($_GET['edit']);
-    $editProject = Project::getById($editId);
-    if (!$editProject) {
+    $project = Project::getById($editId);
+    if (!$project) {
         $error = 'Projekt nicht gefunden';
         $showForm = false;
     }
@@ -398,7 +398,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
     <div class="flex items-center justify-between mb-4">
         <h1 class="text-3xl font-bold text-gray-800">
             <i class="fas fa-briefcase text-purple-600 mr-2"></i>
-            <?php echo $editProject ? 'Projekt bearbeiten' : 'Neues Projekt'; ?>
+            <?php echo $project ? 'Projekt bearbeiten' : 'Neues Projekt'; ?>
         </h1>
         <a href="manage.php" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
             <i class="fas fa-arrow-left mr-2"></i>Zurück zur Übersicht
@@ -417,8 +417,8 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
     <form method="POST" enctype="multipart/form-data" class="space-y-6">
         <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
         <input type="hidden" name="save_project" value="1">
-        <?php if ($editProject): ?>
-        <input type="hidden" name="project_id" value="<?php echo $editProject['id']; ?>">
+        <?php if ($project): ?>
+        <input type="hidden" name="project_id" value="<?php echo $project['id']; ?>">
         <?php endif; ?>
         
         <!-- Title -->
@@ -429,7 +429,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
             <input 
                 type="text" 
                 name="title" 
-                value="<?php echo htmlspecialchars($_POST['title'] ?? $editProject['title'] ?? ''); ?>"
+                value="<?php echo htmlspecialchars($_POST['title'] ?? $project['title'] ?? ''); ?>"
                 required
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Projekt-Titel eingeben"
@@ -446,7 +446,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 rows="5"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Projekt-Beschreibung eingeben"
-            ><?php echo htmlspecialchars($_POST['description'] ?? $editProject['description'] ?? ''); ?></textarea>
+            ><?php echo htmlspecialchars($_POST['description'] ?? $project['description'] ?? ''); ?></textarea>
         </div>
 
         <!-- Client Information -->
@@ -458,7 +458,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 <input 
                     type="text" 
                     name="client_name" 
-                    value="<?php echo htmlspecialchars($_POST['client_name'] ?? $editProject['client_name'] ?? ''); ?>"
+                    value="<?php echo htmlspecialchars($_POST['client_name'] ?? $project['client_name'] ?? ''); ?>"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="Name des Kunden"
                 >
@@ -470,7 +470,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 <input 
                     type="text" 
                     name="client_contact_details" 
-                    value="<?php echo htmlspecialchars($_POST['client_contact_details'] ?? $editProject['client_contact_details'] ?? ''); ?>"
+                    value="<?php echo htmlspecialchars($_POST['client_contact_details'] ?? $project['client_contact_details'] ?? ''); ?>"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="E-Mail, Telefon, etc."
                 >
@@ -487,12 +487,12 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                     name="priority" 
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
-                    <option value="low" <?php echo (($_POST['priority'] ?? $editProject['priority'] ?? 'medium') === 'low') ? 'selected' : ''; ?>>Niedrig</option>
-                    <option value="medium" <?php echo (($_POST['priority'] ?? $editProject['priority'] ?? 'medium') === 'medium') ? 'selected' : ''; ?>>Mittel</option>
-                    <option value="high" <?php echo (($_POST['priority'] ?? $editProject['priority'] ?? 'medium') === 'high') ? 'selected' : ''; ?>>Hoch</option>
+                    <option value="low" <?php echo (($_POST['priority'] ?? $project['priority'] ?? 'medium') === 'low') ? 'selected' : ''; ?>>Niedrig</option>
+                    <option value="medium" <?php echo (($_POST['priority'] ?? $project['priority'] ?? 'medium') === 'medium') ? 'selected' : ''; ?>>Mittel</option>
+                    <option value="high" <?php echo (($_POST['priority'] ?? $project['priority'] ?? 'medium') === 'high') ? 'selected' : ''; ?>>Hoch</option>
                 </select>
             </div>
-            <?php if ($editProject): ?>
+            <?php if ($project): ?>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     Status
@@ -501,14 +501,14 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                     name="status" 
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
-                    <option value="draft" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'draft') ? 'selected' : ''; ?>>Entwurf</option>
-                    <option value="open" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'open') ? 'selected' : ''; ?>>Offen</option>
-                    <option value="tender" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'tender') ? 'selected' : ''; ?>>Ausschreibung (veraltet)</option>
-                    <option value="applying" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'applying') ? 'selected' : ''; ?>>Bewerbungsphase</option>
-                    <option value="assigned" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'assigned') ? 'selected' : ''; ?>>Vergeben</option>
-                    <option value="running" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'running') ? 'selected' : ''; ?>>Laufend</option>
-                    <option value="completed" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'completed') ? 'selected' : ''; ?>>Abgeschlossen</option>
-                    <option value="archived" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'archived') ? 'selected' : ''; ?>>Archiviert</option>
+                    <option value="draft" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'draft') ? 'selected' : ''; ?>>Entwurf</option>
+                    <option value="open" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'open') ? 'selected' : ''; ?>>Offen</option>
+                    <option value="tender" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'tender') ? 'selected' : ''; ?>>Ausschreibung (veraltet)</option>
+                    <option value="applying" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'applying') ? 'selected' : ''; ?>>Bewerbungsphase</option>
+                    <option value="assigned" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'assigned') ? 'selected' : ''; ?>>Vergeben</option>
+                    <option value="running" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'running') ? 'selected' : ''; ?>>Laufend</option>
+                    <option value="completed" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'completed') ? 'selected' : ''; ?>>Abgeschlossen</option>
+                    <option value="archived" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'archived') ? 'selected' : ''; ?>>Archiviert</option>
                 </select>
                 <p class="text-sm text-gray-500 mt-2">
                     <i class="fas fa-info-circle mr-1"></i>
@@ -527,7 +527,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 <input 
                     type="date" 
                     name="start_date" 
-                    value="<?php echo htmlspecialchars($_POST['start_date'] ?? $editProject['start_date'] ?? ''); ?>"
+                    value="<?php echo htmlspecialchars($_POST['start_date'] ?? $project['start_date'] ?? ''); ?>"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
             </div>
@@ -538,7 +538,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 <input 
                     type="date" 
                     name="end_date" 
-                    value="<?php echo htmlspecialchars($_POST['end_date'] ?? $editProject['end_date'] ?? ''); ?>"
+                    value="<?php echo htmlspecialchars($_POST['end_date'] ?? $project['end_date'] ?? ''); ?>"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
             </div>
@@ -552,7 +552,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
             <input 
                 type="number" 
                 name="max_consultants" 
-                value="<?php echo htmlspecialchars($_POST['max_consultants'] ?? $editProject['max_consultants'] ?? '1'); ?>"
+                value="<?php echo htmlspecialchars($_POST['max_consultants'] ?? $project['max_consultants'] ?? '1'); ?>"
                 min="1"
                 required
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -565,9 +565,9 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
             <label class="block text-sm font-medium text-gray-700 mb-2">
                 Projekt-Bild
             </label>
-            <?php if ($editProject && !empty($editProject['image_path'])): ?>
+            <?php if ($project && !empty($project['image_path'])): ?>
             <div class="mb-4">
-                <img src="/<?php echo htmlspecialchars($editProject['image_path']); ?>" 
+                <img src="/<?php echo htmlspecialchars($project['image_path']); ?>" 
                      alt="Aktuelles Bild"
                      class="w-64 h-48 object-cover rounded-lg border border-gray-300">
                 <p class="text-sm text-gray-500 mt-2">Aktuelles Bild (wird ersetzt, wenn Sie ein neues hochladen)</p>
@@ -590,11 +590,11 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
             <label class="block text-sm font-medium text-gray-700 mb-2">
                 Projekt-Dokumentation (PDF)
             </label>
-            <?php if ($editProject && !empty($editProject['documentation'])): ?>
+            <?php if ($project && !empty($project['documentation'])): ?>
             <div class="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-300">
                 <p class="text-sm text-gray-700">
                     <i class="fas fa-file-pdf text-red-500 mr-2"></i>
-                    <a href="/<?php echo htmlspecialchars($editProject['documentation']); ?>" 
+                    <a href="/<?php echo htmlspecialchars($project['documentation']); ?>" 
                        target="_blank" 
                        class="text-purple-600 hover:underline">
                         Aktuelle Dokumentation anzeigen
@@ -619,7 +619,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
             <a href="manage.php" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
                 Abbrechen
             </a>
-            <?php if ($editProject): ?>
+            <?php if ($project): ?>
                 <button type="submit" class="flex-1 btn-primary">
                     <i class="fas fa-save mr-2"></i>
                     Änderungen speichern
