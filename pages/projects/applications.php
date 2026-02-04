@@ -97,7 +97,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accept_application'])
                     }
                 }
                 
-                $message = $emailSent ? 'Status aktualisiert und Benachrichtigung versendet' : 'Status aktualisiert';
+                // Check if team is now fully staffed
+                // Only check if max_consultants is defined and greater than 0
+                // Skip check if project is already in 'assigned' or later status
+                $maxConsultants = isset($project['max_consultants']) ? intval($project['max_consultants']) : 0;
+                
+                if ($maxConsultants > 0 && !in_array($project['status'], ['assigned', 'running', 'completed', 'archived'])) {
+                    $stmt = $db->prepare("SELECT COUNT(*) as assignment_count FROM project_assignments WHERE project_id = ?");
+                    $stmt->execute([$projectId]);
+                    $assignmentResult = $stmt->fetch();
+                    $assignmentCount = $assignmentResult ? intval($assignmentResult['assignment_count']) : 0;
+                    
+                    // If team is fully staffed, update project status and notify leads
+                    if ($assignmentCount >= $maxConsultants) {
+                        // Update project status to 'assigned' (team is fully staffed)
+                        $stmt = $db->prepare("UPDATE projects SET status = 'assigned' WHERE id = ?");
+                        $stmt->execute([$projectId]);
+                        
+                        // Get all project leads
+                        $leadUserIds = Project::getProjectLeads($projectId);
+                        
+                        // Track if lead notifications were sent successfully
+                        $leadNotificationsSent = 0;
+                        
+                        // Send notification to each lead
+                        foreach ($leadUserIds as $leadUserId) {
+                            $leadUser = User::getById($leadUserId);
+                            if ($leadUser && !empty($leadUser['email'])) {
+                                try {
+                                    if (MailService::sendTeamCompletionNotification($leadUser['email'], $project['title'])) {
+                                        $leadNotificationsSent++;
+                                    }
+                                } catch (Exception $emailError) {
+                                    error_log("Failed to send team completion notification to lead {$leadUserId}: " . $emailError->getMessage());
+                                    // Don't fail the whole operation if email fails
+                                }
+                            }
+                        }
+                        
+                        // Build success message based on email results
+                        if ($emailSent && $leadNotificationsSent > 0) {
+                            $message = "Status aktualisiert, Team vollständig und Benachrichtigungen versendet (inkl. {$leadNotificationsSent} Lead(s))";
+                        } elseif ($emailSent) {
+                            $message = "Status aktualisiert, Team vollständig und Benachrichtigung an Bewerber versendet";
+                        } elseif ($leadNotificationsSent > 0) {
+                            $message = "Status aktualisiert und Team vollständig (Benachrichtigungen an {$leadNotificationsSent} Lead(s) versendet)";
+                        } else {
+                            $message = "Status aktualisiert und Team vollständig";
+                        }
+                    } else {
+                        $message = $emailSent ? 'Status aktualisiert und Benachrichtigung versendet' : 'Status aktualisiert';
+                    }
+                } else {
+                    // No max_consultants defined or project already staffed, use default success message
+                    $message = $emailSent ? 'Status aktualisiert und Benachrichtigung versendet' : 'Status aktualisiert';
+                }
                 
             } catch (Exception $e) {
                 $db->rollBack();
