@@ -217,10 +217,8 @@ class MailService {
                 $mail->SMTPDebug = 0;
             }
             
-        } catch (\PHPMailer\PHPMailer\Exception $e) {
-            error_log("Failed to configure PHPMailer: " . $e->getMessage());
-            throw $e;
         } catch (\Exception $e) {
+            // Catch both PHPMailer exceptions and general exceptions (e.g., from isVendorMissing check)
             error_log("Failed to configure PHPMailer: " . $e->getMessage());
             throw $e;
         }
