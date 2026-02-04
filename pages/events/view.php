@@ -227,7 +227,7 @@ ob_start();
                 </a>
                 
                 <!-- iCal Download Button -->
-                <a href="../../api/download_ics.php?event_id=<?php echo $eventId; ?>" 
+                <a href="../../api/download_ics.php?event_id=<?php echo htmlspecialchars($eventId, ENT_QUOTES, 'UTF-8'); ?>" 
                    class="inline-flex items-center px-5 py-2.5 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:border-ibc-blue hover:text-ibc-blue ease-premium shadow-sm">
                     <i class="fas fa-download mr-2"></i>
                     iCal herunterladen

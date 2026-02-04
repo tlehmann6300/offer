@@ -17,9 +17,9 @@ if (!Auth::check()) {
 
 // Get event ID
 $eventId = $_GET['event_id'] ?? null;
-if (!$eventId) {
+if (!$eventId || !is_numeric($eventId) || $eventId <= 0) {
     http_response_code(400);
-    echo 'Event ID fehlt';
+    echo 'Ungültige Event ID';
     exit;
 }
 
@@ -44,8 +44,12 @@ if (!empty($allowedRoles) && !in_array($userRole, $allowedRoles)) {
 // Generate ICS content
 $icsContent = CalendarService::generateIcsFile($event);
 
-// Generate filename
-$filename = 'event_' . $eventId . '_' . date('Ymd') . '.ics';
+// Generate filename - sanitize to prevent header injection
+$safeEventId = preg_replace('/[^0-9]/', '', $eventId);
+$safeDate = date('Ymd');
+$filename = 'event_' . $safeEventId . '_' . $safeDate . '.ics';
+// RFC 6266 compliant filename encoding
+$filename = str_replace('"', '', $filename); // Remove any quotes
 
 // Set headers for file download
 header('Content-Type: text/calendar; charset=utf-8');
