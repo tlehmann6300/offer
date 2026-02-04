@@ -364,16 +364,15 @@ ob_start();
                             class="max-w-xs rounded-xl border border-gray-300 shadow-sm"
                         >
                         <div class="mt-2">
-                            <label class="inline-flex items-center">
-                                <input 
-                                    type="checkbox" 
-                                    name="delete_image" 
-                                    value="1"
-                                    <?php echo $readOnly ? 'disabled' : ''; ?>
-                                    class="form-checkbox h-4 w-4 text-red-600 transition duration-150 ease-in-out"
-                                >
-                                <span class="ml-2 text-sm text-gray-700">Bild löschen</span>
-                            </label>
+                            <input 
+                                type="checkbox" 
+                                name="delete_image" 
+                                id="delete_image" 
+                                value="1" 
+                                <?php echo $readOnly ? 'disabled' : ''; ?>
+                                class="form-checkbox h-4 w-4 text-red-600 transition duration-150 ease-in-out"
+                            >
+                            <label for="delete_image" class="ml-2 text-sm text-gray-700">Bild löschen</label>
                         </div>
                     </div>
                     <?php endif; ?>
