@@ -153,14 +153,21 @@ require_once __DIR__ . '/../../src/Auth.php';
                 
                 <!-- Verwaltung Dropdown -->
                 <div class="pt-2">
-                    <button onclick="toggleVerwaltungDropdown()" class="w-full flex items-center justify-between space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                    <button onclick="toggleVerwaltungDropdown()" 
+                            id="verwaltung-button"
+                            class="w-full flex items-center justify-between space-x-3 p-3 rounded-lg hover:bg-white/10 transition"
+                            aria-expanded="false"
+                            aria-controls="verwaltung-dropdown">
                         <div class="flex items-center space-x-3">
                             <i class="fas fa-cog w-5"></i>
                             <span>Verwaltung</span>
                         </div>
                         <i id="verwaltung-arrow" class="fas fa-chevron-down text-sm transition-transform"></i>
                     </button>
-                    <div id="verwaltung-dropdown" class="hidden ml-4 mt-1 space-y-1">
+                    <div id="verwaltung-dropdown" 
+                         class="hidden ml-4 mt-1 space-y-1"
+                         role="region"
+                         aria-labelledby="verwaltung-button">
                         <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                             <i class="fas fa-clipboard-list w-5"></i>
                             <span>Meine Ausleihen</span>
@@ -258,8 +265,16 @@ require_once __DIR__ . '/../../src/Auth.php';
         function toggleVerwaltungDropdown() {
             const dropdown = document.getElementById('verwaltung-dropdown');
             const arrow = document.getElementById('verwaltung-arrow');
+            const button = document.getElementById('verwaltung-button');
+            const isHidden = dropdown.classList.contains('hidden');
+            
             dropdown.classList.toggle('hidden');
             arrow.classList.toggle('rotate-180');
+            
+            // Update aria-expanded for accessibility
+            if (button) {
+                button.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+            }
         }
     </script>
 </body>
