@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
+require_once __DIR__ . '/../../includes/helpers.php';
 
 // Update event statuses (pseudo-cron)
 require_once __DIR__ . '/../../includes/pseudo_cron.php';

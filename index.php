@@ -1,6 +1,7 @@
 <?php
 require_once 'config/config.php';
 require_once 'src/Auth.php';
+require_once 'includes/helpers.php';
 
 if (Auth::check()) {
     header('Location: ' . BASE_URL . '/pages/dashboard/index.php');
