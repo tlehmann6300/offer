@@ -169,10 +169,15 @@ class MailService {
      * Create and configure PHPMailer instance with SMTP settings
      * 
      * @param bool $enableDebug Enable SMTP debug output (default: false, overridden by environment)
-     * @return \PHPMailer\PHPMailer\PHPMailer Configured PHPMailer instance
+     * @return \PHPMailer\PHPMailer\PHPMailer|null Configured PHPMailer instance or null if vendor missing
      * @throws \PHPMailer\PHPMailer\Exception If SMTP credentials are missing
      */
     private static function createMailer($enableDebug = false) {
+        // Check if PHPMailer is available
+        if (self::isVendorMissing()) {
+            throw new \Exception("PHPMailer not available: Composer vendor missing");
+        }
+        
         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
         
         try {
