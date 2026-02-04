@@ -359,7 +359,7 @@ ob_start();
                     <div class="mb-3">
                         <p class="text-sm text-gray-600 mb-2">Aktuelles Bild:</p>
                         <img 
-                            src="/<?php echo htmlspecialchars($event['image_path']); ?>" 
+                            src="<?php echo htmlspecialchars(BASE_URL . '/' . $event['image_path']); ?>" 
                             alt="Event Bild"
                             class="max-w-xs rounded-xl border border-gray-300 shadow-sm"
                         >

@@ -194,6 +194,18 @@ ob_start();
             </div>
         <?php endif; ?>
 
+        <!-- Event Image -->
+        <?php if (!empty($event['image_path'])): ?>
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <h2 class="text-xl font-bold text-gray-800 mb-3">Event-Bild</h2>
+                <img 
+                    src="<?php echo htmlspecialchars(BASE_URL . '/' . $event['image_path']); ?>" 
+                    alt="<?php echo htmlspecialchars($event['title']); ?>"
+                    class="w-full max-w-2xl rounded-xl border border-gray-300 shadow-soft"
+                >
+            </div>
+        <?php endif; ?>
+
         <!-- Participant Counter -->
         <?php if (!$event['is_external']): ?>
             <div class="mt-6 pt-6 border-t border-gray-200">
