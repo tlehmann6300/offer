@@ -179,6 +179,7 @@ ob_start();
                 <?php 
                 switch($project['status']) {
                     case 'draft': echo 'bg-gray-100 text-gray-800'; break;
+                    case 'open': echo 'bg-blue-100 text-blue-800'; break;
                     case 'tender': echo 'bg-blue-100 text-blue-800'; break;
                     case 'applying': echo 'bg-yellow-100 text-yellow-800'; break;
                     case 'assigned': echo 'bg-green-100 text-green-800'; break;
@@ -190,6 +191,7 @@ ob_start();
                 <?php 
                 switch($project['status']) {
                     case 'draft': echo 'Entwurf'; break;
+                    case 'open': echo 'Offen'; break;
                     case 'tender': echo 'Ausschreibung'; break;
                     case 'applying': echo 'Bewerbungsphase'; break;
                     case 'assigned': echo 'Vergeben'; break;
@@ -461,13 +463,18 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                     <option value="draft" <?php echo (($editProject['status'] ?? 'draft') === 'draft') ? 'selected' : ''; ?>>Entwurf</option>
-                    <option value="tender" <?php echo (($editProject['status'] ?? 'draft') === 'tender') ? 'selected' : ''; ?>>Ausschreibung</option>
+                    <option value="open" <?php echo (($editProject['status'] ?? 'draft') === 'open') ? 'selected' : ''; ?>>Offen</option>
+                    <option value="tender" <?php echo (($editProject['status'] ?? 'draft') === 'tender') ? 'selected' : ''; ?>>Ausschreibung (veraltet)</option>
                     <option value="applying" <?php echo (($editProject['status'] ?? 'draft') === 'applying') ? 'selected' : ''; ?>>Bewerbungsphase</option>
                     <option value="assigned" <?php echo (($editProject['status'] ?? 'draft') === 'assigned') ? 'selected' : ''; ?>>Vergeben</option>
                     <option value="running" <?php echo (($editProject['status'] ?? 'draft') === 'running') ? 'selected' : ''; ?>>Laufend</option>
                     <option value="completed" <?php echo (($editProject['status'] ?? 'draft') === 'completed') ? 'selected' : ''; ?>>Abgeschlossen</option>
                     <option value="archived" <?php echo (($editProject['status'] ?? 'draft') === 'archived') ? 'selected' : ''; ?>>Archiviert</option>
                 </select>
+                <p class="text-sm text-gray-500 mt-2">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Hinweis: Status 'Ausschreibung' ist veraltet. Nutzen Sie 'Offen' für neue Projekte.
+                </p>
             </div>
         </div>
 
