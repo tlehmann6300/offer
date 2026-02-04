@@ -98,41 +98,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accept_application'])
                 }
                 
                 // Check if team is now fully staffed
-                $stmt = $db->prepare("SELECT COUNT(*) as assignment_count FROM project_assignments WHERE project_id = ?");
-                $stmt->execute([$projectId]);
-                $assignmentResult = $stmt->fetch();
-                $assignmentCount = $assignmentResult ? intval($assignmentResult['assignment_count']) : 0;
+                // Only check if max_consultants is defined and greater than 0
+                $maxConsultants = isset($project['max_consultants']) ? intval($project['max_consultants']) : 0;
                 
-                // Get max_consultants from project
-                $maxConsultants = isset($project['max_consultants']) ? intval($project['max_consultants']) : 1;
-                
-                // If team is fully staffed, update project status and notify leads
-                if ($assignmentCount >= $maxConsultants) {
-                    // Update project status to 'assigned' (team is fully staffed)
-                    $stmt = $db->prepare("UPDATE projects SET status = 'assigned' WHERE id = ?");
+                if ($maxConsultants > 0) {
+                    $stmt = $db->prepare("SELECT COUNT(*) as assignment_count FROM project_assignments WHERE project_id = ?");
                     $stmt->execute([$projectId]);
+                    $assignmentResult = $stmt->fetch();
+                    $assignmentCount = $assignmentResult ? intval($assignmentResult['assignment_count']) : 0;
                     
-                    // Get all project leads
-                    $leadUserIds = Project::getProjectLeads($projectId);
-                    
-                    // Send notification to each lead
-                    foreach ($leadUserIds as $leadUserId) {
-                        $leadUser = User::getById($leadUserId);
-                        if ($leadUser && !empty($leadUser['email'])) {
-                            try {
-                                MailService::sendTeamCompletionNotification(
-                                    $leadUser['email'], 
-                                    $project['title']
-                                );
-                            } catch (Exception $emailError) {
-                                error_log("Failed to send team completion notification to lead {$leadUserId}: " . $emailError->getMessage());
-                                // Don't fail the whole operation if email fails
+                    // If team is fully staffed, update project status and notify leads
+                    if ($assignmentCount >= $maxConsultants) {
+                        // Update project status to 'assigned' (team is fully staffed)
+                        $stmt = $db->prepare("UPDATE projects SET status = 'assigned' WHERE id = ?");
+                        $stmt->execute([$projectId]);
+                        
+                        // Get all project leads
+                        $leadUserIds = Project::getProjectLeads($projectId);
+                        
+                        // Send notification to each lead
+                        foreach ($leadUserIds as $leadUserId) {
+                            $leadUser = User::getById($leadUserId);
+                            if ($leadUser && !empty($leadUser['email'])) {
+                                try {
+                                    MailService::sendTeamCompletionNotification(
+                                        $leadUser['email'], 
+                                        $project['title']
+                                    );
+                                } catch (Exception $emailError) {
+                                    error_log("Failed to send team completion notification to lead {$leadUserId}: " . $emailError->getMessage());
+                                    // Don't fail the whole operation if email fails
+                                }
                             }
                         }
+                        
+                        $message = $emailSent ? 'Status aktualisiert, Team vollständig und Benachrichtigungen versendet' : 'Status aktualisiert und Team vollständig';
+                    } else {
+                        $message = $emailSent ? 'Status aktualisiert und Benachrichtigung versendet' : 'Status aktualisiert';
                     }
-                    
-                    $message = $emailSent ? 'Status aktualisiert, Team vollständig und Benachrichtigungen versendet' : 'Status aktualisiert und Team vollständig';
                 } else {
+                    // No max_consultants defined, use default success message
                     $message = $emailSent ? 'Status aktualisiert und Benachrichtigung versendet' : 'Status aktualisiert';
                 }
                 
