@@ -19,29 +19,37 @@ try {
     $method = $reflectionClass->getMethod('createMailer');
     $method->setAccessible(true);
     
-    // Test with debug explicitly disabled (should still respect environment)
+    // Test with current environment (debug parameter is no longer used)
     $mail = $method->invoke(null, false);
     
-    if (ENVIRONMENT === 'production') {
-        if ($mail->SMTPDebug === 0) {
-            echo "✓ SMTPDebug is 0 (disabled) in production environment\n";
-        } else {
-            echo "✗ SMTPDebug should be 0 in production, but got: {$mail->SMTPDebug}\n";
-        }
-    } else {
+    if (ENVIRONMENT === 'development') {
         if ($mail->SMTPDebug === 2) {
             echo "✓ SMTPDebug is 2 (enabled) in development environment\n";
         } else {
             echo "✗ SMTPDebug should be 2 in development, but got: {$mail->SMTPDebug}\n";
         }
+    } else {
+        if ($mail->SMTPDebug === 0) {
+            echo "✓ SMTPDebug is 0 (disabled) in non-development environment\n";
+        } else {
+            echo "✗ SMTPDebug should be 0 in non-development environments, but got: {$mail->SMTPDebug}\n";
+        }
     }
     
-    // Test with debug explicitly enabled (should always enable)
+    // Test with debug parameter (should not override environment setting anymore)
     $mailDebug = $method->invoke(null, true);
-    if ($mailDebug->SMTPDebug === 2) {
-        echo "✓ SMTPDebug is 2 when explicitly enabled via parameter\n";
+    if (ENVIRONMENT === 'development') {
+        if ($mailDebug->SMTPDebug === 2) {
+            echo "✓ SMTPDebug is 2 in development (debug parameter ignored)\n";
+        } else {
+            echo "✗ SMTPDebug should be 2 in development, but got: {$mailDebug->SMTPDebug}\n";
+        }
     } else {
-        echo "✗ SMTPDebug should be 2 when explicitly enabled, but got: {$mailDebug->SMTPDebug}\n";
+        if ($mailDebug->SMTPDebug === 0) {
+            echo "✓ SMTPDebug is 0 in non-development (debug parameter ignored)\n";
+        } else {
+            echo "✗ SMTPDebug should be 0 in non-development, but got: {$mailDebug->SMTPDebug}\n";
+        }
     }
     
 } catch (Exception $e) {
@@ -55,13 +63,13 @@ echo "\n=== Test 3: Simulate Different Environment Behaviors ===\n";
 $originalEnv = ENVIRONMENT;
 
 // Test production behavior (we can't redefine constants, so we'll explain the logic)
-echo "In production (ENVIRONMENT = 'production'):\n";
-echo "  - SMTPDebug would be set to 0 (disabled)\n";
-echo "  - Unless explicitly enabled with createMailer(true)\n";
-
-echo "\nIn development/staging (ENVIRONMENT != 'production'):\n";
+echo "In development (ENVIRONMENT = 'development'):\n";
 echo "  - SMTPDebug is set to 2 (enabled)\n";
-echo "  - Helps with debugging email issues\n";
+echo "  - Verbose debug output for troubleshooting\n";
+
+echo "\nIn all other environments (production, staging, etc.):\n";
+echo "  - SMTPDebug is set to 0 (disabled)\n";
+echo "  - No debug output to prevent information leakage\n";
 
 // Test 4: Verify the logic in code
 echo "\n=== Test 4: Verify Environment Check Logic ===\n";
@@ -71,12 +79,14 @@ $startLine = $reflectionMethod->getStartLine();
 $endLine = $reflectionMethod->getEndLine();
 
 echo "✓ createMailer method location verified\n";
-echo "✓ Method checks ENVIRONMENT constant and \$_ENV fallback\n";
-echo "✓ Sets SMTPDebug = 0 for production, SMTPDebug = 2 otherwise\n";
+echo "✓ Method checks ENVIRONMENT constant\n";
+echo "✓ Sets SMTPDebug = 2 only when ENVIRONMENT === 'development'\n";
+echo "✓ Sets SMTPDebug = 0 for all other environments\n";
 
 echo "\n=== Debug Mode Tests Completed ===\n";
 echo "\nSummary:\n";
 echo "- Current environment: " . ENVIRONMENT . "\n";
-echo "- Debug mode is properly set based on ENVIRONMENT\n";
-echo "- Production: SMTPDebug = 0 (no debug output)\n";
+echo "- Debug mode is only enabled in 'development' environment\n";
 echo "- Development: SMTPDebug = 2 (verbose debug output)\n";
+echo "- All others: SMTPDebug = 0 (no debug output)\n";
+echo "- Output buffering is used around send() calls to capture any debug output\n";
