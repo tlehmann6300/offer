@@ -167,8 +167,11 @@ class MailService {
     
     /**
      * Create and configure PHPMailer instance with SMTP settings
+     * SMTPDebug is hard-coded to 0 (disabled) by default for security.
+     * Debug mode is only enabled when ENVIRONMENT === 'development'.
      * 
-     * @param bool $enableDebug Enable SMTP debug output (default: false, overridden by environment)
+     * @param bool $enableDebug Deprecated - Debug mode is controlled by ENVIRONMENT constant only
+     * @deprecated Parameter is ignored. Debug mode is controlled by ENVIRONMENT constant.
      * @return \PHPMailer\PHPMailer\PHPMailer|null Configured PHPMailer instance or null if vendor missing
      * @throws \PHPMailer\PHPMailer\Exception If SMTP credentials are missing
      */
@@ -205,12 +208,13 @@ class MailService {
             $mail->CharSet = 'UTF-8';
             $mail->Encoding = 'base64';
             
-            // Enable debugging only in development mode
+            // SMTPDebug is hard-coded to 0 (disabled) by default for security
+            // Only enable in explicit development mode
+            $mail->SMTPDebug = 0;
+            $mail->Debugoutput = 'error_log'; // Default to error_log for any debug output
             if (defined('ENVIRONMENT') && ENVIRONMENT === 'development') {
-                $mail->SMTPDebug = 2; // Verbose debug output
+                $mail->SMTPDebug = 2; // Verbose debug output only in development
                 $mail->Debugoutput = 'html'; // Format debug output for browser viewing
-            } else {
-                $mail->SMTPDebug = 0; // Disable verbose debug output
             }
             
         } catch (\Exception $e) {
