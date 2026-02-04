@@ -135,6 +135,14 @@ ob_start();
         </a>
     </div>
     
+    <!-- Draft Warning -->
+    <?php if ($project['status'] === 'draft'): ?>
+    <div class="mb-6 p-4 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-lg">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        <strong>Dieses Projekt ist ein Entwurf und für normale Mitglieder noch nicht sichtbar.</strong>
+    </div>
+    <?php endif; ?>
+    
     <?php if ($message): ?>
     <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
         <i class="fas fa-check-circle mr-2"></i><?php echo htmlspecialchars($message); ?>
@@ -155,6 +163,18 @@ ob_start();
             <img src="/<?php echo htmlspecialchars($project['image_path']); ?>" 
                  alt="<?php echo htmlspecialchars($project['title']); ?>"
                  class="w-full h-96 object-cover">
+        </div>
+        <?php endif; ?>
+        
+        <!-- PDF Download Button -->
+        <?php if (!empty($project['file_path']) && file_exists(__DIR__ . '/../../' . $project['file_path'])): ?>
+        <div class="mb-6">
+            <a href="/<?php echo htmlspecialchars($project['file_path']); ?>" 
+               class="inline-flex items-center px-5 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-semibold hover:from-red-700 hover:to-red-800 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition duration-200"
+               download>
+                <i class="fas fa-file-pdf mr-2"></i>
+                Projekt-Datei herunterladen (PDF)
+            </a>
         </div>
         <?php endif; ?>
         
