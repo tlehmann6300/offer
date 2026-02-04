@@ -27,8 +27,17 @@ if (!$project) {
     exit;
 }
 
-// Sicherheits-Check: Entwürfe nur für Manager sichtbar
-if ($project['status'] === 'draft' && !Auth::hasPermission('manager')) {
+// Security Gate: Drafts sind privat!
+if (
+    isset($project['status']) && 
+    $project['status'] === 'draft' && 
+    !Auth::hasPermission('manage_projects')
+) {
+    // Optional: Loggen, wer es versucht hat
+    error_log('Unauthorized access attempt to draft project ID ' . $projectId . ' by User ' . $user['id']);
+    
+    // Redirect zur Übersicht mit Fehler
+    $_SESSION['error'] = 'Zugriff verweigert. Dieses Projekt ist noch nicht veröffentlicht.';
     header('Location: index.php');
     exit;
 }
@@ -142,7 +151,7 @@ ob_start();
     </div>
     
     <!-- Draft Warning -->
-    <?php if ($project['status'] === 'draft' && Auth::hasPermission('manager')): ?>
+    <?php if ($project['status'] === 'draft' && Auth::hasPermission('manage_projects')): ?>
     <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
         Status: ENTWURF - Für Mitglieder noch nicht sichtbar.
     </div>
