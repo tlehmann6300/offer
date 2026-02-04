@@ -271,7 +271,15 @@ class Event {
     public static function getById($id, $includeHelperSlots = true) {
         $db = Database::getContentDB();
         
-        $stmt = $db->prepare("SELECT * FROM events WHERE id = ?");
+        // Use a subquery to get the attendee count in one query
+        $stmt = $db->prepare("
+            SELECT e.*,
+                   (SELECT COUNT(*) 
+                    FROM event_signups 
+                    WHERE event_id = e.id AND status = 'confirmed') as attendee_count
+            FROM events e
+            WHERE e.id = ?
+        ");
         $stmt->execute([$id]);
         $event = $stmt->fetch();
         
@@ -289,6 +297,9 @@ class Event {
         if ($includeHelperSlots && $event['needs_helpers']) {
             $event['helper_types'] = self::getHelperTypes($id);
         }
+        
+        // Get list of attendees with user ID and name
+        $event['attendees'] = self::getEventAttendees($id);
         
         return $event;
     }
@@ -952,6 +963,60 @@ class Event {
         $stmt->execute([$eventId]);
         $result = $stmt->fetch();
         return (int)($result['count'] ?? 0);
+    }
+    
+    /**
+     * Get event attendees (confirmed signups) with user ID and name
+     * Returns an array of attendees with user_id, first_name, and last_name
+     */
+    public static function getEventAttendees($eventId) {
+        $contentDb = Database::getContentDB();
+        $userDb = Database::getUserDB();
+        
+        // First, get confirmed signups from content database
+        $stmt = $contentDb->prepare("
+            SELECT DISTINCT user_id
+            FROM event_signups
+            WHERE event_id = ? AND status = 'confirmed'
+            ORDER BY created_at ASC
+        ");
+        $stmt->execute([$eventId]);
+        $signups = $stmt->fetchAll();
+        
+        if (empty($signups)) {
+            return [];
+        }
+        
+        // Extract user IDs
+        $userIds = array_column($signups, 'user_id');
+        
+        // Get user names from user database
+        // Build placeholders for IN clause
+        $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+        
+        $stmt = $userDb->prepare("
+            SELECT u.id as user_id, ap.first_name, ap.last_name
+            FROM users u
+            LEFT JOIN alumni_profiles ap ON u.id = ap.user_id
+            WHERE u.id IN ($placeholders)
+            ORDER BY ap.last_name ASC, ap.first_name ASC
+        ");
+        $stmt->execute($userIds);
+        $attendees = $stmt->fetchAll();
+        
+        // For users without alumni profiles, set name to email or placeholder
+        foreach ($attendees as &$attendee) {
+            if (empty($attendee['first_name']) && empty($attendee['last_name'])) {
+                // Get email from users table as fallback
+                $stmt = $userDb->prepare("SELECT email FROM users WHERE id = ?");
+                $stmt->execute([$attendee['user_id']]);
+                $user = $stmt->fetch();
+                $attendee['first_name'] = $user['email'] ?? 'User';
+                $attendee['last_name'] = '';
+            }
+        }
+        
+        return $attendees;
     }
     
     /**
