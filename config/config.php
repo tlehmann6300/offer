@@ -103,3 +103,6 @@ date_default_timezone_set('Europe/Berlin');
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Load helper functions globally
+require_once __DIR__ . '/../includes/helpers.php';
