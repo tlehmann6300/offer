@@ -18,21 +18,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_project'])) {
     CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
     
     try {
+        $projectId = intval($_POST['project_id'] ?? 0);
+        
+        // Determine status based on context
+        if ($projectId > 0) {
+            // Edit mode: use status from dropdown
+            $status = $_POST['status'] ?? 'draft';
+        } else {
+            // Create mode: determine from button pressed
+            $isDraft = isset($_POST['save_draft']);
+            $status = $isDraft ? 'draft' : 'open';
+        }
+        
         $projectData = [
             'title' => trim($_POST['title'] ?? ''),
             'description' => trim($_POST['description'] ?? ''),
             'client_name' => trim($_POST['client_name'] ?? ''),
             'client_contact_details' => trim($_POST['client_contact_details'] ?? ''),
             'priority' => $_POST['priority'] ?? 'medium',
-            'status' => $_POST['status'] ?? 'draft',
+            'status' => $status,
             'max_consultants' => max(1, intval($_POST['max_consultants'] ?? 1)),
             'start_date' => !empty($_POST['start_date']) ? $_POST['start_date'] : null,
             'end_date' => !empty($_POST['end_date']) ? $_POST['end_date'] : null,
         ];
         
-        // Validate required fields
+        // Validate required fields based on action
         if (empty($projectData['title'])) {
             throw new Exception('Titel ist erforderlich');
+        }
+        
+        // If creating new project and publishing (not draft), validate all required fields
+        if ($projectId === 0 && $status !== 'draft') {
+            $requiredFields = [
+                'description' => 'Beschreibung',
+                'client_name' => 'Kundenname',
+                'client_contact_details' => 'Kontaktdaten',
+                'start_date' => 'Startdatum',
+                'end_date' => 'Enddatum'
+            ];
+            
+            foreach ($requiredFields as $field => $label) {
+                if (empty($projectData[$field])) {
+                    throw new Exception($label . ' ist erforderlich für die Veröffentlichung');
+                }
+            }
         }
         
         // Handle image upload
@@ -46,7 +75,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_project'])) {
             $projectData['image_path'] = $uploadResult['path'];
         }
         
-        $projectId = intval($_POST['project_id'] ?? 0);
+        // Handle PDF file upload
+        if (isset($_FILES['project_file']) && $_FILES['project_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $uploadResult = Project::handleDocumentationUpload($_FILES['project_file']);
+            
+            if (!$uploadResult['success']) {
+                throw new Exception($uploadResult['error']);
+            }
+            
+            $projectData['documentation'] = $uploadResult['path'];
+        }
         
         if ($projectId > 0) {
             // Update existing project
@@ -391,7 +429,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
             <input 
                 type="text" 
                 name="title" 
-                value="<?php echo htmlspecialchars($editProject['title'] ?? ''); ?>"
+                value="<?php echo htmlspecialchars($_POST['title'] ?? $editProject['title'] ?? ''); ?>"
                 required
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Projekt-Titel eingeben"
@@ -408,7 +446,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 rows="5"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Projekt-Beschreibung eingeben"
-            ><?php echo htmlspecialchars($editProject['description'] ?? ''); ?></textarea>
+            ><?php echo htmlspecialchars($_POST['description'] ?? $editProject['description'] ?? ''); ?></textarea>
         </div>
 
         <!-- Client Information -->
@@ -420,7 +458,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 <input 
                     type="text" 
                     name="client_name" 
-                    value="<?php echo htmlspecialchars($editProject['client_name'] ?? ''); ?>"
+                    value="<?php echo htmlspecialchars($_POST['client_name'] ?? $editProject['client_name'] ?? ''); ?>"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="Name des Kunden"
                 >
@@ -432,7 +470,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 <input 
                     type="text" 
                     name="client_contact_details" 
-                    value="<?php echo htmlspecialchars($editProject['client_contact_details'] ?? ''); ?>"
+                    value="<?php echo htmlspecialchars($_POST['client_contact_details'] ?? $editProject['client_contact_details'] ?? ''); ?>"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="E-Mail, Telefon, etc."
                 >
@@ -449,11 +487,12 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                     name="priority" 
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
-                    <option value="low" <?php echo (($editProject['priority'] ?? 'medium') === 'low') ? 'selected' : ''; ?>>Niedrig</option>
-                    <option value="medium" <?php echo (($editProject['priority'] ?? 'medium') === 'medium') ? 'selected' : ''; ?>>Mittel</option>
-                    <option value="high" <?php echo (($editProject['priority'] ?? 'medium') === 'high') ? 'selected' : ''; ?>>Hoch</option>
+                    <option value="low" <?php echo (($_POST['priority'] ?? $editProject['priority'] ?? 'medium') === 'low') ? 'selected' : ''; ?>>Niedrig</option>
+                    <option value="medium" <?php echo (($_POST['priority'] ?? $editProject['priority'] ?? 'medium') === 'medium') ? 'selected' : ''; ?>>Mittel</option>
+                    <option value="high" <?php echo (($_POST['priority'] ?? $editProject['priority'] ?? 'medium') === 'high') ? 'selected' : ''; ?>>Hoch</option>
                 </select>
             </div>
+            <?php if ($editProject): ?>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     Status
@@ -462,20 +501,21 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                     name="status" 
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
-                    <option value="draft" <?php echo (($editProject['status'] ?? 'draft') === 'draft') ? 'selected' : ''; ?>>Entwurf</option>
-                    <option value="open" <?php echo (($editProject['status'] ?? 'draft') === 'open') ? 'selected' : ''; ?>>Offen</option>
-                    <option value="tender" <?php echo (($editProject['status'] ?? 'draft') === 'tender') ? 'selected' : ''; ?>>Ausschreibung (veraltet)</option>
-                    <option value="applying" <?php echo (($editProject['status'] ?? 'draft') === 'applying') ? 'selected' : ''; ?>>Bewerbungsphase</option>
-                    <option value="assigned" <?php echo (($editProject['status'] ?? 'draft') === 'assigned') ? 'selected' : ''; ?>>Vergeben</option>
-                    <option value="running" <?php echo (($editProject['status'] ?? 'draft') === 'running') ? 'selected' : ''; ?>>Laufend</option>
-                    <option value="completed" <?php echo (($editProject['status'] ?? 'draft') === 'completed') ? 'selected' : ''; ?>>Abgeschlossen</option>
-                    <option value="archived" <?php echo (($editProject['status'] ?? 'draft') === 'archived') ? 'selected' : ''; ?>>Archiviert</option>
+                    <option value="draft" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'draft') ? 'selected' : ''; ?>>Entwurf</option>
+                    <option value="open" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'open') ? 'selected' : ''; ?>>Offen</option>
+                    <option value="tender" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'tender') ? 'selected' : ''; ?>>Ausschreibung (veraltet)</option>
+                    <option value="applying" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'applying') ? 'selected' : ''; ?>>Bewerbungsphase</option>
+                    <option value="assigned" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'assigned') ? 'selected' : ''; ?>>Vergeben</option>
+                    <option value="running" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'running') ? 'selected' : ''; ?>>Laufend</option>
+                    <option value="completed" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'completed') ? 'selected' : ''; ?>>Abgeschlossen</option>
+                    <option value="archived" <?php echo (($_POST['status'] ?? $editProject['status'] ?? 'draft') === 'archived') ? 'selected' : ''; ?>>Archiviert</option>
                 </select>
                 <p class="text-sm text-gray-500 mt-2">
                     <i class="fas fa-info-circle mr-1"></i>
                     Hinweis: Status 'Ausschreibung' ist veraltet. Nutzen Sie 'Offen' für neue Projekte.
                 </p>
             </div>
+            <?php endif; ?>
         </div>
 
         <!-- Date Range -->
@@ -487,7 +527,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 <input 
                     type="date" 
                     name="start_date" 
-                    value="<?php echo htmlspecialchars($editProject['start_date'] ?? ''); ?>"
+                    value="<?php echo htmlspecialchars($_POST['start_date'] ?? $editProject['start_date'] ?? ''); ?>"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
             </div>
@@ -498,7 +538,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 <input 
                     type="date" 
                     name="end_date" 
-                    value="<?php echo htmlspecialchars($editProject['end_date'] ?? ''); ?>"
+                    value="<?php echo htmlspecialchars($_POST['end_date'] ?? $editProject['end_date'] ?? ''); ?>"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
             </div>
@@ -512,7 +552,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
             <input 
                 type="number" 
                 name="max_consultants" 
-                value="<?php echo htmlspecialchars($editProject['max_consultants'] ?? '1'); ?>"
+                value="<?php echo htmlspecialchars($_POST['max_consultants'] ?? $editProject['max_consultants'] ?? '1'); ?>"
                 min="1"
                 required
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -564,8 +604,8 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
             <?php endif; ?>
             <input 
                 type="file" 
-                name="documentation" 
-                accept="application/pdf"
+                name="project_file" 
+                accept=".pdf"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
             <p class="text-sm text-gray-500 mt-2">
@@ -579,10 +619,21 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
             <a href="manage.php" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
                 Abbrechen
             </a>
-            <button type="submit" class="flex-1 btn-primary">
-                <i class="fas fa-save mr-2"></i>
-                <?php echo $editProject ? 'Änderungen speichern' : 'Projekt erstellen'; ?>
-            </button>
+            <?php if ($editProject): ?>
+                <button type="submit" class="flex-1 btn-primary">
+                    <i class="fas fa-save mr-2"></i>
+                    Änderungen speichern
+                </button>
+            <?php else: ?>
+                <button type="submit" name="save_draft" value="1" class="flex-1 px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
+                    <i class="fas fa-file mr-2"></i>
+                    Als Entwurf speichern
+                </button>
+                <button type="submit" class="flex-1 btn-primary">
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    Projekt veröffentlichen
+                </button>
+            <?php endif; ?>
         </div>
     </form>
 </div>
