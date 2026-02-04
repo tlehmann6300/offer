@@ -166,28 +166,28 @@ require_once __DIR__ . '/../../src/Auth.php';
                         <i id="verwaltung-arrow" class="fas fa-chevron-down text-sm transition-transform duration-300"></i>
                     </button>
                     <nav id="verwaltung-dropdown" 
-                         class="hidden bg-gray-800 rounded-r-md mt-1 border-l-2 border-gray-600 ml-4 pl-2 overflow-hidden transition-all duration-300 ease-in-out"
+                         class="hidden bg-black/40 rounded-lg mt-2 ml-2 border-l-2 border-gray-600 overflow-hidden"
                          aria-labelledby="verwaltung-button">
-                        <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white hover:translate-x-1 transition-transform duration-200">
+                        <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
                             <i class="fas fa-clipboard-list w-5 mr-2"></i>
                             <span>Meine Ausleihen</span>
                         </a>
                         <?php if (Auth::hasPermission('manager')): ?>
-                        <a href="<?php echo asset('pages/events/manage.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white hover:translate-x-1 transition-transform duration-200">
+                        <a href="<?php echo asset('pages/events/manage.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
                             <i class="fas fa-calendar-alt w-5 mr-2"></i>
                             <span>Event-Verwaltung</span>
                         </a>
-                        <a href="<?php echo asset('pages/projects/manage.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white hover:translate-x-1 transition-transform duration-200">
+                        <a href="<?php echo asset('pages/projects/manage.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
                             <i class="fas fa-tasks w-5 mr-2"></i>
                             <span>Projekt-Verwaltung</span>
                         </a>
-                        <a href="<?php echo asset('pages/inventory/manage.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white hover:translate-x-1 transition-transform duration-200">
+                        <a href="<?php echo asset('pages/inventory/manage.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
                             <i class="fas fa-cogs w-5 mr-2"></i>
                             <span>Inventar-Verwaltung</span>
                         </a>
                         <?php endif; ?>
                         <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
-                        <a href="<?php echo asset('pages/admin/users.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white hover:translate-x-1 transition-transform duration-200">
+                        <a href="<?php echo asset('pages/admin/users.php'); ?>" class="flex items-center px-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
                             <i class="fas fa-users w-5 mr-2"></i>
                             <span>Benutzerverwaltung</span>
                         </a>
@@ -209,6 +209,14 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <i class="fas fa-user w-5"></i>
                     <span>Profil</span>
                 </a>
+                
+                <!-- Logout Button -->
+                <div class="mt-auto pt-4 border-t border-gray-700">
+                    <a href="<?php echo asset('pages/auth/logout.php'); ?>" 
+                       class="flex items-center justify-center w-full px-4 py-3 text-sm font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-md transition-colors">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Abmelden
+                    </a>
+                </div>
             </nav>
         </div>
 
@@ -222,16 +230,6 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <div class="text-xs text-white/70"><?php echo htmlspecialchars(ucfirst($_SESSION['user_role'] ?? 'guest')); ?></div>
                 </div>
             </div>
-        </div>
-
-        <!-- Logout Button Container -->
-        <div class="mt-auto pt-6 border-t border-gray-700 px-6 pb-6">
-            <a href="<?php echo asset('pages/auth/logout.php'); ?>" class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span>Abmelden</span>
-            </a>
         </div>
     </aside>
 
