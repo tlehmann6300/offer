@@ -142,10 +142,6 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <i class="fas fa-boxes w-5"></i>
                     <span>Inventar</span>
                 </a>
-                <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                    <i class="fas fa-clipboard-list w-5"></i>
-                    <span>Meine Ausleihen</span>
-                </a>
                 <a href="<?php echo asset('pages/events/index.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                     <i class="fas fa-calendar-check w-5"></i>
                     <span>Events</span>
@@ -155,28 +151,53 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <span>Projekte</span>
                 </a>
                 
-                <?php if (Auth::hasPermission('manager')): ?>
-                <!-- Management Section -->
-                <div class="pt-4 mt-4 border-t border-white/20">
-                    <h3 class="text-xs font-semibold text-gray-300 uppercase tracking-wider px-3 mb-2">Verwaltung</h3>
-                    <a href="<?php echo asset('pages/events/manage.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                        <i class="fas fa-calendar-alt w-5"></i>
-                        <span>Event-Verwaltung</span>
-                    </a>
-                    <a href="<?php echo asset('pages/projects/manage.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                        <i class="fas fa-tasks w-5"></i>
-                        <span>Projekt-Verwaltung</span>
-                    </a>
-                    <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
-                    <a href="<?php echo asset('pages/admin/users.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                        <i class="fas fa-users w-5"></i>
-                        <span>Benutzerverwaltung</span>
-                    </a>
+                <!-- Verwaltung Dropdown -->
+                <div class="pt-2">
+                    <button type="button"
+                            onclick="toggleVerwaltungDropdown()" 
+                            id="verwaltung-button"
+                            class="w-full flex items-center justify-between space-x-3 p-3 rounded-lg hover:bg-white/10 transition"
+                            aria-expanded="false"
+                            aria-controls="verwaltung-dropdown">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-cog w-5"></i>
+                            <span>Verwaltung</span>
+                        </div>
+                        <i id="verwaltung-arrow" class="fas fa-chevron-down text-sm transition-transform"></i>
+                    </button>
+                    <nav id="verwaltung-dropdown" 
+                         class="hidden ml-4 mt-1 space-y-1"
+                         aria-labelledby="verwaltung-button">
+                        <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                            <i class="fas fa-clipboard-list w-5"></i>
+                            <span>Meine Ausleihen</span>
+                        </a>
+                        <?php if (Auth::hasPermission('manager')): ?>
+                        <a href="<?php echo asset('pages/events/manage.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                            <i class="fas fa-calendar-alt w-5"></i>
+                            <span>Event-Verwaltung</span>
+                        </a>
+                        <a href="<?php echo asset('pages/projects/manage.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                            <i class="fas fa-tasks w-5"></i>
+                            <span>Projekt-Verwaltung</span>
+                        </a>
+                        <?php endif; ?>
+                        <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
+                        <a href="<?php echo asset('pages/admin/users.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                            <i class="fas fa-users w-5"></i>
+                            <span>Benutzerverwaltung</span>
+                        </a>
+                        <?php endif; ?>
+                    </nav>
+                </div>
+                
+                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
+                <!-- Admin Section (Audit-Logs kept separate) -->
+                <div class="pt-2">
                     <a href="<?php echo asset('pages/admin/audit.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                         <i class="fas fa-clipboard-list w-5"></i>
                         <span>Audit-Logs</span>
                     </a>
-                    <?php endif; ?>
                 </div>
                 <?php endif; ?>
                 
@@ -239,6 +260,22 @@ require_once __DIR__ . '/../../src/Auth.php';
                 sidebarOverlay.classList.add('hidden');
             }
         });
+
+        // Verwaltung dropdown toggle
+        function toggleVerwaltungDropdown() {
+            const dropdown = document.getElementById('verwaltung-dropdown');
+            const arrow = document.getElementById('verwaltung-arrow');
+            const button = document.getElementById('verwaltung-button');
+            const isHidden = dropdown.classList.contains('hidden');
+            
+            dropdown.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-180');
+            
+            // Update aria-expanded for accessibility
+            if (button) {
+                button.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+            }
+        }
     </script>
 </body>
 </html>

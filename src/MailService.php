@@ -5,12 +5,25 @@
  */
 
 require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../vendor/autoload.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+// Check if vendor autoload exists and load it
+$autoloadPath = __DIR__ . '/../vendor/autoload.php';
+if (file_exists($autoloadPath)) {
+    require_once $autoloadPath;
+}
+
+// Check if PHPMailer classes are available
+define('MAIL_SERVICE_VENDOR_AVAILABLE', class_exists('PHPMailer\PHPMailer\PHPMailer'));
 
 class MailService {
+    
+    /**
+     * Check if vendor autoload is available
+     * @return bool True if vendor autoload is missing
+     */
+    private static function isVendorMissing() {
+        return !MAIL_SERVICE_VENDOR_AVAILABLE;
+    }
     
     /**
      * Get the professional HTML email template with IBC corporate design
@@ -156,11 +169,16 @@ class MailService {
      * Create and configure PHPMailer instance with SMTP settings
      * 
      * @param bool $enableDebug Enable SMTP debug output (default: false, overridden by environment)
-     * @return PHPMailer Configured PHPMailer instance
-     * @throws Exception If SMTP credentials are missing
+     * @return \PHPMailer\PHPMailer\PHPMailer|null Configured PHPMailer instance or null if vendor missing
+     * @throws \PHPMailer\PHPMailer\Exception If SMTP credentials are missing
      */
     private static function createMailer($enableDebug = false) {
-        $mail = new PHPMailer(true);
+        // Check if PHPMailer is available
+        if (self::isVendorMissing()) {
+            throw new \Exception("PHPMailer not available: Composer vendor missing");
+        }
+        
+        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
         
         try {
             // SMTP configuration - load dynamically from constants or $_ENV
@@ -169,7 +187,7 @@ class MailService {
             $mail->SMTPAuth = true;
             $mail->Username = defined('SMTP_USER') ? SMTP_USER : ($_ENV['SMTP_USER'] ?? '');
             $mail->Password = defined('SMTP_PASS') ? SMTP_PASS : ($_ENV['SMTP_PASS'] ?? '');
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = defined('SMTP_PORT') ? SMTP_PORT : ($_ENV['SMTP_PORT'] ?? 587);
             
             // Validate SMTP credentials are configured
@@ -199,7 +217,8 @@ class MailService {
                 $mail->SMTPDebug = 0;
             }
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            // Catch both PHPMailer exceptions and the vendor missing exception thrown when PHPMailer is unavailable
             error_log("Failed to configure PHPMailer: " . $e->getMessage());
             throw $e;
         }
@@ -214,6 +233,11 @@ class MailService {
      * @return bool Success status
      */
     public static function sendTestMail($toEmail) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send test email: Composer vendor missing");
+            return false;
+        }
+        
         try {
             $mail = self::createMailer(true); // Enable debug output
             
@@ -259,7 +283,7 @@ class MailService {
             error_log("Test email sent successfully to {$toEmail}");
             return true;
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Failed to send test email to {$toEmail}: " . $e->getMessage());
             return false;
         }
@@ -277,6 +301,11 @@ class MailService {
      * @return bool Success status
      */
     public static function sendHelperConfirmation($toEmail, $toName, $event, $slot, $icsContent, $googleCalendarLink) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send helper confirmation: Composer vendor missing");
+            return false;
+        }
+        
         $subject = "Einsatzbestätigung: " . $event['title'];
         
         // Build email body with new template
@@ -376,6 +405,11 @@ class MailService {
      * @return bool Success status
      */
     public static function sendInvitation($email, $token, $role) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send invitation: Composer vendor missing");
+            return false;
+        }
+        
         $subject = "Einladung zum IBC Intranet";
         
         // Build registration link
@@ -410,6 +444,11 @@ class MailService {
      * @return bool Success status
      */
     private static function sendEmailWithAttachment($toEmail, $toName, $subject, $htmlBody, $attachmentFilename, $attachmentContent) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send email with attachment: Composer vendor missing");
+            return false;
+        }
+        
         try {
             $mail = self::createMailer();
             
@@ -438,7 +477,7 @@ class MailService {
             error_log("Successfully sent helper confirmation email to {$toEmail}");
             return true;
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Error sending email to {$toEmail}: " . $e->getMessage());
             return false;
         }
@@ -453,6 +492,11 @@ class MailService {
      * @return bool Success status
      */
     private static function sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send email with embedded image: Composer vendor missing");
+            return false;
+        }
+        
         try {
             $mail = self::createMailer();
             
@@ -478,7 +522,7 @@ class MailService {
             error_log("Successfully sent invitation email to {$toEmail}");
             return true;
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Error sending email to {$toEmail}: " . $e->getMessage());
             return false;
         }
@@ -493,6 +537,11 @@ class MailService {
      * @return bool Success status
      */
     public static function sendEmail($toEmail, $subject, $htmlBody) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send email: Composer vendor missing");
+            return false;
+        }
+        
         try {
             $mail = self::createMailer();
             
@@ -508,7 +557,7 @@ class MailService {
             $mail->send();
             return true;
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Error sending email to {$toEmail}: " . $e->getMessage());
             return false;
         }
@@ -523,6 +572,11 @@ class MailService {
      * @return bool Success status
      */
     public static function sendProjectAcceptance($toEmail, $project, $role) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send project acceptance: Composer vendor missing");
+            return false;
+        }
+        
         $subject = "Projektzusage: " . $project['title'];
         
         // Build body content
@@ -553,6 +607,11 @@ class MailService {
      * @return bool Success status
      */
     public static function sendProjectApplicationStatus($userEmail, $projectTitle, $status, $clientData = null) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send project application status: Composer vendor missing");
+            return false;
+        }
+        
         if ($status === 'accepted') {
             $subject = "Projektzusage: " . $projectTitle;
             $htmlBody = self::buildProjectApplicationAcceptedBody($projectTitle, $clientData);

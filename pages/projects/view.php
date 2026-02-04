@@ -265,83 +265,87 @@ ob_start();
                 </div>
             <?php elseif (isset($_GET['action']) && $_GET['action'] === 'apply'): ?>
                 <!-- Show Application Form -->
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">
-                    <i class="fas fa-paper-plane text-green-600 mr-2"></i>
-                    Jetzt bewerben
-                </h2>
-                
-                <form method="POST" class="space-y-4">
-                    <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
-                    <input type="hidden" name="apply" value="1">
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                        <i class="fas fa-paper-plane text-blue-600 mr-2" aria-hidden="true"></i>
+                        Jetzt bewerben
+                    </h2>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Motivation <span class="text-red-500">*</span>
-                        </label>
-                        <textarea 
-                            name="motivation" 
-                            rows="5"
-                            required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            placeholder="Warum möchten Sie an diesem Projekt teilnehmen?"
-                        ></textarea>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Anzahl bisheriger Projekterfahrungen
-                        </label>
-                        <input 
-                            type="number" 
-                            name="experience_count" 
-                            min="0"
-                            value="0"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        >
-                    </div>
-                    
-                    <!-- Experience Confirmation Checkbox -->
-                    <div class="flex items-start">
-                        <input 
-                            type="checkbox" 
-                            id="experience_confirmed" 
-                            name="experience_confirmed" 
-                            value="1"
-                            required
-                            class="mt-1 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                        >
-                        <label for="experience_confirmed" class="ml-3 text-sm text-gray-700">
-                            Ich bestätige, dass ich die Anzahl bisheriger Projekte korrekt angegeben habe <span class="text-red-500">*</span>
-                        </label>
-                    </div>
-                    
-                    <!-- GDPR Consent Checkbox -->
-                    <div class="flex items-start">
-                        <input 
-                            type="checkbox" 
-                            id="gdpr_consent" 
-                            name="gdpr_consent" 
-                            value="1"
-                            required
-                            class="mt-1 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                        >
-                        <label for="gdpr_consent" class="ml-3 text-sm text-gray-700">
-                            Ich willige in die Verarbeitung meiner Daten zwecks Projektvergabe ein (DSGVO) <span class="text-red-500">*</span>
-                        </label>
-                    </div>
-                    
-                    <div class="flex space-x-4">
-                        <a href="view.php?id=<?php echo $project['id']; ?>" 
-                           class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
-                            Abbrechen
-                        </a>
-                        <button type="submit" 
-                                class="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition">
-                            <i class="fas fa-paper-plane mr-2"></i>
-                            Bewerbung absenden
-                        </button>
-                    </div>
-                </form>
+                    <form method="POST" class="space-y-6">
+                        <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
+                        <input type="hidden" name="apply" value="1">
+                        
+                        <div>
+                            <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-comment-dots text-blue-600 mr-2" aria-hidden="true"></i>
+                                Motivation <span class="text-red-500 ml-1">*</span>
+                            </label>
+                            <textarea 
+                                name="motivation" 
+                                rows="5"
+                                required
+                                class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                                placeholder="Warum möchten Sie an diesem Projekt teilnehmen?"
+                            ></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-briefcase text-blue-600 mr-2" aria-hidden="true"></i>
+                                Anzahl bisheriger Projekterfahrungen
+                            </label>
+                            <input 
+                                type="number" 
+                                name="experience_count" 
+                                min="0"
+                                value="0"
+                                class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                            >
+                        </div>
+                        
+                        <!-- Experience Confirmation Checkbox -->
+                        <div class="flex items-start">
+                            <input 
+                                type="checkbox" 
+                                id="experience_confirmed" 
+                                name="experience_confirmed" 
+                                value="1"
+                                required
+                                class="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            >
+                            <label for="experience_confirmed" class="ml-3 text-sm text-gray-700">
+                                Ich bestätige, dass ich die Anzahl bisheriger Projekte korrekt angegeben habe <span class="text-red-500">*</span>
+                            </label>
+                        </div>
+                        
+                        <!-- GDPR Consent Checkbox -->
+                        <div class="flex items-start">
+                            <input 
+                                type="checkbox" 
+                                id="gdpr_consent" 
+                                name="gdpr_consent" 
+                                value="1"
+                                required
+                                class="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            >
+                            <label for="gdpr_consent" class="ml-3 text-sm text-gray-700">
+                                Ich willige in die Verarbeitung meiner Daten zwecks Projektvergabe ein (DSGVO) <span class="text-red-500">*</span>
+                            </label>
+                        </div>
+                        
+                        <div class="flex space-x-4 pt-4">
+                            <a href="view.php?id=<?php echo $project['id']; ?>" 
+                               class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
+                                Abbrechen
+                            </a>
+                            <button type="submit" 
+                                    class="flex-1 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-bold text-lg hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 transition shadow-lg hover:shadow-xl">
+                                <i class="fas fa-paper-plane mr-2" aria-hidden="true"></i>
+                                Bewerbung absenden
+                            </button>
+                        </div>
+                    </form>
+                </div>
             <?php else: ?>
                 <!-- Show "Apply Now" button when user hasn't applied yet -->
                 <a href="view.php?id=<?php echo $project['id']; ?>&action=apply" 
