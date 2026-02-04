@@ -978,7 +978,6 @@ class Event {
             SELECT DISTINCT user_id
             FROM event_signups
             WHERE event_id = ? AND status = 'confirmed'
-            ORDER BY created_at ASC
         ");
         $stmt->execute([$eventId]);
         $signups = $stmt->fetchAll();
@@ -999,15 +998,17 @@ class Event {
             FROM users u
             LEFT JOIN alumni_profiles ap ON u.id = ap.user_id
             WHERE u.id IN ($placeholders)
-            ORDER BY ap.last_name ASC, ap.first_name ASC
+            ORDER BY COALESCE(ap.last_name, u.email) ASC, COALESCE(ap.first_name, '') ASC
         ");
         $stmt->execute($userIds);
         $attendees = $stmt->fetchAll();
         
-        // For users without alumni profiles, use email as fallback
+        // For users without alumni profiles, use a fallback display name
         foreach ($attendees as &$attendee) {
             if (empty($attendee['first_name']) && empty($attendee['last_name'])) {
-                $attendee['first_name'] = $attendee['email'] ?? 'User';
+                // Use email local part as first name for better display
+                $emailParts = explode('@', $attendee['email'] ?? '');
+                $attendee['first_name'] = $emailParts[0] ?? 'User';
                 $attendee['last_name'] = '';
             }
             // Remove email from the output as it's only needed for fallback
