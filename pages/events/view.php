@@ -198,11 +198,18 @@ ob_start();
         <?php if (!empty($event['image_path'])): ?>
             <div class="mt-6 pt-6 border-t border-gray-200">
                 <h2 class="text-xl font-bold text-gray-800 mb-3">Event-Bild</h2>
-                <img 
-                    src="<?php echo htmlspecialchars(rtrim(BASE_URL, '/') . '/' . ltrim($event['image_path'], '/')); ?>" 
-                    alt="<?php echo htmlspecialchars($event['title']); ?>"
-                    class="w-full max-w-2xl rounded-xl border border-gray-300 shadow-soft"
-                >
+                <?php if (file_exists(__DIR__ . '/../../' . $event['image_path'])): ?>
+                    <img 
+                        src="<?php echo htmlspecialchars(BASE_URL . '/' . $event['image_path']); ?>" 
+                        alt="<?php echo htmlspecialchars($event['title']); ?>"
+                        class="w-full max-w-2xl rounded-xl border border-gray-300 shadow-soft"
+                    >
+                <?php else: ?>
+                    <div class="w-full max-w-2xl rounded-xl border border-gray-300 bg-gray-100 p-8 text-center">
+                        <i class="fas fa-image text-gray-400 text-6xl mb-4"></i>
+                        <p class="text-gray-600">Bild nicht verfügbar</p>
+                    </div>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
 
