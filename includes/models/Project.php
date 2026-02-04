@@ -9,7 +9,7 @@ class Project {
     /**
      * Upload directory for project documentation
      */
-    private const DOCUMENTATION_UPLOAD_DIR = '/uploads/projects/';
+    private const DOCUMENTATION_UPLOAD_DIR = 'uploads/projects/';
     
     /**
      * Allowed MIME types for documentation uploads (PDF)
@@ -83,8 +83,9 @@ class Project {
             ];
         }
         
-        // Generate secure random filename
-        $randomFilename = 'project_doc_' . bin2hex(random_bytes(16)) . '.pdf';
+        // Generate secure random filename with timestamp for tracking
+        $timestamp = date('Ymd_His');
+        $randomFilename = 'project_doc_' . $timestamp . '_' . bin2hex(random_bytes(8)) . '.pdf';
         $uploadPath = $uploadDir . $randomFilename;
         
         // Move uploaded file to destination
@@ -100,13 +101,31 @@ class Project {
         chmod($uploadPath, 0644);
         
         // Return relative path for database storage
-        $relativePath = trim(self::DOCUMENTATION_UPLOAD_DIR, '/') . '/' . $randomFilename;
+        $relativePath = rtrim(self::DOCUMENTATION_UPLOAD_DIR, '/') . '/' . $randomFilename;
         
         return [
             'success' => true,
             'path' => $relativePath,
             'error' => null
         ];
+    }
+    
+    /**
+     * Handle documentation upload from $_FILES and update data array
+     * 
+     * @param array $data Data array to update with documentation path
+     * @return void
+     * @throws Exception If upload fails
+     */
+    private static function processDocumentationUpload(&$data) {
+        if (isset($_FILES['documentation']) && $_FILES['documentation']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $uploadResult = self::handleDocumentationUpload($_FILES['documentation']);
+            if ($uploadResult['success']) {
+                $data['documentation'] = $uploadResult['path'];
+            } else {
+                throw new Exception($uploadResult['error']);
+            }
+        }
     }
     
     /**
@@ -118,14 +137,7 @@ class Project {
         $db = Database::getContentDB();
         
         // Handle documentation upload if provided in $_FILES
-        if (isset($_FILES['documentation']) && $_FILES['documentation']['error'] !== UPLOAD_ERR_NO_FILE) {
-            $uploadResult = self::handleDocumentationUpload($_FILES['documentation']);
-            if ($uploadResult['success']) {
-                $data['documentation'] = $uploadResult['path'];
-            } else {
-                throw new Exception($uploadResult['error']);
-            }
-        }
+        self::processDocumentationUpload($data);
         
         $stmt = $db->prepare("
             INSERT INTO projects (
@@ -169,14 +181,7 @@ class Project {
         $db = Database::getContentDB();
         
         // Handle documentation upload if provided in $_FILES
-        if (isset($_FILES['documentation']) && $_FILES['documentation']['error'] !== UPLOAD_ERR_NO_FILE) {
-            $uploadResult = self::handleDocumentationUpload($_FILES['documentation']);
-            if ($uploadResult['success']) {
-                $data['documentation'] = $uploadResult['path'];
-            } else {
-                throw new Exception($uploadResult['error']);
-            }
-        }
+        self::processDocumentationUpload($data);
         
         $fields = [];
         $values = [];
@@ -233,6 +238,8 @@ class Project {
             // Specific status requested
             // Only allow draft status if user has manage_projects permission
             if ($status === 'draft' && !$hasManagePermission) {
+                // Log unauthorized access attempt for security audit
+                error_log("Unauthorized draft project access attempt - Role: " . ($userRole ?? 'unknown'));
                 return []; // Return empty array if trying to access draft without permission
             }
             
