@@ -119,7 +119,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accept_application'])
                         
                         // Track if lead notifications were sent successfully
                         $leadNotificationsSent = 0;
-                        $totalLeads = count($leadUserIds);
                         
                         // Send notification to each lead
                         foreach ($leadUserIds as $leadUserId) {
@@ -138,11 +137,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accept_application'])
                         
                         // Build success message based on email results
                         if ($emailSent && $leadNotificationsSent > 0) {
-                            $message = "Status aktualisiert, Team vollständig und Benachrichtigungen versendet";
+                            $message = "Status aktualisiert, Team vollständig und Benachrichtigungen versendet (inkl. {$leadNotificationsSent} Lead(s))";
                         } elseif ($emailSent) {
-                            $message = "Status aktualisiert, Team vollständig und Benachrichtigung versendet";
+                            $message = "Status aktualisiert, Team vollständig und Benachrichtigung an Bewerber versendet";
                         } elseif ($leadNotificationsSent > 0) {
-                            $message = "Status aktualisiert und Team vollständig (Benachrichtigungen an Leads versendet)";
+                            $message = "Status aktualisiert und Team vollständig (Benachrichtigungen an {$leadNotificationsSent} Lead(s) versendet)";
                         } else {
                             $message = "Status aktualisiert und Team vollständig";
                         }
