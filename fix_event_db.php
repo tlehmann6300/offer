@@ -41,7 +41,7 @@ try {
     
 } catch (Exception $e) {
     echo "Fehler: " . $e->getMessage() . "\n";
-    exit(1);
+    return;
 }
 
 // Self-delete this file

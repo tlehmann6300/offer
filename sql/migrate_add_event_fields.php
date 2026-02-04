@@ -82,5 +82,5 @@ try {
 } catch (Exception $e) {
     echo "\n✗ Migration failed: " . $e->getMessage() . "\n";
     echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
-    exit(1);
+    return;
 }
