@@ -249,12 +249,10 @@ ob_start();
                 <span>Ende: <?php echo date('d.m.Y', strtotime($project['end_date'])); ?></span>
             </div>
             <?php endif; ?>
-            <?php if (!empty($project['max_consultants'])): ?>
             <div class="flex items-center">
                 <i class="fas fa-users-cog w-5 text-purple-600"></i>
-                <span>Benötigt: <?php echo intval($project['max_consultants']); ?> Berater</span>
+                <span>Benötigt: <?php echo intval($project['max_consultants'] ?? 1); ?> Berater</span>
             </div>
-            <?php endif; ?>
         </div>
 
         <!-- Application Count -->
