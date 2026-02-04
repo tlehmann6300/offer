@@ -153,7 +153,8 @@ require_once __DIR__ . '/../../src/Auth.php';
                 
                 <!-- Verwaltung Dropdown -->
                 <div class="pt-2">
-                    <button onclick="toggleVerwaltungDropdown()" 
+                    <button type="button"
+                            onclick="toggleVerwaltungDropdown()" 
                             id="verwaltung-button"
                             class="w-full flex items-center justify-between space-x-3 p-3 rounded-lg hover:bg-white/10 transition"
                             aria-expanded="false"
@@ -164,9 +165,8 @@ require_once __DIR__ . '/../../src/Auth.php';
                         </div>
                         <i id="verwaltung-arrow" class="fas fa-chevron-down text-sm transition-transform"></i>
                     </button>
-                    <div id="verwaltung-dropdown" 
+                    <nav id="verwaltung-dropdown" 
                          class="hidden ml-4 mt-1 space-y-1"
-                         role="region"
                          aria-labelledby="verwaltung-button">
                         <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                             <i class="fas fa-clipboard-list w-5"></i>
@@ -188,7 +188,7 @@ require_once __DIR__ . '/../../src/Auth.php';
                             <span>Benutzerverwaltung</span>
                         </a>
                         <?php endif; ?>
-                    </div>
+                    </nav>
                 </div>
                 
                 <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
