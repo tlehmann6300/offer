@@ -43,6 +43,7 @@ $canComplete = $isLead || $userRole === 'board' || $userRole === 'manager';
 // Get team size info
 $teamSize = Project::getTeamSize($projectId);
 $maxConsultants = intval($project['max_consultants'] ?? 1);
+$teamPercentage = $maxConsultants > 0 ? min(100, round(($teamSize / $maxConsultants) * 100)) : 0;
 
 // Handle application submission
 $message = '';
@@ -257,10 +258,10 @@ ob_start();
             </div>
             <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
                 <div class="bg-gradient-to-r from-purple-500 to-blue-500 h-4 rounded-full transition-all duration-300 flex items-center justify-end pr-2"
-                     style="width: <?php echo $maxConsultants > 0 ? min(100, ($teamSize / $maxConsultants) * 100) : 0; ?>%">
+                     style="width: <?php echo $teamPercentage; ?>%">
                     <?php if ($teamSize > 0): ?>
                     <span class="text-xs font-semibold text-white">
-                        <?php echo round(($teamSize / $maxConsultants) * 100); ?>%
+                        <?php echo $teamPercentage; ?>%
                     </span>
                     <?php endif; ?>
                 </div>
