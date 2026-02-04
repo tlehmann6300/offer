@@ -267,6 +267,80 @@ try {
             ]);
             break;
             
+        case 'simple_register':
+            // Simple event registration using event_registrations table
+            $eventId = $input['event_id'] ?? null;
+            
+            if (!$eventId) {
+                throw new Exception('Event-ID fehlt');
+            }
+            
+            // Get user details
+            $userEmail = $user['email'];
+            $userName = ($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '');
+            
+            // Get database connection
+            $db = Database::getContentDB();
+            
+            // Get event data
+            $stmt = $db->prepare("
+                SELECT id, title, description, location, start_time, end_time, contact_person
+                FROM events
+                WHERE id = ?
+            ");
+            $stmt->execute([$eventId]);
+            $event = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$event) {
+                throw new Exception('Event nicht gefunden');
+            }
+            
+            // Check if user is already registered
+            $stmt = $db->prepare("
+                SELECT id, status 
+                FROM event_registrations 
+                WHERE event_id = ? AND user_id = ?
+            ");
+            $stmt->execute([$eventId, $userId]);
+            $existingRegistration = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($existingRegistration && $existingRegistration['status'] === 'confirmed') {
+                throw new Exception('Sie sind bereits für dieses Event angemeldet');
+            }
+            
+            // Save registration in event_registrations table
+            if ($existingRegistration) {
+                // Update existing cancelled registration
+                $stmt = $db->prepare("
+                    UPDATE event_registrations 
+                    SET status = 'confirmed', registered_at = NOW(), updated_at = NOW()
+                    WHERE id = ?
+                ");
+                $stmt->execute([$existingRegistration['id']]);
+            } else {
+                // Insert new registration
+                $stmt = $db->prepare("
+                    INSERT INTO event_registrations (event_id, user_id, status, registered_at)
+                    VALUES (?, ?, 'confirmed', NOW())
+                ");
+                $stmt->execute([$eventId, $userId]);
+            }
+            
+            // Send confirmation email using MailService::sendEventConfirmation
+            try {
+                MailService::sendEventConfirmation($userEmail, $userName, $event);
+            } catch (Exception $mailError) {
+                // Log error but don't fail the registration
+                error_log("Failed to send confirmation email: " . $mailError->getMessage());
+            }
+            
+            // Return success response
+            echo json_encode([
+                'success' => true,
+                'message' => 'Erfolgreich angemeldet'
+            ]);
+            break;
+            
         default:
             throw new Exception('Ungültige Aktion');
     }

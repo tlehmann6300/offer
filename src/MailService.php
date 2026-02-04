@@ -397,6 +397,93 @@ class MailService {
     }
     
     /**
+     * Send event confirmation email for general event registration
+     * 
+     * @param string $toEmail Recipient email address
+     * @param string $toName Recipient name
+     * @param array $event Event data with keys: id, title, description, location, start_time, end_time, contact_person
+     * @return bool Success status
+     */
+    public static function sendEventConfirmation($toEmail, $toName, $event) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send event confirmation: Composer vendor missing");
+            return false;
+        }
+        
+        $subject = "Anmeldebestätigung: " . $event['title'];
+        
+        // Build email body
+        $body = self::buildEventConfirmationBody($toName, $event);
+        
+        // Send email (has its own exception handling)
+        return self::sendEmailWithEmbeddedImage($toEmail, $subject, $body);
+    }
+    
+    /**
+     * Build HTML email body for event confirmation
+     * 
+     * @param string $userName User name
+     * @param array $event Event data
+     * @return string HTML email body
+     */
+    private static function buildEventConfirmationBody($userName, $event) {
+        // Format dates
+        $start = new DateTime($event['start_time']);
+        $end = new DateTime($event['end_time']);
+        
+        // Check if event spans multiple days
+        if ($start->format('Y-m-d') === $end->format('Y-m-d')) {
+            // Same day event
+            $when = $start->format('d.m.Y H:i') . ' - ' . $end->format('H:i');
+        } else {
+            // Multi-day event
+            $when = $start->format('d.m.Y H:i') . ' - ' . $end->format('d.m.Y H:i');
+        }
+        
+        // Build body content
+        $bodyContent = '<p class="email-text">Hallo ' . htmlspecialchars($userName) . ',</p>
+        <p class="email-text">vielen Dank für deine Anmeldung! Hier sind die Details zum Event:</p>
+        
+        <table class="info-table">
+            <tr>
+                <td>Event</td>
+                <td>' . htmlspecialchars($event['title']) . '</td>
+            </tr>
+            <tr>
+                <td>Wann</td>
+                <td>' . htmlspecialchars($when) . '</td>
+            </tr>';
+        
+        if (!empty($event['location'])) {
+            $bodyContent .= '<tr>
+                <td>Wo</td>
+                <td>' . htmlspecialchars($event['location']) . '</td>
+            </tr>';
+        }
+        
+        if (!empty($event['contact_person'])) {
+            $bodyContent .= '<tr>
+                <td>Kontaktperson</td>
+                <td>' . htmlspecialchars($event['contact_person']) . '</td>
+            </tr>';
+        }
+        
+        $bodyContent .= '</table>';
+        
+        if (!empty($event['description'])) {
+            $bodyContent .= '<p class="email-text"><strong>Beschreibung:</strong><br>' . nl2br(htmlspecialchars($event['description'])) . '</p>';
+        }
+        
+        $bodyContent .= '<p class="email-text">Wir freuen uns auf deine Teilnahme!</p>';
+        
+        // Create call-to-action button
+        $eventLink = BASE_URL . '/pages/events/index.php';
+        $callToAction = '<a href="' . htmlspecialchars($eventLink) . '" class="button">Zu den Events</a>';
+        
+        return self::getTemplate('Anmeldebestätigung', $bodyContent, $callToAction);
+    }
+    
+    /**
      * Send invitation email with registration token (New method)
      * 
      * @param string $email Recipient email address
