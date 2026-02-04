@@ -284,7 +284,7 @@ ob_start();
                                 name="motivation" 
                                 rows="5"
                                 required
-                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
                                 placeholder="Warum möchten Sie an diesem Projekt teilnehmen?"
                             ></textarea>
                         </div>
@@ -299,7 +299,7 @@ ob_start();
                                 name="experience_count" 
                                 min="0"
                                 value="0"
-                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
                             >
                         </div>
                         
@@ -339,7 +339,7 @@ ob_start();
                                 Abbrechen
                             </a>
                             <button type="submit" 
-                                    class="flex-1 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-bold text-lg hover:from-blue-700 hover:to-blue-800 transition transform hover:scale-105 shadow-lg hover:shadow-xl">
+                                    class="flex-1 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-bold text-lg hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 transition shadow-lg hover:shadow-xl">
                                 <i class="fas fa-paper-plane mr-2"></i>
                                 Bewerbung absenden
                             </button>
