@@ -372,12 +372,10 @@ function signupForEvent(eventId) {
             showMessage('Erfolgreich angemeldet!', 'success');
             setTimeout(() => location.reload(), 1500);
         } else {
-            alert(data.message || 'Fehler bei der Anmeldung');
             showMessage(data.message || 'Fehler bei der Anmeldung', 'error');
         }
     })
     .catch(error => {
-        alert('Netzwerkfehler');
         showMessage('Netzwerkfehler', 'error');
     });
 }
