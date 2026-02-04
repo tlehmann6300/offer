@@ -18,13 +18,14 @@ $rejectedMethod->setAccessible(true);
 
 // Test data
 $testProjectTitle = 'Web Development Project';
+$testProjectId = 123; // Test project ID
 $testClientData = [
     'name' => 'Max Mustermann GmbH',
     'contact' => 'max.mustermann@example.com, Tel: +49 123 456789'
 ];
 
 echo "=== Test 1: Acceptance email with client data ===\n";
-$acceptedEmailBody = $acceptedMethod->invoke(null, $testProjectTitle, $testClientData);
+$acceptedEmailBody = $acceptedMethod->invoke(null, $testProjectTitle, $testProjectId, $testClientData);
 
 if (!empty($acceptedEmailBody)) {
     echo "✓ Acceptance email body generated\n";
@@ -174,7 +175,7 @@ $xssClientData = [
     'contact' => '<img src=x onerror=alert("XSS")>evil@example.com'
 ];
 
-$xssAcceptedBody = $acceptedMethod->invoke(null, $xssProjectTitle, $xssClientData);
+$xssAcceptedBody = $acceptedMethod->invoke(null, $xssProjectTitle, $testProjectId, $xssClientData);
 
 if (strpos($xssAcceptedBody, '<script>') === false && strpos($xssAcceptedBody, '&lt;script&gt;') !== false) {
     echo "✓ XSS in project title properly escaped\n";
@@ -198,7 +199,7 @@ if (strpos($xssRejectedBody, '<script>') === false && strpos($xssRejectedBody, '
 
 echo "\n=== Test 7: Acceptance email without client data ===\n";
 
-$acceptedEmailBodyNoClient = $acceptedMethod->invoke(null, $testProjectTitle, null);
+$acceptedEmailBodyNoClient = $acceptedMethod->invoke(null, $testProjectTitle, $testProjectId, null);
 
 if (!empty($acceptedEmailBodyNoClient)) {
     echo "✓ Acceptance email without client data generated\n";
@@ -238,8 +239,8 @@ try {
 
 // Check method parameters
 $params = $reflectionPublic->getParameters();
-if (count($params) === 4) {
-    echo "✓ Method has correct number of parameters (4)\n";
+if (count($params) === 5) {
+    echo "✓ Method has correct number of parameters (5)\n";
     
     if ($params[0]->getName() === 'userEmail') {
         echo "✓ First parameter is 'userEmail'\n";
@@ -259,13 +260,42 @@ if (count($params) === 4) {
         echo "✗ Third parameter name incorrect\n";
     }
     
-    if ($params[3]->getName() === 'clientData' && $params[3]->isOptional()) {
-        echo "✓ Fourth parameter is 'clientData' and is optional\n";
+    if ($params[3]->getName() === 'projectId') {
+        echo "✓ Fourth parameter is 'projectId'\n";
     } else {
-        echo "✗ Fourth parameter incorrect or not optional\n";
+        echo "✗ Fourth parameter name incorrect\n";
+    }
+    
+    if ($params[4]->getName() === 'clientData' && $params[4]->isOptional()) {
+        echo "✓ Fifth parameter is 'clientData' and is optional\n";
+    } else {
+        echo "✗ Fifth parameter incorrect or not optional\n";
     }
 } else {
     echo "✗ Method has incorrect number of parameters\n";
+}
+
+echo "\n=== Test 9: Verify project link and button text ===\n";
+
+// Test that the acceptance email contains the correct project link
+if (strpos($acceptedEmailBody, '/pages/projects/view.php?id=' . $testProjectId) !== false) {
+    echo "✓ Acceptance email contains correct project view link\n";
+} else {
+    echo "✗ Acceptance email does not contain correct project view link\n";
+}
+
+// Test that the button text is "Zum Projekt"
+if (strpos($acceptedEmailBody, '>Zum Projekt</a>') !== false) {
+    echo "✓ Button text is 'Zum Projekt'\n";
+} else {
+    echo "✗ Button text is not 'Zum Projekt'\n";
+}
+
+// Test that the old link to manage.php is NOT present
+if (strpos($acceptedEmailBody, '/pages/projects/manage.php') === false) {
+    echo "✓ Old manage.php link correctly removed\n";
+} else {
+    echo "✗ Old manage.php link still present\n";
 }
 
 echo "\n=== All tests completed ===\n";
