@@ -46,6 +46,9 @@ foreach ($userSignups as $signup) {
     }
 }
 
+// Get registration count
+$registrationCount = Event::getRegistrationCount($eventId);
+
 // Get helper types and slots if needed
 $helperTypes = [];
 if ($event['needs_helpers'] && $userRole !== 'alumni') {
@@ -190,6 +193,22 @@ ob_start();
             </div>
         <?php endif; ?>
 
+        <!-- Participant Counter -->
+        <?php if (!$event['is_external']): ?>
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <div class="flex items-center justify-center bg-gradient-to-r from-ibc-blue/10 to-ibc-green/10 rounded-xl p-6">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-ibc-blue mb-2">
+                            <?php echo $registrationCount; ?>
+                        </div>
+                        <div class="text-lg font-semibold text-gray-700">
+                            Angemeldete Teilnehmer
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <!-- Participation Button -->
         <div class="flex gap-4 mt-6 pt-6 border-t border-gray-200">
             <?php if ($event['is_external']): ?>
@@ -209,7 +228,7 @@ ob_start();
                     <button onclick="signupForEvent(<?php echo $eventId; ?>)" 
                             class="inline-flex items-center px-8 py-3 bg-ibc-green text-white rounded-xl font-semibold hover:shadow-glow-green ease-premium">
                         <i class="fas fa-user-plus mr-2"></i>
-                        Teilnehmen
+                        Jetzt anmelden
                     </button>
                 <?php elseif ($canCancel && $userSignupId && !$userSlotId): ?>
                     <button onclick="cancelSignup(<?php echo $userSignupId; ?>)" 
@@ -337,7 +356,7 @@ function showMessage(message, type = 'success') {
 
 // Signup for event (general participation)
 function signupForEvent(eventId) {
-    fetch('/api/event_signup.php', {
+    fetch('../../api/event_signup.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -353,17 +372,19 @@ function signupForEvent(eventId) {
             showMessage('Erfolgreich angemeldet!', 'success');
             setTimeout(() => location.reload(), 1500);
         } else {
+            alert(data.message || 'Fehler bei der Anmeldung');
             showMessage(data.message || 'Fehler bei der Anmeldung', 'error');
         }
     })
     .catch(error => {
+        alert('Netzwerkfehler');
         showMessage('Netzwerkfehler', 'error');
     });
 }
 
 // Signup for helper slot
 function signupForSlot(eventId, slotId, slotStart, slotEnd) {
-    fetch('/api/event_signup.php', {
+    fetch('../../api/event_signup.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -400,7 +421,7 @@ function cancelSignup(signupId, message = 'Möchten Sie Ihre Anmeldung wirklich 
         return;
     }
     
-    fetch('/api/event_signup.php', {
+    fetch('../../api/event_signup.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
