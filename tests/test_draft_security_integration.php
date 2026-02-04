@@ -43,11 +43,11 @@ if (
     echo "Log message generated: $logMessage\n";
     
     // Set session error
-    $_SESSION['error'] = 'Zugriff verweigert. Dieses Projekt ist noch nicht veröffentlicht.';
+    $_SESSION['error'] = 'Zugriff verweigert. Dieses Projekt ist noch im Entwurf.';
 }
 
 // Verify error message is set
-if (isset($_SESSION['error']) && $_SESSION['error'] === 'Zugriff verweigert. Dieses Projekt ist noch nicht veröffentlicht.') {
+if (isset($_SESSION['error']) && $_SESSION['error'] === 'Zugriff verweigert. Dieses Projekt ist noch im Entwurf.') {
     echo "✓ Session error message correctly set\n\n";
     $testsPassed++;
 } else {
@@ -71,7 +71,7 @@ if (
     $project['status'] === 'draft' && 
     !Auth::hasPermission('manage_projects')
 ) {
-    $_SESSION['error'] = 'Zugriff verweigert. Dieses Projekt ist noch nicht veröffentlicht.';
+    $_SESSION['error'] = 'Zugriff verweigert. Dieses Projekt ist noch im Entwurf.';
 }
 
 // Verify no error message is set for manager
@@ -123,7 +123,7 @@ if (
     $project['status'] === 'draft' && 
     !Auth::hasPermission('manage_projects')
 ) {
-    $_SESSION['error'] = 'Zugriff verweigert. Dieses Projekt ist noch nicht veröffentlicht.';
+    $_SESSION['error'] = 'Zugriff verweigert. Dieses Projekt ist noch im Entwurf.';
 }
 
 // Verify no error message is set for board
@@ -149,7 +149,7 @@ if (
     $project['status'] === 'draft' && 
     !Auth::hasPermission('manage_projects')
 ) {
-    $_SESSION['error'] = 'Zugriff verweigert. Dieses Projekt ist noch nicht veröffentlicht.';
+    $_SESSION['error'] = 'Zugriff verweigert. Dieses Projekt ist noch im Entwurf.';
 }
 
 // Verify error message is set for alumni
