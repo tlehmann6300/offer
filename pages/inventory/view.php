@@ -384,29 +384,22 @@ ob_start();
                         <?php echo htmlspecialchars($entry['reason'] ?? '-'); ?>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-600">
-                        <?php
-                        // Check for both 'details' and 'comment' fields for compatibility
+                        <?php 
+                        // JSON sauber formatieren
                         $details = $entry['details'] ?? $entry['comment'] ?? '';
-                        $decoded = json_decode($details, true);
-                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                            // If there's an 'original_data' key, use that instead
-                            if (isset($decoded['original_data']) && is_array($decoded['original_data'])) {
-                                $decoded = $decoded['original_data'];
+                        $json = json_decode($details, true);
+                        if (json_last_error() === JSON_ERROR_NONE && is_array($json)) {
+                            echo '<div class=\'text-xs space-y-1\'>';
+                            foreach ($json as $k => $v) {
+                                if ($k == 'image_path' || empty($v)) continue; // Bildpfad ignorieren
+                                echo '<div class=\'flex gap-2\'>';
+                                echo '<span class=\'font-semibold text-gray-600 w-24 shrink-0\'>' . ucfirst($k) . ':</span>';
+                                echo '<span class=\'text-gray-800 truncate\'>' . htmlspecialchars(is_array($v) ? json_encode($v) : $v) . '</span>';
+                                echo '</div>';
                             }
-                            
-                            echo '<ul class="list-disc list-inside text-xs text-gray-600">';
-                            foreach ($decoded as $key => $val) {
-                                // Skip empty or internal fields
-                                if ($key === 'image_path' || is_array($val)) continue;
-                                // Format field names: convert underscores to spaces and capitalize
-                                $formattedKey = ucwords(str_replace('_', ' ', $key));
-                                $safeKey = htmlspecialchars($formattedKey);
-                                $safeVal = htmlspecialchars($val);
-                                echo '<li><strong>' . $safeKey . ':</strong> ' . $safeVal . '</li>';
-                            }
-                            echo '</ul>';
+                            echo '</div>';
                         } else {
-                            echo htmlspecialchars($details ?: '-');
+                            echo htmlspecialchars($details);
                         }
                         ?>
                     </td>
