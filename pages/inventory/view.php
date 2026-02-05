@@ -385,6 +385,7 @@ ob_start();
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-600">
                         <?php
+                        // Check for both 'details' and 'comment' fields for compatibility
                         $details = $entry['details'] ?? $entry['comment'] ?? '';
                         $decoded = json_decode($details, true);
                         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
@@ -397,7 +398,9 @@ ob_start();
                             foreach ($decoded as $key => $val) {
                                 // Skip empty or internal fields
                                 if ($key === 'image_path' || is_array($val)) continue;
-                                $safeKey = htmlspecialchars(ucfirst($key));
+                                // Format field names: convert underscores to spaces and capitalize
+                                $formattedKey = ucwords(str_replace('_', ' ', $key));
+                                $safeKey = htmlspecialchars($formattedKey);
                                 $safeVal = htmlspecialchars($val);
                                 echo '<li><strong>' . $safeKey . ':</strong> ' . $safeVal . '</li>';
                             }
