@@ -16,11 +16,13 @@ $message = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify CSRF token first for security
+    CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
+    
     // Only allow form submission for admin users
     if (!$isAdmin) {
         $error = 'Neue Artikel müssen zuerst in EasyVerein erstellt und dann synchronisiert werden.';
     } else {
-        CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
     
     $name = $_POST['name'] ?? '';
     $description = $_POST['description'] ?? '';
