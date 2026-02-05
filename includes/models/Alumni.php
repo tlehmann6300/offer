@@ -112,8 +112,11 @@ class Alumni {
      * @return string Sanitized image path
      */
     private static function sanitizeImagePath(string $imagePath): string {
-        // Remove any directory traversal attempts
-        $imagePath = str_replace(['../', '..\\', '../', '..\\\\'], '', $imagePath);
+        // Remove any directory traversal attempts with repeated replacements
+        do {
+            $previousPath = $imagePath;
+            $imagePath = str_replace(['../', '..\\'], '', $imagePath);
+        } while ($imagePath !== $previousPath);
         
         // Ensure path starts with uploads/ if it doesn't already
         if (!str_starts_with($imagePath, 'uploads/')) {
@@ -145,14 +148,14 @@ class Alumni {
         
         // Filter by industry
         if (!empty($filters['industry'])) {
-            $whereClauses[] = "industry = ?";
-            $params[] = $filters['industry'];
+            $whereClauses[] = "industry LIKE ?";
+            $params[] = '%' . $filters['industry'] . '%';
         }
         
         // Filter by company
         if (!empty($filters['company'])) {
-            $whereClauses[] = "company = ?";
-            $params[] = $filters['company'];
+            $whereClauses[] = "company LIKE ?";
+            $params[] = '%' . $filters['company'] . '%';
         }
         
         $whereSQL = '';
