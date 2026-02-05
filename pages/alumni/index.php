@@ -35,6 +35,16 @@ ob_start();
 ?>
 
 <div class="max-w-7xl mx-auto">
+    <!-- Success Message -->
+    <?php if (isset($_SESSION['success_message'])): ?>
+    <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+        <i class="fas fa-check-circle mr-2"></i><?php echo htmlspecialchars($_SESSION['success_message']); ?>
+    </div>
+    <?php 
+        unset($_SESSION['success_message']); 
+    endif; 
+    ?>
+
     <!-- Header with Edit Button -->
     <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>

@@ -1,0 +1,321 @@
+<?php
+require_once __DIR__ . '/../../src/Auth.php';
+require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
+require_once __DIR__ . '/../../includes/models/Alumni.php';
+require_once __DIR__ . '/../../includes/utils/SecureImageUpload.php';
+
+// Check authentication - redirect if not logged in
+if (!Auth::check()) {
+    header('Location: ../auth/login.php');
+    exit;
+}
+
+// Get current user info
+$user = Auth::user();
+$userId = $_SESSION['user_id'];
+
+// Fetch existing profile for the current user only
+$profile = Alumni::getProfileByUserId($userId);
+
+$message = '';
+$error = '';
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
+    
+    // Get form data
+    $firstName = trim($_POST['first_name'] ?? '');
+    $lastName = trim($_POST['last_name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $mobilePhone = trim($_POST['mobile_phone'] ?? '');
+    $linkedinUrl = trim($_POST['linkedin_url'] ?? '');
+    $xingUrl = trim($_POST['xing_url'] ?? '');
+    $industry = trim($_POST['industry'] ?? '');
+    $company = trim($_POST['company'] ?? '');
+    $position = trim($_POST['position'] ?? '');
+    
+    // Validate required fields
+    if (empty($firstName) || empty($lastName) || empty($email) || empty($company) || empty($position)) {
+        $error = 'Bitte füllen Sie alle Pflichtfelder aus (Name, E-Mail, Firma, Position)';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
+    } elseif (!empty($linkedinUrl) && !filter_var($linkedinUrl, FILTER_VALIDATE_URL)) {
+        $error = 'Bitte geben Sie eine gültige LinkedIn-URL ein';
+    } elseif (!empty($xingUrl) && !filter_var($xingUrl, FILTER_VALIDATE_URL)) {
+        $error = 'Bitte geben Sie eine gültige Xing-URL ein';
+    } else {
+        // Prepare data array
+        $data = [
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => $email,
+            'mobile_phone' => $mobilePhone,
+            'linkedin_url' => $linkedinUrl,
+            'xing_url' => $xingUrl,
+            'industry' => $industry,
+            'company' => $company,
+            'position' => $position
+        ];
+        
+        // Handle image upload if provided
+        if (isset($_FILES['image'])) {
+            $uploadError = $_FILES['image']['error'];
+            
+            if ($uploadError === UPLOAD_ERR_OK) {
+                $uploadResult = SecureImageUpload::uploadImage($_FILES['image']);
+                
+                if ($uploadResult['success']) {
+                    // Delete old image if updating and old image exists
+                    if ($profile && !empty($profile['image_path'])) {
+                        SecureImageUpload::deleteImage($profile['image_path']);
+                    }
+                    $data['image_path'] = $uploadResult['path'];
+                } else {
+                    $error = $uploadResult['error'];
+                }
+            } elseif ($uploadError === UPLOAD_ERR_INI_SIZE || $uploadError === UPLOAD_ERR_FORM_SIZE) {
+                $error = 'Die hochgeladene Datei ist zu groß. Maximum: 5MB';
+            } elseif ($uploadError === UPLOAD_ERR_PARTIAL) {
+                $error = 'Die Datei wurde nur teilweise hochgeladen. Bitte versuchen Sie es erneut.';
+            } elseif ($uploadError !== UPLOAD_ERR_NO_FILE) {
+                $error = 'Fehler beim Hochladen der Datei (Code: ' . $uploadError . ')';
+            }
+        }
+        
+        // Keep existing image if no new image uploaded and profile exists
+        if (empty($error) && $profile && !empty($profile['image_path']) && !isset($data['image_path'])) {
+            $data['image_path'] = $profile['image_path'];
+        }
+        
+        // If no errors, update or create the profile
+        if (empty($error)) {
+            try {
+                if (Alumni::updateOrCreateProfile($userId, $data)) {
+                    // Update last_verified_at timestamp
+                    Alumni::verifyProfile($userId);
+                    
+                    // Redirect to index with success message
+                    $_SESSION['success_message'] = 'Profil erfolgreich gespeichert!';
+                    header('Location: index.php');
+                    exit;
+                } else {
+                    $error = 'Fehler beim Speichern des Profils. Bitte versuchen Sie es erneut.';
+                }
+            } catch (Exception $e) {
+                $error = 'Fehler: ' . htmlspecialchars($e->getMessage());
+            }
+        }
+    }
+}
+
+// Pre-fill form values from existing profile or user data
+$firstName = $profile['first_name'] ?? $user['first_name'] ?? '';
+$lastName = $profile['last_name'] ?? $user['last_name'] ?? '';
+$email = $profile['email'] ?? $user['email'] ?? '';
+$mobilePhone = $profile['mobile_phone'] ?? '';
+$linkedinUrl = $profile['linkedin_url'] ?? '';
+$xingUrl = $profile['xing_url'] ?? '';
+$industry = $profile['industry'] ?? '';
+$company = $profile['company'] ?? '';
+$position = $profile['position'] ?? '';
+$imagePath = $profile['image_path'] ?? '';
+
+$title = 'Mein Alumni-Profil bearbeiten - IBC Intranet';
+ob_start();
+?>
+
+<div class="max-w-4xl mx-auto">
+    <div class="mb-6">
+        <a href="index.php" class="text-purple-600 hover:text-purple-700 inline-flex items-center mb-4">
+            <i class="fas fa-arrow-left mr-2"></i>Zurück zum Alumni Directory
+        </a>
+    </div>
+
+    <?php if ($error): ?>
+    <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+        <i class="fas fa-exclamation-circle mr-2"></i><?php echo htmlspecialchars($error); ?>
+    </div>
+    <?php endif; ?>
+
+    <div class="card p-8">
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">
+                <i class="fas fa-user-edit text-purple-600 mr-2"></i>
+                <?php echo $profile ? 'Profil bearbeiten' : 'Profil erstellen'; ?>
+            </h1>
+            <p class="text-gray-600 mt-2">
+                Vervollständigen Sie Ihr Alumni-Profil, damit andere Sie finden und kontaktieren können.
+            </p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
+            
+            <!-- Personal Information -->
+            <div class="border-b pb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Persönliche Informationen</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Vorname *</label>
+                        <input 
+                            type="text" 
+                            name="first_name" 
+                            required 
+                            value="<?php echo htmlspecialchars($firstName); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nachname *</label>
+                        <input 
+                            type="text" 
+                            name="last_name" 
+                            required 
+                            value="<?php echo htmlspecialchars($lastName); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">E-Mail *</label>
+                        <input 
+                            type="email" 
+                            name="email" 
+                            required 
+                            value="<?php echo htmlspecialchars($email); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mobiltelefon</label>
+                        <input 
+                            type="text" 
+                            name="mobile_phone" 
+                            value="<?php echo htmlspecialchars($mobilePhone); ?>"
+                            placeholder="+49 123 4567890"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professional Information -->
+            <div class="border-b pb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Berufliche Informationen</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Firma *</label>
+                        <input 
+                            type="text" 
+                            name="company" 
+                            required 
+                            value="<?php echo htmlspecialchars($company); ?>"
+                            placeholder="z.B. ABC GmbH"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Position *</label>
+                        <input 
+                            type="text" 
+                            name="position" 
+                            required 
+                            value="<?php echo htmlspecialchars($position); ?>"
+                            placeholder="z.B. Senior Consultant"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Branche</label>
+                        <input 
+                            type="text" 
+                            name="industry" 
+                            value="<?php echo htmlspecialchars($industry); ?>"
+                            placeholder="z.B. IT, Consulting, Finance"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media Links -->
+            <div class="border-b pb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Social Media</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fab fa-linkedin text-blue-600 mr-1"></i>
+                            LinkedIn URL
+                        </label>
+                        <input 
+                            type="url" 
+                            name="linkedin_url" 
+                            value="<?php echo htmlspecialchars($linkedinUrl); ?>"
+                            placeholder="https://www.linkedin.com/in/ihr-profil"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fab fa-xing text-green-700 mr-1"></i>
+                            Xing URL
+                        </label>
+                        <input 
+                            type="url" 
+                            name="xing_url" 
+                            value="<?php echo htmlspecialchars($xingUrl); ?>"
+                            placeholder="https://www.xing.com/profile/ihr-profil"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Picture -->
+            <div class="pb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Profilbild</h2>
+                <?php if ($imagePath): ?>
+                <div class="mb-4">
+                    <p class="text-sm text-gray-600 mb-2">Aktuelles Profilbild:</p>
+                    <img src="/<?php echo htmlspecialchars($imagePath); ?>" alt="Aktuelles Profilbild" class="w-32 h-32 rounded-full object-cover shadow-lg">
+                </div>
+                <?php endif; ?>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <?php echo $imagePath ? 'Neues Bild hochladen (optional)' : 'Bild hochladen (optional)'; ?>
+                    </label>
+                    <input 
+                        type="file" 
+                        name="image" 
+                        accept="image/jpeg,image/png,image/gif,image/webp"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                    <p class="text-sm text-gray-500 mt-2">
+                        Erlaubt: JPG, PNG, GIF, WebP. Maximum: 5MB. Wird sicher verarbeitet und validiert.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="flex justify-end space-x-4 pt-6 border-t">
+                <a href="index.php" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                    Abbrechen
+                </a>
+                <button type="submit" class="px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg hover:shadow-xl">
+                    <i class="fas fa-save mr-2"></i>Profil speichern
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<?php
+$content = ob_get_clean();
+require_once __DIR__ . '/../../includes/templates/main_layout.php';
+?>
