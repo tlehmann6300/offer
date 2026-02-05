@@ -214,41 +214,31 @@ require_once __DIR__ . '/../../src/Auth.php';
             </nav>
         </div>
 
-        <div class="mt-auto pt-6 border-t border-gray-700">
-            <div class="flex items-center px-2 mb-4">
-                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-3">
+        <div class='mt-auto border-t border-gray-700 p-4 bg-black/20'>
+            <div class='flex items-center gap-3 mb-4'>
+                <div class='w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-sm shadow-md border border-white/10 shrink-0'>
                     <?php 
-                    $firstname = !empty($currentUser['firstname']) ? $currentUser['firstname'] : '';
-                    $lastname = !empty($currentUser['lastname']) ? $currentUser['lastname'] : '';
-                    
-                    if (!empty($firstname) && !empty($lastname)) {
-                        echo strtoupper(substr($firstname, 0, 1) . substr($lastname, 0, 1));
-                    } elseif (!empty($firstname)) {
-                        echo strtoupper(substr($firstname, 0, 1));
-                    } elseif (!empty($lastname)) {
-                        echo strtoupper(substr($lastname, 0, 1));
-                    } elseif (!empty($currentUser['email'])) {
-                        echo strtoupper(substr($currentUser['email'], 0, 1));
-                    } else {
-                        echo 'U';
-                    }
+                    $fn = Auth::user()['firstname'] ?? 'U';
+                    $ln = Auth::user()['lastname'] ?? 'U';
+                    echo strtoupper(substr($fn, 0, 1) . substr($ln, 0, 1)); 
                     ?>
                 </div>
-                <div class="overflow-hidden">
-                    <p class="text-sm font-medium text-white truncate" title="<?php echo htmlspecialchars($currentUser['email']); ?>">
-                        <?php 
-                        $fullname = trim($currentUser['firstname'] . ' ' . $currentUser['lastname']);
-                        echo htmlspecialchars(!empty($fullname) ? $fullname : $currentUser['email']); 
-                        ?>
+                <div class='overflow-hidden'>
+                    <p class='text-sm font-semibold text-white truncate leading-tight'>
+                        <?php echo htmlspecialchars($fn . ' ' . $ln); ?>
                     </p>
-                    <p class="text-xs text-gray-400 truncate">
-                        <?php echo htmlspecialchars(ucfirst($currentUser['role'])); ?>
+                    <p class='text-xs text-gray-400 truncate mt-0.5'>
+                        <?php echo htmlspecialchars(Auth::user()['email'] ?? ''); ?>
                     </p>
+                    <span class='inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-900/50 text-blue-300 border border-blue-800'>
+                        <?php echo htmlspecialchars(ucfirst(Auth::user()['role'] ?? 'User')); ?>
+                    </span>
                 </div>
             </div>
-            <a href="<?php echo asset('pages/auth/logout.php'); ?>" 
-               class="flex items-center justify-center w-full px-4 py-2 text-sm font-bold text-white bg-red-600/80 hover:bg-red-600 rounded-lg transition-colors">
-                <i class="fas fa-sign-out-alt mr-2"></i> Abmelden
+            <a href='<?php echo asset('pages/auth/logout.php'); ?>' 
+               class='flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all shadow-sm hover:shadow-md group'>
+                <i class='fas fa-sign-out-alt mr-2 group-hover:-translate-x-1 transition-transform'></i> 
+                Abmelden
             </a>
         </div>
     </aside>
