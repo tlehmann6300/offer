@@ -151,9 +151,9 @@ try {
             }
             
             // Test update
-            Project::update($projectId, ['status' => 'tender']);
+            Project::update($projectId, ['status' => 'applying']);
             $updatedProject = Project::getById($projectId);
-            if ($updatedProject['status'] === 'tender') {
+            if ($updatedProject['status'] === 'applying') {
                 echo "✓ Updated project status successfully\n";
             } else {
                 echo "✗ Failed to update project status\n";
