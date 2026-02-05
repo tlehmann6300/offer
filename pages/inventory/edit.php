@@ -130,7 +130,7 @@ ob_start();
 <div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 rounded-lg">
     <div class="flex items-center">
         <i class="fas fa-lock text-yellow-600 mr-3"></i>
-        <span class="font-medium">🔒 Stammdaten werden durch EasyVerein verwaltet. Änderungen bitte dort vornehmen.</span>
+        <span class="font-medium">Stammdaten werden durch EasyVerein verwaltet. Änderungen bitte dort vornehmen.</span>
     </div>
 </div>
 <?php endif; ?>
