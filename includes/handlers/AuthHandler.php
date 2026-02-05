@@ -205,6 +205,21 @@ class AuthHandler {
     }
 
     /**
+     * Check if user has specific role (exact match, not hierarchical)
+     * 
+     * @param string $role Required role
+     * @return bool True if user has exact role
+     */
+    public static function hasRole($role) {
+        self::startSession();
+        if (!self::isAuthenticated()) {
+            return false;
+        }
+        
+        return isset($_SESSION['user_role']) && $_SESSION['user_role'] === $role;
+    }
+
+    /**
      * Check if alumni user is validated
      * Alumni users need board approval before accessing internal alumni network data
      */
