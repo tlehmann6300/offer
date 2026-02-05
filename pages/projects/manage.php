@@ -503,17 +503,12 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 >
                     <option value="draft" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'draft') ? 'selected' : ''; ?>>Entwurf</option>
                     <option value="open" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'open') ? 'selected' : ''; ?>>Offen</option>
-                    <option value="tender" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'tender') ? 'selected' : ''; ?>>Ausschreibung (veraltet)</option>
                     <option value="applying" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'applying') ? 'selected' : ''; ?>>Bewerbungsphase</option>
                     <option value="assigned" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'assigned') ? 'selected' : ''; ?>>Vergeben</option>
                     <option value="running" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'running') ? 'selected' : ''; ?>>Laufend</option>
                     <option value="completed" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'completed') ? 'selected' : ''; ?>>Abgeschlossen</option>
                     <option value="archived" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'archived') ? 'selected' : ''; ?>>Archiviert</option>
                 </select>
-                <p class="text-sm text-gray-500 mt-2">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    Hinweis: Status 'Ausschreibung' ist veraltet. Nutzen Sie 'Offen' für neue Projekte.
-                </p>
             </div>
             <?php endif; ?>
         </div>
