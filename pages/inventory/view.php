@@ -384,7 +384,26 @@ ob_start();
                         <?php echo htmlspecialchars($entry['reason'] ?? '-'); ?>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-600">
-                        <?php echo htmlspecialchars($entry['comment'] ?? '-'); ?>
+                        <?php
+                        $details = $entry['details'] ?? $entry['comment'] ?? '';
+                        $decoded = json_decode($details, true);
+                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                            // If there's an 'original_data' key, use that instead
+                            if (isset($decoded['original_data']) && is_array($decoded['original_data'])) {
+                                $decoded = $decoded['original_data'];
+                            }
+                            
+                            echo '<ul class="list-disc list-inside text-xs text-gray-600">';
+                            foreach ($decoded as $key => $val) {
+                                // Überspringe leere oder interne Felder
+                                if ($key === 'image_path' || is_array($val)) continue;
+                                echo '<li><strong>' . htmlspecialchars(ucfirst($key)) . ':</strong> ' . htmlspecialchars($val) . '</li>';
+                            }
+                            echo '</ul>';
+                        } else {
+                            echo htmlspecialchars($details ?: '-');
+                        }
+                        ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
