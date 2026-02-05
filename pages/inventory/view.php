@@ -61,6 +61,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['adjust_stock'])) {
     }
 }
 
+/**
+ * Helper function to format history comment/details
+ * Handles JSON data smartly - showing changes or summary
+ * 
+ * @param string $data The comment/details data (plain text or JSON)
+ * @return string HTML formatted output
+ */
+function formatHistoryComment($data) {
+    if (empty($data)) {
+        return '-';
+    }
+    
+    // Try to decode as JSON
+    $json = json_decode($data, true);
+    
+    // Check if JSON is valid and is an array
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($json)) {
+        // Not valid JSON or not an array - return as plain text
+        return htmlspecialchars($data);
+    }
+    
+    // Filter out empty values and unwanted fields
+    $filtered = array_filter($json, function($value, $key) {
+        // Ignore empty values, image paths, and null values
+        if (empty($value) && $value !== 0 && $value !== '0') return false;
+        if ($key === 'image_path') return false;
+        if ($key === 'original_data') return false; // Skip nested import data
+        return true;
+    }, ARRAY_FILTER_USE_BOTH);
+    
+    // If no meaningful data after filtering, show generic message
+    if (empty($filtered)) {
+        return '<span class="text-gray-500 italic">Details aktualisiert</span>';
+    }
+    
+    // Check if this looks like a full snapshot (many fields typically used in an item)
+    $snapshotFields = ['name', 'description', 'category_id', 'location_id', 'current_stock', 
+                       'min_stock', 'unit', 'unit_price', 'serial_number', 'notes', 'status'];
+    $matchCount = count(array_intersect(array_keys($filtered), $snapshotFields));
+    
+    // If it has many item fields (>= 4), it's likely a full snapshot
+    if ($matchCount >= 4) {
+        return '<span class="text-gray-500 italic">Details aktualisiert</span>';
+    }
+    
+    // Format as HTML definition list for changes
+    $output = '<dl class="text-xs space-y-1">';
+    
+    foreach ($filtered as $key => $value) {
+        // Format the key for display (convert snake_case to readable format)
+        $displayKey = ucfirst(str_replace('_', ' ', $key));
+        
+        // Handle different value types
+        if (is_array($value)) {
+            // If array, check if it looks like old/new value pair
+            if (isset($value['old']) && isset($value['new'])) {
+                $oldValue = htmlspecialchars($value['old']);
+                $newValue = htmlspecialchars($value['new']);
+                $output .= '<div class="flex gap-2">';
+                $output .= '<dt class="font-semibold text-gray-600 w-28 shrink-0">' . htmlspecialchars($displayKey) . ':</dt>';
+                $output .= '<dd class="text-gray-800">' . $oldValue . ' → ' . $newValue . '</dd>';
+                $output .= '</div>';
+            } else {
+                // Generic array display
+                $output .= '<div class="flex gap-2">';
+                $output .= '<dt class="font-semibold text-gray-600 w-28 shrink-0">' . htmlspecialchars($displayKey) . ':</dt>';
+                $output .= '<dd class="text-gray-800">' . htmlspecialchars(json_encode($value)) . '</dd>';
+                $output .= '</div>';
+            }
+        } else {
+            // Simple value
+            $output .= '<div class="flex gap-2">';
+            $output .= '<dt class="font-semibold text-gray-600 w-28 shrink-0">' . htmlspecialchars($displayKey) . ':</dt>';
+            $output .= '<dd class="text-gray-800">' . htmlspecialchars($value) . '</dd>';
+            $output .= '</div>';
+        }
+    }
+    
+    $output .= '</dl>';
+    return $output;
+}
+
 $history = Inventory::getHistory($itemId, 20);
 $activeCheckouts = Inventory::getItemCheckouts($itemId);
 
@@ -385,24 +467,9 @@ ob_start();
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-600">
                         <?php 
-                        // JSON sauber formatieren
+                        // Use helper function to format history comment/details
                         $details = $entry['details'] ?? $entry['comment'] ?? '';
-                        $json = json_decode($details, true);
-                        if (json_last_error() === JSON_ERROR_NONE && is_array($json)) {
-                            echo '<div class=\'text-xs space-y-1\'>';
-                            foreach ($json as $k => $v) {
-                                if ($k === 'image_path' || empty($v)) continue; // Bildpfad ignorieren
-                                echo '<div class=\'flex gap-2\'>';
-                                echo '<span class=\'font-semibold text-gray-600 w-24 shrink-0\'>' . htmlspecialchars(ucfirst($k)) . ':</span>';
-                                $valueOutput = is_array($v) ? json_encode($v) : $v;
-                                if (is_array($v) && $valueOutput === false) $valueOutput = '[Array]';
-                                echo '<span class=\'text-gray-800 truncate\'>' . htmlspecialchars($valueOutput) . '</span>';
-                                echo '</div>';
-                            }
-                            echo '</div>';
-                        } else {
-                            echo htmlspecialchars($details ?: '-');
-                        }
+                        echo formatHistoryComment($details);
                         ?>
                     </td>
                 </tr>
