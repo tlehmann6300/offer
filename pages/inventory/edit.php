@@ -21,6 +21,9 @@ if (!$item) {
     exit;
 }
 
+// Check if item is synced with EasyVerein
+$isSyncedItem = !empty($item['easyverein_id']);
+
 $message = '';
 $error = '';
 
@@ -46,9 +49,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $unit_price = floatval($_POST['unit_price'] ?? 0);
         $notes = $_POST['notes'] ?? '';
         
-        if (empty($name)) {
-            $error = 'Name ist erforderlich';
+        // For synced items, don't allow editing master data fields
+        if ($isSyncedItem) {
+            // Only allow editing local operational data
+            $data = [
+                'location_id' => $location_id,
+                'min_stock' => $min_stock,
+                'unit' => $unit,
+                'unit_price' => $unit_price,
+                'notes' => $notes
+            ];
         } else {
+            // For non-synced items, allow all fields
+            if (empty($name)) {
+                $error = 'Name ist erforderlich';
+            }
+            
+            $data = [
+                'name' => $name,
+                'description' => $description,
+                'category_id' => $category_id,
+                'location_id' => $location_id,
+                'min_stock' => $min_stock,
+                'unit' => $unit,
+                'unit_price' => $unit_price,
+                'notes' => $notes
+            ];
+        }
+        
+        if (empty($error)) {
             $imagePath = $item['image_path'];
             
             // Handle image upload using secure upload utility
@@ -67,17 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             if (empty($error)) {
-                $data = [
-                    'name' => $name,
-                    'description' => $description,
-                    'category_id' => $category_id,
-                    'location_id' => $location_id,
-                    'min_stock' => $min_stock,
-                    'unit' => $unit,
-                    'unit_price' => $unit_price,
-                    'image_path' => $imagePath,
-                    'notes' => $notes
-                ];
+                $data['image_path'] = $imagePath;
                 
                 try {
                     if (Inventory::update($itemId, $data, $_SESSION['user_id'])) {
@@ -106,6 +125,15 @@ ob_start();
         <i class="fas fa-arrow-left mr-2"></i>Zurück zum Artikel
     </a>
 </div>
+
+<?php if ($isSyncedItem): ?>
+<div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 rounded-lg">
+    <div class="flex items-center">
+        <i class="fas fa-lock text-yellow-600 mr-3"></i>
+        <span class="font-medium">Stammdaten werden durch EasyVerein verwaltet. Änderungen bitte dort vornehmen.</span>
+    </div>
+</div>
+<?php endif; ?>
 
 <?php if ($error): ?>
 <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
@@ -137,7 +165,8 @@ ob_start();
                     name="name" 
                     required 
                     value="<?php echo htmlspecialchars($item['name']); ?>"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    <?php if ($isSyncedItem): ?>readonly<?php endif; ?>
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500<?php if ($isSyncedItem): ?> bg-gray-100 cursor-not-allowed<?php endif; ?>"
                 >
             </div>
 
@@ -145,7 +174,8 @@ ob_start();
                 <label class="block text-sm font-medium text-gray-700 mb-2">Kategorie</label>
                 <select 
                     name="category_id" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    <?php if ($isSyncedItem): ?>disabled<?php endif; ?>
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500<?php if ($isSyncedItem): ?> bg-gray-100 cursor-not-allowed<?php endif; ?>"
                 >
                     <option value="">Keine Kategorie</option>
                     <?php foreach ($categories as $category): ?>
@@ -176,7 +206,8 @@ ob_start();
                 <textarea 
                     name="description" 
                     rows="4"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    <?php if ($isSyncedItem): ?>readonly<?php endif; ?>
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500<?php if ($isSyncedItem): ?> bg-gray-100 cursor-not-allowed<?php endif; ?>"
                 ><?php echo htmlspecialchars($item['description']); ?></textarea>
             </div>
         </div>
@@ -191,9 +222,9 @@ ob_start();
                         type="number" 
                         value="<?php echo $item['current_stock']; ?>"
                         disabled
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100<?php if ($isSyncedItem): ?> cursor-not-allowed<?php endif; ?>"
                     >
-                    <p class="text-xs text-gray-500 mt-1">Verwenden Sie die Bestandsanpassung auf der Detailseite</p>
+                    <p class="text-xs text-gray-500 mt-1"><?php if ($isSyncedItem): ?>Von EasyVerein verwaltet<?php else: ?>Verwenden Sie die Bestandsanpassung auf der Detailseite<?php endif; ?></p>
                 </div>
 
                 <div>
