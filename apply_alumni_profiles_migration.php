@@ -20,31 +20,18 @@ try {
     
     $sql = file_get_contents($migrationFile);
     
-    // Split by semicolon and execute each statement
-    $statements = array_filter(
-        array_map('trim', explode(';', $sql)),
-        function($stmt) {
-            // Filter out empty statements and comments
-            return !empty($stmt) && !preg_match('/^--/', $stmt);
-        }
-    );
-    
-    foreach ($statements as $statement) {
-        if (!empty($statement)) {
-            echo "Executing: " . substr($statement, 0, 100) . "...\n";
-            try {
-                $db->exec($statement);
-                echo "✓ Success\n\n";
-            } catch (PDOException $e) {
-                // Check if error is about table/column/index already existing
-                if (strpos($e->getMessage(), 'already exists') !== false || 
-                    strpos($e->getMessage(), 'Duplicate column name') !== false || 
-                    strpos($e->getMessage(), 'Duplicate key name') !== false) {
-                    echo "⚠ Skipped (already exists)\n\n";
-                } else {
-                    throw $e;
-                }
-            }
+    // Execute the migration SQL
+    echo "Executing: Creating alumni_profiles table...\n";
+    try {
+        $db->exec($sql);
+        echo "✓ Success\n\n";
+    } catch (PDOException $e) {
+        // Check if error is about table already existing
+        if (strpos($e->getMessage(), 'already exists') !== false || 
+            strpos($e->getMessage(), 'Table') !== false && strpos($e->getMessage(), 'already exists') !== false) {
+            echo "⚠ Skipped (table already exists)\n\n";
+        } else {
+            throw $e;
         }
     }
     
