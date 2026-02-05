@@ -12,9 +12,10 @@
  * Output: Clean HTML table with color-coded status indicators
  */
 
-// Disable error display for clean HTML output
+// Suppress error display for clean HTML output
+// Errors are still caught and displayed in the check results
 ini_set('display_errors', '0');
-error_reporting(0);
+error_reporting(E_ALL);
 
 // Load configuration
 $configPath = __DIR__ . '/config/config.php';
@@ -50,6 +51,7 @@ $userDbDetails = '';
 
 if ($configLoaded && defined('DB_USER_HOST')) {
     try {
+        // Suppress connection warnings as we handle errors via connect_error
         $userConn = @new mysqli(DB_USER_HOST, DB_USER_USER, DB_USER_PASS, DB_USER_NAME);
         
         if ($userConn->connect_error) {
@@ -83,6 +85,7 @@ $contentDbDetails = '';
 
 if ($configLoaded && defined('DB_CONTENT_HOST')) {
     try {
+        // Suppress connection warnings as we handle errors via connect_error
         $contentConn = @new mysqli(DB_CONTENT_HOST, DB_CONTENT_USER, DB_CONTENT_PASS, DB_CONTENT_NAME);
         
         if ($contentConn->connect_error) {
@@ -116,19 +119,22 @@ $uploadsWritable = $uploadsExists && is_writable($uploadsPath);
 $uploadsStatus = $uploadsExists && $uploadsWritable;
 
 $uploadsMessage = '';
+$uploadsPermissions = 'N/A';
 if (!$uploadsExists) {
     $uploadsMessage = 'Directory does not exist';
 } elseif (!$uploadsWritable) {
     $uploadsMessage = 'Directory exists but is not writable';
+    $uploadsPermissions = substr(sprintf('%o', fileperms($uploadsPath)), -4);
 } else {
     $uploadsMessage = 'Directory exists and is writable';
+    $uploadsPermissions = substr(sprintf('%o', fileperms($uploadsPath)), -4);
 }
 
 $results[] = [
     'check' => 'assets/uploads Directory',
     'status' => $uploadsStatus,
     'message' => $uploadsMessage,
-    'details' => 'Path: ' . $uploadsPath . ' | Permissions: ' . ($uploadsExists ? substr(sprintf('%o', fileperms($uploadsPath)), -4) : 'N/A')
+    'details' => 'Path: ' . $uploadsPath . ' | Permissions: ' . $uploadsPermissions
 ];
 
 // 5. Check BASE_URL
@@ -176,7 +182,7 @@ $results[] = [
 
 // Calculate overall status
 $totalChecks = count($results);
-$passedChecks = count(array_filter($results, function($r) { return $r['status']; }));
+$passedChecks = count(array_filter($results, function($result) { return $result['status']; }));
 $overallStatus = $passedChecks === $totalChecks;
 
 ?>
