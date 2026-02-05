@@ -48,12 +48,28 @@ class BlogPost {
         $stmt->execute($params);
         $posts = $stmt->fetchAll();
         
-        // For each post, fetch the author's email from the User DB
+        if (empty($posts)) {
+            return $posts;
+        }
+        
+        // Collect all unique author IDs
+        $authorIds = array_unique(array_column($posts, 'author_id'));
+        
+        // Fetch all author emails in a single query
+        $placeholders = implode(',', array_fill(0, count($authorIds), '?'));
+        $userStmt = $userDb->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
+        $userStmt->execute($authorIds);
+        $authors = $userStmt->fetchAll();
+        
+        // Create a map of author_id => email
+        $authorMap = [];
+        foreach ($authors as $author) {
+            $authorMap[$author['id']] = $author['email'];
+        }
+        
+        // Add author email to each post
         foreach ($posts as &$post) {
-            $userStmt = $userDb->prepare("SELECT email FROM users WHERE id = ?");
-            $userStmt->execute([$post['author_id']]);
-            $user = $userStmt->fetch();
-            $post['author_email'] = $user ? $user['email'] : 'Unknown';
+            $post['author_email'] = $authorMap[$post['author_id']] ?? 'Unknown';
         }
         
         return $posts;
@@ -113,12 +129,26 @@ class BlogPost {
         $commentsStmt->execute([$id]);
         $comments = $commentsStmt->fetchAll();
         
-        // For each comment, fetch the commenter's email from the User DB
-        foreach ($comments as &$comment) {
-            $userStmt = $userDb->prepare("SELECT email FROM users WHERE id = ?");
-            $userStmt->execute([$comment['user_id']]);
-            $user = $userStmt->fetch();
-            $comment['commenter_email'] = $user ? $user['email'] : 'Unknown';
+        if (!empty($comments)) {
+            // Collect all unique user IDs
+            $userIds = array_unique(array_column($comments, 'user_id'));
+            
+            // Fetch all commenter emails in a single query
+            $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+            $userStmt = $userDb->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
+            $userStmt->execute($userIds);
+            $commenters = $userStmt->fetchAll();
+            
+            // Create a map of user_id => email
+            $commenterMap = [];
+            foreach ($commenters as $commenter) {
+                $commenterMap[$commenter['id']] = $commenter['email'];
+            }
+            
+            // Add commenter email to each comment
+            foreach ($comments as &$comment) {
+                $comment['commenter_email'] = $commenterMap[$comment['user_id']] ?? 'Unknown';
+            }
         }
         
         $post['comments'] = $comments;
