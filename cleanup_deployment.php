@@ -26,7 +26,19 @@ $targetList = [
     'post_deploy_cleanup.php'
 ];
 
-$confirmationReceived = isset($_POST['execute_cleanup']) && $_POST['execute_cleanup'] === 'confirmed';
+// Generate CSRF token for security
+session_start();
+if (!isset($_SESSION['cleanup_token'])) {
+    $_SESSION['cleanup_token'] = bin2hex(random_bytes(32));
+}
+
+// Verify CSRF token and confirmation
+$confirmationReceived = false;
+if (isset($_POST['execute_cleanup']) && $_POST['execute_cleanup'] === 'confirmed') {
+    if (isset($_POST['csrf_token']) && hash_equals($_SESSION['cleanup_token'], $_POST['csrf_token'])) {
+        $confirmationReceived = true;
+    }
+}
 
 ?>
 <!DOCTYPE html>
@@ -171,6 +183,7 @@ $confirmationReceived = isset($_POST['execute_cleanup']) && $_POST['execute_clea
                 </p>
                 <form method="post">
                     <input type="hidden" name="execute_cleanup" value="confirmed">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['cleanup_token']); ?>">
                     <button type="submit" class="btn-primary">Yes, clean up system now</button>
                 </form>
             </div>
@@ -206,19 +219,18 @@ $confirmationReceived = isset($_POST['execute_cleanup']) && $_POST['execute_clea
             $statusText = 'Not Found';
             $notFoundCount++;
         } else {
-            try {
-                if (@unlink($fullPath)) {
-                    $statusClass = 'status-deleted';
-                    $statusText = 'Deleted';
-                    $successCount++;
-                } else {
-                    $statusClass = 'status-error';
-                    $statusText = 'Error';
-                    $errorCount++;
-                }
-            } catch (Exception $ex) {
+            // Verify path doesn't contain directory traversal
+            if (strpos($filename, '..') !== false || strpos($filename, '/') !== false) {
                 $statusClass = 'status-error';
-                $statusText = 'Error: ' . $ex->getMessage();
+                $statusText = 'Invalid filename';
+                $errorCount++;
+            } elseif (unlink($fullPath)) {
+                $statusClass = 'status-deleted';
+                $statusText = 'Deleted';
+                $successCount++;
+            } else {
+                $statusClass = 'status-error';
+                $statusText = 'Error: Permission denied or file locked';
                 $errorCount++;
             }
         }
@@ -260,7 +272,9 @@ $confirmationReceived = isset($_POST['execute_cleanup']) && $_POST['execute_clea
         
         // Self-destruct
         $scriptPath = __FILE__;
-        @unlink($scriptPath);
+        if (!unlink($scriptPath)) {
+            error_log("Failed to self-destruct cleanup_deployment.php - manual deletion required");
+        }
     } else {
         echo "<div class='warning'>";
         echo "<h3>⚠️ Cannot Self-Destruct</h3>";
