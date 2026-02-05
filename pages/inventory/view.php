@@ -395,9 +395,11 @@ ob_start();
                             
                             echo '<ul class="list-disc list-inside text-xs text-gray-600">';
                             foreach ($decoded as $key => $val) {
-                                // Überspringe leere oder interne Felder
+                                // Skip empty or internal fields
                                 if ($key === 'image_path' || is_array($val)) continue;
-                                echo '<li><strong>' . htmlspecialchars(ucfirst($key)) . ':</strong> ' . htmlspecialchars($val) . '</li>';
+                                $safeKey = htmlspecialchars(ucfirst($key));
+                                $safeVal = htmlspecialchars($val);
+                                echo '<li><strong>' . $safeKey . ':</strong> ' . $safeVal . '</li>';
                             }
                             echo '</ul>';
                         } else {
