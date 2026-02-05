@@ -136,12 +136,12 @@ ob_start();
                     <!-- Profile Image -->
                     <div class="flex justify-center mb-4">
                         <?php 
-                        $imagePath = !empty($profile['image_path']) 
-                            ? asset($profile['image_path'])
-                            : asset('assets/img/default-avatar.png');
+                        // Generate initials for fallback
+                        $initials = strtoupper(substr($profile['first_name'], 0, 1) . substr($profile['last_name'], 0, 1));
+                        $imagePath = !empty($profile['image_path']) ? asset($profile['image_path']) : '';
                         ?>
                         <div class="w-24 h-24 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-3xl font-bold overflow-hidden shadow-lg">
-                            <?php if (!empty($profile['image_path'])): ?>
+                            <?php if (!empty($imagePath)): ?>
                                 <img 
                                     src="<?php echo $imagePath; ?>" 
                                     alt="<?php echo htmlspecialchars($profile['first_name'] . ' ' . $profile['last_name']); ?>"
@@ -149,16 +149,10 @@ ob_start();
                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                                 >
                                 <div style="display:none;" class="w-full h-full flex items-center justify-center text-3xl">
-                                    <?php 
-                                    $initials = strtoupper(substr($profile['first_name'], 0, 1) . substr($profile['last_name'], 0, 1));
-                                    echo htmlspecialchars($initials);
-                                    ?>
+                                    <?php echo htmlspecialchars($initials); ?>
                                 </div>
                             <?php else: ?>
-                                <?php 
-                                $initials = strtoupper(substr($profile['first_name'], 0, 1) . substr($profile['last_name'], 0, 1));
-                                echo htmlspecialchars($initials);
-                                ?>
+                                <?php echo htmlspecialchars($initials); ?>
                             <?php endif; ?>
                         </div>
                     </div>
