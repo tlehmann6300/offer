@@ -127,6 +127,7 @@ require_once __DIR__ . '/../../src/Auth.php';
 
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar fixed left-0 top-0 h-screen w-64 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-40 text-white shadow-2xl flex flex-col">
+        <?php $currentUser = Auth::user(); ?>
         <div class="p-6 flex-1 overflow-y-auto">
             <!-- IBC Logo in Navbar -->
             <div class="mb-8">
@@ -210,26 +211,45 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <span>Profil</span>
                 </a>
                 
-                <!-- Logout Button -->
-                <div class="mt-auto pt-4 border-t border-gray-700">
-                    <a href="<?php echo asset('pages/auth/logout.php'); ?>" 
-                       class="flex items-center justify-center w-full px-4 py-3 text-sm font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-md transition-colors">
-                        <i class="fas fa-sign-out-alt mr-2"></i> Abmelden
-                    </a>
-                </div>
             </nav>
         </div>
 
-        <div class="p-6 border-t border-white/20">
-            <div class="flex items-center space-x-3 mb-4">
-                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                    <i class="fas fa-user"></i>
+        <div class="mt-auto pt-6 border-t border-gray-700">
+            <div class="flex items-center px-2 mb-4">
+                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-3">
+                    <?php 
+                    $firstname = !empty($currentUser['firstname']) ? $currentUser['firstname'] : '';
+                    $lastname = !empty($currentUser['lastname']) ? $currentUser['lastname'] : '';
+                    
+                    if (!empty($firstname) && !empty($lastname)) {
+                        echo strtoupper(substr($firstname, 0, 1) . substr($lastname, 0, 1));
+                    } elseif (!empty($firstname)) {
+                        echo strtoupper(substr($firstname, 0, 1));
+                    } elseif (!empty($lastname)) {
+                        echo strtoupper(substr($lastname, 0, 1));
+                    } elseif (!empty($currentUser['email'])) {
+                        echo strtoupper(substr($currentUser['email'], 0, 1));
+                    } else {
+                        echo 'U';
+                    }
+                    ?>
                 </div>
-                <div>
-                    <div class="font-semibold"><?php echo htmlspecialchars($_SESSION['user_email'] ?? 'Guest'); ?></div>
-                    <div class="text-xs text-white/70"><?php echo htmlspecialchars(ucfirst($_SESSION['user_role'] ?? 'guest')); ?></div>
+                <div class="overflow-hidden">
+                    <p class="text-sm font-medium text-white truncate" title="<?php echo htmlspecialchars($currentUser['email']); ?>">
+                        <?php 
+                        $fullname = trim($currentUser['firstname'] . ' ' . $currentUser['lastname']);
+                        echo htmlspecialchars(!empty($fullname) ? $fullname : $currentUser['email']); 
+                        ?>
+                    </p>
+                    <p class="text-xs text-gray-400 truncate">
+                        <?php echo htmlspecialchars(ucfirst($currentUser['role'])); ?>
+                    </p>
                 </div>
             </div>
+            <a href="<?php echo asset('pages/auth/logout.php'); ?>" 
+               class="flex items-center justify-center w-full px-4 py-2 text-sm font-bold text-white bg-red-600/80 hover:bg-red-600 rounded-lg transition-colors">
+                <i class="fas fa-sign-out-alt mr-2"></i> Abmelden
+            </a>
         </div>
     </aside>
 
