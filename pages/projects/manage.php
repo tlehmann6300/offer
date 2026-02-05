@@ -218,7 +218,6 @@ ob_start();
                 switch($project['status']) {
                     case 'draft': echo 'bg-gray-100 text-gray-800'; break;
                     case 'open': echo 'bg-blue-100 text-blue-800'; break;
-                    case 'tender': echo 'bg-blue-100 text-blue-800'; break;
                     case 'applying': echo 'bg-yellow-100 text-yellow-800'; break;
                     case 'assigned': echo 'bg-green-100 text-green-800'; break;
                     case 'running': echo 'bg-purple-100 text-purple-800'; break;
@@ -230,7 +229,6 @@ ob_start();
                 switch($project['status']) {
                     case 'draft': echo 'Entwurf'; break;
                     case 'open': echo 'Offen'; break;
-                    case 'tender': echo 'Ausschreibung'; break;
                     case 'applying': echo 'Bewerbungsphase'; break;
                     case 'assigned': echo 'Vergeben'; break;
                     case 'running': echo 'Laufend'; break;

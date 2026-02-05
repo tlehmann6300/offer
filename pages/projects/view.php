@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply'])) {
     // Check if user can apply
     if ($userRole === 'alumni') {
         $error = 'Alumni können sich nicht auf Projekte bewerben';
-    } elseif ($project['status'] !== 'open' && $project['status'] !== 'tender' && $project['status'] !== 'applying') {
+    } elseif ($project['status'] !== 'open' && $project['status'] !== 'applying') {
         $error = 'Bewerbungen für dieses Projekt sind nicht möglich';
     } else {
         try {
@@ -204,7 +204,6 @@ ob_start();
                 switch($project['status']) {
                     case 'draft': echo 'bg-gray-100 text-gray-800'; break;
                     case 'open': echo 'bg-yellow-100 text-yellow-800'; break;
-                    case 'tender': echo 'bg-yellow-100 text-yellow-800'; break;
                     case 'applying': echo 'bg-yellow-100 text-yellow-800'; break;
                     case 'assigned': echo 'bg-blue-100 text-blue-800'; break;
                     case 'running': echo 'bg-blue-100 text-blue-800'; break;
@@ -217,7 +216,6 @@ ob_start();
                 switch($project['status']) {
                     case 'draft': echo 'Entwurf'; break;
                     case 'open': echo 'Offen'; break;
-                    case 'tender': echo 'Ausschreibung'; break;
                     case 'applying': echo 'Bewerbungsphase'; break;
                     case 'assigned': echo 'Vergeben'; break;
                     case 'running': echo 'Laufend'; break;
@@ -389,8 +387,8 @@ ob_start();
         </div>
         <?php endif; ?>
         
-        <!-- Application Section (Only for members, when status is 'open', 'applying' or 'tender') -->
-        <?php if (($project['status'] === 'open' || $project['status'] === 'tender' || $project['status'] === 'applying') && $userRole !== 'alumni'): ?>
+        <!-- Application Section (Only for members, when status is 'open' or 'applying') -->
+        <?php if (($project['status'] === 'open' || $project['status'] === 'applying') && $userRole !== 'alumni'): ?>
         <div class="border-t border-gray-200 pt-6 mt-6">
             <?php if ($userApplication): ?>
                 <!-- Show Application Status -->
