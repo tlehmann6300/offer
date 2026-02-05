@@ -228,7 +228,7 @@ try {
         echo "  Expected: uploads/passwd, Got: {$sanitizedProfile2['image_path']}\n";
     }
     
-    // Test 12c: Backslash traversal
+    // Test 12c: Backslash traversal (Windows-style, tests cross-platform security)
     $maliciousPath3 = '..\\..\\windows\\system32\\config';
     Alumni::updateOrCreateProfile($testUserId3, ['image_path' => $maliciousPath3]);
     $sanitizedProfile3 = Alumni::getProfileByUserId($testUserId3);

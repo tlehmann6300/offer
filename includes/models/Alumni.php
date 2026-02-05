@@ -113,6 +113,7 @@ class Alumni {
      */
     private static function sanitizeImagePath(string $imagePath): string {
         // Reject paths that contain traversal attempts
+        // First pattern catches standalone '..' at start, second catches '/..' or '\..'
         if (preg_match('/\.\./', $imagePath) || 
             preg_match('/[\/\\\\]\.\./', $imagePath) ||
             str_contains($imagePath, "\0") ||
@@ -121,7 +122,8 @@ class Alumni {
             $imagePath = basename($imagePath);
         }
         
-        // Remove any remaining directory traversal attempts
+        // Additional loop-based sanitization as defense-in-depth
+        // Handles edge cases where basename might not catch everything
         do {
             $previousPath = $imagePath;
             $imagePath = str_replace(['../', '..\\'], '', $imagePath);
