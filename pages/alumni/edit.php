@@ -38,6 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate required fields
     if (empty($firstName) || empty($lastName) || empty($email) || empty($company) || empty($position)) {
         $error = 'Bitte füllen Sie alle Pflichtfelder aus (Name, E-Mail, Firma, Position)';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
+    } elseif (!empty($linkedinUrl) && !filter_var($linkedinUrl, FILTER_VALIDATE_URL)) {
+        $error = 'Bitte geben Sie eine gültige LinkedIn-URL ein';
+    } elseif (!empty($xingUrl) && !filter_var($xingUrl, FILTER_VALIDATE_URL)) {
+        $error = 'Bitte geben Sie eine gültige Xing-URL ein';
     } else {
         // Prepare data array
         $data = [
@@ -53,19 +59,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
         
         // Handle image upload if provided
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $uploadResult = SecureImageUpload::uploadImage($_FILES['image']);
+        if (isset($_FILES['image'])) {
+            $uploadError = $_FILES['image']['error'];
             
-            if ($uploadResult['success']) {
-                // Delete old image if updating and old image exists
-                if ($profile && !empty($profile['image_path'])) {
-                    SecureImageUpload::deleteImage($profile['image_path']);
+            if ($uploadError === UPLOAD_ERR_OK) {
+                $uploadResult = SecureImageUpload::uploadImage($_FILES['image']);
+                
+                if ($uploadResult['success']) {
+                    // Delete old image if updating and old image exists
+                    if ($profile && !empty($profile['image_path'])) {
+                        SecureImageUpload::deleteImage($profile['image_path']);
+                    }
+                    $data['image_path'] = $uploadResult['path'];
+                } else {
+                    $error = $uploadResult['error'];
                 }
-                $data['image_path'] = $uploadResult['path'];
-            } else {
-                $error = $uploadResult['error'];
+            } elseif ($uploadError === UPLOAD_ERR_INI_SIZE || $uploadError === UPLOAD_ERR_FORM_SIZE) {
+                $error = 'Die hochgeladene Datei ist zu groß. Maximum: 5MB';
+            } elseif ($uploadError === UPLOAD_ERR_PARTIAL) {
+                $error = 'Die Datei wurde nur teilweise hochgeladen. Bitte versuchen Sie es erneut.';
+            } elseif ($uploadError !== UPLOAD_ERR_NO_FILE) {
+                $error = 'Fehler beim Hochladen der Datei (Code: ' . $uploadError . ')';
             }
-        } elseif ($profile && !empty($profile['image_path'])) {
+        }
+        
+        // Keep existing image if no new image uploaded and profile exists
+        if (empty($error) && $profile && !empty($profile['image_path']) && !isset($data['image_path'])) {
             // Keep existing image if no new image uploaded
             $data['image_path'] = $profile['image_path'];
         }
