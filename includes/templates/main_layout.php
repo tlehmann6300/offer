@@ -214,24 +214,44 @@ require_once __DIR__ . '/../../src/Auth.php';
             </nav>
         </div>
 
-        <div class='mt-auto border-t border-gray-700 p-4 bg-black/20'>
+        <div class='mt-auto border-t border-gray-700 pt-6 pb-4 px-4 bg-black/20'>
+            <?php 
+            $currentUser = Auth::user();
+            $fn = !empty($currentUser['firstname']) ? $currentUser['firstname'] : '';
+            $ln = !empty($currentUser['lastname']) ? $currentUser['lastname'] : '';
+            $email = $currentUser['email'] ?? '';
+            $role = $currentUser['role'] ?? 'User';
+            
+            // Generate initials with proper fallbacks
+            if (!empty($fn) && !empty($ln)) {
+                $initials = strtoupper(substr($fn, 0, 1) . substr($ln, 0, 1));
+            } elseif (!empty($fn)) {
+                $initials = strtoupper(substr($fn, 0, 1));
+            } elseif (!empty($ln)) {
+                $initials = strtoupper(substr($ln, 0, 1));
+            } elseif (!empty($email)) {
+                $initials = strtoupper(substr($email, 0, 1));
+            } else {
+                $initials = 'U';
+            }
+            
+            // Generate display name
+            $fullname = trim($fn . ' ' . $ln);
+            $displayName = !empty($fullname) ? $fullname : $email;
+            ?>
             <div class='flex items-center gap-3 mb-4'>
                 <div class='w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-sm shadow-md border border-white/10 shrink-0'>
-                    <?php 
-                    $fn = Auth::user()['firstname'] ?? 'U';
-                    $ln = Auth::user()['lastname'] ?? 'U';
-                    echo strtoupper(substr($fn, 0, 1) . substr($ln, 0, 1)); 
-                    ?>
+                    <?php echo $initials; ?>
                 </div>
                 <div class='overflow-hidden'>
                     <p class='text-sm font-semibold text-white truncate leading-tight'>
-                        <?php echo htmlspecialchars($fn . ' ' . $ln); ?>
+                        <?php echo htmlspecialchars($displayName); ?>
                     </p>
                     <p class='text-xs text-gray-400 truncate mt-0.5'>
-                        <?php echo htmlspecialchars(Auth::user()['email'] ?? ''); ?>
+                        <?php echo htmlspecialchars($email); ?>
                     </p>
                     <span class='inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-900/50 text-blue-300 border border-blue-800'>
-                        <?php echo htmlspecialchars(ucfirst(Auth::user()['role'] ?? 'User')); ?>
+                        <?php echo htmlspecialchars(ucfirst($role)); ?>
                     </span>
                 </div>
             </div>
