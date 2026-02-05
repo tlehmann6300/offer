@@ -21,7 +21,7 @@ class Alumni {
         $stmt = $db->prepare("
             SELECT id, user_id, first_name, last_name, email, mobile_phone, 
                    linkedin_url, xing_url, industry, company, position, 
-                   image_path, last_verified_at, created_at, updated_at
+                   image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
             FROM alumni_profiles 
             WHERE user_id = ?
         ");
@@ -179,7 +179,7 @@ class Alumni {
         $sql = "
             SELECT id, user_id, first_name, last_name, email, mobile_phone, 
                    linkedin_url, xing_url, industry, company, position, 
-                   image_path, last_verified_at, created_at, updated_at
+                   image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
             FROM alumni_profiles" . $whereSQL . "
             ORDER BY last_name ASC, first_name ASC
         ";
@@ -223,7 +223,7 @@ class Alumni {
         $stmt = $db->prepare("
             SELECT id, user_id, first_name, last_name, email, mobile_phone, 
                    linkedin_url, xing_url, industry, company, position, 
-                   image_path, last_verified_at, created_at, updated_at
+                   image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
             FROM alumni_profiles 
             WHERE last_verified_at < DATE_SUB(NOW(), INTERVAL ? MONTH)
               AND (last_reminder_sent_at IS NULL OR last_reminder_sent_at < DATE_SUB(NOW(), INTERVAL ? MONTH))
