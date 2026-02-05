@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS inventory (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     last_synced_at DATETIME DEFAULT NULL,
-    is_archived_in_easyverein BOOLEAN NOT NULL DEFAULT FALSE,
+    is_archived_in_easyverein BOOLEAN NOT NULL DEFAULT 0,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
     FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE SET NULL,
     UNIQUE INDEX idx_easyverein_id (easyverein_id),
@@ -359,7 +359,7 @@ CREATE TABLE IF NOT EXISTS event_registrations (
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
-  COMMENT='Simple event registrations for users';
+  COMMENT='Tracks user registrations for events with confirmation status';
 
 -- ============================================
 -- SYSTEM LOGS
