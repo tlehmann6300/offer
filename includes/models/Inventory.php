@@ -13,11 +13,15 @@ class Inventory {
         $db = Database::getContentDB();
         $stmt = $db->prepare("
             SELECT i.*, c.name as category_name, c.color as category_color, 
-                   l.name as location_name
+                   l.name as location_name,
+                   i.current_stock as quantity,
+                   (i.current_stock - COALESCE(SUM(r.amount), 0)) as available_quantity
             FROM inventory i
             LEFT JOIN categories c ON i.category_id = c.id
             LEFT JOIN locations l ON i.location_id = l.id
+            LEFT JOIN rentals r ON i.id = r.item_id AND r.actual_return IS NULL
             WHERE i.id = ?
+            GROUP BY i.id
         ");
         $stmt->execute([$id]);
         return $stmt->fetch();
@@ -30,10 +34,13 @@ class Inventory {
         $db = Database::getContentDB();
         $sql = "
             SELECT i.*, c.name as category_name, c.color as category_color, 
-                   l.name as location_name
+                   l.name as location_name,
+                   i.current_stock as quantity,
+                   (i.current_stock - COALESCE(SUM(r.amount), 0)) as available_quantity
             FROM inventory i
             LEFT JOIN categories c ON i.category_id = c.id
             LEFT JOIN locations l ON i.location_id = l.id
+            LEFT JOIN rentals r ON i.id = r.item_id AND r.actual_return IS NULL
             WHERE 1=1
         ";
         $params = [];
@@ -59,7 +66,7 @@ class Inventory {
             $sql .= " AND i.current_stock <= i.min_stock";
         }
         
-        $sql .= " ORDER BY i.name ASC";
+        $sql .= " GROUP BY i.id ORDER BY i.name ASC";
         
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
