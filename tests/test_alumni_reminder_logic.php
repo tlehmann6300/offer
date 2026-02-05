@@ -116,9 +116,6 @@ try {
     // Test 3: After marking, profile should not appear in getOutdatedProfiles
     echo "Test 3: After markReminderSent, profile excluded from getOutdatedProfiles\n";
     
-    // Wait a moment to ensure timestamp is different
-    sleep(1);
-    
     $outdatedProfilesAfter = Alumni::getOutdatedProfiles(12);
     $outdatedUserIdsAfter = array_column($outdatedProfilesAfter, 'user_id');
     
@@ -134,10 +131,12 @@ try {
     // Test 4: markReminderSent on non-existent user
     echo "Test 4: markReminderSent on non-existent user\n";
     $result = Alumni::markReminderSent(99999);
+    // PDO execute() returns true even when no rows are affected
+    // This is expected behavior - the query succeeded, just no rows matched
     if ($result) {
-        echo "✓ Method returns true even for non-existent user (no error)\n\n";
+        echo "✓ Method returns true for non-existent user (query succeeded, no rows affected)\n\n";
     } else {
-        echo "✗ Method returned false for non-existent user\n\n";
+        echo "✗ Method returned false unexpectedly\n\n";
     }
     
     // Test 5: Verify interaction between verifyProfile and reminder logic
