@@ -6,6 +6,8 @@ declare(strict_types=1);
  * Manages alumni profile data and operations
  */
 
+require_once __DIR__ . '/../database.php';
+
 class Alumni {
     
     /**
