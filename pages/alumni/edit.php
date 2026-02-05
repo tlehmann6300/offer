@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Bitte füllen Sie alle Pflichtfelder aus (Name, E-Mail, Firma, Position)';
     }
     
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
     }
     
