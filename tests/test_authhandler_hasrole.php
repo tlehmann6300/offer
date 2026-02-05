@@ -32,7 +32,7 @@ echo "✓ PASSED: hasRole method exists\n\n";
 // Test 2: Test hasRole returns false when not authenticated
 echo "=== Test 2: Test hasRole returns false when not authenticated ===\n";
 // Start a clean session
-if (session_status() !== PHP_SESSION_NONE) {
+if (session_status() === PHP_SESSION_ACTIVE) {
     session_destroy();
 }
 session_start();
@@ -85,7 +85,7 @@ if ($result === true) {
     exit(1);
 }
 
-// Test 6: Test that hasRole is NOT hierarchical (manager should not have admin role)
+// Test 6: Test that hasRole is NOT hierarchical (admin should not have board role)
 echo "=== Test 6: Test hasRole is not hierarchical ===\n";
 $_SESSION['authenticated'] = true;
 $_SESSION['user_role'] = 'admin';

@@ -84,6 +84,7 @@ ob_start();
             </h1>
             <p class="text-gray-600"><?php echo count($items); ?> Artikel gefunden</p>
         </div>
+        <!-- EasyVerein Sync Button - Admin/Board only -->
         <?php if (AuthHandler::hasRole('admin') || AuthHandler::hasRole('board')): ?>
         <div class="mt-4 md:mt-0 flex gap-2">
             <a href="sync.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
@@ -91,6 +92,7 @@ ob_start();
             </a>
         </div>
         <?php endif; ?>
+        <!-- Import Button - Manager level and above -->
         <?php if (Auth::hasPermission('manager')): ?>
         <div class="mt-4 md:mt-0 flex gap-2">
             <button type="button" onclick="document.getElementById('importModal').classList.remove('hidden')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
