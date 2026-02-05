@@ -144,12 +144,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Pre-fill form values from existing post or empty
-$title = $post['title'] ?? '';
-$category = $post['category'] ?? '';
-$content = $post['content'] ?? '';
-$externalLink = $post['external_link'] ?? '';
-$imagePath = $post['image_path'] ?? '';
+// Pre-fill form values - Use POST data if form was submitted (even with errors), otherwise use existing post or empty
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Preserve user input on validation errors
+    $title = trim($_POST['title'] ?? '');
+    $category = trim($_POST['category'] ?? '');
+    $content = trim($_POST['content'] ?? '');
+    $externalLink = trim($_POST['external_link'] ?? '');
+    $imagePath = $post['image_path'] ?? '';
+} else {
+    // Initial form load - use existing post data or empty
+    $title = $post['title'] ?? '';
+    $category = $post['category'] ?? '';
+    $content = $post['content'] ?? '';
+    $externalLink = $post['external_link'] ?? '';
+    $imagePath = $post['image_path'] ?? '';
+}
 
 $pageTitle = $isEdit ? 'Beitrag bearbeiten - IBC Intranet' : 'Neuen Beitrag erstellen - IBC Intranet';
 ob_start();
