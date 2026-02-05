@@ -1,224 +1,196 @@
 <?php
 /**
- * Production System Reset Script
- * Completely resets databases and creates fresh admin account
- * 
- * CRITICAL SECURITY WARNINGS:
- * 1. This script DESTROYS ALL EXISTING DATA permanently
- * 2. DELETE this file immediately after use
- * 3. Never leave this file in a production environment
- * 4. Access is controlled by URL parameter only - use with extreme caution
- * 5. Admin password is hardcoded per specification - change immediately after first login
- * 
- * Usage: install_fresh.php?secure_key=MakeItNew2024
+ * Database Reconstruction System
+ * DANGER: Destroys all data and rebuilds from scratch
+ * DELETE IMMEDIATELY AFTER RUNNING
+ * Required: ?secure_key=MakeItNew2024
  */
 
-// Security gate - require specific access parameter
-if (!isset($_GET['secure_key']) || $_GET['secure_key'] !== 'MakeItNew2024') {
-    die('Access Denied');
-}
+($_GET['secure_key'] ?? '') === 'MakeItNew2024' or die('Access Denied');
 
-// Load environment configuration
 require_once __DIR__ . '/config/config.php';
 
-// Track operation outcomes
-$operationResults = [];
-
-// HTML output styling
-$htmlStyles = '
-<style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
-    .results-container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    h1 { color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 10px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-    th { background-color: #4CAF50; color: white; }
-    .status-success { color: #4CAF50; font-weight: bold; }
-    .status-fail { color: #f44336; font-weight: bold; }
-    tr:hover { background-color: #f5f5f5; }
-</style>
-';
-
-echo '<!DOCTYPE html><html><head><title>System Reset</title>' . $htmlStyles . '</head><body>';
-echo '<div class="results-container"><h1>🔄 Production System Reset</h1>';
-
-// Step 1: Connect to MySQL server (without database selection)
-try {
-    $userServerConn = new PDO(
-        "mysql:host=" . DB_USER_HOST . ";charset=utf8mb4",
-        DB_USER_USER,
-        DB_USER_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
-    $operationResults[] = ['operation' => 'Connected to User DB Server', 'outcome' => 'Success'];
-} catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Connected to User DB Server', 'outcome' => 'Failed - Check configuration'];
-    error_log('User DB connection error: ' . $error->getMessage());
-    displayResultsTable($operationResults);
-    die();
-}
-
-try {
-    $contentServerConn = new PDO(
-        "mysql:host=" . DB_CONTENT_HOST . ";charset=utf8mb4",
-        DB_CONTENT_USER,
-        DB_CONTENT_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
-    $operationResults[] = ['operation' => 'Connected to Content DB Server', 'outcome' => 'Success'];
-} catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Connected to Content DB Server', 'outcome' => 'Failed - Check configuration'];
-    error_log('Content DB connection error: ' . $error->getMessage());
-    displayResultsTable($operationResults);
-    die();
-}
-
-// Step 2: Drop existing databases
-try {
-    $userServerConn->exec("DROP DATABASE IF EXISTS " . DB_USER_NAME);
-    $operationResults[] = ['operation' => 'Dropped User Database', 'outcome' => 'Success'];
-} catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Dropped User Database', 'outcome' => 'Failed - Check permissions'];
-    error_log('Drop User DB error: ' . $error->getMessage());
-}
-
-try {
-    $contentServerConn->exec("DROP DATABASE IF EXISTS " . DB_CONTENT_NAME);
-    $operationResults[] = ['operation' => 'Dropped Content Database', 'outcome' => 'Success'];
-} catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Dropped Content Database', 'outcome' => 'Failed - Check permissions'];
-    error_log('Drop Content DB error: ' . $error->getMessage());
-}
-
-// Step 3: Create fresh databases
-try {
-    $userServerConn->exec("CREATE DATABASE " . DB_USER_NAME . " CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    $operationResults[] = ['operation' => 'Created User Database', 'outcome' => 'Success'];
-} catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Created User Database', 'outcome' => 'Failed - Check permissions'];
-    error_log('Create User DB error: ' . $error->getMessage());
-    displayResultsTable($operationResults);
-    die();
-}
-
-try {
-    $contentServerConn->exec("CREATE DATABASE " . DB_CONTENT_NAME . " CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    $operationResults[] = ['operation' => 'Created Content Database', 'outcome' => 'Success'];
-} catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Created Content Database', 'outcome' => 'Failed - Check permissions'];
-    error_log('Create Content DB error: ' . $error->getMessage());
-    displayResultsTable($operationResults);
-    die();
-}
-
-// Step 4: Reconnect to specific databases for schema import
-$userServerConn = null;
-$contentServerConn = null;
-
-try {
-    $userDbConn = new PDO(
-        "mysql:host=" . DB_USER_HOST . ";dbname=" . DB_USER_NAME . ";charset=utf8mb4",
-        DB_USER_USER,
-        DB_USER_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
-} catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Reconnected to User DB', 'outcome' => 'Failed - Check database'];
-    error_log('Reconnect User DB error: ' . $error->getMessage());
-    displayResultsTable($operationResults);
-    die();
-}
-
-try {
-    $contentDbConn = new PDO(
-        "mysql:host=" . DB_CONTENT_HOST . ";dbname=" . DB_CONTENT_NAME . ";charset=utf8mb4",
-        DB_CONTENT_USER,
-        DB_CONTENT_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
-} catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Reconnected to Content DB', 'outcome' => 'Failed - Check database'];
-    error_log('Reconnect Content DB error: ' . $error->getMessage());
-    displayResultsTable($operationResults);
-    die();
-}
-
-// Step 5: Import User DB schema
-$userSchemaPath = __DIR__ . '/sql/full_user_schema.sql';
-if (!file_exists($userSchemaPath)) {
-    $operationResults[] = ['operation' => 'Import User Schema', 'outcome' => 'Failed: Schema file not found'];
-} else {
-    $userSchemaContent = file_get_contents($userSchemaPath);
-    try {
-        $userDbConn->exec($userSchemaContent);
-        $operationResults[] = ['operation' => 'Import User Schema', 'outcome' => 'Success'];
-    } catch (PDOException $error) {
-        $operationResults[] = ['operation' => 'Import User Schema', 'outcome' => 'Failed - Check schema file'];
-        error_log('Import User Schema error: ' . $error->getMessage());
-        displayResultsTable($operationResults);
-        die();
+class SystemRebuilder {
+    private $actionLog = [];
+    private $pdoOptions = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
+    
+    public function execute() {
+        $this->renderPageStart();
+        
+        $connections = $this->establishServerLinks();
+        if (!$connections) return;
+        
+        $this->purgeExistingDatabases($connections);
+        $this->buildFreshDatabases($connections);
+        
+        $dbLinks = $this->reconnectToDatabases();
+        if (!$dbLinks) return;
+        
+        $this->loadSchemaFiles($dbLinks);
+        $this->seedAdministrator($dbLinks['users']);
+        
+        $this->renderActionLog();
+        $this->renderPageEnd();
+    }
+    
+    private function establishServerLinks() {
+        $userLink = $this->connectToServer(DB_USER_HOST, DB_USER_USER, DB_USER_PASS, 'User Server');
+        $contentLink = $this->connectToServer(DB_CONTENT_HOST, DB_CONTENT_USER, DB_CONTENT_PASS, 'Content Server');
+        
+        return ($userLink && $contentLink) ? ['user' => $userLink, 'content' => $contentLink] : null;
+    }
+    
+    private function connectToServer($hostname, $username, $credential, $label) {
+        try {
+            $link = new PDO("mysql:host={$hostname};charset=utf8mb4", $username, $credential, $this->pdoOptions);
+            $this->logAction("Connect {$label}", true);
+            return $link;
+        } catch (PDOException $ex) {
+            error_log("{$label} link failed: " . $ex->getMessage());
+            $this->logAction("Connect {$label}", false);
+            $this->renderActionLog();
+            $this->renderPageEnd();
+            exit;
+        }
+    }
+    
+    private function purgeExistingDatabases($links) {
+        $this->executeSQL($links['user'], "DROP DATABASE IF EXISTS " . DB_USER_NAME, 'Remove User DB');
+        $this->executeSQL($links['content'], "DROP DATABASE IF EXISTS " . DB_CONTENT_NAME, 'Remove Content DB');
+    }
+    
+    private function buildFreshDatabases($links) {
+        $charset = " CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+        
+        if (!$this->executeSQL($links['user'], "CREATE DATABASE " . DB_USER_NAME . $charset, 'Build User DB')) {
+            $this->renderActionLog();
+            $this->renderPageEnd();
+            exit;
+        }
+        
+        if (!$this->executeSQL($links['content'], "CREATE DATABASE " . DB_CONTENT_NAME . $charset, 'Build Content DB')) {
+            $this->renderActionLog();
+            $this->renderPageEnd();
+            exit;
+        }
+    }
+    
+    private function reconnectToDatabases() {
+        $userDb = $this->connectWithDatabase(DB_USER_HOST, DB_USER_NAME, DB_USER_USER, DB_USER_PASS, 'User DB');
+        $contentDb = $this->connectWithDatabase(DB_CONTENT_HOST, DB_CONTENT_NAME, DB_CONTENT_USER, DB_CONTENT_PASS, 'Content DB');
+        
+        return ($userDb && $contentDb) ? ['users' => $userDb, 'content' => $contentDb] : null;
+    }
+    
+    private function connectWithDatabase($host, $dbname, $user, $pass, $label) {
+        try {
+            $conn = new PDO("mysql:host={$host};dbname={$dbname};charset=utf8mb4", $user, $pass, $this->pdoOptions);
+            $this->logAction("Attach {$label}", true);
+            return $conn;
+        } catch (PDOException $ex) {
+            error_log("{$label} attach failed: " . $ex->getMessage());
+            $this->logAction("Attach {$label}", false);
+            $this->renderActionLog();
+            $this->renderPageEnd();
+            exit;
+        }
+    }
+    
+    private function loadSchemaFiles($databases) {
+        $userSqlFile = __DIR__ . '/sql/full_user_schema.sql';
+        $contentSqlFile = __DIR__ . '/sql/full_content_schema.sql';
+        
+        if (is_file($userSqlFile)) {
+            $sqlStatements = file_get_contents($userSqlFile);
+            $this->executeSQL($databases['users'], $sqlStatements, 'Load User Tables', true);
+        } else {
+            $this->logAction('Load User Tables', false, 'File missing');
+        }
+        
+        if (is_file($contentSqlFile)) {
+            $sqlStatements = file_get_contents($contentSqlFile);
+            $this->executeSQL($databases['content'], $sqlStatements, 'Load Content Tables', true);
+        } else {
+            $this->logAction('Load Content Tables', false, 'File missing');
+        }
+    }
+    
+    private function seedAdministrator($userDatabase) {
+        $adminCreds = [
+            'email' => 'admin@ibc-intranet.de',
+            'plaintext' => 'Admin123!',
+            'privilege' => 'admin'
+        ];
+        
+        $encryptedPass = password_hash($adminCreds['plaintext'], PASSWORD_ARGON2ID);
+        
+        try {
+            $stmt = $userDatabase->prepare(
+                "INSERT INTO users (email, password, role, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())"
+            );
+            $stmt->execute([$adminCreds['email'], $encryptedPass, $adminCreds['privilege']]);
+            $this->logAction('Seed Administrator', true);
+        } catch (PDOException $ex) {
+            error_log('Admin seed failed: ' . $ex->getMessage());
+            $this->logAction('Seed Administrator', false);
+        }
+    }
+    
+    private function executeSQL($connection, $query, $description, $critical = false) {
+        try {
+            $connection->exec($query);
+            $this->logAction($description, true);
+            return true;
+        } catch (PDOException $ex) {
+            error_log("{$description} error: " . $ex->getMessage());
+            $this->logAction($description, false);
+            return !$critical;
+        }
+    }
+    
+    private function logAction($action, $success, $note = '') {
+        $this->actionLog[] = [
+            'task' => $action,
+            'success' => $success,
+            'message' => $note
+        ];
+    }
+    
+    private function renderPageStart() {
+        echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>System Rebuild</title>';
+        echo '<style>';
+        echo 'body{margin:0;padding:2rem;font:14px/1.6 system-ui,sans-serif;background:#f8f9fa}';
+        echo '.wrapper{max-width:900px;margin:0 auto;background:#fff;padding:2rem;border-radius:10px;box-shadow:0 4px 6px rgba(0,0,0,.07)}';
+        echo 'h1{color:#2c3e50;margin:0 0 1.5rem;padding-bottom:1rem;border-bottom:4px solid #27ae60}';
+        echo 'table{width:100%;border-collapse:collapse;margin-top:1.5rem}';
+        echo 'th,td{text-align:left;padding:1rem;border-bottom:1px solid #e9ecef}';
+        echo 'th{background:#27ae60;color:#fff;font-weight:600}';
+        echo 'tr:hover{background:#f8f9fa}';
+        echo '.ok{color:#27ae60;font-weight:600}';
+        echo '.fail{color:#e74c3c;font-weight:600}';
+        echo '</style></head><body><div class="wrapper"><h1>🔄 System Reconstruction</h1>';
+    }
+    
+    private function renderActionLog() {
+        echo '<table><thead><tr><th>Task</th><th>Result</th></tr></thead><tbody>';
+        
+        foreach ($this->actionLog as $entry) {
+            $styling = $entry['success'] ? 'ok' : 'fail';
+            $status = $entry['success'] ? 'Success' : ($entry['message'] ?: 'Failed');
+            
+            echo '<tr>';
+            echo '<td>' . htmlspecialchars($entry['task']) . '</td>';
+            echo '<td class="' . $styling . '">' . htmlspecialchars($status) . '</td>';
+            echo '</tr>';
+        }
+        
+        echo '</tbody></table>';
+    }
+    
+    private function renderPageEnd() {
+        echo '</div></body></html>';
     }
 }
 
-// Step 6: Import Content DB schema
-$contentSchemaPath = __DIR__ . '/sql/full_content_schema.sql';
-if (!file_exists($contentSchemaPath)) {
-    $operationResults[] = ['operation' => 'Import Content Schema', 'outcome' => 'Failed: Schema file not found'];
-} else {
-    $contentSchemaContent = file_get_contents($contentSchemaPath);
-    try {
-        $contentDbConn->exec($contentSchemaContent);
-        $operationResults[] = ['operation' => 'Import Content Schema', 'outcome' => 'Success'];
-    } catch (PDOException $error) {
-        $operationResults[] = ['operation' => 'Import Content Schema', 'outcome' => 'Failed - Check schema file'];
-        error_log('Import Content Schema error: ' . $error->getMessage());
-        displayResultsTable($operationResults);
-        die();
-    }
-}
-
-// Step 7: Create super admin account
-// WARNING: Password is hardcoded per specification - CHANGE IMMEDIATELY after first login
-$superAdminEmail = 'admin@ibc-intranet.de';
-$superAdminPass = 'Admin123!';
-$superAdminRole = 'admin';
-
-try {
-    $hashedPassword = password_hash($superAdminPass, PASSWORD_ARGON2ID);
-    
-    $insertQuery = $userDbConn->prepare(
-        "INSERT INTO users (email, password, role, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())"
-    );
-    
-    $insertQuery->execute([$superAdminEmail, $hashedPassword, $superAdminRole]);
-    
-    $operationResults[] = ['operation' => 'Created Admin Account', 'outcome' => 'Success'];
-} catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Created Admin Account', 'outcome' => 'Failed - Check users table'];
-    error_log('Create Admin error: ' . $error->getMessage());
-}
-
-// Display all results
-displayResultsTable($operationResults);
-
-echo '</div></body></html>';
-
-/**
- * Helper function to render results table
- */
-function displayResultsTable($results) {
-    echo '<table>';
-    echo '<thead><tr><th>Operation</th><th>Status</th></tr></thead>';
-    echo '<tbody>';
-    
-    foreach ($results as $result) {
-        $statusClass = (strpos($result['outcome'], 'Success') !== false) ? 'status-success' : 'status-fail';
-        echo '<tr>';
-        echo '<td>' . htmlspecialchars($result['operation']) . '</td>';
-        echo '<td class="' . $statusClass . '">' . htmlspecialchars($result['outcome']) . '</td>';
-        echo '</tr>';
-    }
-    
-    echo '</tbody>';
-    echo '</table>';
-}
+$rebuilder = new SystemRebuilder();
+$rebuilder->execute();
