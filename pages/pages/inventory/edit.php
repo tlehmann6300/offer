@@ -79,11 +79,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'notes' => $notes
                 ];
                 
-                if (Inventory::update($itemId, $data, $_SESSION['user_id'])) {
-                    header('Location: view.php?id=' . $itemId);
-                    exit;
-                } else {
-                    $error = 'Fehler beim Aktualisieren des Artikels';
+                try {
+                    if (Inventory::update($itemId, $data, $_SESSION['user_id'])) {
+                        header('Location: view.php?id=' . $itemId);
+                        exit;
+                    } else {
+                        $error = 'Fehler beim Aktualisieren des Artikels';
+                    }
+                } catch (Exception $e) {
+                    $error = $e->getMessage();
                 }
             }
         }

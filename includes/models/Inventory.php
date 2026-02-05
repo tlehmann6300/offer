@@ -28,6 +28,42 @@ class Inventory {
     }
 
     /**
+     * Get available stock for an item
+     * 
+     * Calculates available stock as: (Synced Total Stock from DB) - (Count of Active/Reserved Local Loans)
+     * 
+     * @param int $id Item ID
+     * @return int Available stock quantity
+     */
+    public static function getAvailableStock($id) {
+        $db = Database::getContentDB();
+        
+        // Get total stock from inventory and sum of active rentals
+        // Note: r.actual_return IS NULL identifies active (unreturned) rentals
+        $stmt = $db->prepare("
+            SELECT 
+                i.current_stock,
+                COALESCE(SUM(r.amount), 0) as active_rentals
+            FROM inventory i
+            LEFT JOIN rentals r ON i.id = r.item_id AND r.actual_return IS NULL
+            WHERE i.id = ?
+            GROUP BY i.id, i.current_stock
+        ");
+        $stmt->execute([$id]);
+        $result = $stmt->fetch();
+        
+        if (!$result) {
+            return 0;
+        }
+        
+        // Formula: Total Stock - Active Rentals
+        $availableStock = $result['current_stock'] - $result['active_rentals'];
+        
+        // Ensure non-negative
+        return max(0, $availableStock);
+    }
+
+    /**
      * Get all items with filters
      */
     public static function getAll($filters = []) {
@@ -122,9 +158,42 @@ class Inventory {
 
     /**
      * Update item
+     * 
+     * Protects EasyVerein-synced items from direct Master Data modifications
+     * Master Data fields: name, description, current_stock
+     * Local Operational fields: location_id, notes, category_id, etc.
+     * 
+     * @param int $id Item ID
+     * @param array $data Fields to update
+     * @param int $userId User ID performing the update
+     * @param bool $isSyncUpdate Set to true when called from EasyVereinSync (default: false)
+     * @throws Exception If attempting to modify Master Data on EasyVerein-synced items
+     * @return bool Success status
      */
-    public static function update($id, $data, $userId) {
+    public static function update($id, $data, $userId, $isSyncUpdate = false) {
         $db = Database::getContentDB();
+        
+        // Check if this item is synced with EasyVerein (unless this IS a sync update)
+        if (!$isSyncUpdate) {
+            $stmt = $db->prepare("SELECT easyverein_id FROM inventory WHERE id = ?");
+            $stmt->execute([$id]);
+            $item = $stmt->fetch();
+            
+            if ($item && !empty($item['easyverein_id'])) {
+                // This item is synced with EasyVerein
+                // Check if trying to modify Master Data fields
+                $masterDataFields = ['name', 'description', 'current_stock'];
+                $attemptedMasterDataChanges = array_intersect(array_keys($data), $masterDataFields);
+                
+                if (!empty($attemptedMasterDataChanges)) {
+                    throw new Exception(
+                        "Cannot modify Master Data fields (" . implode(', ', $attemptedMasterDataChanges) . ") " .
+                        "for EasyVerein-synced items. These fields are managed by EasyVerein sync. " .
+                        "You can only modify Local Operational Data (location_id, notes, category_id, etc.)."
+                    );
+                }
+            }
+        }
         
         $fields = [];
         $values = [];
@@ -820,5 +889,20 @@ class Inventory {
             'skipped' => $skipped,
             'errors' => $errors
         ];
+    }
+    
+    /**
+     * Sync inventory from EasyVerein
+     * 
+     * Wrapper method to easily call EasyVereinSync::sync()
+     * 
+     * @param int $userId User ID performing the sync (for audit trail)
+     * @return array Result with statistics (created, updated, archived, errors)
+     */
+    public static function syncFromEasyVerein($userId) {
+        require_once __DIR__ . '/../services/EasyVereinSync.php';
+        
+        $sync = new EasyVereinSync();
+        return $sync->sync($userId);
     }
 }
