@@ -18,7 +18,7 @@ $userId = $_SESSION['user_id'];
 $profile = Alumni::getProfileByUserId($userId);
 
 $message = '';
-$error = '';
+$errors = [];
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -37,14 +37,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Validate required fields
     if (empty($firstName) || empty($lastName) || empty($email) || empty($company) || empty($position)) {
-        $error = 'Bitte füllen Sie alle Pflichtfelder aus (Name, E-Mail, Firma, Position)';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
-    } elseif (!empty($linkedinUrl) && !filter_var($linkedinUrl, FILTER_VALIDATE_URL)) {
-        $error = 'Bitte geben Sie eine gültige LinkedIn-URL ein';
-    } elseif (!empty($xingUrl) && !filter_var($xingUrl, FILTER_VALIDATE_URL)) {
-        $error = 'Bitte geben Sie eine gültige Xing-URL ein';
-    } else {
+        $errors[] = 'Bitte füllen Sie alle Pflichtfelder aus (Name, E-Mail, Firma, Position)';
+    }
+    
+    if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
+    }
+    
+    if (!empty($linkedinUrl) && !filter_var($linkedinUrl, FILTER_VALIDATE_URL)) {
+        $errors[] = 'Bitte geben Sie eine gültige LinkedIn-URL ein';
+    }
+    
+    if (!empty($xingUrl) && !filter_var($xingUrl, FILTER_VALIDATE_URL)) {
+        $errors[] = 'Bitte geben Sie eine gültige Xing-URL ein';
+    }
+    
+    if (empty($errors)) {
         // Prepare data array
         $data = [
             'first_name' => $firstName,
@@ -72,24 +80,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     $data['image_path'] = $uploadResult['path'];
                 } else {
-                    $error = $uploadResult['error'];
+                    $errors[] = $uploadResult['error'];
                 }
             } elseif ($uploadError === UPLOAD_ERR_INI_SIZE || $uploadError === UPLOAD_ERR_FORM_SIZE) {
-                $error = 'Die hochgeladene Datei ist zu groß. Maximum: 5MB';
+                $errors[] = 'Die hochgeladene Datei ist zu groß. Maximum: 5MB';
             } elseif ($uploadError === UPLOAD_ERR_PARTIAL) {
-                $error = 'Die Datei wurde nur teilweise hochgeladen. Bitte versuchen Sie es erneut.';
+                $errors[] = 'Die Datei wurde nur teilweise hochgeladen. Bitte versuchen Sie es erneut.';
             } elseif ($uploadError !== UPLOAD_ERR_NO_FILE) {
-                $error = 'Fehler beim Hochladen der Datei (Code: ' . $uploadError . ')';
+                $errors[] = 'Fehler beim Hochladen der Datei (Code: ' . $uploadError . ')';
             }
         }
         
         // Keep existing image if no new image uploaded and profile exists
-        if (empty($error) && $profile && !empty($profile['image_path']) && !isset($data['image_path'])) {
+        if (empty($errors) && $profile && !empty($profile['image_path']) && !isset($data['image_path'])) {
             $data['image_path'] = $profile['image_path'];
         }
         
         // If no errors, update or create the profile
-        if (empty($error)) {
+        if (empty($errors)) {
             try {
                 if (Alumni::updateOrCreateProfile($userId, $data)) {
                     // Update last_verified_at timestamp
@@ -100,10 +108,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     header('Location: index.php');
                     exit;
                 } else {
-                    $error = 'Fehler beim Speichern des Profils. Bitte versuchen Sie es erneut.';
+                    $errors[] = 'Fehler beim Speichern des Profils. Bitte versuchen Sie es erneut.';
                 }
             } catch (Exception $e) {
-                $error = 'Fehler: ' . htmlspecialchars($e->getMessage());
+                $errors[] = 'Fehler: ' . htmlspecialchars($e->getMessage());
             }
         }
     }
@@ -132,9 +140,11 @@ ob_start();
         </a>
     </div>
 
-    <?php if ($error): ?>
+    <?php if (!empty($errors)): ?>
     <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-        <i class="fas fa-exclamation-circle mr-2"></i><?php echo htmlspecialchars($error); ?>
+        <?php foreach ($errors as $error): ?>
+            <div><i class="fas fa-exclamation-circle mr-2"></i><?php echo htmlspecialchars($error); ?></div>
+        <?php endforeach; ?>
     </div>
     <?php endif; ?>
 
