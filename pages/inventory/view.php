@@ -391,15 +391,17 @@ ob_start();
                         if (json_last_error() === JSON_ERROR_NONE && is_array($json)) {
                             echo '<div class=\'text-xs space-y-1\'>';
                             foreach ($json as $k => $v) {
-                                if ($k == 'image_path' || empty($v)) continue; // Bildpfad ignorieren
+                                if ($k === 'image_path' || empty($v)) continue; // Bildpfad ignorieren
                                 echo '<div class=\'flex gap-2\'>';
-                                echo '<span class=\'font-semibold text-gray-600 w-24 shrink-0\'>' . ucfirst($k) . ':</span>';
-                                echo '<span class=\'text-gray-800 truncate\'>' . htmlspecialchars(is_array($v) ? json_encode($v) : $v) . '</span>';
+                                echo '<span class=\'font-semibold text-gray-600 w-24 shrink-0\'>' . htmlspecialchars(ucfirst($k)) . ':</span>';
+                                $valueOutput = is_array($v) ? json_encode($v) : $v;
+                                if (is_array($v) && $valueOutput === false) $valueOutput = '[Array]';
+                                echo '<span class=\'text-gray-800 truncate\'>' . htmlspecialchars($valueOutput) . '</span>';
                                 echo '</div>';
                             }
                             echo '</div>';
                         } else {
-                            echo htmlspecialchars($details);
+                            echo htmlspecialchars($details ?: '-');
                         }
                         ?>
                     </td>
