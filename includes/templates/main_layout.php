@@ -217,18 +217,18 @@ require_once __DIR__ . '/../../src/Auth.php';
         <div class='mt-auto border-t border-gray-700 pt-6 pb-4 px-4 bg-black/20'>
             <?php 
             $currentUser = Auth::user();
-            $fn = !empty($currentUser['firstname']) ? $currentUser['firstname'] : '';
-            $ln = !empty($currentUser['lastname']) ? $currentUser['lastname'] : '';
+            $firstname = !empty($currentUser['firstname']) ? $currentUser['firstname'] : '';
+            $lastname = !empty($currentUser['lastname']) ? $currentUser['lastname'] : '';
             $email = $currentUser['email'] ?? '';
             $role = $currentUser['role'] ?? 'User';
             
             // Generate initials with proper fallbacks
-            if (!empty($fn) && !empty($ln)) {
-                $initials = strtoupper(substr($fn, 0, 1) . substr($ln, 0, 1));
-            } elseif (!empty($fn)) {
-                $initials = strtoupper(substr($fn, 0, 1));
-            } elseif (!empty($ln)) {
-                $initials = strtoupper(substr($ln, 0, 1));
+            if (!empty($firstname) && !empty($lastname)) {
+                $initials = strtoupper(substr($firstname, 0, 1) . substr($lastname, 0, 1));
+            } elseif (!empty($firstname)) {
+                $initials = strtoupper(substr($firstname, 0, 1));
+            } elseif (!empty($lastname)) {
+                $initials = strtoupper(substr($lastname, 0, 1));
             } elseif (!empty($email)) {
                 $initials = strtoupper(substr($email, 0, 1));
             } else {
@@ -236,7 +236,7 @@ require_once __DIR__ . '/../../src/Auth.php';
             }
             
             // Generate display name
-            $fullname = trim($fn . ' ' . $ln);
+            $fullname = trim($firstname . ' ' . $lastname);
             $displayName = !empty($fullname) ? $fullname : $email;
             ?>
             <div class='flex items-center gap-3 mb-4'>
@@ -244,12 +244,14 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <?php echo $initials; ?>
                 </div>
                 <div class='overflow-hidden'>
-                    <p class='text-sm font-semibold text-white truncate leading-tight'>
+                    <p class='text-sm font-semibold text-white truncate leading-tight' title='<?php echo htmlspecialchars($displayName); ?>'>
                         <?php echo htmlspecialchars($displayName); ?>
                     </p>
-                    <p class='text-xs text-gray-400 truncate mt-0.5'>
+                    <?php if (!empty($email)): ?>
+                    <p class='text-xs text-gray-400 truncate mt-0.5' title='<?php echo htmlspecialchars($email); ?>'>
                         <?php echo htmlspecialchars($email); ?>
                     </p>
+                    <?php endif; ?>
                     <span class='inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-900/50 text-blue-300 border border-blue-800'>
                         <?php echo htmlspecialchars(ucfirst($role)); ?>
                     </span>
