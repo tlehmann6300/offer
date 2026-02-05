@@ -183,13 +183,13 @@ ob_start();
 
         <!-- Details -->
         <div class="space-y-2 mb-4 text-sm text-gray-600">
-            <?php if ($item['category_name']): ?>
+            <?php if (!empty($item['category_name'])): ?>
             <div class="flex items-center">
                 <i class="fas fa-tag w-5 text-purple-600"></i>
                 <span><?php echo htmlspecialchars($item['category_name']); ?></span>
             </div>
             <?php endif; ?>
-            <?php if ($item['location_name']): ?>
+            <?php if (!empty($item['location_name'])): ?>
             <div class="flex items-center">
                 <i class="fas fa-map-marker-alt w-5 text-purple-600"></i>
                 <span><?php echo htmlspecialchars($item['location_name']); ?></span>
@@ -197,14 +197,15 @@ ob_start();
             <?php endif; ?>
             <div class="flex items-center">
                 <i class="fas fa-box w-5 text-purple-600"></i>
-                <span>Aktueller Bestand: <?php echo htmlspecialchars($item['current_stock']); ?> <?php echo htmlspecialchars($item['unit']); ?></span>
+                <span>Bestand: <?php echo $item['current_stock']; ?> <?php echo htmlspecialchars($item['unit'] ?? 'Stk'); ?></span>
             </div>
         </div>
 
         <!-- Stock Warning -->
         <?php 
         $lowStockThreshold = $item['min_stock'] ?? DEFAULT_LOW_STOCK_THRESHOLD;
-        if ($item['current_stock'] <= $lowStockThreshold && $lowStockThreshold > 0): 
+        // FIX: Nutze current_stock für die Warnung
+        if ($item['current_stock'] <= $lowStockThreshold): 
         ?>
         <div class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
             <div class="flex items-center text-sm text-yellow-800">
