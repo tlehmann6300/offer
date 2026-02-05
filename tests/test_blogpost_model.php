@@ -240,7 +240,7 @@ try {
     
     // Test 9: getAll() with pagination and filtering
     test("getAll() - Retrieves posts with pagination", function() use ($db) {
-        // Create multiple test posts (1-indexed for clearer test output)
+        // Create multiple test posts (loop starts at 1 for clearer test post titles like "Test Post 1", "Test Post 2")
         $postIds = [];
         for ($i = 1; $i <= 5; $i++) {
             $testData = [

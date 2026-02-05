@@ -265,7 +265,7 @@ class BlogPost {
      * Check if a user role can create/edit blog posts
      * 
      * @param string $userRole User role
-     * @return bool True if role is authorized (admin, board, head), false otherwise (member, alumni)
+     * @return bool True if role is authorized (admin, board, head), false otherwise
      */
     public static function canAuth($userRole) {
         $authorizedRoles = ['admin', 'board', 'head'];
