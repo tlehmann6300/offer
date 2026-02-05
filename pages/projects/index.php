@@ -66,7 +66,7 @@ ob_start();
             <?php foreach ($filteredProjects as $project): ?>
                 <?php
                     $isArchived = $project['status'] === 'archived';
-                    $canApply = ($project['status'] === 'open' || $project['status'] === 'tender' || $project['status'] === 'applying') && $userRole !== 'alumni';
+                    $canApply = ($project['status'] === 'open' || $project['status'] === 'applying') && $userRole !== 'alumni';
                 ?>
                 
                 <div class="card p-6 relative hover:shadow-lg transition <?php echo $isArchived ? 'opacity-60 grayscale' : ''; ?>">
@@ -94,7 +94,6 @@ ob_start();
                             <?php 
                             switch($project['status']) {
                                 case 'open': echo 'bg-blue-100 text-blue-800'; break;
-                                case 'tender': echo 'bg-blue-100 text-blue-800'; break;
                                 case 'applying': echo 'bg-yellow-100 text-yellow-800'; break;
                                 case 'assigned': echo 'bg-green-100 text-green-800'; break;
                                 case 'running': echo 'bg-purple-100 text-purple-800'; break;
@@ -106,7 +105,6 @@ ob_start();
                             <?php 
                             switch($project['status']) {
                                 case 'open': echo 'Offen'; break;
-                                case 'tender': echo 'Ausschreibung'; break;
                                 case 'applying': echo 'Bewerbungsphase'; break;
                                 case 'assigned': echo 'Vergeben'; break;
                                 case 'running': echo 'Laufend'; break;

@@ -23,7 +23,7 @@ try {
         'client_name' => 'ACME Corporation',
         'client_contact_details' => 'contact@acme.com, +1-555-1234',
         'priority' => 'high',
-        'status' => 'tender',
+        'status' => 'open',
         'start_date' => date('Y-m-d', strtotime('+30 days')),
         'end_date' => date('Y-m-d', strtotime('+90 days'))
     ];

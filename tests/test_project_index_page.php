@@ -77,7 +77,6 @@ try {
         'Jetzt bewerben' => 'Apply button',
         'archived' => 'Archived status handling',
         'grayscale' => 'Archived styling',
-        'tender' => 'Tender status',
         'applying' => 'Applying status'
     ];
     
@@ -153,7 +152,7 @@ try {
             // Create test projects with different statuses
             $testProjects = [
                 ['title' => 'Draft Project Test', 'status' => 'draft'],
-                ['title' => 'Tender Project Test', 'status' => 'tender'],
+                ['title' => 'Open Project Test', 'status' => 'open'],
                 ['title' => 'Archived Project Test', 'status' => 'archived']
             ];
             
@@ -174,21 +173,21 @@ try {
             $nonDraftProjects = $stmt->fetchAll();
             
             $foundDraft = false;
-            $foundTender = false;
+            $foundOpen = false;
             $foundArchived = false;
             
             foreach ($nonDraftProjects as $project) {
                 if ($project['status'] === 'draft') $foundDraft = true;
-                if ($project['status'] === 'tender') $foundTender = true;
+                if ($project['status'] === 'open') $foundOpen = true;
                 if ($project['status'] === 'archived') $foundArchived = true;
             }
             
-            if (!$foundDraft && $foundTender && $foundArchived) {
+            if (!$foundDraft && $foundOpen && $foundArchived) {
                 echo "✓ Draft filtering works correctly (draft excluded, others included)\n";
             } else {
                 echo "✗ Draft filtering failed\n";
                 echo "  Found draft: " . ($foundDraft ? 'yes' : 'no') . "\n";
-                echo "  Found tender: " . ($foundTender ? 'yes' : 'no') . "\n";
+                echo "  Found open: " . ($foundOpen ? 'yes' : 'no') . "\n";
                 echo "  Found archived: " . ($foundArchived ? 'yes' : 'no') . "\n";
             }
             
@@ -211,7 +210,7 @@ try {
     echo "Test 8: Verify Role-Based Button Logic\n";
     $roleChecks = [
         'userRole !== \'alumni\'' => 'Alumni exclusion check',
-        'status === \'tender\' || $project[\'status\'] === \'applying\'' => 'Status check for apply button',
+        'status === \'open\' || $project[\'status\'] === \'applying\'' => 'Status check for apply button',
         'canApply' => 'Apply permission variable'
     ];
     
