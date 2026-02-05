@@ -139,7 +139,8 @@ try {
     // Create an event with correct status
     $eventData3 = [
         'title' => 'Test Event - Batch Correct',
-        'description' => 'For batch testing',
+        'description' => 'Test event for batch update optimization verification - status should not change',
+        'location' => 'Test Location',
         'start_time' => date('Y-m-d H:i:s', strtotime('+10 days')),
         'end_time' => date('Y-m-d H:i:s', strtotime('+10 days +1 hour')),
         'registration_start' => date('Y-m-d H:i:s', strtotime('-1 day')),
