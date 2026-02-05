@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../src/Auth.php';
+require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
 
 if (!Auth::check()) {
@@ -83,11 +84,17 @@ ob_start();
             </h1>
             <p class="text-gray-600"><?php echo count($items); ?> Artikel gefunden</p>
         </div>
+        <!-- EasyVerein Sync Button - Admin/Board only -->
+        <?php if (AuthHandler::hasRole('admin') || AuthHandler::hasRole('board')): ?>
+        <div class="mt-4 md:mt-0 flex gap-2">
+            <a href="sync.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+                <i class="fas fa-sync-alt mr-2"></i> EasyVerein Sync
+            </a>
+        </div>
+        <?php endif; ?>
+        <!-- Import Button - Manager level and above -->
         <?php if (Auth::hasPermission('manager')): ?>
         <div class="mt-4 md:mt-0 flex gap-2">
-            <a href="sync.php" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                🔄 Synchronize from EasyVerein
-            </a>
             <button type="button" onclick="document.getElementById('importModal').classList.remove('hidden')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
                 <i class="fas fa-file-import mr-2"></i>
                 Massenimport
@@ -288,9 +295,9 @@ ob_start();
     <div class="col-span-full card p-12 text-center">
         <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
         <p class="text-gray-500 text-lg">Keine Artikel gefunden</p>
-        <?php if (Auth::hasPermission('manager')): ?>
-        <a href="sync.php" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition inline-block mt-4">
-            🔄 Synchronize from EasyVerein
+        <?php if (AuthHandler::hasRole('admin') || AuthHandler::hasRole('board')): ?>
+        <a href="sync.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-flex items-center mt-4">
+            <i class="fas fa-sync-alt mr-2"></i> EasyVerein Sync
         </a>
         <?php endif; ?>
     </div>

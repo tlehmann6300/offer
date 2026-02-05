@@ -5,6 +5,7 @@
  */
 
 require_once __DIR__ . '/../../src/Auth.php';
+require_once __DIR__ . '/../../includes/handlers/AuthHandler.php';
 require_once __DIR__ . '/../../includes/services/EasyVereinSync.php';
 
 // Check authentication and permissions
@@ -13,8 +14,8 @@ if (!Auth::check()) {
     exit;
 }
 
-// Only managers can perform synchronization
-if (!Auth::hasPermission('manager')) {
+// Only admin and board members can perform synchronization
+if (!AuthHandler::hasRole('admin') && !AuthHandler::hasRole('board')) {
     $_SESSION['error'] = 'Sie haben keine Berechtigung, diese Aktion auszuführen.';
     header('Location: index.php');
     exit;
