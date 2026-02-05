@@ -96,22 +96,38 @@ class Event {
     
     /**
      * Update event status in database if it differs from calculated status
-     * Helper method to avoid code duplication
      * 
-     * @param array $event Event data
+     * OPTIMIZATION: This method minimizes database writes during read operations by:
+     * 1. Comparing the current status (from database) with the calculated status
+     * 2. Only executing a database UPDATE when the status has actually changed
+     * 3. Avoiding unnecessary write operations when status is already correct
+     * 
+     * This lazy-update pattern ensures efficient read operations while keeping
+     * status data in sync with event timestamps.
+     * 
+     * @param array $event Event data fetched directly from database (must contain 'status' field)
      * @param PDO $db Database connection
      * @return array Updated event data with correct status
      */
     private static function updateEventStatusIfNeeded($event, $db) {
+        // Get current status from database object
+        // This is the actual value stored in the database at query time
         $currentStatus = $event['status'];
+        
+        // Calculate what the status should be based on event timestamps
         $calculatedStatus = self::calculateStatus($event);
         
+        // OPTIMIZATION: Only update if status has changed
+        // Using strict comparison (!==) ensures type-safe comparison
         if ($currentStatus !== $calculatedStatus) {
-            // Update status in database
+            // Status has changed - update database
             $updateStmt = $db->prepare("UPDATE events SET status = ? WHERE id = ?");
             $updateStmt->execute([$calculatedStatus, $event['id']]);
+            
+            // Update the event array to reflect the new status
             $event['status'] = $calculatedStatus;
         }
+        // If statuses match, no database write occurs (optimization)
         
         return $event;
     }
@@ -502,23 +518,29 @@ class Event {
         $stmt->execute($params);
         $events = $stmt->fetchAll();
         
-        // Batch update statuses - collect events that need updates
+        // OPTIMIZATION: Batch update statuses - only update events that need changes
+        // This minimizes write operations by comparing current vs calculated status
         $eventsToUpdate = [];
         foreach ($events as &$event) {
+            // Current status from database
             $currentStatus = $event['status'];
+            // Calculate what status should be based on timestamps
             $calculatedStatus = self::calculateStatus($event);
             
+            // Only add to update batch if status has changed
             if ($currentStatus !== $calculatedStatus) {
                 $eventsToUpdate[] = [
                     'id' => $event['id'],
                     'status' => $calculatedStatus
                 ];
+                // Update array for immediate use
                 $event['status'] = $calculatedStatus;
             }
         }
         unset($event); // Break reference
         
-        // Perform batch status updates if needed
+        // Perform batch status updates only if there are changes
+        // OPTIMIZATION: If all statuses are already correct, no database writes occur
         if (!empty($eventsToUpdate)) {
             $db->beginTransaction();
             try {
