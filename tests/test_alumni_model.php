@@ -199,20 +199,63 @@ try {
     
     // Test 12: Image Path Sanitization
     echo "Test 12: Image Path Sanitization\n";
-    $maliciousPath = '../../../etc/passwd';
-    $updateWithMaliciousPath = [
-        'image_path' => $maliciousPath
-    ];
-    Alumni::updateOrCreateProfile($testUserId3, $updateWithMaliciousPath);
-    $sanitizedProfile = Alumni::getProfileByUserId($testUserId3);
     
-    if (!str_contains($sanitizedProfile['image_path'], '../')) {
-        echo "✓ Image path sanitization works correctly\n";
-        echo "  Malicious input: $maliciousPath\n";
-        echo "  Sanitized output: {$sanitizedProfile['image_path']}\n\n";
+    // Test 12a: Directory traversal with ../
+    $maliciousPath1 = '../../../etc/passwd';
+    Alumni::updateOrCreateProfile($testUserId3, ['image_path' => $maliciousPath1]);
+    $sanitizedProfile1 = Alumni::getProfileByUserId($testUserId3);
+    
+    if (!str_contains($sanitizedProfile1['image_path'], '../') && 
+        str_starts_with($sanitizedProfile1['image_path'], 'uploads/')) {
+        echo "✓ Directory traversal with ../ blocked correctly\n";
+        echo "  Input: $maliciousPath1\n";
+        echo "  Output: {$sanitizedProfile1['image_path']}\n";
     } else {
-        echo "✗ Image path sanitization failed\n\n";
+        echo "✗ Directory traversal with ../ not properly sanitized\n";
     }
+    
+    // Test 12b: Absolute path
+    $maliciousPath2 = '/etc/passwd';
+    Alumni::updateOrCreateProfile($testUserId3, ['image_path' => $maliciousPath2]);
+    $sanitizedProfile2 = Alumni::getProfileByUserId($testUserId3);
+    
+    if ($sanitizedProfile2['image_path'] === 'uploads/passwd') {
+        echo "✓ Absolute path blocked correctly\n";
+        echo "  Input: $maliciousPath2\n";
+        echo "  Output: {$sanitizedProfile2['image_path']}\n";
+    } else {
+        echo "✗ Absolute path not properly sanitized\n";
+        echo "  Expected: uploads/passwd, Got: {$sanitizedProfile2['image_path']}\n";
+    }
+    
+    // Test 12c: Backslash traversal
+    $maliciousPath3 = '..\\..\\windows\\system32\\config';
+    Alumni::updateOrCreateProfile($testUserId3, ['image_path' => $maliciousPath3]);
+    $sanitizedProfile3 = Alumni::getProfileByUserId($testUserId3);
+    
+    if (!str_contains($sanitizedProfile3['image_path'], '..') && 
+        str_starts_with($sanitizedProfile3['image_path'], 'uploads/')) {
+        echo "✓ Backslash traversal blocked correctly\n";
+        echo "  Input: $maliciousPath3\n";
+        echo "  Output: {$sanitizedProfile3['image_path']}\n";
+    } else {
+        echo "✗ Backslash traversal not properly sanitized\n";
+    }
+    
+    // Test 12d: Normal safe path
+    $safePath = 'profiles/user123.jpg';
+    Alumni::updateOrCreateProfile($testUserId3, ['image_path' => $safePath]);
+    $sanitizedProfile4 = Alumni::getProfileByUserId($testUserId3);
+    
+    if ($sanitizedProfile4['image_path'] === 'uploads/profiles/user123.jpg') {
+        echo "✓ Safe path handled correctly\n";
+        echo "  Input: $safePath\n";
+        echo "  Output: {$sanitizedProfile4['image_path']}\n";
+    } else {
+        echo "✗ Safe path not handled correctly\n";
+        echo "  Expected: uploads/profiles/user123.jpg, Got: {$sanitizedProfile4['image_path']}\n";
+    }
+    echo "\n";
     
     // Test 13: Missing Required Fields
     echo "Test 13: Missing Required Fields\n";

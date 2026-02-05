@@ -112,7 +112,16 @@ class Alumni {
      * @return string Sanitized image path
      */
     private static function sanitizeImagePath(string $imagePath): string {
-        // Remove any directory traversal attempts with repeated replacements
+        // Reject paths that contain traversal attempts
+        if (preg_match('/\.\./', $imagePath) || 
+            preg_match('/[\/\\\\]\.\./', $imagePath) ||
+            str_contains($imagePath, "\0") ||
+            str_starts_with($imagePath, '/')) {
+            // If path contains traversal attempts or null bytes, use only the basename
+            $imagePath = basename($imagePath);
+        }
+        
+        // Remove any remaining directory traversal attempts
         do {
             $previousPath = $imagePath;
             $imagePath = str_replace(['../', '..\\'], '', $imagePath);
@@ -120,7 +129,7 @@ class Alumni {
         
         // Ensure path starts with uploads/ if it doesn't already
         if (!str_starts_with($imagePath, 'uploads/')) {
-            $imagePath = 'uploads/' . ltrim($imagePath, '/');
+            $imagePath = 'uploads/' . ltrim($imagePath, '/\\');
         }
         
         return $imagePath;
