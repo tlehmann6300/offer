@@ -130,8 +130,6 @@ class Project {
     
     /**
      * Create a new project
-     * 
-     * Note: The 'tender' status is deprecated. New projects should use 'draft' or 'open'.
      */
     public static function create($data) {
         $db = Database::getContentDB();
@@ -174,8 +172,6 @@ class Project {
     
     /**
      * Update an existing project
-     * 
-     * Note: The 'tender' status is deprecated. Use 'open' for new active projects.
      */
     public static function update($id, $data) {
         $db = Database::getContentDB();
