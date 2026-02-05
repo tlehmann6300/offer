@@ -250,7 +250,7 @@ require_once __DIR__ . '/../../src/Auth.php';
                         <?php echo htmlspecialchars($displayName); ?>
                     </p>
                     <?php if (!empty($email)): ?>
-                    <p class='text-xs text-gray-300 truncate leading-relaxed' title='<?php echo htmlspecialchars($email); ?>' style='max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;'>
+                    <p class='text-xs text-gray-300 truncate leading-relaxed' title='<?php echo htmlspecialchars($email); ?>'>
                         <?php echo htmlspecialchars($email); ?>
                     </p>
                     <?php endif; ?>
