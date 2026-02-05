@@ -197,14 +197,14 @@ ob_start();
             <?php endif; ?>
             <div class="flex items-center">
                 <i class="fas fa-box w-5 text-purple-600"></i>
-                <span>Bestand: <?php echo $item['quantity']; ?> / Verfügbar: <?php echo $item['available_quantity']; ?></span>
+                <span>Aktueller Bestand: <?php echo $item['current_stock']; ?> <?php echo htmlspecialchars($item['unit']); ?></span>
             </div>
         </div>
 
         <!-- Stock Warning -->
         <?php 
-        $lowStockThreshold = $item['low_stock_threshold'] ?? DEFAULT_LOW_STOCK_THRESHOLD;
-        if ($item['available_quantity'] <= $lowStockThreshold): 
+        $lowStockThreshold = $item['min_stock'] ?? DEFAULT_LOW_STOCK_THRESHOLD;
+        if ($item['current_stock'] <= $lowStockThreshold && $lowStockThreshold > 0): 
         ?>
         <div class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
             <div class="flex items-center text-sm text-yellow-800">
