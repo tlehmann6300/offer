@@ -139,6 +139,10 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <i class="fas fa-home w-5"></i>
                     <span>Dashboard</span>
                 </a>
+                <a href="<?php echo asset('pages/blog/index.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                    <i class="fas fa-newspaper w-5"></i>
+                    <span>News / Blog</span>
+                </a>
                 <a href="<?php echo asset('pages/inventory/index.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                     <i class="fas fa-boxes w-5"></i>
                     <span>Inventar</span>
