@@ -47,6 +47,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['import_json']) && Aut
 $importErrors = $_SESSION['import_errors'] ?? [];
 unset($_SESSION['import_errors']);
 
+// Get sync results from session and clear them
+$syncResult = $_SESSION['sync_result'] ?? null;
+unset($_SESSION['sync_result']);
+
 // Get filters
 $filters = [];
 if (!empty($_GET['category_id'])) {
@@ -81,9 +85,8 @@ ob_start();
         </div>
         <?php if (Auth::hasPermission('manager')): ?>
         <div class="mt-4 md:mt-0 flex gap-2">
-            <a href="add.php" class="btn-primary inline-block">
-                <i class="fas fa-plus mr-2"></i>
-                Neuer Artikel
+            <a href="sync.php" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                🔄 Synchronize from EasyVerein
             </a>
             <button type="button" onclick="document.getElementById('importModal').classList.remove('hidden')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
                 <i class="fas fa-file-import mr-2"></i>
@@ -106,6 +109,33 @@ ob_start();
                 <summary class="cursor-pointer text-sm underline">Details anzeigen (<?php echo count($importErrors); ?> Fehler)</summary>
                 <ul class="mt-2 list-disc list-inside text-sm">
                     <?php foreach ($importErrors as $error): ?>
+                    <li><?php echo htmlspecialchars($error); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </details>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- Sync Results -->
+<?php if ($syncResult): ?>
+<div class="mb-6 p-4 rounded-lg bg-blue-100 border border-blue-400 text-blue-700">
+    <div class="flex items-start">
+        <i class="fas fa-sync-alt mr-3 mt-1"></i>
+        <div class="flex-1">
+            <p class="font-semibold">EasyVerein Synchronisierung abgeschlossen</p>
+            <ul class="mt-2 text-sm">
+                <li>✓ Erstellt: <?php echo htmlspecialchars($syncResult['created']); ?> Artikel</li>
+                <li>✓ Aktualisiert: <?php echo htmlspecialchars($syncResult['updated']); ?> Artikel</li>
+                <li>✓ Archiviert: <?php echo htmlspecialchars($syncResult['archived']); ?> Artikel</li>
+            </ul>
+            <?php if (!empty($syncResult['errors'])): ?>
+            <details class="mt-2">
+                <summary class="cursor-pointer text-sm underline">Fehler anzeigen (<?php echo count($syncResult['errors']); ?>)</summary>
+                <ul class="mt-2 list-disc list-inside text-sm">
+                    <?php foreach ($syncResult['errors'] as $error): ?>
                     <li><?php echo htmlspecialchars($error); ?></li>
                     <?php endforeach; ?>
                 </ul>
@@ -259,16 +289,16 @@ ob_start();
         <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
         <p class="text-gray-500 text-lg">Keine Artikel gefunden</p>
         <?php if (Auth::hasPermission('manager')): ?>
-        <a href="add.php" class="btn-primary inline-block mt-4">
-            <i class="fas fa-plus mr-2"></i>Ersten Artikel hinzufügen
+        <a href="sync.php" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition inline-block mt-4">
+            🔄 Synchronize from EasyVerein
         </a>
         <?php endif; ?>
     </div>
     <?php else: ?>
     <?php foreach ($items as $item): ?>
-    <div class="card overflow-hidden card-hover">
+    <div class="card overflow-hidden card-hover <?php echo $item['is_archived_in_easyverein'] ? 'opacity-60' : ''; ?>">
         <!-- Image -->
-        <div class="h-48 bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center">
+        <div class="h-48 bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center <?php echo $item['is_archived_in_easyverein'] ? 'grayscale' : ''; ?>">
             <?php if ($item['image_path']): ?>
             <img src="/<?php echo htmlspecialchars($item['image_path']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="w-full h-full object-cover">
             <?php else: ?>
@@ -290,6 +320,22 @@ ob_start();
                 <?php if ($item['location_name']): ?>
                 <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full">
                     <i class="fas fa-map-marker-alt mr-1"></i><?php echo htmlspecialchars($item['location_name']); ?>
+                </span>
+                <?php endif; ?>
+                <!-- Sync Status Badge -->
+                <?php if (!empty($item['easyverein_id'])): ?>
+                <span class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full" title="Synchronized with EasyVerein">
+                    <i class="fas fa-sync-alt mr-1"></i>Synced
+                </span>
+                <?php else: ?>
+                <span class="px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full" title="Local item only">
+                    <i class="fas fa-desktop mr-1"></i>Local only
+                </span>
+                <?php endif; ?>
+                <!-- Archived Badge -->
+                <?php if ($item['is_archived_in_easyverein']): ?>
+                <span class="px-2 py-1 text-xs bg-red-100 text-red-700 rounded-full" title="Archived in EasyVerein">
+                    <i class="fas fa-archive mr-1"></i>Archiviert
                 </span>
                 <?php endif; ?>
             </div>
