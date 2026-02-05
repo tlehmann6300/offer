@@ -2,11 +2,9 @@
 // 1. Konfiguration laden
 require_once __DIR__ . '/../../config/config.php';
 
-// 2. DEBUGGING ERZWINGEN (WICHTIG: Muss NACH der config.php stehen!)
-// Überschreibt die Einstellungen aus der config.php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// 2. Error reporting is configured in config.php based on ENVIRONMENT constant
+// Detailed error display is only enabled in non-production environments
+// This prevents information leakage (file paths, stack traces) in production
 
 // 3. Weitere Abhängigkeiten laden
 require_once __DIR__ . '/../../src/Auth.php';
@@ -67,12 +65,31 @@ try {
     }
 
 } catch (Throwable $e) {
-    // 5. ABSTURZ ABFANGEN UND ANZEIGEN
+    // 5. Display error information based on environment
+    // Detailed error information is only shown in non-production environments to prevent information leakage
     echo '<div style="background-color: #fee2e2; border: 2px solid #ef4444; color: #991b1b; padding: 20px; font-family: sans-serif; margin: 20px; border-radius: 8px;">';
     echo '<h2 style="margin-top:0">Kritischer Fehler aufgetreten</h2>';
-    echo '<p><strong>Fehlermeldung:</strong> ' . htmlspecialchars($e->getMessage()) . '</p>';
-    echo '<p><strong>Datei:</strong> ' . htmlspecialchars($e->getFile()) . ' (Zeile ' . $e->getLine() . ')</p>';
-    echo '<pre style="background: #fff; padding: 10px; overflow: auto;">' . htmlspecialchars($e->getTraceAsString()) . '</pre>';
+    
+    if (ENVIRONMENT !== 'production') {
+        // Show detailed error information only in non-production environments
+        echo '<p><strong>Fehlermeldung:</strong> ' . htmlspecialchars($e->getMessage()) . '</p>';
+        echo '<p><strong>Datei:</strong> ' . htmlspecialchars($e->getFile()) . ' (Zeile ' . $e->getLine() . ')</p>';
+        echo '<pre style="background: #fff; padding: 10px; overflow: auto;">' . htmlspecialchars($e->getTraceAsString()) . '</pre>';
+    } else {
+        // Log error details to server logs in production, but show generic message to user
+        // This prevents information leakage while still allowing developers to debug issues
+        error_log(sprintf(
+            'Login error: %s in %s:%d. Stack trace: %s',
+            $e->getMessage(),
+            $e->getFile(),
+            $e->getLine(),
+            $e->getTraceAsString()
+        ));
+        
+        // Show generic error message in production to prevent information leakage
+        echo '<p>Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut oder wenden Sie sich an den Administrator.</p>';
+    }
+    
     echo '</div>';
     exit;
 }
