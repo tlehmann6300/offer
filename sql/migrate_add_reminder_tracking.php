@@ -42,7 +42,7 @@ try {
     echo "2. Run cron/send_overdue_reminders.php to send reminders to users with overdue items\n\n";
     
 } catch (Exception $e) {
-    echo "Fehler: " . $e->getMessage() . "\n";
+    echo "Error: " . $e->getMessage() . "\n";
     echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
     return;
 }

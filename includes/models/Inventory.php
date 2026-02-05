@@ -965,7 +965,7 @@ class Inventory {
                         $rental['user_name'] = $users[$rental['user_id']]['username'];
                     } else {
                         $rental['user_email'] = null;
-                        $rental['user_name'] = 'Unbekannt';
+                        $rental['user_name'] = 'Unknown';
                     }
                 }
             }
