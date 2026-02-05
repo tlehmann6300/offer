@@ -114,12 +114,15 @@ class EasyVereinSync {
                             'description' => $evItem['Description'],
                             'current_stock' => $evItem['TotalQuantity'],
                             'serial_number' => $evItem['SerialNumber'],
-                            'last_synced_at' => date('Y-m-d H:i:s'),
                             'is_archived_in_easyverein' => 0
                         ];
                         
                         // Use Inventory::update() with $isSyncUpdate = true to bypass protection
                         Inventory::update($existingItem['id'], $updateData, $userId, true);
+                        
+                        // Update last_synced_at separately using MySQL NOW() for timezone consistency
+                        $stmt = $db->prepare("UPDATE inventory SET last_synced_at = NOW() WHERE id = ?");
+                        $stmt->execute([$existingItem['id']]);
                         
                         $stats['updated']++;
                         

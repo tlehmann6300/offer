@@ -32,13 +32,14 @@ class Inventory {
      * 
      * Calculates available stock as: (Synced Total Stock from DB) - (Count of Active/Reserved Local Loans)
      * 
-     * @param int $itemId Item ID
+     * @param int $id Item ID
      * @return int Available stock quantity
      */
-    public static function getAvailableStock($itemId) {
+    public static function getAvailableStock($id) {
         $db = Database::getContentDB();
         
         // Get total stock from inventory and sum of active rentals
+        // Note: r.actual_return IS NULL identifies active (unreturned) rentals
         $stmt = $db->prepare("
             SELECT 
                 i.current_stock,
@@ -48,7 +49,7 @@ class Inventory {
             WHERE i.id = ?
             GROUP BY i.id, i.current_stock
         ");
-        $stmt->execute([$itemId]);
+        $stmt->execute([$id]);
         $result = $stmt->fetch();
         
         if (!$result) {
