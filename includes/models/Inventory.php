@@ -905,4 +905,95 @@ class Inventory {
         $sync = new EasyVereinSync();
         return $sync->sync($userId);
     }
+    
+    /**
+     * Get overdue checkouts that need reminders
+     * 
+     * Returns rentals where:
+     * - actual_return is NULL (not returned yet)
+     * - expected_return < NOW() (overdue)
+     * - last_reminder_sent_at is NULL OR more than 24 hours ago
+     * 
+     * @return array List of overdue rentals with user and item information
+     */
+    public static function getOverdueCheckoutsForReminders() {
+        $db = Database::getContentDB();
+        
+        // Get overdue rentals that haven't been reminded in the last 24 hours
+        $stmt = $db->query("
+            SELECT 
+                r.id as rental_id,
+                r.user_id,
+                r.item_id,
+                r.amount,
+                r.expected_return,
+                r.rented_at,
+                i.name as item_name,
+                i.unit
+            FROM rentals r
+            JOIN inventory i ON r.item_id = i.id
+            WHERE r.actual_return IS NULL
+            AND r.expected_return IS NOT NULL
+            AND r.expected_return < NOW()
+            AND (
+                r.last_reminder_sent_at IS NULL
+                OR r.last_reminder_sent_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)
+            )
+            ORDER BY r.expected_return ASC
+        ");
+        
+        $overdueRentals = $stmt->fetchAll();
+        
+        // Fetch user information from user database
+        if (!empty($overdueRentals)) {
+            $userDb = Database::getUserDB();
+            $userIds = array_unique(array_column($overdueRentals, 'user_id'));
+            
+            if (!empty($userIds)) {
+                $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
+                $userStmt = $userDb->prepare("SELECT id, email, username FROM users WHERE id IN ($placeholders)");
+                $userStmt->execute($userIds);
+                $users = [];
+                foreach ($userStmt->fetchAll() as $user) {
+                    $users[$user['id']] = $user;
+                }
+                
+                // Add user info to rentals
+                foreach ($overdueRentals as &$rental) {
+                    if (isset($users[$rental['user_id']])) {
+                        $rental['user_email'] = $users[$rental['user_id']]['email'];
+                        $rental['user_name'] = $users[$rental['user_id']]['username'];
+                    } else {
+                        $rental['user_email'] = null;
+                        $rental['user_name'] = 'Unbekannt';
+                    }
+                }
+            }
+        }
+        
+        return $overdueRentals;
+    }
+    
+    /**
+     * Mark that a reminder was sent for a rental
+     * 
+     * @param int $rentalId The rental ID
+     * @return bool Success status
+     */
+    public static function markReminderSent($rentalId) {
+        $db = Database::getContentDB();
+        
+        try {
+            $stmt = $db->prepare("
+                UPDATE rentals 
+                SET last_reminder_sent_at = NOW() 
+                WHERE id = ?
+            ");
+            $stmt->execute([$rentalId]);
+            return true;
+        } catch (Exception $e) {
+            error_log("Failed to mark reminder sent for rental {$rentalId}: " . $e->getMessage());
+            return false;
+        }
+    }
 }

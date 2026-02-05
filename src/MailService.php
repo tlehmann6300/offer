@@ -855,4 +855,42 @@ class MailService {
         // Send email (has its own exception handling)
         return self::sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody);
     }
+    
+    /**
+     * Send overdue inventory reminder email
+     * 
+     * @param string $toEmail Recipient email address
+     * @param string $userName Recipient name
+     * @param string $itemName Name of the item
+     * @param string $expectedReturnDate Expected return date (formatted)
+     * @return bool Success status
+     */
+    public static function sendInventoryOverdueReminder($toEmail, $userName, $itemName, $expectedReturnDate) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send inventory overdue reminder: Composer vendor missing");
+            return false;
+        }
+        
+        $subject = "Erinnerung: Rückgabe überfällig - " . $itemName;
+        
+        // Format the date nicely
+        $dateObj = new DateTime($expectedReturnDate);
+        $formattedDate = $dateObj->format('d.m.Y');
+        
+        // Build body content
+        $bodyContent = '<p class="email-text">Hallo ' . htmlspecialchars($userName) . ',</p>
+        <p class="email-text">die Rückgabe für <strong>' . htmlspecialchars($itemName) . '</strong> war am <strong>' . htmlspecialchars($formattedDate) . '</strong> fällig.</p>
+        <p class="email-text">Bitte bringe es zurück.</p>
+        <p class="email-text">Falls du das Item bereits zurückgegeben hast oder Fragen hast, melde dich bitte bei uns.</p>';
+        
+        // Create call-to-action button
+        $inventoryLink = BASE_URL . '/pages/inventory/my_checkouts.php';
+        $callToAction = '<a href="' . htmlspecialchars($inventoryLink) . '" class="button">Meine Ausleihen ansehen</a>';
+        
+        // Get complete HTML template
+        $htmlBody = self::getTemplate('Rückgabe-Erinnerung', $bodyContent, $callToAction);
+        
+        // Send email (has its own exception handling)
+        return self::sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody);
+    }
 }
