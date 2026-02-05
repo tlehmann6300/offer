@@ -226,9 +226,10 @@ class Alumni {
                    image_path, last_verified_at, created_at, updated_at
             FROM alumni_profiles 
             WHERE last_verified_at < DATE_SUB(NOW(), INTERVAL ? MONTH)
+              AND (last_reminder_sent_at IS NULL OR last_reminder_sent_at < DATE_SUB(NOW(), INTERVAL ? MONTH))
             ORDER BY last_verified_at ASC
         ");
-        $stmt->execute([$months]);
+        $stmt->execute([$months, $months]);
         return $stmt->fetchAll();
     }
     
@@ -243,6 +244,22 @@ class Alumni {
         $stmt = $db->prepare("
             UPDATE alumni_profiles 
             SET last_verified_at = NOW() 
+            WHERE user_id = ?
+        ");
+        return $stmt->execute([$userId]);
+    }
+    
+    /**
+     * Mark that a reminder email was sent to this user
+     * 
+     * @param int $userId The user ID
+     * @return bool True on success
+     */
+    public static function markReminderSent(int $userId): bool {
+        $db = Database::getContentDB();
+        $stmt = $db->prepare("
+            UPDATE alumni_profiles 
+            SET last_reminder_sent_at = NOW() 
             WHERE user_id = ?
         ");
         return $stmt->execute([$userId]);
