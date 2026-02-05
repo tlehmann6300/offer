@@ -85,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Keep existing image if no new image uploaded and profile exists
         if (empty($error) && $profile && !empty($profile['image_path']) && !isset($data['image_path'])) {
-            // Keep existing image if no new image uploaded
             $data['image_path'] = $profile['image_path'];
         }
         
