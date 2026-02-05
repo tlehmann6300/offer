@@ -2,7 +2,15 @@
 /**
  * Production System Reset Script
  * Completely resets databases and creates fresh admin account
- * WARNING: This destroys all existing data!
+ * 
+ * CRITICAL SECURITY WARNINGS:
+ * 1. This script DESTROYS ALL EXISTING DATA permanently
+ * 2. DELETE this file immediately after use
+ * 3. Never leave this file in a production environment
+ * 4. Access is controlled by URL parameter only - use with extreme caution
+ * 5. Admin password is hardcoded per specification - change immediately after first login
+ * 
+ * Usage: install_fresh.php?secure_key=MakeItNew2024
  */
 
 // Security gate - require specific access parameter
@@ -44,7 +52,8 @@ try {
     );
     $operationResults[] = ['operation' => 'Connected to User DB Server', 'outcome' => 'Success'];
 } catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Connected to User DB Server', 'outcome' => 'Failed: ' . $error->getMessage()];
+    $operationResults[] = ['operation' => 'Connected to User DB Server', 'outcome' => 'Failed - Check configuration'];
+    error_log('User DB connection error: ' . $error->getMessage());
     displayResultsTable($operationResults);
     die();
 }
@@ -58,7 +67,8 @@ try {
     );
     $operationResults[] = ['operation' => 'Connected to Content DB Server', 'outcome' => 'Success'];
 } catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Connected to Content DB Server', 'outcome' => 'Failed: ' . $error->getMessage()];
+    $operationResults[] = ['operation' => 'Connected to Content DB Server', 'outcome' => 'Failed - Check configuration'];
+    error_log('Content DB connection error: ' . $error->getMessage());
     displayResultsTable($operationResults);
     die();
 }
@@ -68,14 +78,16 @@ try {
     $userServerConn->exec("DROP DATABASE IF EXISTS " . DB_USER_NAME);
     $operationResults[] = ['operation' => 'Dropped User Database', 'outcome' => 'Success'];
 } catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Dropped User Database', 'outcome' => 'Failed: ' . $error->getMessage()];
+    $operationResults[] = ['operation' => 'Dropped User Database', 'outcome' => 'Failed - Check permissions'];
+    error_log('Drop User DB error: ' . $error->getMessage());
 }
 
 try {
     $contentServerConn->exec("DROP DATABASE IF EXISTS " . DB_CONTENT_NAME);
     $operationResults[] = ['operation' => 'Dropped Content Database', 'outcome' => 'Success'];
 } catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Dropped Content Database', 'outcome' => 'Failed: ' . $error->getMessage()];
+    $operationResults[] = ['operation' => 'Dropped Content Database', 'outcome' => 'Failed - Check permissions'];
+    error_log('Drop Content DB error: ' . $error->getMessage());
 }
 
 // Step 3: Create fresh databases
@@ -83,7 +95,8 @@ try {
     $userServerConn->exec("CREATE DATABASE " . DB_USER_NAME . " CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
     $operationResults[] = ['operation' => 'Created User Database', 'outcome' => 'Success'];
 } catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Created User Database', 'outcome' => 'Failed: ' . $error->getMessage()];
+    $operationResults[] = ['operation' => 'Created User Database', 'outcome' => 'Failed - Check permissions'];
+    error_log('Create User DB error: ' . $error->getMessage());
     displayResultsTable($operationResults);
     die();
 }
@@ -92,7 +105,8 @@ try {
     $contentServerConn->exec("CREATE DATABASE " . DB_CONTENT_NAME . " CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
     $operationResults[] = ['operation' => 'Created Content Database', 'outcome' => 'Success'];
 } catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Created Content Database', 'outcome' => 'Failed: ' . $error->getMessage()];
+    $operationResults[] = ['operation' => 'Created Content Database', 'outcome' => 'Failed - Check permissions'];
+    error_log('Create Content DB error: ' . $error->getMessage());
     displayResultsTable($operationResults);
     die();
 }
@@ -109,7 +123,8 @@ try {
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
 } catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Reconnected to User DB', 'outcome' => 'Failed: ' . $error->getMessage()];
+    $operationResults[] = ['operation' => 'Reconnected to User DB', 'outcome' => 'Failed - Check database'];
+    error_log('Reconnect User DB error: ' . $error->getMessage());
     displayResultsTable($operationResults);
     die();
 }
@@ -122,7 +137,8 @@ try {
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
 } catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Reconnected to Content DB', 'outcome' => 'Failed: ' . $error->getMessage()];
+    $operationResults[] = ['operation' => 'Reconnected to Content DB', 'outcome' => 'Failed - Check database'];
+    error_log('Reconnect Content DB error: ' . $error->getMessage());
     displayResultsTable($operationResults);
     die();
 }
@@ -137,7 +153,8 @@ if (!file_exists($userSchemaPath)) {
         $userDbConn->exec($userSchemaContent);
         $operationResults[] = ['operation' => 'Import User Schema', 'outcome' => 'Success'];
     } catch (PDOException $error) {
-        $operationResults[] = ['operation' => 'Import User Schema', 'outcome' => 'Failed: ' . $error->getMessage()];
+        $operationResults[] = ['operation' => 'Import User Schema', 'outcome' => 'Failed - Check schema file'];
+        error_log('Import User Schema error: ' . $error->getMessage());
         displayResultsTable($operationResults);
         die();
     }
@@ -153,13 +170,15 @@ if (!file_exists($contentSchemaPath)) {
         $contentDbConn->exec($contentSchemaContent);
         $operationResults[] = ['operation' => 'Import Content Schema', 'outcome' => 'Success'];
     } catch (PDOException $error) {
-        $operationResults[] = ['operation' => 'Import Content Schema', 'outcome' => 'Failed: ' . $error->getMessage()];
+        $operationResults[] = ['operation' => 'Import Content Schema', 'outcome' => 'Failed - Check schema file'];
+        error_log('Import Content Schema error: ' . $error->getMessage());
         displayResultsTable($operationResults);
         die();
     }
 }
 
 // Step 7: Create super admin account
+// WARNING: Password is hardcoded per specification - CHANGE IMMEDIATELY after first login
 $superAdminEmail = 'admin@ibc-intranet.de';
 $superAdminPass = 'Admin123!';
 $superAdminRole = 'admin';
@@ -173,9 +192,10 @@ try {
     
     $insertQuery->execute([$superAdminEmail, $hashedPassword, $superAdminRole]);
     
-    $operationResults[] = ['operation' => 'Created Admin Account', 'outcome' => 'Success (Email: ' . $superAdminEmail . ')'];
+    $operationResults[] = ['operation' => 'Created Admin Account', 'outcome' => 'Success'];
 } catch (PDOException $error) {
-    $operationResults[] = ['operation' => 'Created Admin Account', 'outcome' => 'Failed: ' . $error->getMessage()];
+    $operationResults[] = ['operation' => 'Created Admin Account', 'outcome' => 'Failed - Check users table'];
+    error_log('Create Admin error: ' . $error->getMessage());
 }
 
 // Display all results
