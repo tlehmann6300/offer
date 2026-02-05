@@ -37,6 +37,7 @@ $emailsFailed = 0;
 foreach ($profilesToProcess as $profile) {
     $firstName = $profile['first_name'];
     $email = $profile['email'];
+    $userId = $profile['user_id'];
     
     echo "Sending reminder to: {$firstName} ({$email})... ";
     
@@ -45,6 +46,8 @@ foreach ($profilesToProcess as $profile) {
         $success = MailService::sendAlumniReminder($email, $firstName);
         
         if ($success) {
+            // Mark reminder as sent to prevent re-sending
+            Alumni::markReminderSent($userId);
             $emailsSent++;
             echo "SUCCESS\n";
         } else {
