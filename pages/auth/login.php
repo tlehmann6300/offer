@@ -70,7 +70,7 @@ try {
     echo '<div style="background-color: #fee2e2; border: 2px solid #ef4444; color: #991b1b; padding: 20px; font-family: sans-serif; margin: 20px; border-radius: 8px;">';
     echo '<h2 style="margin-top:0">Kritischer Fehler aufgetreten</h2>';
     
-    if (ENVIRONMENT !== 'production') {
+    if (defined('ENVIRONMENT') && ENVIRONMENT !== 'production') {
         // Show detailed error information only in non-production environments
         echo '<p><strong>Fehlermeldung:</strong> ' . htmlspecialchars($e->getMessage()) . '</p>';
         echo '<p><strong>Datei:</strong> ' . htmlspecialchars($e->getFile()) . ' (Zeile ' . $e->getLine() . ')</p>';
