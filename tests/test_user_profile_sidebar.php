@@ -35,37 +35,44 @@ echo "\n=== Test 2: Auth::user() Usage ===\n";
 
 // Check if Auth::user() is used instead of $_SESSION variables
 $authUserCount = substr_count($templateContent, 'Auth::user()');
-if ($authUserCount >= 4) {
-    echo "✓ Auth::user() is used (found $authUserCount occurrences)\n";
+if ($authUserCount >= 1) {
+    echo "✓ Auth::user() is used and stored in a variable (found $authUserCount occurrence)\n";
 } else {
-    echo "✗ Auth::user() usage insufficient (found $authUserCount occurrences, expected at least 4)\n";
+    echo "✗ Auth::user() usage not found\n";
 }
 
-// Check for firstname and lastname in initials
-if (preg_match('/substr\(Auth::user\(\)\[\'firstname\'\]/', $templateContent) &&
-    preg_match('/substr\(Auth::user\(\)\[\'lastname\'\]/', $templateContent)) {
-    echo "✓ User initials use firstname and lastname from Auth::user()\n";
+// Check if user data is stored in a variable
+if (preg_match('/\$currentUser = Auth::user\(\);/', $templateContent)) {
+    echo "✓ User data is cached in \$currentUser variable to avoid redundant calls\n";
 } else {
-    echo "✗ User initials do not correctly use firstname and lastname\n";
+    echo "✗ User data is not cached in a variable\n";
+}
+
+// Check for firstname and lastname in initials with proper empty checks
+if (preg_match('/\$firstname = !empty\(\$currentUser\[\'firstname\'\]\)/', $templateContent) &&
+    preg_match('/\$lastname = !empty\(\$currentUser\[\'lastname\'\]\)/', $templateContent)) {
+    echo "✓ User initials use proper empty checks for firstname and lastname\n";
+} else {
+    echo "✗ User initials do not have proper empty checks\n";
 }
 
 // Check for full name display
-if (preg_match('/Auth::user\(\)\[\'firstname\'\] \. \' \' \. Auth::user\(\)\[\'lastname\'\]/', $templateContent)) {
-    echo "✓ Full name (firstname + lastname) is displayed\n";
+if (preg_match('/\$currentUser\[\'firstname\'\] \. \' \' \. \$currentUser\[\'lastname\'\]/', $templateContent)) {
+    echo "✓ Full name (firstname + lastname) is displayed using \$currentUser\n";
 } else {
     echo "✗ Full name display not found\n";
 }
 
 // Check for role display
-if (preg_match('/ucfirst\(Auth::user\(\)\[\'role\'\]\)/', $templateContent)) {
-    echo "✓ User role from Auth::user() is displayed\n";
+if (preg_match('/ucfirst\(\$currentUser\[\'role\'\]\)/', $templateContent)) {
+    echo "✓ User role from \$currentUser is displayed\n";
 } else {
     echo "✗ User role display not found\n";
 }
 
 // Check for email in title attribute
-if (preg_match('/title=\'.*Auth::user\(\)\[\'email\'\]/', $templateContent)) {
-    echo "✓ Email is shown in title attribute for tooltip\n";
+if (preg_match('/title=\'.*\$currentUser\[\'email\'\]/', $templateContent)) {
+    echo "✓ Email is shown in title attribute for tooltip using \$currentUser\n";
 } else {
     echo "✗ Email tooltip not found\n";
 }
@@ -93,13 +100,13 @@ if (preg_match('/<i class=\'fas fa-sign-out-alt mr-2\'><\/i> Abmelden/', $templa
     echo "✗ Logout button icon or text not found\n";
 }
 
-echo "\n=== Test 4: BASE_URL Usage ===\n";
+echo "\n=== Test 4: asset() Helper Usage ===\n";
 
-// Check if BASE_URL is used for logout link
-if (preg_match('/href=\'<\?php echo BASE_URL; \?>\/pages\/auth\/logout\.php\'/', $templateContent)) {
-    echo "✓ Logout button uses BASE_URL for the link\n";
+// Check if asset() helper is used for logout link
+if (preg_match('/href=\'<\?php echo asset\(\'pages\/auth\/logout\.php\'\); \?>\'/', $templateContent)) {
+    echo "✓ Logout button uses asset() helper for the link\n";
 } else {
-    echo "✗ Logout button does not use BASE_URL\n";
+    echo "✗ Logout button does not use asset() helper\n";
 }
 
 echo "\n=== Test 5: Removed Old Code ===\n";
@@ -144,11 +151,13 @@ if (strpos($templateContent, "class='text-xs text-gray-400 truncate'") !== false
 echo "\n=== Test Summary ===\n";
 echo "User Profile implementation verified:\n";
 echo "  - ✓ User initials avatar with firstname and lastname\n";
+echo "  - ✓ Proper empty checks for firstname and lastname\n";
+echo "  - ✓ User data cached in \$currentUser to avoid redundant Auth::user() calls\n";
 echo "  - ✓ Full name display (firstname + lastname)\n";
 echo "  - ✓ User role display\n";
 echo "  - ✓ Email shown in tooltip\n";
 echo "  - ✓ Logout button within profile section\n";
-echo "  - ✓ All data from Auth::user() instead of $_SESSION\n";
-echo "  - ✓ BASE_URL used for logout link\n";
+echo "  - ✓ All data from \$currentUser (cached Auth::user() result)\n";
+echo "  - ✓ asset() helper used for logout link\n";
 echo "  - ✓ Responsive design with text truncation\n";
 echo "\n✓ User profile sidebar implementation is complete and correct.\n";

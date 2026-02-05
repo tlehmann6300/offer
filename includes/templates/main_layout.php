@@ -127,6 +127,7 @@ require_once __DIR__ . '/../../src/Auth.php';
 
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar fixed left-0 top-0 h-screen w-64 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-40 text-white shadow-2xl flex flex-col">
+        <?php $currentUser = Auth::user(); ?>
         <div class="p-6 flex-1 overflow-y-auto">
             <!-- IBC Logo in Navbar -->
             <div class="mb-8">
@@ -216,18 +217,22 @@ require_once __DIR__ . '/../../src/Auth.php';
         <div class='mt-auto pt-6 border-t border-gray-700'>
             <div class='flex items-center px-2 mb-4'>
                 <div class='w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-3'>
-                    <?php echo strtoupper(substr(Auth::user()['firstname'] ?? 'U', 0, 1) . substr(Auth::user()['lastname'] ?? 'U', 0, 1)); ?>
+                    <?php 
+                    $firstname = !empty($currentUser['firstname']) ? $currentUser['firstname'] : 'U';
+                    $lastname = !empty($currentUser['lastname']) ? $currentUser['lastname'] : 'U';
+                    echo strtoupper(substr($firstname, 0, 1) . substr($lastname, 0, 1)); 
+                    ?>
                 </div>
                 <div class='overflow-hidden'>
-                    <p class='text-sm font-medium text-white truncate' title='<?php echo htmlspecialchars(Auth::user()['email']); ?>'>
-                        <?php echo htmlspecialchars(Auth::user()['firstname'] . ' ' . Auth::user()['lastname']); ?>
+                    <p class='text-sm font-medium text-white truncate' title='<?php echo htmlspecialchars($currentUser['email']); ?>'>
+                        <?php echo htmlspecialchars($currentUser['firstname'] . ' ' . $currentUser['lastname']); ?>
                     </p>
                     <p class='text-xs text-gray-400 truncate'>
-                        <?php echo htmlspecialchars(ucfirst(Auth::user()['role'])); ?>
+                        <?php echo htmlspecialchars(ucfirst($currentUser['role'])); ?>
                     </p>
                 </div>
             </div>
-            <a href='<?php echo BASE_URL; ?>/pages/auth/logout.php' 
+            <a href='<?php echo asset('pages/auth/logout.php'); ?>' 
                class='flex items-center justify-center w-full px-4 py-2 text-sm font-bold text-white bg-red-600/80 hover:bg-red-600 rounded-lg transition-colors'>
                 <i class='fas fa-sign-out-alt mr-2'></i> Abmelden
             </a>
