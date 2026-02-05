@@ -51,7 +51,6 @@ CREATE TABLE IF NOT EXISTS blog_likes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (post_id, user_id),
     FOREIGN KEY (post_id) REFERENCES blog_posts(id) ON DELETE CASCADE,
-    INDEX idx_post_id (post_id),
     INDEX idx_user_id (user_id)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
