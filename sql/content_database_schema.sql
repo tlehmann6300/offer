@@ -230,7 +230,7 @@ CREATE TABLE IF NOT EXISTS projects (
     client_name VARCHAR(255) DEFAULT NULL COMMENT 'Sensibel',
     client_contact_details TEXT DEFAULT NULL COMMENT 'Sensibel',
     priority ENUM('low', 'medium', 'high') NOT NULL DEFAULT 'medium',
-    status ENUM('draft', 'applying', 'assigned', 'running', 'completed', 'archived') NOT NULL DEFAULT 'draft',
+    status ENUM('draft', 'open', 'applying', 'assigned', 'running', 'completed', 'archived') NOT NULL DEFAULT 'draft',
     max_consultants INT UNSIGNED NOT NULL DEFAULT 1,
     start_date DATE DEFAULT NULL,
     end_date DATE DEFAULT NULL,
