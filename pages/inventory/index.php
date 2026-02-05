@@ -127,9 +127,9 @@ ob_start();
         <div class="flex-1">
             <p class="font-semibold">EasyVerein Synchronisierung abgeschlossen</p>
             <ul class="mt-2 text-sm">
-                <li>✓ Erstellt: <?php echo $syncResult['created']; ?> Artikel</li>
-                <li>✓ Aktualisiert: <?php echo $syncResult['updated']; ?> Artikel</li>
-                <li>✓ Archiviert: <?php echo $syncResult['archived']; ?> Artikel</li>
+                <li>✓ Erstellt: <?php echo htmlspecialchars($syncResult['created']); ?> Artikel</li>
+                <li>✓ Aktualisiert: <?php echo htmlspecialchars($syncResult['updated']); ?> Artikel</li>
+                <li>✓ Archiviert: <?php echo htmlspecialchars($syncResult['archived']); ?> Artikel</li>
             </ul>
             <?php if (!empty($syncResult['errors'])): ?>
             <details class="mt-2">

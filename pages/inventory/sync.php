@@ -20,9 +20,12 @@ if (!Auth::hasPermission('manager')) {
     exit;
 }
 
+// Get user ID from session, fallback to 0 if not set
+$userId = $_SESSION['user_id'] ?? 0;
+
 // Perform synchronization
 $sync = new EasyVereinSync();
-$result = $sync->sync($_SESSION['user_id']);
+$result = $sync->sync($userId);
 
 // Store results in session for display
 $_SESSION['sync_result'] = $result;
