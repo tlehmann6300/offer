@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     // Validate category is one of the allowed values
-    $allowedCategories = ['Allgemein', 'IT', 'Marketing', 'HR', 'QM', 'Akquise'];
+    $allowedCategories = ['Allgemein', 'IT', 'Marketing', 'Human Resources', 'Qualitätsmanagement', 'Akquise'];
     if (!empty($category) && !in_array($category, $allowedCategories)) {
         $errors[] = 'Ungültige Kategorie ausgewählt.';
     }
@@ -209,8 +209,8 @@ ob_start();
                     <option value="Allgemein" <?php echo $category === 'Allgemein' ? 'selected' : ''; ?>>Allgemein</option>
                     <option value="IT" <?php echo $category === 'IT' ? 'selected' : ''; ?>>IT</option>
                     <option value="Marketing" <?php echo $category === 'Marketing' ? 'selected' : ''; ?>>Marketing</option>
-                    <option value="HR" <?php echo $category === 'HR' ? 'selected' : ''; ?>>HR</option>
-                    <option value="QM" <?php echo $category === 'QM' ? 'selected' : ''; ?>>QM</option>
+                    <option value="Human Resources" <?php echo $category === 'Human Resources' ? 'selected' : ''; ?>>Human Resources</option>
+                    <option value="Qualitätsmanagement" <?php echo $category === 'Qualitätsmanagement' ? 'selected' : ''; ?>>Qualitätsmanagement</option>
                     <option value="Akquise" <?php echo $category === 'Akquise' ? 'selected' : ''; ?>>Akquise</option>
                 </select>
             </div>
