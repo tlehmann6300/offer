@@ -210,26 +210,27 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <span>Profil</span>
                 </a>
                 
-                <!-- Logout Button -->
-                <div class="mt-auto pt-4 border-t border-gray-700">
-                    <a href="<?php echo asset('pages/auth/logout.php'); ?>" 
-                       class="flex items-center justify-center w-full px-4 py-3 text-sm font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-md transition-colors">
-                        <i class="fas fa-sign-out-alt mr-2"></i> Abmelden
-                    </a>
-                </div>
             </nav>
         </div>
 
-        <div class="p-6 border-t border-white/20">
-            <div class="flex items-center space-x-3 mb-4">
-                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                    <i class="fas fa-user"></i>
+        <div class='mt-auto pt-6 border-t border-gray-700'>
+            <div class='flex items-center px-2 mb-4'>
+                <div class='w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-3'>
+                    <?php echo strtoupper(substr(Auth::user()['firstname'] ?? 'U', 0, 1) . substr(Auth::user()['lastname'] ?? 'U', 0, 1)); ?>
                 </div>
-                <div>
-                    <div class="font-semibold"><?php echo htmlspecialchars($_SESSION['user_email'] ?? 'Guest'); ?></div>
-                    <div class="text-xs text-white/70"><?php echo htmlspecialchars(ucfirst($_SESSION['user_role'] ?? 'guest')); ?></div>
+                <div class='overflow-hidden'>
+                    <p class='text-sm font-medium text-white truncate' title='<?php echo htmlspecialchars(Auth::user()['email']); ?>'>
+                        <?php echo htmlspecialchars(Auth::user()['firstname'] . ' ' . Auth::user()['lastname']); ?>
+                    </p>
+                    <p class='text-xs text-gray-400 truncate'>
+                        <?php echo htmlspecialchars(ucfirst(Auth::user()['role'])); ?>
+                    </p>
                 </div>
             </div>
+            <a href='<?php echo BASE_URL; ?>/pages/auth/logout.php' 
+               class='flex items-center justify-center w-full px-4 py-2 text-sm font-bold text-white bg-red-600/80 hover:bg-red-600 rounded-lg transition-colors'>
+                <i class='fas fa-sign-out-alt mr-2'></i> Abmelden
+            </a>
         </div>
     </aside>
 
