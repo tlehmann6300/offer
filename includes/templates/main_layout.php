@@ -214,7 +214,8 @@ require_once __DIR__ . '/../../src/Auth.php';
             </nav>
         </div>
 
-        <div class='mt-auto border-t border-gray-700 pt-6 pb-4 px-4 bg-black/20'>
+        <!-- User Profile Section -->
+        <div class='mt-auto border-t border-white/20 pt-8 pb-6 px-5 bg-gradient-to-b from-black/30 to-black/40'>
             <?php 
             $currentUser = Auth::user();
             $firstname = !empty($currentUser['firstname']) ? $currentUser['firstname'] : '';
@@ -239,28 +240,30 @@ require_once __DIR__ . '/../../src/Auth.php';
             $fullname = trim($firstname . ' ' . $lastname);
             $displayName = !empty($fullname) ? $fullname : $email;
             ?>
-            <div class='flex items-center gap-3 mb-4'>
-                <div class='w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-sm shadow-md border border-white/10 shrink-0'>
+            <!-- User Info -->
+            <div class='flex items-center gap-3 mb-5'>
+                <div class='w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-base shadow-lg border-2 border-white/20 shrink-0'>
                     <?php echo $initials; ?>
                 </div>
-                <div class='overflow-hidden'>
-                    <p class='text-sm font-semibold text-white truncate leading-tight' title='<?php echo htmlspecialchars($displayName); ?>'>
+                <div class='flex-1 min-w-0'>
+                    <p class='text-sm font-semibold text-white truncate leading-snug mb-0.5' title='<?php echo htmlspecialchars($displayName); ?>'>
                         <?php echo htmlspecialchars($displayName); ?>
                     </p>
                     <?php if (!empty($email)): ?>
-                    <p class='text-xs text-gray-400 truncate mt-0.5' title='<?php echo htmlspecialchars($email); ?>'>
+                    <p class='text-xs text-gray-300 truncate leading-relaxed' title='<?php echo htmlspecialchars($email); ?>'>
                         <?php echo htmlspecialchars($email); ?>
                     </p>
                     <?php endif; ?>
-                    <span class='inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-900/50 text-blue-300 border border-blue-800'>
+                    <span class='inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-white/10 text-white border border-white/20'>
                         <?php echo htmlspecialchars(ucfirst($role)); ?>
                     </span>
                 </div>
             </div>
+            <!-- Logout Button -->
             <a href='<?php echo asset('pages/auth/logout.php'); ?>' 
-               class='flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all shadow-sm hover:shadow-md group'>
-                <i class='fas fa-sign-out-alt mr-2 group-hover:-translate-x-1 transition-transform'></i> 
-                Abmelden
+               class='flex items-center justify-center w-full px-4 py-2 text-xs font-medium text-white/90 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm'>
+                <i class='fas fa-sign-out-alt text-xs mr-2 group-hover:translate-x-0.5 transition-transform'></i> 
+                <span>Abmelden</span>
             </a>
         </div>
     </aside>
