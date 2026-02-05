@@ -11,23 +11,18 @@ function getBasePath() {
 }
 
 /**
- * Generate URL relative to document root
+ * Generate URL relative to document root using BASE_URL
+ * Uses BASE_URL constant for robust URL generation regardless of subdirectory depth
  */
 function url($path) {
-    // Remove leading slash if present
+    // Remove trailing slashes from BASE_URL
+    $baseUrl = rtrim(BASE_URL, '/');
+    
+    // Remove leading slashes from path
     $path = ltrim($path, '/');
     
-    // Get the base path from the current script location
-    $scriptPath = $_SERVER['SCRIPT_NAME'];
-    $depth = substr_count(dirname($scriptPath), '/') - substr_count($_SERVER['DOCUMENT_ROOT'], '/');
-    
-    // Build relative path
-    if (strpos($scriptPath, '/pages/') !== false) {
-        $depth = 2; // From pages/subdir/
-    }
-    
-    $basePath = str_repeat('../', $depth);
-    return $basePath . $path;
+    // Combine with exactly one slash
+    return $baseUrl . '/' . $path;
 }
 
 /**
