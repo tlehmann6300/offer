@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS locations (
 -- Inventory table
 CREATE TABLE IF NOT EXISTS inventory (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    easyverein_id VARCHAR(100) DEFAULT NULL,
     name VARCHAR(100) NOT NULL,
     description TEXT DEFAULT NULL,
     serial_number VARCHAR(100) DEFAULT NULL,
@@ -50,8 +51,11 @@ CREATE TABLE IF NOT EXISTS inventory (
     notes TEXT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_synced_at DATETIME DEFAULT NULL,
+    is_archived_in_easyverein BOOLEAN NOT NULL DEFAULT 0,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
     FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE SET NULL,
+    UNIQUE INDEX idx_easyverein_id (easyverein_id),
     INDEX idx_category (category_id),
     INDEX idx_location (location_id),
     INDEX idx_serial_number (serial_number)
@@ -235,6 +239,7 @@ CREATE TABLE IF NOT EXISTS projects (
     start_date DATE DEFAULT NULL,
     end_date DATE DEFAULT NULL,
     image_path VARCHAR(255) DEFAULT NULL,
+    file_path VARCHAR(255) DEFAULT NULL,
     documentation TEXT DEFAULT NULL COMMENT 'Project completion documentation/report',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -282,6 +287,79 @@ CREATE TABLE IF NOT EXISTS project_assignments (
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
   COMMENT='Assignments of users to projects with specific roles';
+
+-- ============================================
+-- BLOG MODULE
+-- ============================================
+
+-- Blog posts table
+CREATE TABLE IF NOT EXISTS blog_posts (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content LONGTEXT NOT NULL,
+    image_path VARCHAR(255) DEFAULT NULL,
+    external_link VARCHAR(255) DEFAULT NULL,
+    category ENUM('Allgemein', 'IT', 'Marketing', 'Human Resources', 'Qualitätsmanagement', 'Akquise') NOT NULL,
+    author_id INT UNSIGNED NOT NULL COMMENT 'Links to user_db.users',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_category (category),
+    INDEX idx_author_id (author_id)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Blog posts with categorization and author tracking';
+
+-- Blog comments table
+CREATE TABLE IF NOT EXISTS blog_comments (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    post_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL COMMENT 'Author of comment',
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES blog_posts(id) ON DELETE CASCADE,
+    INDEX idx_post_id (post_id),
+    INDEX idx_user_id (user_id)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Comments on blog posts';
+
+-- Blog likes table
+CREATE TABLE IF NOT EXISTS blog_likes (
+    post_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (post_id, user_id),
+    FOREIGN KEY (post_id) REFERENCES blog_posts(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='User likes on blog posts - composite primary key prevents duplicate likes';
+
+-- ============================================
+-- EVENT REGISTRATIONS
+-- ============================================
+
+-- Event registrations table
+CREATE TABLE IF NOT EXISTS event_registrations (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('confirmed', 'cancelled') NOT NULL DEFAULT 'confirmed',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_registration (event_id, user_id),
+    INDEX idx_event_id (event_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_status (status)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Tracks user registrations for events with confirmation status';
 
 -- ============================================
 -- SYSTEM LOGS

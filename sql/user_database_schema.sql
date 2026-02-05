@@ -25,23 +25,31 @@ CREATE TABLE IF NOT EXISTS users (
 -- Alumni profiles table
 CREATE TABLE IF NOT EXISTS alumni_profiles (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id INT UNSIGNED NOT NULL,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    phone VARCHAR(20) DEFAULT NULL,
-    address TEXT DEFAULT NULL,
-    join_date DATE DEFAULT NULL,
-    graduation_date DATE DEFAULT NULL,
-    bio TEXT DEFAULT NULL,
-    profile_image VARCHAR(255) DEFAULT NULL,
+    user_id INT UNSIGNED NOT NULL UNIQUE COMMENT 'Links to users table',
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    mobile_phone VARCHAR(50) DEFAULT NULL,
+    linkedin_url VARCHAR(255) DEFAULT NULL,
+    xing_url VARCHAR(255) DEFAULT NULL,
+    industry VARCHAR(255) DEFAULT NULL COMMENT 'For filtering',
+    company VARCHAR(255) NOT NULL,
+    position VARCHAR(255) NOT NULL,
+    image_path VARCHAR(255) DEFAULT NULL,
+    last_verified_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_reminder_sent_at DATETIME DEFAULT NULL COMMENT 'Tracks when the annual reminder email was sent to this alumni',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_alumni_user
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_user_id (user_id)
+    INDEX idx_user_id (user_id),
+    INDEX idx_industry (industry),
+    INDEX idx_company (company),
+    INDEX idx_last_name (last_name)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_unicode_ci;
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Extended profile data for Alumni, Board, and Admins';
 
 -- Invitation tokens table
 CREATE TABLE IF NOT EXISTS invitation_tokens (
