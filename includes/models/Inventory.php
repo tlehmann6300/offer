@@ -30,23 +30,61 @@ class Inventory {
     /**
      * Get all items with filters
      */
-    public static function getAll() {
-        $db = Database::getInstance()->getConnection();
-        // SQL mit Subqueries für korrekte Bestandsberechnung
+    public static function getAll($filters = []) {
+        $db = Database::getContentDB();
+        
+        // Build WHERE clauses based on filters
+        $whereClauses = [];
+        $params = [];
+        
+        if (!empty($filters['category_id'])) {
+            $whereClauses[] = "i.category_id = ?";
+            $params[] = $filters['category_id'];
+        }
+        
+        if (!empty($filters['location_id'])) {
+            $whereClauses[] = "i.location_id = ?";
+            $params[] = $filters['location_id'];
+        }
+        
+        if (!empty($filters['search'])) {
+            $whereClauses[] = "(i.name LIKE ? OR i.description LIKE ?)";
+            $searchTerm = '%' . $filters['search'] . '%';
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+        
+        if (!empty($filters['low_stock'])) {
+            $whereClauses[] = "i.current_stock <= i.min_stock AND i.min_stock > 0";
+        }
+        
+        $whereSQL = '';
+        if (!empty($whereClauses)) {
+            $whereSQL = ' WHERE ' . implode(' AND ', $whereClauses);
+        }
+        
+        // SQL query with correct table and column names
+        // Note: quantity is an alias for current_stock for backward compatibility
+        // available_quantity = current_stock - active rentals
         $sql = "SELECT i.*, 
                        c.name as category_name, 
+                       c.color as category_color,
                        l.name as location_name,
-                       (SELECT COALESCE(SUM(quantity), 0) FROM inventory_stock WHERE item_id = i.id) as quantity,
-                       (
-                           (SELECT COALESCE(SUM(quantity), 0) FROM inventory_stock WHERE item_id = i.id) - 
-                           (SELECT COUNT(*) FROM inventory_checkouts WHERE item_id = i.id AND returned_at IS NULL)
-                       ) as available_quantity
-                FROM inventory_items i
+                       i.current_stock as quantity,
+                       (i.current_stock - COALESCE(SUM(r.amount), 0)) as available_quantity
+                FROM inventory i
                 LEFT JOIN categories c ON i.category_id = c.id
                 LEFT JOIN locations l ON i.location_id = l.id
+                LEFT JOIN rentals r ON i.id = r.item_id AND r.actual_return IS NULL" 
+                . $whereSQL . "
+                GROUP BY i.id, i.name, i.description, i.serial_number, i.category_id, i.location_id, 
+                         i.status, i.current_stock, i.min_stock, i.unit, i.unit_price, i.purchase_date, 
+                         i.image_path, i.notes, i.created_at, i.updated_at,
+                         c.name, c.color, l.name
                 ORDER BY i.name ASC";
-                
-        $stmt = $db->query($sql);
+        
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
