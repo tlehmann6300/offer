@@ -822,4 +822,37 @@ class MailService {
         // Send email (has its own exception handling)
         return self::sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody);
     }
+    
+    /**
+     * Send alumni profile verification reminder email
+     * 
+     * @param string $toEmail Recipient email address
+     * @param string $firstName Recipient first name
+     * @return bool Success status
+     */
+    public static function sendAlumniReminder($toEmail, $firstName) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send alumni reminder: Composer vendor missing");
+            return false;
+        }
+        
+        $subject = "Bitte aktualisiere dein IBC Alumni Profil";
+        
+        // Build body content
+        $bodyContent = '<p class="email-text">Hallo ' . htmlspecialchars($firstName) . ',</p>
+        <p class="email-text">bitte prüfe, ob deine Daten im IBC Intranet noch aktuell sind.</p>
+        <p class="email-text">Dein Alumni-Profil wurde seit über einem Jahr nicht mehr aktualisiert. 
+        Wir möchten sicherstellen, dass alle Informationen korrekt und auf dem neuesten Stand sind.</p>
+        <p class="email-text">Bitte nimm dir einen Moment Zeit, um dein Profil zu überprüfen und bei Bedarf zu aktualisieren.</p>';
+        
+        // Create call-to-action button with link to edit page
+        $editLink = BASE_URL . '/pages/alumni/edit.php';
+        $callToAction = '<a href="' . htmlspecialchars($editLink) . '" class="button">Profil aktualisieren</a>';
+        
+        // Get complete HTML template
+        $htmlBody = self::getTemplate('Alumni Profil Aktualisierung', $bodyContent, $callToAction);
+        
+        // Send email (has its own exception handling)
+        return self::sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody);
+    }
 }

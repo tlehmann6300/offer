@@ -1,0 +1,69 @@
+<?php
+/**
+ * Alumni Reminders Cron Script
+ * 
+ * Sends reminder emails to alumni whose profiles haven't been verified in over 1 year.
+ * Limits to max 20 emails per execution to avoid SMTP timeouts/blocks.
+ * 
+ * Usage: php cron/send_alumni_reminders.php
+ */
+
+// Load required files
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../includes/database.php';
+require_once __DIR__ . '/../includes/models/Alumni.php';
+require_once __DIR__ . '/../src/MailService.php';
+
+// Output start message
+echo "=== Alumni Reminder Email Cron Job ===\n";
+echo "Started at: " . date('Y-m-d H:i:s') . "\n\n";
+
+// Fetch profiles where last_verified_at is older than 1 year (12 months)
+$outdatedProfiles = Alumni::getOutdatedProfiles(12);
+
+$totalOutdated = count($outdatedProfiles);
+echo "Found {$totalOutdated} alumni profiles that need verification.\n";
+
+// Limit to max 20 emails per execution
+$maxEmails = 20;
+$profilesToProcess = array_slice($outdatedProfiles, 0, $maxEmails);
+
+echo "Processing {" . count($profilesToProcess) . "} profiles (max {$maxEmails} per execution).\n\n";
+
+$emailsSent = 0;
+$emailsFailed = 0;
+
+// Loop through profiles and send reminder emails
+foreach ($profilesToProcess as $profile) {
+    $firstName = $profile['first_name'];
+    $email = $profile['email'];
+    
+    echo "Sending reminder to: {$firstName} ({$email})... ";
+    
+    // Send email using MailService
+    try {
+        $success = MailService::sendAlumniReminder($email, $firstName);
+        
+        if ($success) {
+            $emailsSent++;
+            echo "SUCCESS\n";
+        } else {
+            $emailsFailed++;
+            echo "FAILED\n";
+        }
+    } catch (Exception $e) {
+        $emailsFailed++;
+        echo "ERROR: " . $e->getMessage() . "\n";
+    }
+    
+    // Small delay between emails to avoid overwhelming SMTP server
+    usleep(100000); // 0.1 second delay
+}
+
+// Output summary
+echo "\n=== Summary ===\n";
+echo "Total outdated profiles: {$totalOutdated}\n";
+echo "Emails sent successfully: {$emailsSent}\n";
+echo "Emails failed: {$emailsFailed}\n";
+echo "Remaining profiles: " . max(0, $totalOutdated - $maxEmails) . "\n";
+echo "Completed at: " . date('Y-m-d H:i:s') . "\n";
