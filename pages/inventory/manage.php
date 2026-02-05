@@ -197,7 +197,7 @@ ob_start();
             <?php endif; ?>
             <div class="flex items-center">
                 <i class="fas fa-box w-5 text-purple-600"></i>
-                <span>Aktueller Bestand: <?php echo $item['current_stock']; ?> <?php echo htmlspecialchars($item['unit']); ?></span>
+                <span>Aktueller Bestand: <?php echo htmlspecialchars($item['current_stock']); ?> <?php echo htmlspecialchars($item['unit']); ?></span>
             </div>
         </div>
 
