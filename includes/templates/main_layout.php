@@ -214,27 +214,41 @@ require_once __DIR__ . '/../../src/Auth.php';
             </nav>
         </div>
 
-        <div class='mt-auto pt-6 border-t border-gray-700'>
-            <div class='flex items-center px-2 mb-4'>
-                <div class='w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-3'>
+        <div class="mt-auto pt-6 border-t border-gray-700">
+            <div class="flex items-center px-2 mb-4">
+                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-3">
                     <?php 
-                    $firstname = !empty($currentUser['firstname']) ? $currentUser['firstname'] : 'U';
-                    $lastname = !empty($currentUser['lastname']) ? $currentUser['lastname'] : 'U';
-                    echo strtoupper(substr($firstname, 0, 1) . substr($lastname, 0, 1)); 
+                    $firstname = !empty($currentUser['firstname']) ? $currentUser['firstname'] : '';
+                    $lastname = !empty($currentUser['lastname']) ? $currentUser['lastname'] : '';
+                    
+                    if (!empty($firstname) && !empty($lastname)) {
+                        echo strtoupper(substr($firstname, 0, 1) . substr($lastname, 0, 1));
+                    } elseif (!empty($firstname)) {
+                        echo strtoupper(substr($firstname, 0, 1));
+                    } elseif (!empty($lastname)) {
+                        echo strtoupper(substr($lastname, 0, 1));
+                    } elseif (!empty($currentUser['email'])) {
+                        echo strtoupper(substr($currentUser['email'], 0, 1));
+                    } else {
+                        echo 'U';
+                    }
                     ?>
                 </div>
-                <div class='overflow-hidden'>
-                    <p class='text-sm font-medium text-white truncate' title='<?php echo htmlspecialchars($currentUser['email']); ?>'>
-                        <?php echo htmlspecialchars($currentUser['firstname'] . ' ' . $currentUser['lastname']); ?>
+                <div class="overflow-hidden">
+                    <p class="text-sm font-medium text-white truncate" title="<?php echo htmlspecialchars($currentUser['email']); ?>">
+                        <?php 
+                        $fullname = trim($currentUser['firstname'] . ' ' . $currentUser['lastname']);
+                        echo htmlspecialchars(!empty($fullname) ? $fullname : $currentUser['email']); 
+                        ?>
                     </p>
-                    <p class='text-xs text-gray-400 truncate'>
+                    <p class="text-xs text-gray-400 truncate">
                         <?php echo htmlspecialchars(ucfirst($currentUser['role'])); ?>
                     </p>
                 </div>
             </div>
-            <a href='<?php echo asset('pages/auth/logout.php'); ?>' 
-               class='flex items-center justify-center w-full px-4 py-2 text-sm font-bold text-white bg-red-600/80 hover:bg-red-600 rounded-lg transition-colors'>
-                <i class='fas fa-sign-out-alt mr-2'></i> Abmelden
+            <a href="<?php echo asset('pages/auth/logout.php'); ?>" 
+               class="flex items-center justify-center w-full px-4 py-2 text-sm font-bold text-white bg-red-600/80 hover:bg-red-600 rounded-lg transition-colors">
+                <i class="fas fa-sign-out-alt mr-2"></i> Abmelden
             </a>
         </div>
     </aside>
