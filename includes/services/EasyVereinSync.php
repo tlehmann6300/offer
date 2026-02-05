@@ -5,6 +5,7 @@
  */
 
 require_once __DIR__ . '/../database.php';
+require_once __DIR__ . '/../models/Inventory.php';
 
 class EasyVereinSync {
     
@@ -106,27 +107,19 @@ class EasyVereinSync {
                     $existingItem = $stmt->fetch();
                     
                     if ($existingItem) {
-                        // Update existing item
-                        // DO overwrite master data: name, description, current_stock (total), serial_number
-                        // DO NOT overwrite operational fields: location_id, category_id
-                        $stmt = $db->prepare("
-                            UPDATE inventory 
-                            SET name = ?,
-                                description = ?,
-                                current_stock = ?,
-                                serial_number = ?,
-                                last_synced_at = NOW(),
-                                is_archived_in_easyverein = 0
-                            WHERE easyverein_id = ?
-                        ");
+                        // Update existing item using Inventory model with sync flag
+                        // This allows the update to bypass Master Data protection
+                        $updateData = [
+                            'name' => $evItem['Name'],
+                            'description' => $evItem['Description'],
+                            'current_stock' => $evItem['TotalQuantity'],
+                            'serial_number' => $evItem['SerialNumber'],
+                            'last_synced_at' => date('Y-m-d H:i:s'),
+                            'is_archived_in_easyverein' => 0
+                        ];
                         
-                        $stmt->execute([
-                            $evItem['Name'],
-                            $evItem['Description'],
-                            $evItem['TotalQuantity'],
-                            $evItem['SerialNumber'],
-                            $easyvereinId
-                        ]);
+                        // Use Inventory::update() with $isSyncUpdate = true to bypass protection
+                        Inventory::update($existingItem['id'], $updateData, $userId, true);
                         
                         $stats['updated']++;
                         
