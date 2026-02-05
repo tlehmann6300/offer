@@ -70,12 +70,22 @@ try {
     echo '<div style="background-color: #fee2e2; border: 2px solid #ef4444; color: #991b1b; padding: 20px; font-family: sans-serif; margin: 20px; border-radius: 8px;">';
     echo '<h2 style="margin-top:0">Kritischer Fehler aufgetreten</h2>';
     
-    if (defined('ENVIRONMENT') && ENVIRONMENT !== 'production') {
+    if (ENVIRONMENT !== 'production') {
         // Show detailed error information only in non-production environments
         echo '<p><strong>Fehlermeldung:</strong> ' . htmlspecialchars($e->getMessage()) . '</p>';
         echo '<p><strong>Datei:</strong> ' . htmlspecialchars($e->getFile()) . ' (Zeile ' . $e->getLine() . ')</p>';
         echo '<pre style="background: #fff; padding: 10px; overflow: auto;">' . htmlspecialchars($e->getTraceAsString()) . '</pre>';
     } else {
+        // Log error details to server logs in production, but show generic message to user
+        // This prevents information leakage while still allowing developers to debug issues
+        error_log(sprintf(
+            'Login error: %s in %s:%d. Stack trace: %s',
+            $e->getMessage(),
+            $e->getFile(),
+            $e->getLine(),
+            $e->getTraceAsString()
+        ));
+        
         // Show generic error message in production to prevent information leakage
         echo '<p>Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut oder wenden Sie sich an den Administrator.</p>';
     }
