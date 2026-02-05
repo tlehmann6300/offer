@@ -147,6 +147,10 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <i class="fas fa-calendar-check w-5"></i>
                     <span>Events</span>
                 </a>
+                <a href="<?php echo asset('pages/alumni/index.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                    <i class="fas fa-user-tie w-5"></i>
+                    <span>Alumni-Netzwerk</span>
+                </a>
                 <a href="<?php echo asset('pages/projects/index.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                     <i class="fas fa-briefcase w-5"></i>
                     <span>Projekte</span>
