@@ -95,7 +95,7 @@ function getCategoryColor($category) {
 }
 
 // Check if user can edit this post (is author OR admin/board)
-$canEdit = ($post['author_id'] == $userId) || BlogPost::canAuth($userRole);
+$canEdit = ($post['author_id'] === $userId) || BlogPost::canAuth($userRole);
 
 $title = htmlspecialchars($post['title']) . ' - IBC Intranet';
 ob_start();
