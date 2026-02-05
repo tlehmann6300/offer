@@ -127,7 +127,7 @@ ob_start();
     <?php else: ?>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <?php foreach ($posts as $post): ?>
-                <div class="card overflow-hidden flex flex-col">
+                <a href="view.php?id=<?php echo (int)$post['id']; ?>" class="card overflow-hidden flex flex-col hover:shadow-xl transition-shadow cursor-pointer">
                     <!-- Image -->
                     <div class="h-48 bg-gray-200 overflow-hidden">
                         <?php if (!empty($post['image_path'])): ?>
@@ -187,7 +187,7 @@ ob_start();
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
