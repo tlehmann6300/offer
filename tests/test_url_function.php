@@ -85,7 +85,15 @@ test(
     url('api/event_signup.php')
 );
 
-// Test 8: BASE_URL with trailing slash (simulate different config)
+// Test 8: Path with trailing slashes
+// Note: url() maintains consistency with asset() - trailing slashes are preserved
+test(
+    "Path with trailing slashes (matches asset() behavior)",
+    "https://intra.business-consulting.de/assets/css//",
+    url('assets/css//')
+);
+
+// Test 9: BASE_URL with trailing slash (simulate different config)
 // This tests the rtrim behavior
 $testBaseUrl = 'https://example.com/subfolder/';
 define('TEST_BASE_URL', $testBaseUrl);
@@ -99,7 +107,7 @@ test(
     $testResult
 );
 
-// Test 9: Consistency with asset() function
+// Test 10: Consistency with asset() function
 // url() should produce the same output as asset() for the same path
 test(
     "url() should be consistent with asset() function",
