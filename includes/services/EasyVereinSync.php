@@ -191,6 +191,7 @@ class EasyVereinSync {
             }
             
             // Handle deletions: Mark items with easyverein_id NOT in current fetch as archived
+            // This should run even if currentEasyVereinIds is empty (i.e., EasyVerein returns no items)
             if (!empty($currentEasyVereinIds)) {
                 $placeholders = str_repeat('?,', count($currentEasyVereinIds) - 1) . '?';
                 
@@ -204,33 +205,44 @@ class EasyVereinSync {
                 ");
                 $stmt->execute($currentEasyVereinIds);
                 $itemsToArchive = $stmt->fetchAll();
+            } else {
+                // If EasyVerein returns no items, archive all items with easyverein_id
+                $stmt = $db->prepare("
+                    SELECT id, easyverein_id, name
+                    FROM inventory
+                    WHERE easyverein_id IS NOT NULL
+                    AND is_archived_in_easyverein = 0
+                ");
+                $stmt->execute();
+                $itemsToArchive = $stmt->fetchAll();
+            }
+            
+            // Archive items not found in current sync
+            foreach ($itemsToArchive as $item) {
+                // Mark as archived (soft delete)
+                $stmt = $db->prepare("
+                    UPDATE inventory
+                    SET is_archived_in_easyverein = 1,
+                        last_synced_at = NOW()
+                    WHERE id = ?
+                ");
+                $stmt->execute([$item['id']]);
                 
-                foreach ($itemsToArchive as $item) {
-                    // Mark as archived (soft delete)
-                    $stmt = $db->prepare("
-                        UPDATE inventory
-                        SET is_archived_in_easyverein = 1,
-                            last_synced_at = NOW()
-                        WHERE id = ?
-                    ");
-                    $stmt->execute([$item['id']]);
-                    
-                    $stats['archived']++;
-                    
-                    // Log archival
-                    $this->logSyncHistory(
-                        $item['id'],
-                        $userId,
-                        'sync_archive',
-                        null,
-                        null,
-                        'Archived - no longer in EasyVerein',
-                        json_encode([
-                            'easyverein_id' => $item['easyverein_id'],
-                            'name' => $item['name']
-                        ])
-                    );
-                }
+                $stats['archived']++;
+                
+                // Log archival
+                $this->logSyncHistory(
+                    $item['id'],
+                    $userId,
+                    'sync_archive',
+                    null,
+                    null,
+                    'Archived - no longer in EasyVerein',
+                    json_encode([
+                        'easyverein_id' => $item['easyverein_id'],
+                        'name' => $item['name']
+                    ])
+                );
             }
             
         } catch (Exception $e) {
