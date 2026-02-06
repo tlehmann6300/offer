@@ -251,9 +251,13 @@ CREATE TABLE IF NOT EXISTS alumni_profiles (
     mobile_phone VARCHAR(50) DEFAULT NULL,
     linkedin_url VARCHAR(255) DEFAULT NULL,
     xing_url VARCHAR(255) DEFAULT NULL,
-    industry VARCHAR(255) DEFAULT NULL COMMENT 'For filtering',
-    company VARCHAR(255) NOT NULL,
-    position VARCHAR(255) NOT NULL,
+    industry VARCHAR(255) DEFAULT NULL COMMENT 'Branche - for alumni filtering',
+    company VARCHAR(255) DEFAULT NULL COMMENT 'Aktueller Arbeitgeber - required for alumni, optional for candidates/members',
+    position VARCHAR(255) DEFAULT NULL COMMENT 'Job position - required for alumni, optional for candidates/members',
+    studiengang VARCHAR(255) DEFAULT NULL COMMENT 'Field of study for candidates and members',
+    semester VARCHAR(50) DEFAULT NULL COMMENT 'Current semester for candidates and members',
+    angestrebter_abschluss VARCHAR(255) DEFAULT NULL COMMENT 'Desired degree for candidates and members',
+    about_me TEXT DEFAULT NULL COMMENT 'Personal description/bio for all users',
     image_path VARCHAR(255) DEFAULT NULL,
     last_verified_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     last_reminder_sent_at DATETIME DEFAULT NULL COMMENT 'Tracks when annual reminder email was sent',
@@ -266,7 +270,7 @@ CREATE TABLE IF NOT EXISTS alumni_profiles (
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
-  COMMENT='Extended profile data for alumni with job information';
+  COMMENT='Extended profile data for all users (Alumni, Board, Members, Candidates)';
 
 -- ============================================
 -- BLOG MODULE

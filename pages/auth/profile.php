@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/handlers/GoogleAuthenticator.php';
 require_once __DIR__ . '/../../includes/models/User.php';
+require_once __DIR__ . '/../../includes/models/Alumni.php';
 
 if (!Auth::check()) {
     header('Location: login.php');
@@ -15,9 +16,49 @@ $showQRCode = false;
 $qrCodeUrl = '';
 $secret = '';
 
+// Load user's profile from alumni_profiles table
+$profile = Alumni::getProfileByUserId($user['id']);
+
 // Handle 2FA setup
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['update_email'])) {
+    if (isset($_POST['update_profile'])) {
+        // Handle profile update
+        try {
+            $profileData = [
+                'first_name' => trim($_POST['first_name'] ?? ''),
+                'last_name' => trim($_POST['last_name'] ?? ''),
+                'email' => trim($_POST['profile_email'] ?? ''),
+                'mobile_phone' => trim($_POST['mobile_phone'] ?? ''),
+                'linkedin_url' => trim($_POST['linkedin_url'] ?? ''),
+                'xing_url' => trim($_POST['xing_url'] ?? ''),
+                'about_me' => trim($_POST['about_me'] ?? ''),
+                'image_path' => trim($_POST['image_path'] ?? '')
+            ];
+            
+            // Add role-specific fields
+            if (in_array($user['role'], ['candidate', 'member'])) {
+                // Fields for candidates and members
+                $profileData['studiengang'] = trim($_POST['studiengang'] ?? '');
+                $profileData['semester'] = trim($_POST['semester'] ?? '');
+                $profileData['angestrebter_abschluss'] = trim($_POST['angestrebter_abschluss'] ?? '');
+            } elseif ($user['role'] === 'alumni') {
+                // Fields for alumni
+                $profileData['company'] = trim($_POST['company'] ?? '');
+                $profileData['industry'] = trim($_POST['industry'] ?? '');
+                $profileData['position'] = trim($_POST['position'] ?? '');
+            }
+            
+            // Update or create profile (only for the current user)
+            if (Alumni::updateOrCreateProfile($user['id'], $profileData)) {
+                $message = 'Profil erfolgreich aktualisiert';
+                $profile = Alumni::getProfileByUserId($user['id']); // Reload profile
+            } else {
+                $error = 'Fehler beim Aktualisieren des Profils';
+            }
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+    } else if (isset($_POST['update_email'])) {
         $newEmail = trim($_POST['email'] ?? '');
         
         // Check if email has changed
@@ -197,6 +238,186 @@ ob_start();
                 <i class="fas fa-save mr-2"></i>E-Mail-Adresse aktualisieren
             </button>
         </form>
+    </div>
+
+    <!-- Profile Information -->
+    <div class="lg:col-span-2">
+        <div class="card p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-user-edit text-purple-600 mr-2"></i>
+                Profilangaben
+            </h2>
+            <p class="text-gray-600 mb-6">
+                Aktualisieren Sie Ihre persönlichen Informationen und Kontaktdaten
+            </p>
+            
+            <form method="POST" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Common Fields -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Vorname *</label>
+                        <input 
+                            type="text" 
+                            name="first_name" 
+                            required 
+                            value="<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nachname *</label>
+                        <input 
+                            type="text" 
+                            name="last_name" 
+                            required 
+                            value="<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">E-Mail (Profil) *</label>
+                        <input 
+                            type="email" 
+                            name="profile_email" 
+                            required 
+                            value="<?php echo htmlspecialchars($profile['email'] ?? $user['email']); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
+                        <input 
+                            type="text" 
+                            name="mobile_phone" 
+                            value="<?php echo htmlspecialchars($profile['mobile_phone'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="+49 123 456789"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">LinkedIn URL</label>
+                        <input 
+                            type="url" 
+                            name="linkedin_url" 
+                            value="<?php echo htmlspecialchars($profile['linkedin_url'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="https://linkedin.com/in/..."
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Xing URL</label>
+                        <input 
+                            type="url" 
+                            name="xing_url" 
+                            value="<?php echo htmlspecialchars($profile['xing_url'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="https://xing.com/profile/..."
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Profilbild Pfad</label>
+                        <input 
+                            type="text" 
+                            name="image_path" 
+                            value="<?php echo htmlspecialchars($profile['image_path'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="uploads/profile/image.jpg"
+                        >
+                    </div>
+                    
+                    <?php if (in_array($user['role'], ['candidate', 'member'])): ?>
+                    <!-- Fields for Candidates and Members -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Studiengang</label>
+                        <input 
+                            type="text" 
+                            name="studiengang" 
+                            value="<?php echo htmlspecialchars($profile['studiengang'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="z.B. Wirtschaftsingenieurwesen"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Semester</label>
+                        <input 
+                            type="text" 
+                            name="semester" 
+                            value="<?php echo htmlspecialchars($profile['semester'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="z.B. 5"
+                        >
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Angestrebter Abschluss</label>
+                        <input 
+                            type="text" 
+                            name="angestrebter_abschluss" 
+                            value="<?php echo htmlspecialchars($profile['angestrebter_abschluss'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="z.B. Bachelor of Science"
+                        >
+                    </div>
+                    <?php elseif ($user['role'] === 'alumni'): ?>
+                    <!-- Fields for Alumni -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Aktueller Arbeitgeber</label>
+                        <input 
+                            type="text" 
+                            name="company" 
+                            value="<?php echo htmlspecialchars($profile['company'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="Firmenname"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Position</label>
+                        <input 
+                            type="text" 
+                            name="position" 
+                            value="<?php echo htmlspecialchars($profile['position'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="z.B. Senior Consultant"
+                        >
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Branche</label>
+                        <input 
+                            type="text" 
+                            name="industry" 
+                            value="<?php echo htmlspecialchars($profile['industry'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="z.B. Beratung, IT, Finanzen"
+                        >
+                    </div>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- About Me - Full Width -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Über mich</label>
+                    <textarea 
+                        name="about_me" 
+                        rows="4"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="Erzählen Sie etwas über sich..."
+                    ><?php echo htmlspecialchars($profile['about_me'] ?? ''); ?></textarea>
+                </div>
+                
+                <button type="submit" name="update_profile" class="w-full btn-primary">
+                    <i class="fas fa-save mr-2"></i>Profil speichern
+                </button>
+            </form>
+        </div>
     </div>
 
     <!-- Change Password -->

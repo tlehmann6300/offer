@@ -65,6 +65,10 @@ class Member {
                 ap.industry,
                 ap.company,
                 ap.position,
+                ap.studiengang,
+                ap.semester,
+                ap.angestrebter_abschluss,
+                ap.about_me,
                 ap.image_path,
                 ap.created_at,
                 ap.updated_at
