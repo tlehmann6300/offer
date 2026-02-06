@@ -22,8 +22,7 @@ if (!in_array($user['role'], $allowedRoles)) {
 $searchKeyword = $_GET['search'] ?? '';
 
 // Build SQL query to join alumni_profiles with users table and filter by role
-$db = Database::getContentDB();
-$userDb = Database::getUserDB();
+$db = Database::getUserDB();
 
 $whereClauses = ["u.role IN ('board', 'head', 'member', 'candidate')"];
 $params = [];
@@ -38,14 +37,11 @@ if (!empty($searchKeyword)) {
 
 $whereSQL = ' WHERE ' . implode(' AND ', $whereClauses);
 
-// Get the user database name
-$userDbName = $userDb->query("SELECT DATABASE()")->fetchColumn();
-
 $sql = "
     SELECT ap.id, ap.user_id, ap.first_name, ap.last_name, ap.email, 
            ap.position, ap.image_path, u.role
     FROM alumni_profiles ap
-    INNER JOIN {$userDbName}.users u ON ap.user_id = u.id" . $whereSQL . "
+    INNER JOIN users u ON ap.user_id = u.id" . $whereSQL . "
     ORDER BY ap.last_name ASC, ap.first_name ASC
 ";
 
