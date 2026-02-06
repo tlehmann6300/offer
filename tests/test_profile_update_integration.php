@@ -106,7 +106,7 @@ foreach ($candidateFields as $field) {
         break;
     }
 }
-if ($candidateFieldsFound && strpos($profileContent, "in_array(\$user['role'], ['candidate', 'member'])") !== false) {
+if ($candidateFieldsFound && strpos($profileContent, "in_array(\$user['role'], ['candidate', 'member', 'board', 'head'])") !== false) {
     echo "✓ PASS: Candidate/member-specific fields found and conditional display implemented\n";
     $testsPassed++;
 } else {
