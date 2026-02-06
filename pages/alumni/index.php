@@ -3,7 +3,8 @@ require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Alumni.php';
 require_once __DIR__ . '/../../includes/helpers.php';
 
-// Check authentication
+// Access Control: Allow all logged-in users (Admin, Board, Head, Member, Candidate, Alumni)
+// No role restrictions - any authenticated user can view the alumni directory
 if (!Auth::check()) {
     header('Location: ../auth/login.php');
     exit;
