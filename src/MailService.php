@@ -195,7 +195,7 @@ class MailService {
                     $mail->isMail(); // Use PHP's mail() function
                 } else {
                     // Critical error: Neither SMTP nor mail() available
-                    error_log("CRITICAL ERROR: SMTP_HOST not configured and PHP mail() function is not available. Email sending will fail.");
+                    error_log("CRITICAL ERROR: SMTP_HOST not configured and PHP mail() function is not available. Cannot send email.");
                     throw new \Exception("Email configuration error: SMTP_HOST not set and PHP mail() not available");
                 }
             } else {
