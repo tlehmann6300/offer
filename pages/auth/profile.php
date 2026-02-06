@@ -36,8 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             
             // Add role-specific fields
-            if (in_array($user['role'], ['candidate', 'member'])) {
-                // Fields for candidates and members
+            if (in_array($user['role'], ['candidate', 'member', 'board', 'head'])) {
+                // Fields for candidates, members, board, and heads
                 $profileData['studiengang'] = trim($_POST['studiengang'] ?? '');
                 $profileData['semester'] = trim($_POST['semester'] ?? '');
                 $profileData['angestrebter_abschluss'] = trim($_POST['angestrebter_abschluss'] ?? '');
@@ -331,8 +331,8 @@ ob_start();
                         >
                     </div>
                     
-                    <?php if (in_array($user['role'], ['candidate', 'member'])): ?>
-                    <!-- Fields for Candidates and Members -->
+                    <?php if (in_array($user['role'], ['candidate', 'member', 'board', 'head'])): ?>
+                    <!-- Fields for Candidates, Members, Board, and Heads -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Studiengang</label>
                         <input 
