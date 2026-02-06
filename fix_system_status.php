@@ -29,12 +29,17 @@ $fileCleanupMessage = '';
 
 if (file_exists($directoryPhpPath)) {
     // File exists, attempt to delete
-    if (@unlink($directoryPhpPath)) {
-        $fileCleanupStatus = true;
-        $fileCleanupMessage = '<span style="color:green">✅ Deleted redundant directory.php</span>';
+    if (is_writable(dirname($directoryPhpPath))) {
+        if (unlink($directoryPhpPath)) {
+            $fileCleanupStatus = true;
+            $fileCleanupMessage = '<span style="color:green">✅ Deleted redundant directory.php</span>';
+        } else {
+            $fileCleanupStatus = false;
+            $fileCleanupMessage = '<span style="color:red">❌ Failed to delete directory.php (unknown error)</span>';
+        }
     } else {
         $fileCleanupStatus = false;
-        $fileCleanupMessage = '<span style="color:red">❌ Failed to delete directory.php (check permissions)</span>';
+        $fileCleanupMessage = '<span style="color:red">❌ Cannot delete directory.php (permission denied)</span>';
     }
 } else {
     // File doesn't exist (already cleaned)
@@ -116,7 +121,7 @@ try {
         } else {
             // Column is missing - show critical warning
             $databaseCheckStatus = false;
-            $databaseCheckMessage = '<h2 style="color:red">❌ ACTION REQUIRED: Run /sql/migrate_add_student_fields.php immediately!</h2>';
+            $databaseCheckMessage = '<span style="color:red;font-size:18px;font-weight:bold;">❌ ACTION REQUIRED: Run /sql/migrate_add_student_fields.php immediately!</span>';
         }
     } else {
         $databaseCheckStatus = false;
