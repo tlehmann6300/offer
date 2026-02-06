@@ -128,6 +128,13 @@ require_once __DIR__ . '/../../src/Auth.php';
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar fixed left-0 top-0 h-screen w-64 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-40 text-white shadow-2xl flex flex-col">
         <?php $currentUser = Auth::user(); ?>
+        <?php 
+        // Helper function to determine if a path is active
+        function isActivePath($path) {
+            $currentUri = $_SERVER['REQUEST_URI'];
+            return strpos($currentUri, $path) !== false;
+        }
+        ?>
         <div class="p-6 flex-1 overflow-y-auto">
             <!-- IBC Logo in Navbar -->
             <div class="mb-8">
@@ -139,17 +146,17 @@ require_once __DIR__ . '/../../src/Auth.php';
                 <div class="mb-4">
                     <h3 class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2 px-3">Mein Bereich</h3>
                     <a href="<?php echo asset('pages/dashboard/index.php'); ?>" 
-                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (strpos($_SERVER['REQUEST_URI'], '/dashboard/') !== false) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/dashboard/') ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-home w-5"></i>
                         <span>Dashboard</span>
                     </a>
                     <a href="<?php echo asset('pages/auth/profile.php'); ?>" 
-                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (strpos($_SERVER['REQUEST_URI'], '/auth/profile.php') !== false) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/auth/profile.php') ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-user w-5"></i>
                         <span>Profil</span>
                     </a>
                     <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" 
-                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (strpos($_SERVER['REQUEST_URI'], '/inventory/my_rentals.php') !== false) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/inventory/my_rentals.php') ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-clipboard-list w-5"></i>
                         <span>Meine Ausleihen</span>
                     </a>
@@ -159,33 +166,33 @@ require_once __DIR__ . '/../../src/Auth.php';
                 <div class="mb-4">
                     <h3 class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2 px-3">Hauptmenü</h3>
                     <a href="<?php echo asset('pages/blog/index.php'); ?>" 
-                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (strpos($_SERVER['REQUEST_URI'], '/blog/') !== false) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/blog/') ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-newspaper w-5"></i>
                         <span>News / Blog</span>
                     </a>
                     <a href="<?php echo asset('pages/inventory/index.php'); ?>" 
-                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (strpos($_SERVER['REQUEST_URI'], '/inventory/') !== false && strpos($_SERVER['REQUEST_URI'], '/my_rentals.php') === false) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (isActivePath('/inventory/') && !isActivePath('/my_rentals.php')) ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-boxes w-5"></i>
                         <span>Inventar</span>
                     </a>
                     <a href="<?php echo asset('pages/events/index.php'); ?>" 
-                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (strpos($_SERVER['REQUEST_URI'], '/events/') !== false) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/events/') ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-calendar-check w-5"></i>
                         <span>Events</span>
                     </a>
                     <a href="<?php echo asset('pages/projects/index.php'); ?>" 
-                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (strpos($_SERVER['REQUEST_URI'], '/projects/') !== false) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/projects/') ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-briefcase w-5"></i>
                         <span>Projekte</span>
                     </a>
                     <a href="<?php echo asset('pages/alumni/index.php'); ?>" 
-                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (strpos($_SERVER['REQUEST_URI'], '/alumni/') !== false) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/alumni/') ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-user-tie w-5"></i>
                         <span>Alumni-Netzwerk</span>
                     </a>
                     <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'head', 'member', 'candidate'])): ?>
                     <a href="<?php echo asset('pages/members/directory.php'); ?>" 
-                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (strpos($_SERVER['REQUEST_URI'], '/members/') !== false) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/members/') ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-users w-5"></i>
                         <span>Vereinsmitglieder</span>
                     </a>
@@ -198,29 +205,29 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <h3 class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2 px-3">Verwaltung</h3>
                     <?php if (Auth::hasPermission('manager')): ?>
                     <a href="<?php echo asset('pages/events/manage.php'); ?>" 
-                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (strpos($_SERVER['REQUEST_URI'], '/events/manage.php') !== false) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/events/manage.php') ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-calendar-alt w-5"></i>
                         <span>Event-Verwaltung</span>
                     </a>
                     <a href="<?php echo asset('pages/projects/manage.php'); ?>" 
-                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (strpos($_SERVER['REQUEST_URI'], '/projects/manage.php') !== false) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/projects/manage.php') ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-tasks w-5"></i>
                         <span>Projekt-Verwaltung</span>
                     </a>
                     <a href="<?php echo asset('pages/inventory/manage.php'); ?>" 
-                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (strpos($_SERVER['REQUEST_URI'], '/inventory/manage.php') !== false) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/inventory/manage.php') ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-cogs w-5"></i>
                         <span>Inventar-Verwaltung</span>
                     </a>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
                     <a href="<?php echo asset('pages/admin/users.php'); ?>" 
-                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (strpos($_SERVER['REQUEST_URI'], '/admin/users.php') !== false) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/admin/users.php') ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-users-cog w-5"></i>
                         <span>Benutzerverwaltung</span>
                     </a>
                     <a href="<?php echo asset('pages/admin/audit.php'); ?>" 
-                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (strpos($_SERVER['REQUEST_URI'], '/admin/audit.php') !== false) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/admin/audit.php') ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-clipboard-list w-5"></i>
                         <span>Audit-Logs</span>
                     </a>

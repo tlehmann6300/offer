@@ -17,11 +17,19 @@ $user = Auth::user();
 $stats = Inventory::getDashboardStats();
 
 // Get user's first name for personalized greeting
-$firstname = !empty($user['firstname']) ? $user['firstname'] : (!empty($user['email']) ? explode('@', $user['email'])[0] : 'Benutzer');
+$firstname = 'Benutzer'; // Default fallback
+if (!empty($user['firstname'])) {
+    $firstname = $user['firstname'];
+} elseif (!empty($user['email']) && strpos($user['email'], '@') !== false) {
+    $emailParts = explode('@', $user['email']);
+    $firstname = $emailParts[0];
+}
 
 // Determine greeting based on time of day (German time)
-date_default_timezone_set('Europe/Berlin');
-$hour = (int)date('H');
+// Note: timezone should ideally be set in config, but setting here for dashboard display
+$timezone = new DateTimeZone('Europe/Berlin');
+$now = new DateTime('now', $timezone);
+$hour = (int)$now->format('H');
 if ($hour >= 5 && $hour < 12) {
     $greeting = 'Guten Morgen';
 } elseif ($hour >= 12 && $hour < 18) {
@@ -147,7 +155,7 @@ endif;
 <!-- Quick Stats Widgets -->
 <div class="max-w-6xl mx-auto mb-8">
     <h2 class="text-2xl font-bold text-gray-800 mb-4">
-        <i class="fas fa-dashboard text-purple-600 mr-2"></i>
+        <i class="fas fa-tachometer-alt text-purple-600 mr-2"></i>
         Schnellübersicht
     </h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
