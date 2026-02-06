@@ -224,17 +224,16 @@ try {
         }
     }
     
-    // Should be: Anderson, Brown, Clark, Evans
+    // Should be in alphabetical order: Anderson, Brown, Clark, Evans
     $expectedOrder = ['Anderson', 'Brown', 'Clark', 'Evans'];
-    $actualOrder = array_slice($testMembers, 0, 4);
     
-    if ($actualOrder === $expectedOrder) {
-        echo "✓ Members correctly ordered by last_name\n";
-        echo "  Order: " . implode(', ', $actualOrder) . "\n\n";
+    if ($testMembers === $expectedOrder) {
+        echo "✓ Test members correctly ordered by last_name\n";
+        echo "  Order: " . implode(', ', $testMembers) . "\n\n";
     } else {
-        echo "✗ Members not correctly ordered\n";
+        echo "✗ Test members not correctly ordered\n";
         echo "  Expected: " . implode(', ', $expectedOrder) . "\n";
-        echo "  Actual: " . implode(', ', $actualOrder) . "\n\n";
+        echo "  Actual: " . implode(', ', $testMembers) . "\n\n";
     }
     
     // Test 9: Get statistics

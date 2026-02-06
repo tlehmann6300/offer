@@ -11,6 +11,11 @@ require_once __DIR__ . '/../database.php';
 class Member {
     
     /**
+     * Active member roles (excludes 'alumni')
+     */
+    const ACTIVE_ROLES = ['board', 'head', 'member', 'candidate', 'admin'];
+    
+    /**
      * Get all active members with optional search and role filtering
      * 
      * @param string|null $search Optional search term for first_name, last_name, company, or industry
@@ -22,7 +27,8 @@ class Member {
         $contentDb = Database::getContentDB();
         
         // Build the query with cross-database JOIN
-        $whereClauses = ["u.role IN ('board', 'head', 'member', 'candidate', 'admin')"];
+        $roleList = "'" . implode("', '", self::ACTIVE_ROLES) . "'";
+        $whereClauses = ["u.role IN ($roleList)"];
         $params = [];
         
         // Add search filter if provided
@@ -82,13 +88,16 @@ class Member {
     public static function getStatistics(): array {
         $db = Database::getUserDB();
         
-        $stmt = $db->prepare("
+        $roleList = "'" . implode("', '", self::ACTIVE_ROLES) . "'";
+        $sql = "
             SELECT role, COUNT(*) as count
             FROM users
-            WHERE role IN ('board', 'head', 'member', 'candidate', 'admin')
+            WHERE role IN ($roleList)
             GROUP BY role
             ORDER BY role ASC
-        ");
+        ";
+        
+        $stmt = $db->prepare($sql);
         
         $stmt->execute();
         $results = $stmt->fetchAll();
