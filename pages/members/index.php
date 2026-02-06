@@ -173,7 +173,7 @@ ob_start();
                         <div class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-3xl font-bold overflow-hidden shadow-lg">
                             <?php if (!empty($imagePath)): ?>
                                 <img 
-                                    src="<?php echo $imagePath; ?>" 
+                                    src="<?php echo htmlspecialchars($imagePath); ?>" 
                                     alt="<?php echo htmlspecialchars($member['first_name'] . ' ' . $member['last_name']); ?>"
                                     class="w-full h-full object-cover"
                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
@@ -228,8 +228,19 @@ ob_start();
                         
                         <!-- LinkedIn Icon (if set) -->
                         <?php if (!empty($member['linkedin_url'])): ?>
+                            <?php
+                            // Validate LinkedIn URL to prevent XSS attacks
+                            $linkedinUrl = $member['linkedin_url'];
+                            $isValidLinkedIn = (
+                                strpos($linkedinUrl, 'https://linkedin.com') === 0 ||
+                                strpos($linkedinUrl, 'https://www.linkedin.com') === 0 ||
+                                strpos($linkedinUrl, 'http://linkedin.com') === 0 ||
+                                strpos($linkedinUrl, 'http://www.linkedin.com') === 0
+                            );
+                            ?>
+                            <?php if ($isValidLinkedIn): ?>
                             <a 
-                                href="<?php echo htmlspecialchars($member['linkedin_url']); ?>" 
+                                href="<?php echo htmlspecialchars($linkedinUrl); ?>" 
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 class="w-10 h-10 flex items-center justify-center bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors shadow-md"
@@ -237,6 +248,7 @@ ob_start();
                             >
                                 <i class="fab fa-linkedin-in"></i>
                             </a>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
                     
