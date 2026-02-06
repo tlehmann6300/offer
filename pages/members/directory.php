@@ -176,7 +176,16 @@ ob_start();
                         <?php endif; ?>
                         <p class="text-xs text-gray-400 mt-1">
                             <i class="fas fa-id-badge mr-1"></i>
-                            <?php echo htmlspecialchars(ucfirst($profile['role'])); ?>
+                            <?php 
+                            $roleNames = [
+                                'admin' => 'Administrator',
+                                'board' => 'Vorstand',
+                                'head' => 'Ressortleiter',
+                                'member' => 'Mitglied',
+                                'candidate' => 'Anwärter'
+                            ];
+                            echo htmlspecialchars($roleNames[$profile['role']] ?? ucfirst($profile['role'])); 
+                            ?>
                         </p>
                     </div>
                     

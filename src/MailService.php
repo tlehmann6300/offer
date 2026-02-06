@@ -521,8 +521,19 @@ class MailService {
         $registrationLink = BASE_URL . '/pages/auth/register.php?token=' . urlencode($token);
         
         // Build body content
+        $roleNames = [
+            'admin' => 'Administrator',
+            'board' => 'Vorstand',
+            'alumni_board' => 'Alumni-Vorstand',
+            'manager' => 'Ressortleiter',
+            'member' => 'Mitglied',
+            'alumni' => 'Alumni',
+            'candidate' => 'Anwärter'
+        ];
+        $roleDisplay = $roleNames[$role] ?? ucfirst($role);
+        
         $bodyContent = '<p class="email-text">Hallo,</p>
-        <p class="email-text">du wurdest als <strong>' . htmlspecialchars(ucfirst($role)) . '</strong> zum IBC Intranet eingeladen.</p>
+        <p class="email-text">du wurdest als <strong>' . htmlspecialchars($roleDisplay) . '</strong> zum IBC Intranet eingeladen.</p>
         <p class="email-text">Um dein Konto zu erstellen und Zugang zum System zu erhalten, klicke bitte auf den folgenden Button:</p>';
         
         // Create call-to-action button
