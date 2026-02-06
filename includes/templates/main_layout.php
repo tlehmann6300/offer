@@ -155,6 +155,12 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <i class="fas fa-user-tie w-5"></i>
                     <span>Alumni-Netzwerk</span>
                 </a>
+                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'head', 'member', 'candidate'])): ?>
+                <a href="<?php echo asset('pages/members/directory.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                    <i class="fas fa-users w-5"></i>
+                    <span>Mitglieder</span>
+                </a>
+                <?php endif; ?>
                 <a href="<?php echo asset('pages/projects/index.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
                     <i class="fas fa-briefcase w-5"></i>
                     <span>Projekte</span>
