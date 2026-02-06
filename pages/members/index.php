@@ -130,7 +130,7 @@ ob_start();
             <p class="text-gray-500">Bitte Suchfilter anpassen</p>
         </div>
     <?php else: ?>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
             <?php foreach ($members as $member): ?>
                 <?php
                 // Determine role badge color
@@ -201,22 +201,29 @@ ob_start();
                     }
                 }
                 ?>
-                <div class="card p-6 hover:shadow-xl transition-shadow flex flex-col" style="min-height: 420px;">
+                <div class="card p-6 hover:shadow-xl transition-shadow flex flex-col h-full relative">
+                    <!-- Role Badge: Different colors for each role - Top Right Corner -->
+                    <div class="absolute top-4 right-4">
+                        <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full border <?php echo $badgeClass; ?>">
+                            <?php echo htmlspecialchars($roleName); ?>
+                        </span>
+                    </div>
+                    
                     <!-- Profile Image (Circle, top center) -->
-                    <div class="flex justify-center mb-4">
+                    <div class="flex justify-center mb-4 mt-2">
                         <?php if ($showPlaceholder): ?>
-                            <!-- Placeholder with initials -->
-                            <div class="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 text-3xl font-bold shadow-lg">
+                            <!-- Placeholder with initials - Colored background -->
+                            <div class="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-3xl font-bold shadow-lg">
                                 <?php echo htmlspecialchars($initials); ?>
                             </div>
                         <?php else: ?>
                             <!-- Image with fallback to placeholder on error -->
-                            <div class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-3xl font-bold overflow-hidden shadow-lg">
+                            <div class="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-3xl font-bold overflow-hidden shadow-lg">
                                 <img 
                                     src="<?php echo htmlspecialchars($imagePath); ?>" 
                                     alt="<?php echo htmlspecialchars($member['first_name'] . ' ' . $member['last_name']); ?>"
                                     class="w-full h-full object-cover"
-                                    onerror="this.style.display='none'; this.parentElement.classList.remove('from-blue-400', 'to-blue-600'); this.parentElement.classList.add('bg-gray-300', 'text-gray-700'); this.nextElementSibling.style.display='flex';"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                                 >
                                 <div style="display:none;" class="w-full h-full flex items-center justify-center text-3xl">
                                     <?php echo htmlspecialchars($initials); ?>
@@ -230,16 +237,9 @@ ob_start();
                         <?php echo htmlspecialchars($member['first_name'] . ' ' . $member['last_name']); ?>
                     </h3>
                     
-                    <!-- Role Badge: Different colors for each role -->
-                    <div class="flex justify-center mb-3">
-                        <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full border <?php echo $badgeClass; ?>">
-                            <?php echo htmlspecialchars($roleName); ?>
-                        </span>
-                    </div>
-                    
                     <!-- Info Snippet: 'Position' or 'Studium + Degree' or 'Mitglied' -->
                     <div class="text-center mb-4 flex-grow flex items-center justify-center" style="min-height: 3rem;">
-                        <p class="text-sm text-gray-600">
+                        <p class="text-sm <?php echo ($infoSnippet === 'Mitglied') ? 'text-gray-500' : 'text-gray-600'; ?>">
                             <i class="fas fa-briefcase mr-1 text-gray-400"></i>
                             <?php echo htmlspecialchars($infoSnippet); ?>
                         </p>
