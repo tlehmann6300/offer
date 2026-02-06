@@ -54,7 +54,7 @@ ALTER TABLE invitation_tokens
 MODIFY COLUMN role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate') 
 NOT NULL DEFAULT 'member';
 
--- 3. Fix inventory table - add image_path if missing
+-- 3. Add image_path column to inventory table if missing
 -- For inventory_items table:
 ALTER TABLE inventory_items ADD COLUMN image_path VARCHAR(255) DEFAULT NULL;
 
@@ -196,5 +196,6 @@ If you encounter issues:
 
 ## References
 
-- Problem Statement: Fix 'Column not found' error for image_path
+- Purpose: Fix 'Column not found' error for image_path column
 - Role System: Added candidate role for probationary membership tracking
+- Simplifies role structure to 6 core roles for easier management
