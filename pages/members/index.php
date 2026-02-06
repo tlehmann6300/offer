@@ -162,7 +162,12 @@ ob_start();
                 if (!empty($member['image_path'])) {
                     // Build the full file path for checking existence
                     $fullImagePath = __DIR__ . '/../../' . ltrim($member['image_path'], '/');
-                    if (file_exists($fullImagePath) && is_file($fullImagePath)) {
+                    $realPath = realpath($fullImagePath);
+                    $basePath = realpath(__DIR__ . '/../../');
+                    
+                    // Security: Verify the resolved path is within the base directory
+                    if ($realPath !== false && $basePath !== false && 
+                        strpos($realPath, $basePath) === 0 && is_file($realPath)) {
                         $imagePath = asset($member['image_path']);
                         $showPlaceholder = false;
                     }

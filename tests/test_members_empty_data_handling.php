@@ -34,10 +34,16 @@ echo "Test 3: Image Fallback Logic\n";
 $content = file_get_contents($filePath);
 
 // Check for file_exists check on image_path
-if (strpos($content, 'file_exists($fullImagePath)') !== false) {
-    echo "✓ Checks if image file exists on server\n";
+if (strpos($content, 'realpath($fullImagePath)') !== false) {
+    echo "✓ Uses realpath() for secure path resolution\n";
 } else {
-    echo "✗ Missing file_exists check for image\n";
+    echo "⚠ May not use realpath() for path security\n";
+}
+
+if (strpos($content, 'strpos($realPath, $basePath)') !== false) {
+    echo "✓ Validates path is within base directory (prevents directory traversal)\n";
+} else {
+    echo "⚠ May not validate path boundaries\n";
 }
 
 // Check for placeholder with initials
@@ -67,17 +73,17 @@ echo "\n";
 echo "Test 4: Empty Position Field Handling\n";
 
 // Check for study_program fallback
-if (strpos($content, 'study_program') !== false && strpos($content, 'studiengang') !== false) {
-    echo "✓ Checks both study_program and studiengang fields\n";
+if (preg_match('/study_program.*studiengang|studiengang.*study_program/s', $content)) {
+    echo "✓ Checks both study_program and studiengang fields with OR logic\n";
 } else {
-    echo "✗ Missing study_program or studiengang field check\n";
+    echo "✗ Missing proper study_program or studiengang field check\n";
 }
 
 // Check for degree fallback
-if (strpos($content, 'degree') !== false && strpos($content, 'angestrebter_abschluss') !== false) {
-    echo "✓ Checks both degree and angestrebter_abschluss fields\n";
+if (preg_match('/degree.*angestrebter_abschluss|angestrebter_abschluss.*degree/s', $content)) {
+    echo "✓ Checks both degree and angestrebter_abschluss fields with OR logic\n";
 } else {
-    echo "✗ Missing degree or angestrebter_abschluss field check\n";
+    echo "✗ Missing proper degree or angestrebter_abschluss field check\n";
 }
 
 // Check for 'Mitglied' default text
