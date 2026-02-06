@@ -35,36 +35,37 @@ CREATE TABLE IF NOT EXISTS locations (
 -- Inventory table
 CREATE TABLE IF NOT EXISTS inventory (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    easyverein_id INT UNSIGNED NOT NULL UNIQUE,
+    easyverein_id INT UNSIGNED NULL UNIQUE COMMENT 'Unique ID from easyVerein sync',
     name VARCHAR(255) NOT NULL,
     description TEXT DEFAULT NULL,
     serial_number VARCHAR(100) DEFAULT NULL,
     category_id INT UNSIGNED DEFAULT NULL,
-    location_id INT UNSIGNED DEFAULT NULL,
-    location VARCHAR(255) DEFAULT NULL,
+    location_id INT UNSIGNED DEFAULT NULL COMMENT 'Reference to locations table',
+    location VARCHAR(255) DEFAULT NULL COMMENT 'Text location from easyVerein or manual entry',
     status ENUM('available', 'in_use', 'maintenance', 'retired') NOT NULL DEFAULT 'available',
     current_stock INT NOT NULL DEFAULT 0,
     min_stock INT NOT NULL DEFAULT 0,
     unit VARCHAR(50) DEFAULT 'Stück',
     unit_price DECIMAL(10, 2) DEFAULT 0.00,
     purchase_date DATE DEFAULT NULL,
-    acquisition_date DATE DEFAULT NULL,
-    value DECIMAL(10, 2) DEFAULT 0.00,
+    acquisition_date DATE DEFAULT NULL COMMENT 'Acquisition date from easyVerein',
+    value DECIMAL(10, 2) DEFAULT 0.00 COMMENT 'Item value from easyVerein',
     image_path VARCHAR(255) DEFAULT NULL,
     notes TEXT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    last_synced_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_synced_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Last sync with easyVerein',
     is_archived_in_easyverein BOOLEAN NOT NULL DEFAULT 0,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
     FOREIGN KEY (location_id) REFERENCES locations(id) ON DELETE SET NULL,
-    UNIQUE INDEX idx_easyverein_id (easyverein_id),
+    INDEX idx_easyverein_id (easyverein_id),
     INDEX idx_category (category_id),
     INDEX idx_location (location_id),
     INDEX idx_serial_number (serial_number)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_unicode_ci;
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Inventory with easyVerein integration support';
 
 -- Inventory history (audit log)
 CREATE TABLE IF NOT EXISTS inventory_history (

@@ -110,16 +110,19 @@ try {
             if (strpos($easyvereinIdColumn['Type'], 'varchar') !== false) {
                 echo "  - Converting easyverein_id from VARCHAR to INT UNSIGNED...\n";
                 
-                // First, remove the UNIQUE constraint if it exists
-                $contentDB->exec("ALTER TABLE inventory DROP INDEX idx_easyverein_id");
+                // First, check and remove the UNIQUE index if it exists
+                $stmt = $contentDB->query("SHOW INDEX FROM inventory WHERE Key_name = 'idx_easyverein_id'");
+                if ($stmt->fetch()) {
+                    $contentDB->exec("ALTER TABLE inventory DROP INDEX idx_easyverein_id");
+                }
                 
-                // Change column type
+                // Change column type (make it nullable first to avoid issues with existing data)
                 $contentDB->exec("
                     ALTER TABLE inventory 
-                    MODIFY COLUMN easyverein_id INT UNSIGNED NOT NULL
+                    MODIFY COLUMN easyverein_id INT UNSIGNED NULL
                 ");
                 
-                // Re-add UNIQUE index
+                // Re-add UNIQUE constraint (which automatically creates an index)
                 $contentDB->exec("
                     ALTER TABLE inventory 
                     ADD UNIQUE INDEX idx_easyverein_id (easyverein_id)
@@ -131,8 +134,7 @@ try {
             echo "  - Adding easyverein_id column...\n";
             $contentDB->exec("
                 ALTER TABLE inventory 
-                ADD COLUMN easyverein_id INT UNSIGNED NOT NULL UNIQUE AFTER id,
-                ADD INDEX idx_easyverein_id (easyverein_id)
+                ADD COLUMN easyverein_id INT UNSIGNED NULL UNIQUE AFTER id
             ");
             echo "    ✓ Added easyverein_id column\n";
         }
