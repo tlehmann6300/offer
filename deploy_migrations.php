@@ -19,6 +19,7 @@ $scripts = [
     'fix_event_image.php',
     'migrate_projects.php',
     'sql/migrate_add_event_fields.php',
+    'sql/migrate_add_candidate_role_fix_inventory.php',
     'verify_db_schema.php'
 ];
 
