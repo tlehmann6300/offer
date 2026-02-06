@@ -41,7 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (in_array($userRole, ['candidate', 'member', 'board', 'head'])) {
                 // Fields for students (candidates, members, board, and heads)
                 $profileData['studiengang'] = trim($_POST['studiengang'] ?? '');
-                $profileData['study_program'] = trim($_POST['studiengang'] ?? ''); // Alias for compatibility
+                // study_program: Database column alias for legacy schema compatibility
+                $profileData['study_program'] = trim($_POST['studiengang'] ?? '');
                 $profileData['semester'] = trim($_POST['semester'] ?? '');
                 $profileData['angestrebter_abschluss'] = trim($_POST['angestrebter_abschluss'] ?? '');
                 // Note: Arbeitgeber (company) fields are optional/hidden for students
