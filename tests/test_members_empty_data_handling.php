@@ -46,11 +46,17 @@ if (strpos($content, 'strpos($realPath, $basePath)') !== false) {
     echo "⚠ May not validate path boundaries\n";
 }
 
-// Check for placeholder with initials
-if (strpos($content, 'bg-gray-300') !== false) {
-    echo "✓ Uses bg-gray-300 for placeholder background\n";
+// Check for placeholder with initials - Now uses purple background
+if (strpos($content, 'bg-purple-100') !== false) {
+    echo "✓ Uses bg-purple-100 for placeholder background\n";
 } else {
-    echo "✗ Missing bg-gray-300 for placeholder\n";
+    echo "✗ Missing bg-purple-100 for placeholder\n";
+}
+
+if (strpos($content, 'text-purple-600') !== false) {
+    echo "✓ Uses text-purple-600 for placeholder text\n";
+} else {
+    echo "✗ Missing text-purple-600 for placeholder text\n";
 }
 
 // Check for $showPlaceholder variable
@@ -105,11 +111,11 @@ if (strpos($content, 'flex flex-col') !== false) {
     echo "✗ Missing flexbox column layout\n";
 }
 
-// Check for min-height on cards
-if (preg_match('/min-height.*\d+px|min-h-\[/', $content)) {
-    echo "✓ Sets minimum height for consistent card sizing\n";
+// Check for h-full on cards (replaces min-height)
+if (strpos($content, 'h-full') !== false) {
+    echo "✓ Uses h-full for consistent card sizing\n";
 } else {
-    echo "✗ Missing minimum height for cards\n";
+    echo "✗ Missing h-full for cards\n";
 }
 
 // Check for flex-grow on content area
@@ -124,25 +130,48 @@ echo "\n";
 // Test 6: Image Onerror Fallback
 echo "Test 6: Image Onerror Fallback\n";
 
-// Check for onerror handler that switches to gray background
-if (strpos($content, 'onerror') !== false && strpos($content, 'bg-gray-300') !== false) {
-    echo "✓ Has onerror handler with gray background fallback\n";
+// Check for onerror handler with purple background fallback
+if (strpos($content, 'onerror') !== false && strpos($content, 'bg-purple-100') !== false) {
+    echo "✓ Has onerror handler with purple background fallback\n";
 } else {
     echo "✗ Missing comprehensive onerror handler\n";
 }
 
-// Check if it removes blue gradient classes on error
-if (strpos($content, "classList.remove('from-blue-400'") !== false || 
-    strpos($content, "classList.remove('to-blue-600'") !== false) {
-    echo "✓ Removes blue gradient classes on image error\n";
+echo "\n";
+
+// Test 7: Role Badge Position
+echo "Test 7: Role Badge Position\n";
+
+// Check if badge is positioned absolutely at top-right
+if (strpos($content, 'absolute') !== false && strpos($content, 'top-4 right-4') !== false) {
+    echo "✓ Badge is positioned at top-right corner using absolute positioning\n";
 } else {
-    echo "⚠ May not remove blue gradient classes on error\n";
+    echo "✗ Missing absolute positioning for badge at top-right\n";
 }
 
 echo "\n";
 
-// Test 7: Code Structure
-echo "Test 7: Code Structure\n";
+// Test 8: Grid Layout with h-full
+echo "Test 8: Grid Layout with h-full\n";
+
+// Check for h-full on cards
+if (strpos($content, 'h-full') !== false) {
+    echo "✓ Uses h-full for consistent card heights\n";
+} else {
+    echo "✗ Missing h-full for card consistency\n";
+}
+
+// Check for items-stretch on grid
+if (strpos($content, 'items-stretch') !== false) {
+    echo "✓ Grid uses items-stretch for equal height cards\n";
+} else {
+    echo "✗ Missing items-stretch on grid\n";
+}
+
+echo "\n";
+
+// Test 9: Code Structure
+echo "Test 9: Code Structure\n";
 
 // Check that info snippet is always set
 if (preg_match('/\$infoSnippet\s*=.*position|position.*\$infoSnippet/s', $content)) {
@@ -165,10 +194,11 @@ echo "=== Test Summary ===\n";
 echo "✓ Enhanced empty data handling implemented!\n";
 echo "The members index page now includes:\n";
 echo "  - Server-side file existence check for images\n";
-echo "  - Gray placeholder (bg-gray-300) with initials for missing images\n";
+echo "  - Purple placeholder (bg-purple-100 text-purple-600) with initials for missing images\n";
 echo "  - Fallback to study_program + degree when position is empty\n";
-echo "  - 'Mitglied' default text when all fields are empty\n";
-echo "  - Consistent card heights using flexbox\n";
+echo "  - 'Mitglied' default text when all fields are empty (displayed in gray)\n";
+echo "  - Consistent card heights using h-full and items-stretch\n";
 echo "  - Client-side image error handling\n";
+echo "  - Role badge positioned at top-right corner\n";
 
 echo "\nTest suite completed.\n";
