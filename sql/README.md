@@ -78,6 +78,39 @@ The script prints status messages for each operation and completes with:
 ### `migrate_add_candidate_role_fix_inventory.php`
 Legacy migration script for adding candidate role and fixing inventory table structure.
 
+### `migrate_features_v2.php`
+Migration script to add new features for security, notifications, and project types.
+
+**Changes Made:**
+1. **Security Features** (users table):
+   - `failed_login_attempts` (INT, default 0): Track failed login attempts
+   - `locked_until` (DATETIME, nullable): Temporary account lock timestamp
+   - `is_locked_permanently` (BOOLEAN, default 0): Permanent lock flag
+
+2. **Notification Preferences** (users table):
+   - `notify_new_projects` (BOOLEAN, default 1): Enable project notifications by default
+   - `notify_new_events` (BOOLEAN, default 0): Disable event notifications by default
+
+3. **Project Types** (projects table):
+   - `type` (ENUM('internal', 'external'), default 'internal'): Project type classification
+
+**Usage:**
+```bash
+php sql/migrate_features_v2.php
+```
+
+**Testing:**
+```bash
+php tests/test_features_v2_migration.php
+```
+
+**Features:**
+- Idempotent: Can be run multiple times safely
+- Uses `Database::getUserDB()` for user table updates
+- Uses `Database::getContentDB()` for project table updates
+- Checks before making changes to avoid errors
+- Clear status messages for each operation
+
 ### `remove_old_migrations.php`
 Utility script for cleaning up obsolete migration artifacts.
 
