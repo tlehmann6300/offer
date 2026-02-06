@@ -44,6 +44,12 @@ CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
 $email = trim($_POST['email'] ?? '');
 $role = $_POST['role'] ?? 'member';
 $sendMail = isset($_POST['send_mail']) && $_POST['send_mail'] == '1';
+$validityHours = isset($_POST['validity_hours']) ? intval($_POST['validity_hours']) : 168; // Default 7 days (168 hours)
+
+// Validate validity_hours (must be a positive integer)
+if ($validityHours <= 0) {
+    $validityHours = 168; // Default to 7 days if invalid
+}
 
 // Validate input
 if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -86,7 +92,7 @@ if ($stmt->fetch()) {
 }
 
 // Generate invitation token
-$token = AuthHandler::generateInvitationToken($email, $role, $_SESSION['user_id']);
+$token = AuthHandler::generateInvitationToken($email, $role, $_SESSION['user_id'], $validityHours);
 
 // Build invitation link
 $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
@@ -95,6 +101,20 @@ $invitationLink = $protocol . '://' . $host . '/pages/auth/register.php?token=' 
 
     // Check if we should send email
     if ($sendMail) {
+        // Check if vendor is available
+        if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+            error_log('PHPMailer class not found. Composer vendor may be missing.');
+            echo json_encode([
+                'success' => true,
+                'message' => 'Link generiert, aber E-Mail konnte nicht versendet werden (PHPMailer nicht verfügbar).',
+                'link' => $invitationLink,
+                'email' => $email,
+                'role' => $role,
+                'mail_error' => 'PHPMailer not available'
+            ]);
+            exit;
+        }
+        
         // Send invitation email
         $mailSent = MailService::sendInvitation($email, $token, $role);
         
@@ -108,13 +128,28 @@ $invitationLink = $protocol . '://' . $host . '/pages/auth/register.php?token=' 
                 'link' => $invitationLink
             ]);
         } else {
+            // Email failed, get error details from error log
+            $errorDetails = 'Unknown error';
+            
+            // Check common issues
+            if (!defined('SMTP_HOST') || empty(SMTP_HOST)) {
+                $errorDetails = 'SMTP configuration missing (SMTP_HOST not defined)';
+            } elseif (!defined('SMTP_USERNAME') || empty(SMTP_USERNAME)) {
+                $errorDetails = 'SMTP configuration missing (SMTP_USERNAME not defined)';
+            } elseif (!defined('SMTP_PASSWORD') || empty(SMTP_PASSWORD)) {
+                $errorDetails = 'SMTP configuration missing (SMTP_PASSWORD not defined)';
+            }
+            
+            error_log("Mail sending failed for invitation to $email. Error: $errorDetails");
+            
             // Email failed, but still return link
             echo json_encode([
                 'success' => true,
-                'message' => 'Link generiert, aber E-Mail konnte nicht versendet werden.',
+                'message' => 'Link generiert, aber E-Mail konnte nicht versendet werden. Bitte überprüfen Sie die SMTP-Konfiguration.',
                 'link' => $invitationLink,
                 'email' => $email,
-                'role' => $role
+                'role' => $role,
+                'mail_error' => $errorDetails
             ]);
         }
     } else {
