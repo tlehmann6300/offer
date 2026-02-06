@@ -6,7 +6,8 @@
  * This script should be scheduled to run every 30 minutes.
  * 
  * Crontab example:
- * */30 * * * * /usr/bin/php /path/to/cron/sync_easyverein.php >> /path/to/logs/easyverein_sync.log 2>&1
+ * star-slash-30 * * * * /usr/bin/php /path/to/cron/sync_easyverein.php >> /path/to/logs/easyverein_sync.log 2>&1
+ * (Replace "star-slash" with the actual cron syntax: asterisk followed by forward slash)
  * 
  * Usage: php cron/sync_easyverein.php
  */
