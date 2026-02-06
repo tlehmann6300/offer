@@ -118,10 +118,14 @@ class Auth {
             return ['success' => false, 'message' => 'Ungültige Anmeldedaten'];
         }
         
-        // Check if account is locked
+        // Check if account is permanently locked
+        if (isset($user['is_locked_permanently']) && $user['is_locked_permanently']) {
+            return ['success' => false, 'message' => 'Account gesperrt. Bitte Admin kontaktieren.'];
+        }
+        
+        // Check if account is temporarily locked
         if ($user['locked_until'] && strtotime($user['locked_until']) > time()) {
-            $remainingTime = ceil((strtotime($user['locked_until']) - time()) / 60);
-            return ['success' => false, 'message' => "Konto gesperrt. Versuchen Sie es in $remainingTime Minuten erneut."];
+            return ['success' => false, 'message' => 'Zu viele Versuche. Wartezeit läuft.'];
         }
         
         // Verify password
@@ -129,14 +133,21 @@ class Auth {
             // Increment failed attempts
             $failedAttempts = ($user['failed_login_attempts'] ?? 0) + 1;
             $lockedUntil = null;
+            $isPermanentlyLocked = 0;
             
-            // Lock account after 5 failed attempts
-            if ($failedAttempts >= 5) {
-                $lockedUntil = date('Y-m-d H:i:s', time() + (15 * 60)); // Lock for 15 minutes
+            // Lock account for 30 minutes after 5 failed attempts
+            if ($failedAttempts == 5) {
+                $lockedUntil = date('Y-m-d H:i:s', time() + (30 * 60)); // Lock for 30 minutes
             }
             
-            $stmt = $db->prepare("UPDATE users SET failed_login_attempts = ?, locked_until = ? WHERE id = ?");
-            $stmt->execute([$failedAttempts, $lockedUntil, $user['id']]);
+            // Permanently lock account after 8 failed attempts
+            if ($failedAttempts >= 8) {
+                $isPermanentlyLocked = 1;
+                $lockedUntil = null; // Clear temporary lock when applying permanent lock
+            }
+            
+            $stmt = $db->prepare("UPDATE users SET failed_login_attempts = ?, locked_until = ?, is_locked_permanently = ? WHERE id = ?");
+            $stmt->execute([$failedAttempts, $lockedUntil, $isPermanentlyLocked, $user['id']]);
             
             return ['success' => false, 'message' => 'Ungültige Anmeldedaten'];
         }
@@ -177,6 +188,13 @@ class Auth {
         $_SESSION['user_role'] = $user['role'];
         $_SESSION['authenticated'] = true;
         $_SESSION['last_activity'] = time();
+        
+        // Set 2FA nudge if 2FA is not enabled
+        // Note: This is only reached after full authentication (including 2FA if enabled)
+        // Users with 2FA enabled would have returned earlier if they hadn't provided the code
+        if (!$user['tfa_enabled']) {
+            $_SESSION['show_2fa_nudge'] = true;
+        }
         
         return ['success' => true, 'user' => $user];
     }

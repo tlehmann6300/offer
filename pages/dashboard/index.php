@@ -34,6 +34,64 @@ $title = 'Dashboard - IBC Intranet';
 ob_start();
 ?>
 
+<?php if (isset($_SESSION['show_2fa_nudge']) && $_SESSION['show_2fa_nudge']): ?>
+<!-- 2FA Nudge Modal -->
+<div id="tfa-nudge-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden transform transition-all">
+        <!-- Modal Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-green-600 px-6 py-4">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Sicherheitshinweis</h3>
+            </div>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="px-6 py-6">
+            <p class="text-gray-700 text-lg mb-2 font-semibold">
+                Erhöhen Sie Ihre Sicherheit!
+            </p>
+            <p class="text-gray-600 mb-6">
+                Aktivieren Sie jetzt die 2-Faktor-Authentifizierung für zusätzlichen Schutz Ihres Kontos.
+            </p>
+            
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-blue-600 mt-1 mr-3"></i>
+                    <p class="text-sm text-gray-700">
+                        Die 2-Faktor-Authentifizierung macht Ihr Konto deutlich sicherer, indem bei der Anmeldung ein zusätzlicher Code erforderlich ist.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 bg-gray-50 flex flex-col sm:flex-row gap-3">
+            <a href="../auth/profile.php" class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-shield-alt mr-2"></i>
+                Jetzt einrichten
+            </a>
+            <button onclick="dismissTfaNudge()" class="flex-1 px-6 py-3 bg-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-400 transition-all duration-300">
+                Später
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Dismiss modal - Note: Session variable is already unset on page load (line 89)
+// so the modal won't reappear in this session even if user navigates back to dashboard
+function dismissTfaNudge() {
+    document.getElementById('tfa-nudge-modal').style.display = 'none';
+}
+</script>
+<?php 
+    unset($_SESSION['show_2fa_nudge']);
+endif; 
+?>
+
 <?php if (!empty($securityWarning)): ?>
 <?php echo $securityWarning; ?>
 <?php endif; ?>
