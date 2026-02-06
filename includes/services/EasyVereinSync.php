@@ -22,10 +22,6 @@ class EasyVereinSync {
         // Hardcoded token as per requirements
         $apiToken = '0277d541c6bb7044e901a8a985ea74a9894df724';
         
-        if (empty($apiToken)) {
-            throw new Exception('EasyVerein API token is not configured');
-        }
-        
         try {
             // Initialize cURL
             $ch = curl_init();
