@@ -69,6 +69,19 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
                     <option value="admin">Administrator</option>
                 </select>
             </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Token Validity</label>
+                <select 
+                    id="validityHours" 
+                    name="validity_hours" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                    <option value="24">24 Hours</option>
+                    <option value="48">48 Hours</option>
+                    <option value="168" selected>7 Days</option>
+                </select>
+            </div>
         </div>
         
         <!-- Email Send Option -->

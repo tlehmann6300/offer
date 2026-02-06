@@ -240,15 +240,15 @@ class AuthHandler {
     /**
      * Generate invitation token
      */
-    public static function generateInvitationToken($email, $role, $createdBy) {
+    public static function generateInvitationToken($email, $role, $createdBy, $validityHours = 168) {
         $db = Database::getUserDB();
         $token = bin2hex(random_bytes(32));
-        $expiresAt = date('Y-m-d H:i:s', time() + (7 * 24 * 60 * 60)); // 7 days
+        $expiresAt = date('Y-m-d H:i:s', time() + ($validityHours * 60 * 60)); // Use provided validity hours
         
         $stmt = $db->prepare("INSERT INTO invitation_tokens (token, email, role, created_by, expires_at) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([$token, $email, $role, $createdBy, $expiresAt]);
         
-        self::logSystemAction($createdBy, 'invitation_created', 'invitation', $db->lastInsertId(), "Invitation sent to $email");
+        self::logSystemAction($createdBy, 'invitation_created', 'invitation', $db->lastInsertId(), "Invitation sent to $email with validity of $validityHours hours");
         
         return $token;
     }

@@ -18,11 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['invite_user'])) {
         $email = $_POST['email'] ?? '';
         $role = $_POST['role'] ?? 'member';
+        $validityHours = isset($_POST['validity_hours']) ? intval($_POST['validity_hours']) : 168; // Default 7 days
         
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $error = 'Ungültige E-Mail-Adresse';
         } else {
-            $token = Auth::generateInvitationToken($email, $role, $_SESSION['user_id']);
+            $token = Auth::generateInvitationToken($email, $role, $_SESSION['user_id'], $validityHours);
             $inviteLink = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/pages/auth/register.php?token=' . $token;
             $message = 'Einladung erstellt! Link: ' . $inviteLink;
         }
@@ -117,7 +118,7 @@ ob_start();
             <i class="fas fa-user-plus text-green-600 mr-2"></i>
             Neuen Benutzer einladen
         </h2>
-        <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <form method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">E-Mail</label>
                 <input 
@@ -140,6 +141,17 @@ ob_start();
                     <option value="alumni_board">Alumni-Vorstand</option>
                     <option value="board">Vorstand</option>
                     <option value="admin">Administrator</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Token Validity</label>
+                <select 
+                    name="validity_hours" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                    <option value="24">24 Hours</option>
+                    <option value="48">48 Hours</option>
+                    <option value="168" selected>7 Days</option>
                 </select>
             </div>
             <div class="flex items-end">
