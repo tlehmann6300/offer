@@ -4,7 +4,8 @@
  * 
  * This migration:
  * 1. Adds 'candidate' role to users and invitation_tokens tables
- * 2. Fixes inventory table structure to match easyVerein integration requirements
+ * 2. Updates role ENUM to: admin, board, head, member, alumni, candidate
+ * 3. Fixes inventory/inventory_items table to ensure image_path column exists
  */
 
 require_once __DIR__ . '/../includes/database.php';
@@ -30,7 +31,7 @@ try {
         echo "Adding 'candidate' role to users table...\n";
         $userDB->exec("
             ALTER TABLE users 
-            MODIFY COLUMN role ENUM('admin', 'board', 'alumni_board', 'manager', 'member', 'alumni', 'candidate') 
+            MODIFY COLUMN role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate') 
             NOT NULL DEFAULT 'member'
         ");
         echo "✓ Successfully added 'candidate' role to users table\n";
@@ -46,7 +47,7 @@ try {
         echo "Adding 'candidate' role to invitation_tokens table...\n";
         $userDB->exec("
             ALTER TABLE invitation_tokens 
-            MODIFY COLUMN role ENUM('admin', 'board', 'alumni_board', 'manager', 'member', 'alumni', 'candidate') 
+            MODIFY COLUMN role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate') 
             NOT NULL DEFAULT 'member'
         ");
         echo "✓ Successfully added 'candidate' role to invitation_tokens table\n";
@@ -65,12 +66,25 @@ try {
     
     $contentDB = Database::getContentDB();
     
-    // Check if inventory table exists
+    // Check which inventory table exists (inventory or inventory_items)
     $stmt = $contentDB->query("SHOW TABLES LIKE 'inventory'");
     $inventoryExists = $stmt->fetch() !== false;
     
-    if (!$inventoryExists) {
-        echo "Creating new inventory table with correct structure...\n";
+    $stmt = $contentDB->query("SHOW TABLES LIKE 'inventory_items'");
+    $inventoryItemsExists = $stmt->fetch() !== false;
+    
+    $tableToFix = null;
+    if ($inventoryItemsExists) {
+        $tableToFix = 'inventory_items';
+        echo "Found 'inventory_items' table (full schema)\n";
+    } elseif ($inventoryExists) {
+        $tableToFix = 'inventory';
+        echo "Found 'inventory' table (modern schema)\n";
+    }
+    
+    if (!$tableToFix) {
+        echo "⚠ Warning: Neither 'inventory' nor 'inventory_items' table found\n";
+        echo "  Creating 'inventory' table with correct structure...\n";
         $contentDB->exec("
             CREATE TABLE inventory (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -88,112 +102,29 @@ try {
         ");
         echo "✓ Successfully created inventory table\n";
     } else {
-        echo "Inventory table exists, checking and updating structure...\n";
+        // Validate table name to prevent SQL injection
+        if (!in_array($tableToFix, ['inventory', 'inventory_items'], true)) {
+            throw new Exception("Invalid table name: {$tableToFix}");
+        }
+        
+        echo "Checking and updating {$tableToFix} table structure...\n";
         
         // Get current columns
-        $stmt = $contentDB->query("SHOW COLUMNS FROM inventory");
+        $stmt = $contentDB->query("SHOW COLUMNS FROM {$tableToFix}");
         $columns = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $columnNames = array_column($columns, 'Field');
         
-        // Check easyverein_id column type
-        $easyvereinIdColumn = null;
-        foreach ($columns as $col) {
-            if ($col['Field'] === 'easyverein_id') {
-                $easyvereinIdColumn = $col;
-                break;
-            }
-        }
-        
-        // Fix easyverein_id column if needed
-        if ($easyvereinIdColumn) {
-            // Check if it's VARCHAR instead of INT UNSIGNED
-            if (strpos($easyvereinIdColumn['Type'], 'varchar') !== false) {
-                echo "  - Converting easyverein_id from VARCHAR to INT UNSIGNED...\n";
-                
-                // First, check and remove the UNIQUE index if it exists
-                $stmt = $contentDB->query("SHOW INDEX FROM inventory WHERE Key_name = 'idx_easyverein_id'");
-                if ($stmt->fetch()) {
-                    $contentDB->exec("ALTER TABLE inventory DROP INDEX idx_easyverein_id");
-                }
-                
-                // Change column type (make it nullable first to avoid issues with existing data)
-                $contentDB->exec("
-                    ALTER TABLE inventory 
-                    MODIFY COLUMN easyverein_id INT UNSIGNED NULL
-                ");
-                
-                // Re-add UNIQUE constraint (which automatically creates an index)
-                $contentDB->exec("
-                    ALTER TABLE inventory 
-                    ADD UNIQUE INDEX idx_easyverein_id (easyverein_id)
-                ");
-                
-                echo "    ✓ Successfully converted easyverein_id column\n";
-            }
+        // Check if image_path column exists
+        if (!in_array('image_path', $columnNames)) {
+            echo "  - Adding missing column: image_path...\n";
+            // Safe to use $tableToFix here as it's validated above
+            $contentDB->exec("ALTER TABLE {$tableToFix} ADD COLUMN image_path VARCHAR(255) DEFAULT NULL");
+            echo "    ✓ Added image_path column\n";
         } else {
-            echo "  - Adding easyverein_id column...\n";
-            $contentDB->exec("
-                ALTER TABLE inventory 
-                ADD COLUMN easyverein_id INT UNSIGNED NULL UNIQUE AFTER id
-            ");
-            echo "    ✓ Added easyverein_id column\n";
+            echo "  - Column image_path already exists\n";
         }
         
-        // Check and add missing columns
-        $requiredColumns = [
-            'image_path' => "ALTER TABLE inventory ADD COLUMN image_path VARCHAR(255) DEFAULT NULL",
-            'acquisition_date' => "ALTER TABLE inventory ADD COLUMN acquisition_date DATE DEFAULT NULL",
-            'value' => "ALTER TABLE inventory ADD COLUMN value DECIMAL(10, 2) DEFAULT 0.00",
-            'last_synced_at' => "ALTER TABLE inventory ADD COLUMN last_synced_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
-        ];
-        
-        foreach ($requiredColumns as $columnName => $alterSQL) {
-            if (!in_array($columnName, $columnNames)) {
-                echo "  - Adding missing column: {$columnName}...\n";
-                $contentDB->exec($alterSQL);
-                echo "    ✓ Added {$columnName} column\n";
-            } else {
-                echo "  - Column {$columnName} already exists\n";
-            }
-        }
-        
-        // Update name column length if needed
-        $nameColumn = null;
-        foreach ($columns as $col) {
-            if ($col['Field'] === 'name') {
-                $nameColumn = $col;
-                break;
-            }
-        }
-        
-        if ($nameColumn && strpos($nameColumn['Type'], 'varchar(100)') !== false) {
-            echo "  - Updating name column length to VARCHAR(255)...\n";
-            $contentDB->exec("
-                ALTER TABLE inventory 
-                MODIFY COLUMN name VARCHAR(255) NOT NULL
-            ");
-            echo "    ✓ Updated name column length\n";
-        }
-        
-        // Update location to VARCHAR(255) if it's a foreign key reference
-        $locationColumn = null;
-        foreach ($columns as $col) {
-            if ($col['Field'] === 'location') {
-                $locationColumn = $col;
-                break;
-            }
-        }
-        
-        if ($locationColumn === null) {
-            echo "  - Adding location column...\n";
-            $contentDB->exec("
-                ALTER TABLE inventory 
-                ADD COLUMN location VARCHAR(255) DEFAULT NULL
-            ");
-            echo "    ✓ Added location column\n";
-        }
-        
-        echo "✓ Inventory table structure updated successfully\n";
+        echo "✓ {$tableToFix} table structure updated successfully\n";
     }
     
     echo "\n";
@@ -203,8 +134,12 @@ try {
     echo "Summary:\n";
     echo "  - Added 'candidate' role to users table\n";
     echo "  - Added 'candidate' role to invitation_tokens table\n";
-    echo "  - Fixed inventory table structure for easyVerein integration\n";
-    echo "  - Ensured all required columns exist\n";
+    if ($tableToFix) {
+        echo "  - Fixed {$tableToFix} table structure\n";
+        echo "  - Ensured image_path column exists\n";
+    } else {
+        echo "  - Created inventory table with correct structure\n";
+    }
     
 } catch (Exception $e) {
     echo "\n";
