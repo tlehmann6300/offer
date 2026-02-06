@@ -49,9 +49,39 @@ Original user database schema with additional features (2FA, sessions, invitatio
 ### `content_database_schema.sql`
 Original content database schema with core tables.
 
-## Migration Files
+## Migration Scripts
 
-The `migrations/` directory contains incremental database changes for existing installations.
+### `fix_schema_and_roles.php`
+Migration script to finalize the database schema with the following fixes:
+
+1. **Inventory Fix**: Checks if `inventory_items` table has `image_path` column and adds it if missing
+2. **Role Fix**: Modifies the `users` table role ENUM to include 'candidate'
+3. **Invitation Validity**: Checks if `user_invitations` table has `expires_at` (DATETIME) column and adds it if missing
+
+**Usage:**
+```bash
+php sql/fix_schema_and_roles.php
+```
+
+**Output:**
+The script prints status messages for each operation and completes with:
+```
+✅ Database Schema fixed and Roles updated
+```
+
+**Features:**
+- Idempotent: Can be run multiple times safely
+- Checks before making changes to avoid errors
+- Clear status messages for each operation
+- Handles missing tables gracefully
+
+### `migrate_add_candidate_role_fix_inventory.php`
+Legacy migration script for adding candidate role and fixing inventory table structure.
+
+### `remove_old_migrations.php`
+Utility script for cleaning up obsolete migration artifacts.
+
+The `migrations/` directory (if present) contains incremental database changes for existing installations.
 
 ## Usage
 
