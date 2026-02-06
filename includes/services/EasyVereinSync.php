@@ -219,32 +219,28 @@ class EasyVereinSync {
                         );
                         
                     } else {
-                        // Create new item
-                        $insertData = [
-                            'easyverein_id' => $easyvereinId,
-                            'name' => $name,
-                            'description' => $description,
-                            'serial_number' => $serialNumber,
-                            'current_stock' => $totalQuantity,
-                            'is_archived_in_easyverein' => 0
-                        ];
-                        
-                        // Add image if provided
-                        if ($imagePath) {
-                            $insertData['image_path'] = $imagePath;
-                        }
-                        
-                        $fields = array_keys($insertData);
-                        $placeholders = str_repeat('?,', count($fields) - 1) . '?';
-                        
+                        // Create new item with explicit field list for security
                         $stmt = $db->prepare("
                             INSERT INTO inventory (
-                                " . implode(', ', $fields) . ",
+                                easyverein_id,
+                                name,
+                                description,
+                                serial_number,
+                                current_stock,
+                                image_path,
+                                is_archived_in_easyverein,
                                 last_synced_at
-                            ) VALUES (" . $placeholders . ", NOW())
+                            ) VALUES (?, ?, ?, ?, ?, ?, 0, NOW())
                         ");
                         
-                        $stmt->execute(array_values($insertData));
+                        $stmt->execute([
+                            $easyvereinId,
+                            $name,
+                            $description,
+                            $serialNumber,
+                            $totalQuantity,
+                            $imagePath
+                        ]);
                         
                         $newItemId = $db->lastInsertId();
                         $stats['created']++;

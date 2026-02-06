@@ -5,9 +5,10 @@
  * Synchronizes inventory data from EasyVerein API to local database.
  * This script should be scheduled to run every 30 minutes.
  * 
- * Crontab example:
- * star-slash-30 * * * * /usr/bin/php /path/to/cron/sync_easyverein.php >> /path/to/logs/easyverein_sync.log 2>&1
- * (Replace "star-slash" with the actual cron syntax: asterisk followed by forward slash)
+ * Crontab example (every 30 minutes):
+ * 0,30 * * * * /usr/bin/php /path/to/cron/sync_easyverein.php >> /path/to/logs/easyverein_sync.log 2>&1
+ * 
+ * Or using the step syntax: `[star][slash]30 * * * *` (replace [star][slash] with actual characters)
  * 
  * Usage: php cron/sync_easyverein.php
  */
