@@ -21,7 +21,8 @@ class Alumni {
         $stmt = $db->prepare("
             SELECT id, user_id, first_name, last_name, email, mobile_phone, 
                    linkedin_url, xing_url, industry, company, position, 
-                   studiengang, semester, angestrebter_abschluss, about_me,
+                   studiengang, study_program, semester, angestrebter_abschluss, 
+                   degree, graduation_year, about_me,
                    image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
             FROM alumni_profiles 
             WHERE user_id = ?
@@ -57,8 +58,9 @@ class Alumni {
             $allowedFields = [
                 'first_name', 'last_name', 'email', 'mobile_phone',
                 'linkedin_url', 'xing_url', 'industry', 'company', 
-                'position', 'image_path', 'studiengang', 'semester',
-                'angestrebter_abschluss', 'about_me'
+                'position', 'image_path', 'studiengang', 'study_program', 
+                'semester', 'angestrebter_abschluss', 'degree', 
+                'graduation_year', 'about_me'
             ];
             
             foreach ($allowedFields as $field) {
@@ -91,8 +93,9 @@ class Alumni {
                 INSERT INTO alumni_profiles 
                 (user_id, first_name, last_name, email, mobile_phone, 
                  linkedin_url, xing_url, industry, company, position, image_path,
-                 studiengang, semester, angestrebter_abschluss, about_me)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 studiengang, study_program, semester, angestrebter_abschluss, 
+                 degree, graduation_year, about_me)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             
             return $stmt->execute([
@@ -108,8 +111,11 @@ class Alumni {
                 $data['position'] ?? null,
                 $data['image_path'] ?? null,
                 $data['studiengang'] ?? null,
+                $data['study_program'] ?? null,
                 $data['semester'] ?? null,
                 $data['angestrebter_abschluss'] ?? null,
+                $data['degree'] ?? null,
+                $data['graduation_year'] ?? null,
                 $data['about_me'] ?? null
             ]);
         }
@@ -187,7 +193,8 @@ class Alumni {
         $sql = "
             SELECT id, user_id, first_name, last_name, email, mobile_phone, 
                    linkedin_url, xing_url, industry, company, position, 
-                   studiengang, semester, angestrebter_abschluss, about_me,
+                   studiengang, study_program, semester, angestrebter_abschluss, 
+                   degree, graduation_year, about_me,
                    image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
             FROM alumni_profiles" . $whereSQL . "
             ORDER BY last_name ASC, first_name ASC
@@ -232,7 +239,8 @@ class Alumni {
         $stmt = $db->prepare("
             SELECT id, user_id, first_name, last_name, email, mobile_phone, 
                    linkedin_url, xing_url, industry, company, position, 
-                   studiengang, semester, angestrebter_abschluss, about_me,
+                   studiengang, study_program, semester, angestrebter_abschluss, 
+                   degree, graduation_year, about_me,
                    image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
             FROM alumni_profiles 
             WHERE last_verified_at < DATE_SUB(NOW(), INTERVAL ? MONTH)
