@@ -6,54 +6,113 @@
 
 require_once __DIR__ . '/../database.php';
 require_once __DIR__ . '/../models/Inventory.php';
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../src/MailService.php';
 
 class EasyVereinSync {
     
     /**
-     * Fetch data from EasyVerein
-     * Mock implementation returning hardcoded JSON array
+     * Fetch data from EasyVerein API
      * 
-     * @return array Array of inventory items with EasyVerein data structure
+     * @return array Array of inventory items from EasyVerein API
+     * @throws Exception If API call fails
      */
     public function fetchDataFromEasyVerein() {
-        // Mock implementation with typical inventory items
-        return [
-            [
-                'EasyVereinID' => 'EV-001',
-                'Name' => 'Laptop Dell XPS 15',
-                'Description' => 'High-performance laptop for development work',
-                'TotalQuantity' => 5,
-                'SerialNumber' => 'DL-XPS-2024-001'
-            ],
-            [
-                'EasyVereinID' => 'EV-002',
-                'Name' => 'Projektor Epson EB-2250U',
-                'Description' => 'Full HD projector for presentations',
-                'TotalQuantity' => 3,
-                'SerialNumber' => 'EP-EB-2024-002'
-            ],
-            [
-                'EasyVereinID' => 'EV-003',
-                'Name' => 'Whiteboard 180x120cm',
-                'Description' => 'Mobile whiteboard with stand',
-                'TotalQuantity' => 8,
-                'SerialNumber' => null
-            ],
-            [
-                'EasyVereinID' => 'EV-004',
-                'Name' => 'Konferenzmikrofon Jabra Speak',
-                'Description' => 'USB conference speakerphone',
-                'TotalQuantity' => 10,
-                'SerialNumber' => 'JB-SPK-2024-004'
-            ],
-            [
-                'EasyVereinID' => 'EV-005',
-                'Name' => 'Tablet iPad Air',
-                'Description' => 'Tablet for mobile presentations',
-                'TotalQuantity' => 7,
-                'SerialNumber' => 'AP-IPA-2024-005'
-            ]
-        ];
+        $apiUrl = 'https://easyverein.com/api/v2.0/inventory-object?limit=100';
+        $apiToken = EASYVEREIN_API_TOKEN;
+        
+        if (empty($apiToken)) {
+            throw new Exception('EasyVerein API token is not configured');
+        }
+        
+        try {
+            // Initialize cURL
+            $ch = curl_init();
+            
+            // Set cURL options
+            curl_setopt($ch, CURLOPT_URL, $apiUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $apiToken,
+                'Content-Type: application/json'
+            ]);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+            
+            // Execute the request
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+            
+            // Check for cURL errors
+            if ($response === false) {
+                throw new Exception('cURL error: ' . $curlError);
+            }
+            
+            // Check HTTP status code
+            if ($httpCode !== 200) {
+                $errorMsg = "API returned HTTP {$httpCode}";
+                if ($httpCode === 401) {
+                    $errorMsg .= ' - Unauthorized: Invalid API token';
+                }
+                throw new Exception($errorMsg);
+            }
+            
+            // Parse JSON response
+            $data = json_decode($response, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Failed to parse JSON response: ' . json_last_error_msg());
+            }
+            
+            // EasyVerein API typically returns data in a wrapper
+            // Adjust based on actual API response structure
+            $items = $data['results'] ?? $data['data'] ?? $data;
+            
+            if (!is_array($items)) {
+                throw new Exception('Invalid API response format: expected array of items');
+            }
+            
+            return $items;
+            
+        } catch (Exception $e) {
+            // Log the error
+            error_log('EasyVerein API Error: ' . $e->getMessage());
+            
+            // Send critical alert email
+            $this->sendCriticalAlert($e->getMessage());
+            
+            // Re-throw the exception
+            throw $e;
+        }
+    }
+    
+    /**
+     * Send critical alert email when API sync fails
+     * 
+     * @param string $errorMessage The error message to include in email
+     */
+    private function sendCriticalAlert($errorMessage) {
+        $subject = 'CRITICAL: EasyVerein API Sync Failed';
+        
+        $bodyContent = '<p class="email-text">The EasyVerein API synchronization has failed.</p>';
+        $bodyContent .= '<p class="email-text"><strong>Error Details:</strong></p>';
+        $bodyContent .= '<div style="background-color: #fee; padding: 15px; border-left: 4px solid #c00; margin: 15px 0;">';
+        $bodyContent .= '<pre style="margin: 0; font-family: monospace; white-space: pre-wrap;">' . htmlspecialchars($errorMessage) . '</pre>';
+        $bodyContent .= '</div>';
+        $bodyContent .= '<p class="email-text">Time: ' . date('Y-m-d H:i:s') . '</p>';
+        $bodyContent .= '<p class="email-text">Please investigate and resolve this issue as soon as possible.</p>';
+        
+        // Get email template
+        $htmlBody = MailService::getTemplate('EasyVerein Sync Failure', $bodyContent);
+        
+        // Send email
+        try {
+            MailService::sendEmail('tlehmann630@gmail.com', $subject, $htmlBody);
+        } catch (Exception $e) {
+            error_log('Failed to send critical alert email: ' . $e->getMessage());
+        }
     }
     
     /**
@@ -94,7 +153,20 @@ class EasyVereinSync {
             // Process each item from EasyVerein
             foreach ($easyvereinItems as $evItem) {
                 try {
-                    $easyvereinId = $evItem['EasyVereinID'];
+                    // Map API fields to our expected format
+                    // The API might return different field names, so we handle both old and new formats
+                    $easyvereinId = $evItem['id'] ?? $evItem['EasyVereinID'] ?? null;
+                    $name = $evItem['name'] ?? $evItem['Name'] ?? 'Unnamed Item';
+                    $description = $evItem['description'] ?? $evItem['Description'] ?? '';
+                    $totalQuantity = $evItem['quantity'] ?? $evItem['total_stock'] ?? $evItem['TotalQuantity'] ?? 0;
+                    $serialNumber = $evItem['serial_number'] ?? $evItem['SerialNumber'] ?? null;
+                    $imagePath = $evItem['image'] ?? $evItem['image_path'] ?? null;
+                    
+                    if (!$easyvereinId) {
+                        $stats['errors'][] = "Skipping item without ID: " . ($name ?? 'Unknown');
+                        continue;
+                    }
+                    
                     $currentEasyVereinIds[] = $easyvereinId;
                     
                     // Check if item exists locally by easyverein_id
@@ -110,12 +182,17 @@ class EasyVereinSync {
                         // Update existing item using Inventory model with sync flag
                         // This allows the update to bypass Master Data protection
                         $updateData = [
-                            'name' => $evItem['Name'],
-                            'description' => $evItem['Description'],
-                            'current_stock' => $evItem['TotalQuantity'],
-                            'serial_number' => $evItem['SerialNumber'],
+                            'name' => $name,
+                            'description' => $description,
+                            'current_stock' => $totalQuantity,
+                            'serial_number' => $serialNumber,
                             'is_archived_in_easyverein' => 0
                         ];
+                        
+                        // Update image if provided
+                        if ($imagePath) {
+                            $updateData['image_path'] = $imagePath;
+                        }
                         
                         // Use Inventory::update() with $isSyncUpdate = true to bypass protection
                         Inventory::update($existingItem['id'], $updateData, $userId, true);
@@ -132,36 +209,42 @@ class EasyVereinSync {
                             $userId,
                             'sync_update',
                             $existingItem['current_stock'],
-                            $evItem['TotalQuantity'],
+                            $totalQuantity,
                             'Synchronized from EasyVerein',
                             json_encode([
                                 'old_name' => $existingItem['name'],
-                                'new_name' => $evItem['Name'],
+                                'new_name' => $name,
                                 'easyverein_id' => $easyvereinId
                             ])
                         );
                         
                     } else {
                         // Create new item
+                        $insertData = [
+                            'easyverein_id' => $easyvereinId,
+                            'name' => $name,
+                            'description' => $description,
+                            'serial_number' => $serialNumber,
+                            'current_stock' => $totalQuantity,
+                            'is_archived_in_easyverein' => 0
+                        ];
+                        
+                        // Add image if provided
+                        if ($imagePath) {
+                            $insertData['image_path'] = $imagePath;
+                        }
+                        
+                        $fields = array_keys($insertData);
+                        $placeholders = str_repeat('?,', count($fields) - 1) . '?';
+                        
                         $stmt = $db->prepare("
                             INSERT INTO inventory (
-                                easyverein_id,
-                                name,
-                                description,
-                                serial_number,
-                                current_stock,
-                                last_synced_at,
-                                is_archived_in_easyverein
-                            ) VALUES (?, ?, ?, ?, ?, NOW(), 0)
+                                " . implode(', ', $fields) . ",
+                                last_synced_at
+                            ) VALUES (" . $placeholders . ", NOW())
                         ");
                         
-                        $stmt->execute([
-                            $easyvereinId,
-                            $evItem['Name'],
-                            $evItem['Description'],
-                            $evItem['SerialNumber'],
-                            $evItem['TotalQuantity']
-                        ]);
+                        $stmt->execute(array_values($insertData));
                         
                         $newItemId = $db->lastInsertId();
                         $stats['created']++;
@@ -172,17 +255,17 @@ class EasyVereinSync {
                             $userId,
                             'sync_create',
                             null,
-                            $evItem['TotalQuantity'],
+                            $totalQuantity,
                             'Created from EasyVerein sync',
                             json_encode([
                                 'easyverein_id' => $easyvereinId,
-                                'name' => $evItem['Name']
+                                'name' => $name
                             ])
                         );
                     }
                     
                 } catch (Exception $e) {
-                    $stats['errors'][] = "Error processing item '{$evItem['Name']}' (EV-ID: {$evItem['EasyVereinID']}): " . $e->getMessage();
+                    $stats['errors'][] = "Error processing item '" . ($name ?? 'Unknown') . "' (EV-ID: " . ($easyvereinId ?? 'N/A') . "): " . $e->getMessage();
                 }
             }
             

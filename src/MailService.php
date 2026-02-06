@@ -33,7 +33,7 @@ class MailService {
      * @param string|null $callToAction Optional call-to-action button HTML
      * @return string Complete HTML email template
      */
-    private static function getTemplate($title, $bodyContent, $callToAction = null) {
+    public static function getTemplate($title, $bodyContent, $callToAction = null) {
         $html = '<!DOCTYPE html>
 <html lang="de">
 <head>

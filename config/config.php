@@ -69,6 +69,9 @@ define('SMTP_FROM', $env['SMTP_FROM'] ?? $env['SMTP_USER'] ?? '');
 define('SMTP_FROM_EMAIL', $env['SMTP_FROM_EMAIL'] ?? $env['SMTP_FROM'] ?? $env['SMTP_USER'] ?? '');
 define('SMTP_FROM_NAME', $env['SMTP_FROM_NAME'] ?? 'IBC Intranet');
 
+// EasyVerein API Configuration
+define('EASYVEREIN_API_TOKEN', $env['EASYVEREIN_API_TOKEN'] ?? '');
+
 // Define BASE_URL dynamically if not in .env
 if (isset($env['BASE_URL'])) {
     define('BASE_URL', $env['BASE_URL']);
