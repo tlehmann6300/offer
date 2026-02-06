@@ -10,6 +10,7 @@ if (!Auth::check()) {
 }
 
 $user = Auth::user();
+$userRole = $user['role'] ?? ''; // Retrieve role from Auth
 $message = '';
 $error = '';
 $showQRCode = false;
@@ -35,14 +36,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'image_path' => trim($_POST['image_path'] ?? '')
             ];
             
-            // Add role-specific fields
-            if (in_array($user['role'], ['candidate', 'member', 'board', 'head'])) {
-                // Fields for candidates, members, board, and heads
+            // Add role-specific fields based on user role
+            // Student View: member, candidate, head, board -> Show study fields
+            if (in_array($userRole, ['candidate', 'member', 'board', 'head'])) {
+                // Fields for students (candidates, members, board, and heads)
                 $profileData['studiengang'] = trim($_POST['studiengang'] ?? '');
+                // study_program: Database column alias for legacy schema compatibility
+                $profileData['study_program'] = trim($_POST['studiengang'] ?? '');
                 $profileData['semester'] = trim($_POST['semester'] ?? '');
                 $profileData['angestrebter_abschluss'] = trim($_POST['angestrebter_abschluss'] ?? '');
-            } elseif ($user['role'] === 'alumni') {
-                // Fields for alumni
+                // Note: Arbeitgeber (company) fields are optional/hidden for students
+            } elseif ($userRole === 'alumni') {
+                // Alumni View: Show employment fields
                 $profileData['company'] = trim($_POST['company'] ?? '');
                 $profileData['industry'] = trim($_POST['industry'] ?? '');
                 $profileData['position'] = trim($_POST['position'] ?? '');
@@ -55,6 +60,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $error = 'Fehler beim Aktualisieren des Profils';
             }
+        } catch (PDOException $e) {
+            // Database protection: Graceful error handling for database issues
+            error_log("Profile update database error: " . $e->getMessage());
+            $error = 'Datenbank nicht aktuell. Bitte Admin kontaktieren.';
         } catch (Exception $e) {
             $error = $e->getMessage();
         }
@@ -331,8 +340,9 @@ ob_start();
                         >
                     </div>
                     
-                    <?php if (in_array($user['role'], ['candidate', 'member', 'board', 'head'])): ?>
-                    <!-- Fields for Candidates, Members, Board, and Heads -->
+                    <?php if (in_array($userRole, ['candidate', 'member', 'board', 'head'])): ?>
+                    <!-- Fields for Students: Candidates, Members, Board, and Heads -->
+                    <!-- Student View: Show Studiengang, Semester, Abschluss -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Studiengang</label>
                         <input 
@@ -365,8 +375,9 @@ ob_start();
                             placeholder="z.B. Bachelor of Science"
                         >
                     </div>
-                    <?php elseif ($user['role'] === 'alumni'): ?>
+                    <?php elseif ($userRole === 'alumni'): ?>
                     <!-- Fields for Alumni -->
+                    <!-- Alumni View: Show Arbeitgeber, Position, Branche -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Aktueller Arbeitgeber</label>
                         <input 

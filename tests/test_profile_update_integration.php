@@ -106,7 +106,10 @@ foreach ($candidateFields as $field) {
         break;
     }
 }
-if ($candidateFieldsFound && strpos($profileContent, "in_array(\$user['role'], ['candidate', 'member', 'board', 'head'])") !== false) {
+// Check for either $user['role'] or $userRole variable usage
+$candidateConditional = strpos($profileContent, "in_array(\$user['role'], ['candidate', 'member', 'board', 'head'])") !== false ||
+                        strpos($profileContent, "in_array(\$userRole, ['candidate', 'member', 'board', 'head'])") !== false;
+if ($candidateFieldsFound && $candidateConditional) {
     echo "✓ PASS: Candidate/member-specific fields found and conditional display implemented\n";
     $testsPassed++;
 } else {
@@ -119,7 +122,9 @@ echo "\n";
 echo "=== Test 8: Check alumni-specific fields ===\n";
 $alumniFieldsInForm = strpos($profileContent, 'name="company"') !== false && 
                        strpos($profileContent, 'name="industry"') !== false;
-$alumniConditional = strpos($profileContent, "\$user['role'] === 'alumni'") !== false;
+// Check for either $user['role'] or $userRole variable usage
+$alumniConditional = strpos($profileContent, "\$user['role'] === 'alumni'") !== false ||
+                     strpos($profileContent, "\$userRole === 'alumni'") !== false;
 
 if ($alumniFieldsInForm && $alumniConditional) {
     echo "✓ PASS: Alumni-specific fields found and conditional display implemented\n";
