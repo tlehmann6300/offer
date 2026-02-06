@@ -81,6 +81,8 @@ ob_start();
 </div>
 
 <script>
+// Dismiss modal - Note: Session variable is already unset on page load (line 89)
+// so the modal won't reappear in this session even if user navigates back to dashboard
 function dismissTfaNudge() {
     document.getElementById('tfa-nudge-modal').style.display = 'none';
 }

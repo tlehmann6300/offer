@@ -143,6 +143,7 @@ class Auth {
             // Permanently lock account after 8 failed attempts
             if ($failedAttempts >= 8) {
                 $isPermanentlyLocked = 1;
+                $lockedUntil = null; // Clear temporary lock when applying permanent lock
             }
             
             $stmt = $db->prepare("UPDATE users SET failed_login_attempts = ?, locked_until = ?, is_locked_permanently = ? WHERE id = ?");
@@ -189,6 +190,8 @@ class Auth {
         $_SESSION['last_activity'] = time();
         
         // Set 2FA nudge if 2FA is not enabled
+        // Note: This is only reached after full authentication (including 2FA if enabled)
+        // Users with 2FA enabled would have returned earlier if they hadn't provided the code
         if (!$user['tfa_enabled']) {
             $_SESSION['show_2fa_nudge'] = true;
         }
