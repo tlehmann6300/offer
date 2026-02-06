@@ -45,7 +45,7 @@ class AddCandidateRoleMigrationTest {
             echo "Found role column with type: " . $roleColumn['Type'] . "\n";
             
             // Test 2: Check if candidate role exists
-            if (strpos($roleColumn['Type'], 'candidate') !== false) {
+            if (strpos($roleColumn['Type'], "'candidate'") !== false) {
                 $this->successes[] = "✓ Users table has 'candidate' role in ENUM";
             } else {
                 $this->errors[] = "Users table 'role' ENUM missing 'candidate' value";
@@ -55,7 +55,7 @@ class AddCandidateRoleMigrationTest {
             // Test 3: Check expected roles exist
             $expectedRoles = ['admin', 'board', 'head', 'member', 'alumni', 'candidate'];
             foreach ($expectedRoles as $role) {
-                if (strpos($roleColumn['Type'], $role) !== false) {
+                if (strpos($roleColumn['Type'], "'{$role}'") !== false) {
                     $this->successes[] = "✓ Role '{$role}' exists in ENUM";
                 } else {
                     $this->warnings[] = "Role '{$role}' not found in ENUM";

@@ -19,7 +19,7 @@ try {
     $stmt = $userDB->query("SHOW COLUMNS FROM users LIKE 'role'");
     $roleColumn = $stmt->fetch();
     
-    if ($roleColumn && strpos($roleColumn['Type'], 'candidate') === false) {
+    if ($roleColumn && strpos($roleColumn['Type'], "'candidate'") === false) {
         echo "Adding 'candidate' role to users table...\n";
         $userDB->exec("
             ALTER TABLE users 
