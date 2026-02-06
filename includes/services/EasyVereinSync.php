@@ -19,11 +19,8 @@ class EasyVereinSync {
      */
     public function fetchDataFromEasyVerein() {
         $apiUrl = 'https://easyverein.com/api/v2.0/inventory-object?limit=100';
-        $apiToken = EASYVEREIN_API_TOKEN;
-        
-        if (empty($apiToken)) {
-            throw new Exception('EasyVerein API token is not configured');
-        }
+        // Hardcoded token as per requirements
+        $apiToken = '0277d541c6bb7044e901a8a985ea74a9894df724';
         
         try {
             // Initialize cURL
@@ -94,7 +91,7 @@ class EasyVereinSync {
      * @param string $errorMessage The error message to include in email
      */
     private function sendCriticalAlert($errorMessage) {
-        $subject = 'CRITICAL: EasyVerein API Sync Failed';
+        $subject = 'CRITICAL: EasyVerein Sync Failed';
         
         $bodyContent = '<p class="email-text">The EasyVerein API synchronization has failed.</p>';
         $bodyContent .= '<p class="email-text"><strong>Error Details:</strong></p>';
@@ -154,10 +151,10 @@ class EasyVereinSync {
             foreach ($easyvereinItems as $evItem) {
                 try {
                     // Map API fields to our expected format
-                    // The API might return different field names, so we handle both old and new formats
+                    // Map: name -> name, note -> description, quantity -> total_stock (DB: current_stock)
                     $easyvereinId = $evItem['id'] ?? $evItem['EasyVereinID'] ?? null;
                     $name = $evItem['name'] ?? $evItem['Name'] ?? 'Unnamed Item';
-                    $description = $evItem['description'] ?? $evItem['Description'] ?? '';
+                    $description = $evItem['note'] ?? $evItem['description'] ?? $evItem['Description'] ?? '';
                     $totalQuantity = $evItem['quantity'] ?? $evItem['total_stock'] ?? $evItem['TotalQuantity'] ?? 0;
                     $serialNumber = $evItem['serial_number'] ?? $evItem['SerialNumber'] ?? null;
                     $imagePath = $evItem['image'] ?? $evItem['image_path'] ?? null;

@@ -51,5 +51,5 @@ try {
     exit(1);
 }
 
-echo "\nCompleted at: " . date('Y-m-d H:i:s') . "\n";
+echo "\nSync executed at " . date('Y-m-d H:i:s') . "\n";
 echo "=== End of Synchronization ===\n";
