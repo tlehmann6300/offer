@@ -279,7 +279,11 @@ require_once __DIR__ . '/../../src/Auth.php';
                     </p>
                     <?php endif; ?>
                     <span class='inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-white/10 text-white border border-white/20'>
-                        <?php echo htmlspecialchars(ucfirst($role)); ?>
+                        <?php 
+                        // Translate candidate role to German
+                        $roleDisplay = $role === 'candidate' ? 'Anwärter' : ucfirst($role);
+                        echo htmlspecialchars($roleDisplay); 
+                        ?>
                     </span>
                 </div>
             </div>

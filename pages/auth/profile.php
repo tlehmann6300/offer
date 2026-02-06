@@ -155,7 +155,8 @@ ob_start();
                             'admin' => 'Administrator',
                             'board' => 'Vorstand',
                             'manager' => 'Ressortleiter',
-                            'member' => 'Mitglied'
+                            'member' => 'Mitglied',
+                            'candidate' => 'Anwärter'
                         ];
                         echo $roleNames[$user['role']] ?? ucfirst($user['role']);
                         ?>

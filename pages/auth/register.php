@@ -101,7 +101,8 @@ ob_start();
                     'alumni_board' => 'Alumni-Vorstand',
                     'manager' => 'Ressortleiter',
                     'member' => 'Mitglied',
-                    'alumni' => 'Alumni'
+                    'alumni' => 'Alumni',
+                    'candidate' => 'Anwärter'
                 ];
                 echo $roleNames[$invitation['role']] ?? ucfirst($invitation['role']);
                 ?>

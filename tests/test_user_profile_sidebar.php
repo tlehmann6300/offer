@@ -64,11 +64,11 @@ if (preg_match('/\$fullname = trim\(\$currentUser\[\'firstname\'\] \. \' \' \. \
     echo "✗ Full name display not found\n";
 }
 
-// Check for role display
-if (preg_match('/ucfirst\(\$currentUser\[\'role\'\]\)/', $templateContent)) {
-    echo "✓ User role from \$currentUser is displayed\n";
+// Check for role display with candidate translation
+if (preg_match('/\$roleDisplay = \$role === \'candidate\' \? \'Anwärter\' : ucfirst\(\$role\)/', $templateContent)) {
+    echo "✓ User role is displayed with candidate translation to Anwärter\n";
 } else {
-    echo "✗ User role display not found\n";
+    echo "✗ User role display with candidate translation not found\n";
 }
 
 // Check for email in title attribute
