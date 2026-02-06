@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS users (
         NOT NULL DEFAULT 'member',
     tfa_secret VARCHAR(32) DEFAULT NULL,
     tfa_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+    notify_new_projects BOOLEAN NOT NULL DEFAULT TRUE,
+    notify_new_events BOOLEAN NOT NULL DEFAULT FALSE,
     is_alumni_validated BOOLEAN NOT NULL DEFAULT FALSE,
     last_login DATETIME DEFAULT NULL,
     failed_login_attempts INT NOT NULL DEFAULT 0,

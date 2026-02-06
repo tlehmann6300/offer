@@ -87,6 +87,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = 'Fehler beim Ändern des Passworts';
             }
         }
+    } else if (isset($_POST['update_notifications'])) {
+        $notifyNewProjects = isset($_POST['notify_new_projects']) ? true : false;
+        $notifyNewEvents = isset($_POST['notify_new_events']) ? true : false;
+        
+        if (User::updateNotificationPreferences($user['id'], $notifyNewProjects, $notifyNewEvents)) {
+            $message = 'Benachrichtigungseinstellungen erfolgreich aktualisiert';
+            $user = Auth::user(); // Reload user data
+        } else {
+            $error = 'Fehler beim Aktualisieren der Benachrichtigungseinstellungen';
+        }
     }
 }
 
@@ -320,6 +330,61 @@ ob_start();
                 </form>
             </div>
             <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Notification Settings -->
+    <div class="lg:col-span-2">
+        <div class="card p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-bell text-orange-600 mr-2"></i>
+                Benachrichtigungen
+            </h2>
+            <p class="text-gray-600 mb-6">
+                Wählen Sie aus, über welche Ereignisse Sie per E-Mail benachrichtigt werden möchten
+            </p>
+            
+            <form method="POST" class="space-y-4">
+                <div class="space-y-4">
+                    <!-- New Projects Notification -->
+                    <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <input 
+                            type="checkbox" 
+                            name="notify_new_projects" 
+                            id="notify_new_projects"
+                            <?php echo ($user['notify_new_projects'] ?? true) ? 'checked' : ''; ?>
+                            class="mt-1 h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        >
+                        <label for="notify_new_projects" class="ml-3 flex-1 cursor-pointer">
+                            <span class="block text-sm font-medium text-gray-900">Neue Projekte</span>
+                            <span class="block text-sm text-gray-600">
+                                Erhalten Sie eine E-Mail-Benachrichtigung, wenn ein neues Projekt veröffentlicht wird
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- New Events Notification -->
+                    <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <input 
+                            type="checkbox" 
+                            name="notify_new_events" 
+                            id="notify_new_events"
+                            <?php echo ($user['notify_new_events'] ?? false) ? 'checked' : ''; ?>
+                            class="mt-1 h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        >
+                        <label for="notify_new_events" class="ml-3 flex-1 cursor-pointer">
+                            <span class="block text-sm font-medium text-gray-900">Neue Events</span>
+                            <span class="block text-sm text-gray-600">
+                                Erhalten Sie eine E-Mail-Benachrichtigung, wenn ein neues Event erstellt wird
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" name="update_notifications" class="w-full btn-primary">
+                    <i class="fas fa-save mr-2"></i>Benachrichtigungseinstellungen speichern
+                </button>
+            </form>
         </div>
     </div>
 </div>

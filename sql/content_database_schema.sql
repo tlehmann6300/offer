@@ -238,6 +238,7 @@ CREATE TABLE IF NOT EXISTS projects (
     client_name VARCHAR(255) DEFAULT NULL COMMENT 'Sensibel',
     client_contact_details TEXT DEFAULT NULL COMMENT 'Sensibel',
     priority ENUM('low', 'medium', 'high') NOT NULL DEFAULT 'medium',
+    type ENUM('internal', 'external') NOT NULL DEFAULT 'internal',
     status ENUM('draft', 'open', 'applying', 'assigned', 'running', 'completed', 'archived') NOT NULL DEFAULT 'draft',
     max_consultants INT UNSIGNED NOT NULL DEFAULT 1,
     start_date DATE DEFAULT NULL,
@@ -249,6 +250,7 @@ CREATE TABLE IF NOT EXISTS projects (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_status (status),
     INDEX idx_priority (priority),
+    INDEX idx_type (type),
     INDEX idx_start_date (start_date),
     INDEX idx_end_date (end_date)
 ) ENGINE=InnoDB

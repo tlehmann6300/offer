@@ -144,13 +144,14 @@ class Project {
                 client_name, 
                 client_contact_details, 
                 priority, 
+                type,
                 status, 
                 max_consultants,
                 start_date, 
                 end_date, 
                 image_path,
                 documentation
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         
         $stmt->execute([
@@ -159,6 +160,7 @@ class Project {
             $data['client_name'] ?? null,
             $data['client_contact_details'] ?? null,
             $data['priority'] ?? 'medium',
+            $data['type'] ?? 'internal',
             $data['status'] ?? 'draft',
             $data['max_consultants'] ?? 1,
             $data['start_date'] ?? null,
@@ -167,7 +169,93 @@ class Project {
             $data['documentation'] ?? null
         ]);
         
-        return $db->lastInsertId();
+        $projectId = $db->lastInsertId();
+        
+        // Send notifications if project is not a draft
+        $status = $data['status'] ?? 'draft';
+        if ($status !== 'draft') {
+            self::sendNewProjectNotifications($projectId, $data);
+        }
+        
+        return $projectId;
+    }
+    
+    /**
+     * Send notifications to users who want to be notified about new projects
+     * 
+     * @param int $projectId The project ID
+     * @param array $projectData The project data
+     */
+    private static function sendNewProjectNotifications($projectId, $projectData) {
+        try {
+            // Get users who want to be notified about new projects
+            $userDB = Database::getUserDB();
+            $stmt = $userDB->prepare("
+                SELECT id, email 
+                FROM users 
+                WHERE notify_new_projects = 1
+            ");
+            $stmt->execute();
+            $users = $stmt->fetchAll();
+            
+            if (empty($users)) {
+                return; // No users to notify
+            }
+            
+            // Load MailService
+            require_once __DIR__ . '/../../src/MailService.php';
+            
+            // Prepare email content
+            $projectTitle = htmlspecialchars($projectData['title'] ?? 'Neues Projekt');
+            $projectType = $projectData['type'] ?? 'internal';
+            $projectTypeLabel = $projectType === 'internal' ? 'Intern' : 'Extern';
+            
+            $bodyContent = '<p>Ein neues Projekt wurde veröffentlicht:</p>';
+            $bodyContent .= '<div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">';
+            $bodyContent .= '<h3 style="color: #4a7c2f; margin: 0 0 10px 0;">' . $projectTitle . '</h3>';
+            $bodyContent .= '<p style="margin: 5px 0; color: #1f2937;"><strong>Typ:</strong> ' . $projectTypeLabel . '</p>';
+            
+            if (!empty($projectData['description'])) {
+                $description = htmlspecialchars(substr($projectData['description'], 0, 200));
+                if (strlen($projectData['description']) > 200) {
+                    $description .= '...';
+                }
+                $bodyContent .= '<p style="margin: 5px 0; color: #1f2937;"><strong>Beschreibung:</strong> ' . $description . '</p>';
+            }
+            
+            if (!empty($projectData['start_date'])) {
+                $bodyContent .= '<p style="margin: 5px 0; color: #1f2937;"><strong>Start:</strong> ' . date('d.m.Y', strtotime($projectData['start_date'])) . '</p>';
+            }
+            
+            $bodyContent .= '</div>';
+            $bodyContent .= '<p>Klicken Sie auf den Button unten, um das Projekt anzusehen und sich zu bewerben.</p>';
+            
+            // Create CTA button - use BASE_URL if available
+            $baseUrl = defined('BASE_URL') ? BASE_URL : ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+            $projectUrl = rtrim($baseUrl, '/') . '/pages/projects/view.php?id=' . $projectId;
+            
+            $callToAction = '<a href="' . $projectUrl . '" style="display: inline-block; background-color: #6D9744; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0;">Projekt ansehen</a>';
+            
+            // Build complete HTML email using template
+            $htmlBody = MailService::getTemplate('Neues Projekt', $bodyContent, $callToAction);
+            
+            // Send email to each user
+            foreach ($users as $user) {
+                try {
+                    MailService::sendEmail(
+                        $user['email'],
+                        'Neues Projekt: ' . $projectTitle,
+                        $htmlBody
+                    );
+                } catch (Exception $e) {
+                    // Log error but continue with other users
+                    error_log('Failed to send new project notification to ' . $user['email'] . ': ' . $e->getMessage());
+                }
+            }
+        } catch (Exception $e) {
+            // Log error but don't fail project creation
+            error_log('Failed to send new project notifications: ' . $e->getMessage());
+        }
     }
     
     /**
@@ -179,12 +267,17 @@ class Project {
         // Handle documentation upload if provided in $_FILES
         self::processDocumentationUpload($data);
         
+        // Get old status to check if we're publishing
+        $oldProject = self::getById($id);
+        $wasPublishing = $oldProject && $oldProject['status'] === 'draft' && 
+                        isset($data['status']) && $data['status'] !== 'draft';
+        
         $fields = [];
         $values = [];
         
         $allowedFields = [
             'title', 'description', 'client_name', 'client_contact_details',
-            'priority', 'status', 'max_consultants', 'start_date', 'end_date', 'image_path', 'documentation'
+            'priority', 'type', 'status', 'max_consultants', 'start_date', 'end_date', 'image_path', 'documentation'
         ];
         
         foreach ($data as $key => $value) {
@@ -202,7 +295,17 @@ class Project {
         $sql = "UPDATE projects SET " . implode(', ', $fields) . " WHERE id = ?";
         
         $stmt = $db->prepare($sql);
-        return $stmt->execute($values);
+        $result = $stmt->execute($values);
+        
+        // Send notifications if we're publishing a draft
+        if ($result && $wasPublishing) {
+            $updatedProject = self::getById($id);
+            if ($updatedProject) {
+                self::sendNewProjectNotifications($id, $updatedProject);
+            }
+        }
+        
+        return $result;
     }
     
     /**

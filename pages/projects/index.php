@@ -12,13 +12,31 @@ if (!Auth::check()) {
 $user = Auth::user();
 $userRole = $_SESSION['user_role'] ?? 'member';
 
+// Get filter parameter from URL
+$typeFilter = $_GET['type'] ?? 'all';
+$validTypes = ['all', 'internal', 'external'];
+if (!in_array($typeFilter, $validTypes)) {
+    $typeFilter = 'all';
+}
+
 // Get all projects that are NOT draft
 $db = Database::getContentDB();
-$stmt = $db->query("
-    SELECT * FROM projects 
-    WHERE status != 'draft'
-    ORDER BY created_at DESC
-");
+
+if ($typeFilter === 'all') {
+    $stmt = $db->query("
+        SELECT * FROM projects 
+        WHERE status != 'draft'
+        ORDER BY created_at DESC
+    ");
+} else {
+    $stmt = $db->prepare("
+        SELECT * FROM projects 
+        WHERE status != 'draft' AND type = ?
+        ORDER BY created_at DESC
+    ");
+    $stmt->execute([$typeFilter]);
+}
+
 $projects = $stmt->fetchAll();
 
 // Filter sensitive data for each project based on user role
@@ -53,6 +71,25 @@ ob_start();
             Projekte
         </h1>
         <p class="text-gray-600">Entdecken Sie aktuelle Projekte und bewerben Sie sich</p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="mb-6 card p-4">
+        <div class="flex flex-wrap items-center gap-3">
+            <span class="text-sm font-medium text-gray-700">Filter:</span>
+            <a href="index.php?type=all" 
+               class="px-4 py-2 rounded-lg font-semibold transition <?php echo $typeFilter === 'all' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'; ?>">
+                <i class="fas fa-list mr-2"></i>Alle
+            </a>
+            <a href="index.php?type=internal" 
+               class="px-4 py-2 rounded-lg font-semibold transition <?php echo $typeFilter === 'internal' ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'; ?>">
+                <i class="fas fa-building mr-2"></i>Intern
+            </a>
+            <a href="index.php?type=external" 
+               class="px-4 py-2 rounded-lg font-semibold transition <?php echo $typeFilter === 'external' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700 hover:bg-green-200'; ?>">
+                <i class="fas fa-users mr-2"></i>Extern
+            </a>
+        </div>
     </div>
 
     <!-- Projects Grid -->
@@ -131,6 +168,18 @@ ob_start();
                                 default: echo ucfirst($project['priority']); break;
                             }
                             ?>
+                        </span>
+                    </div>
+
+                    <!-- Project Type Badge -->
+                    <div class="mb-4">
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full
+                            <?php 
+                            $projectType = $project['type'] ?? 'internal';
+                            echo $projectType === 'internal' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800';
+                            ?>">
+                            <i class="fas fa-tag mr-1"></i>
+                            <?php echo $projectType === 'internal' ? 'Intern' : 'Extern'; ?>
                         </span>
                     </div>
 

@@ -154,4 +154,27 @@ class User {
         // If no rows were affected, the user ID doesn't exist
         throw new Exception('Benutzer nicht gefunden');
     }
+    
+    /**
+     * Update notification preferences for user
+     * @param int $userId The ID of the user
+     * @param bool $notifyNewProjects Whether to notify about new projects
+     * @param bool $notifyNewEvents Whether to notify about new events
+     * @return bool Returns true on success
+     */
+    public static function updateNotificationPreferences($userId, $notifyNewProjects, $notifyNewEvents) {
+        $db = Database::getUserDB();
+        
+        $stmt = $db->prepare("
+            UPDATE users 
+            SET notify_new_projects = ?, notify_new_events = ? 
+            WHERE id = ?
+        ");
+        
+        return $stmt->execute([
+            $notifyNewProjects ? 1 : 0,
+            $notifyNewEvents ? 1 : 0,
+            $userId
+        ]);
+    }
 }
