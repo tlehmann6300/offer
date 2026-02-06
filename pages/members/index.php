@@ -155,36 +155,74 @@ ob_start();
                 
                 // Generate initials for fallback
                 $initials = strtoupper(substr($member['first_name'], 0, 1) . substr($member['last_name'], 0, 1));
-                $imagePath = !empty($member['image_path']) ? asset($member['image_path']) : '';
                 
-                // Info snippet: Show position or industry (similar to Studium concept)
+                // Check if image exists and is accessible
+                $imagePath = '';
+                $showPlaceholder = true;
+                if (!empty($member['image_path'])) {
+                    // Build the full file path for checking existence
+                    $fullImagePath = __DIR__ . '/../../' . ltrim($member['image_path'], '/');
+                    $realPath = realpath($fullImagePath);
+                    $basePath = realpath(__DIR__ . '/../../');
+                    
+                    // Security: Verify the resolved path is within the base directory
+                    if ($realPath !== false && $basePath !== false && 
+                        strpos($realPath, $basePath) === 0 && is_file($realPath)) {
+                        $imagePath = asset($member['image_path']);
+                        $showPlaceholder = false;
+                    }
+                }
+                
+                // Info snippet: Show position, or study_program + degree, or 'Mitglied'
                 $infoSnippet = '';
                 if (!empty($member['position'])) {
                     $infoSnippet = $member['position'];
-                } elseif (!empty($member['company'])) {
-                    $infoSnippet = $member['company'];
-                } elseif (!empty($member['industry'])) {
-                    $infoSnippet = $member['industry'];
+                } else {
+                    // If position is empty, try study_program and degree
+                    $studyParts = [];
+                    // Check both study_program and studiengang fields
+                    $studyProgram = !empty($member['study_program']) ? $member['study_program'] : 
+                                    (!empty($member['studiengang']) ? $member['studiengang'] : '');
+                    // Check both degree and angestrebter_abschluss fields
+                    $degree = !empty($member['degree']) ? $member['degree'] : 
+                              (!empty($member['angestrebter_abschluss']) ? $member['angestrebter_abschluss'] : '');
+                    
+                    if (!empty($studyProgram)) {
+                        $studyParts[] = $studyProgram;
+                    }
+                    if (!empty($degree)) {
+                        $studyParts[] = $degree;
+                    }
+                    
+                    if (!empty($studyParts)) {
+                        $infoSnippet = implode(' - ', $studyParts);
+                    } else {
+                        $infoSnippet = 'Mitglied';
+                    }
                 }
                 ?>
-                <div class="card p-6 hover:shadow-xl transition-shadow">
+                <div class="card p-6 hover:shadow-xl transition-shadow flex flex-col" style="min-height: 420px;">
                     <!-- Profile Image (Circle, top center) -->
                     <div class="flex justify-center mb-4">
-                        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-3xl font-bold overflow-hidden shadow-lg">
-                            <?php if (!empty($imagePath)): ?>
+                        <?php if ($showPlaceholder): ?>
+                            <!-- Placeholder with initials -->
+                            <div class="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 text-3xl font-bold shadow-lg">
+                                <?php echo htmlspecialchars($initials); ?>
+                            </div>
+                        <?php else: ?>
+                            <!-- Image with fallback to placeholder on error -->
+                            <div class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-3xl font-bold overflow-hidden shadow-lg">
                                 <img 
                                     src="<?php echo htmlspecialchars($imagePath); ?>" 
                                     alt="<?php echo htmlspecialchars($member['first_name'] . ' ' . $member['last_name']); ?>"
                                     class="w-full h-full object-cover"
-                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                    onerror="this.style.display='none'; this.parentElement.classList.remove('from-blue-400', 'to-blue-600'); this.parentElement.classList.add('bg-gray-300', 'text-gray-700'); this.nextElementSibling.style.display='flex';"
                                 >
-                                <div style="display:none;" class="w-full h-full flex items-center justify-center text-3xl bg-gradient-to-br from-blue-400 to-blue-600">
+                                <div style="display:none;" class="w-full h-full flex items-center justify-center text-3xl">
                                     <?php echo htmlspecialchars($initials); ?>
                                 </div>
-                            <?php else: ?>
-                                <?php echo htmlspecialchars($initials); ?>
-                            <?php endif; ?>
-                        </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     
                     <!-- Name (Bold) -->
@@ -199,18 +237,12 @@ ob_start();
                         </span>
                     </div>
                     
-                    <!-- Info Snippet: 'Position/Ressort' or 'Studium' -->
-                    <div class="text-center mb-4 min-h-[3rem]">
-                        <?php if (!empty($infoSnippet)): ?>
+                    <!-- Info Snippet: 'Position' or 'Studium + Degree' or 'Mitglied' -->
+                    <div class="text-center mb-4 flex-grow flex items-center justify-center" style="min-height: 3rem;">
                         <p class="text-sm text-gray-600">
                             <i class="fas fa-briefcase mr-1 text-gray-400"></i>
                             <?php echo htmlspecialchars($infoSnippet); ?>
                         </p>
-                        <?php else: ?>
-                        <p class="text-sm text-gray-400 italic">
-                            Keine Details verfügbar
-                        </p>
-                        <?php endif; ?>
                     </div>
                     
                     <!-- Contact Icons: Small icons for Mail and LinkedIn (if set) -->
