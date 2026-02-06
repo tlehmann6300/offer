@@ -4,9 +4,10 @@
  * 
  * This migration adds student-specific fields:
  * - study_program (VARCHAR 100) - English field for study program
- * - semester (INT) - Changed from VARCHAR to INT
  * - degree (VARCHAR 50) - English field for degree (e.g., B.Sc., M.Sc.)
  * - graduation_year (INT) - Year of graduation
+ * 
+ * Note: The semester field already exists as VARCHAR(50) and is kept for compatibility.
  */
 
 require_once __DIR__ . '/../includes/database.php';
