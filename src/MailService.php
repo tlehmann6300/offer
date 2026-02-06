@@ -198,12 +198,6 @@ class MailService {
                     error_log("CRITICAL ERROR: SMTP_HOST not configured and PHP mail() function is not available. Email sending will fail.");
                     throw new \Exception("Email configuration error: SMTP_HOST not set and PHP mail() not available");
                 }
-                
-                // Set sender for mail() fallback
-                $mail->setFrom(
-                    defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : ($_ENV['SMTP_FROM_EMAIL'] ?? 'noreply@localhost'),
-                    defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : ($_ENV['SMTP_FROM_NAME'] ?? 'IBC Intranet')
-                );
             } else {
                 // SMTP configuration - load dynamically from constants or $_ENV
                 $mail->isSMTP();
@@ -218,13 +212,13 @@ class MailService {
                 if (empty($mail->Username) || empty($mail->Password)) {
                     error_log("Warning: SMTP credentials are not configured. Email sending may fail.");
                 }
-                
-                // Set sender
-                $mail->setFrom(
-                    defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : ($_ENV['SMTP_FROM_EMAIL'] ?? ''),
-                    defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : ($_ENV['SMTP_FROM_NAME'] ?? 'IBC Intranet')
-                );
             }
+            
+            // Set sender (common for both SMTP and mail() fallback)
+            $mail->setFrom(
+                defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : ($_ENV['SMTP_FROM_EMAIL'] ?? 'noreply@localhost'),
+                defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : ($_ENV['SMTP_FROM_NAME'] ?? 'IBC Intranet')
+            );
             
             // Character encoding
             $mail->CharSet = 'UTF-8';
