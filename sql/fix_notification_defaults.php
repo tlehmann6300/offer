@@ -30,11 +30,15 @@ try {
     
     // 2. Update all existing users to have notify_new_events = 1
     echo "2. Updating all existing users to enable event notifications...\n";
-    $stmt = $userDB->exec("
-        UPDATE users 
-        SET notify_new_events = 1
-    ");
-    echo "   ✓ Updated all existing users\n\n";
+    try {
+        $affectedRows = $userDB->exec("
+            UPDATE users 
+            SET notify_new_events = 1
+        ");
+        echo "   ✓ Updated {$affectedRows} existing user(s)\n\n";
+    } catch (PDOException $e) {
+        echo "   ⚠ Warning: Could not update existing users: " . $e->getMessage() . "\n\n";
+    }
     
     echo "=============================================================\n";
     echo "✅ Event notifications enabled by default for all users.\n";
