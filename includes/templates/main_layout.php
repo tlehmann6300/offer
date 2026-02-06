@@ -191,7 +191,7 @@ require_once __DIR__ . '/../../src/Auth.php';
                 <a href="<?php echo asset('pages/blog/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/blog/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-newspaper w-5 mr-3"></i>
-                    <span>News / Blog</span>
+                    <span>Blog</span>
                 </a>
 
                 <!-- VERWALTUNG Section (Only visible for admin/board) -->
@@ -207,7 +207,7 @@ require_once __DIR__ . '/../../src/Auth.php';
                 <a href="<?php echo asset('pages/admin/audit.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/audit.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-shield-alt w-5 mr-3"></i>
-                    <span>Einstellungen / Audit</span>
+                    <span>Einstellungen</span>
                 </a>
                 <?php endif; ?>
                 
