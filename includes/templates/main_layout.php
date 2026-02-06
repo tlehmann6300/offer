@@ -176,11 +176,13 @@ require_once __DIR__ . '/../../src/Auth.php';
                 <div class="px-6 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                     Netzwerk
                 </div>
+                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board', 'head', 'member', 'candidate'])): ?>
                 <a href="<?php echo asset('pages/members/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/members/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-users w-5 mr-3"></i>
                     <span>Mitglieder</span>
                 </a>
+                <?php endif; ?>
                 <a href="<?php echo asset('pages/alumni/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/alumni/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-graduation-cap w-5 mr-3"></i>
