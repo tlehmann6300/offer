@@ -1,7 +1,7 @@
 <?php
 /**
  * Test script for invitation validity hours feature
- * Verifies that token validity can be set to 24h, 48h, or 7 days
+ * Verifies that token validity can be set to 24h, 7d, or 30d
  */
 
 echo "=== Testing Invitation Token Validity Hours Feature ===\n\n";
@@ -13,8 +13,8 @@ echo "  public static function generateInvitationToken(\$email, \$role, \$create
 echo "\nDefault validity: 168 hours (7 days)\n";
 echo "Supported options:\n";
 echo "  - 24 hours (1 day)\n";
-echo "  - 48 hours (2 days)\n";
 echo "  - 168 hours (7 days)\n";
+echo "  - 720 hours (30 days)\n";
 echo "\n";
 
 // Test 2: UI Components
@@ -23,9 +23,9 @@ echo "Invite User form should include:\n";
 echo "  ✓ Email field\n";
 echo "  ✓ Role dropdown\n";
 echo "  ✓ Token Validity dropdown:\n";
-echo "    - 24 Hours\n";
-echo "    - 48 Hours\n";
-echo "    - 7 Days (selected by default)\n";
+echo "    - 24 hours\n";
+echo "    - 7 days (selected by default)\n";
+echo "    - 30 days\n";
 echo "  ✓ Submit button\n";
 echo "\n";
 
@@ -35,9 +35,9 @@ echo "Invitation creation form should include:\n";
 echo "  ✓ E-Mail-Adresse field\n";
 echo "  ✓ Rolle dropdown\n";
 echo "  ✓ Token Validity dropdown:\n";
-echo "    - 24 Hours\n";
-echo "    - 48 Hours\n";
-echo "    - 7 Days (selected by default)\n";
+echo "    - 24 hours\n";
+echo "    - 7 days (selected by default)\n";
+echo "    - 30 days\n";
 echo "  ✓ Send mail checkbox\n";
 echo "  ✓ Link erstellen button\n";
 echo "\n";
@@ -62,8 +62,8 @@ echo "Examples:\n";
 $now = time();
 $testCases = [
     24 => date('Y-m-d H:i:s', $now + (24 * 60 * 60)),
-    48 => date('Y-m-d H:i:s', $now + (48 * 60 * 60)),
-    168 => date('Y-m-d H:i:s', $now + (168 * 60 * 60))
+    168 => date('Y-m-d H:i:s', $now + (168 * 60 * 60)),
+    720 => date('Y-m-d H:i:s', $now + (720 * 60 * 60))
 ];
 
 foreach ($testCases as $hours => $expiresAt) {
