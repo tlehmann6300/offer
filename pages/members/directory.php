@@ -41,7 +41,7 @@ $sql = "
     SELECT ap.id, ap.user_id, ap.first_name, ap.last_name, ap.email, 
            ap.position, ap.image_path, u.role
     FROM alumni_profiles ap
-    INNER JOIN users u ON ap.user_id = u.id" . $whereSQL . "
+    INNER JOIN users u ON ap.user_id = u.id " . $whereSQL . "
     ORDER BY ap.last_name ASC, ap.first_name ASC
 ";
 
@@ -165,9 +165,15 @@ ob_start();
                     
                     <!-- Position -->
                     <div class="text-center mb-4">
+                        <?php if (!empty($profile['position'])): ?>
                         <p class="text-sm text-gray-600 mb-1">
                             <?php echo htmlspecialchars($profile['position']); ?>
                         </p>
+                        <?php else: ?>
+                        <p class="text-sm text-gray-400 mb-1 italic">
+                            Keine Position angegeben
+                        </p>
+                        <?php endif; ?>
                         <p class="text-xs text-gray-400 mt-1">
                             <i class="fas fa-id-badge mr-1"></i>
                             <?php echo htmlspecialchars(ucfirst($profile['role'])); ?>
