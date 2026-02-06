@@ -1,7 +1,7 @@
 # Candidate Role and Inventory Migration
 
 ## Overview
-This migration adds the "candidate" (Anwärter) role to the user system and fixes the inventory table structure to properly support easyVerein integration.
+This migration adds the "candidate" (Anwärter) role to the user system and ensures the inventory table has the required image_path column.
 
 ## What This Migration Does
 
@@ -11,27 +11,21 @@ This migration adds the "candidate" (Anwärter) role to the user system and fixe
 
 The complete role list becomes:
 - `admin` - System administrators
-- `board` - Board members
-- `alumni_board` - Alumni board members
-- `manager` - Managers
+- `board` - Board members  
+- `head` - Department heads
 - `member` - Regular members
 - `alumni` - Alumni
 - `candidate` - Candidates (Anwärter) ⭐ NEW
 
 ### 2. Content Database Changes - Inventory Table
 
+The migration automatically detects which inventory table schema is in use:
+- `inventory_items` (full schema) 
+- `inventory` (modern schema)
+
 #### Column Updates
-- **easyverein_id**: Changed from `VARCHAR(100)` to `INT UNSIGNED NULL UNIQUE`
-  - Now nullable to support both easyVerein-synced items and manual entries
-  - Unique constraint ensures no duplicate easyVerein IDs
-- **name**: Expanded from `VARCHAR(100)` to `VARCHAR(255)`
-- **location**: Added as `VARCHAR(255)` (text location from easyVerein)
-  - Works alongside `location_id` (reference to locations table)
-  - Allows flexible location storage from easyVerein sync
-- **image_path**: Ensured exists as `VARCHAR(255)`
-- **acquisition_date**: Added as `DATE` (from easyVerein)
-- **value**: Added as `DECIMAL(10,2)` (item value from easyVerein)
-- **last_synced_at**: Updated to `TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`
+- **image_path**: Ensures column exists as `VARCHAR(255) DEFAULT NULL`
+  - Fixes 'Column not found' error when image_path is missing
 
 ## How to Run
 
@@ -52,22 +46,71 @@ If you prefer to run SQL directly in phpMyAdmin or similar:
 ```sql
 -- 1. Add candidate role to users table
 ALTER TABLE users 
-MODIFY COLUMN role ENUM('admin', 'board', 'alumni_board', 'manager', 'member', 'alumni', 'candidate') 
+MODIFY COLUMN role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate') 
 NOT NULL DEFAULT 'member';
 
 -- 2. Add candidate role to invitation_tokens table
 ALTER TABLE invitation_tokens 
-MODIFY COLUMN role ENUM('admin', 'board', 'alumni_board', 'manager', 'member', 'alumni', 'candidate') 
+MODIFY COLUMN role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate') 
 NOT NULL DEFAULT 'member';
 
--- 3. Fix inventory table (see full SQL in problem statement)
--- Note: The migration script handles this more safely with checks
+-- 3. Fix inventory table - add image_path if missing
+-- For inventory_items table:
+ALTER TABLE inventory_items ADD COLUMN image_path VARCHAR(255) DEFAULT NULL;
+
+-- OR for inventory table:
+ALTER TABLE inventory ADD COLUMN image_path VARCHAR(255) DEFAULT NULL;
 ```
 
 ## Testing
 
-Run the test script to verify the migration was successful:
-```bash
+After running the migration, verify:
+
+1. **User roles**: Check that the users and invitation_tokens tables have the correct ENUM:
+```sql
+SHOW COLUMNS FROM users LIKE 'role';
+SHOW COLUMNS FROM invitation_tokens LIKE 'role';
+-- Should show: enum('admin','board','head','member','alumni','candidate')
+```
+
+2. **Inventory table**: Check that image_path column exists:
+```sql
+-- For inventory_items table:
+SHOW COLUMNS FROM inventory_items LIKE 'image_path';
+
+-- OR for inventory table:
+SHOW COLUMNS FROM inventory LIKE 'image_path';
+-- Should show: image_path varchar(255) YES NULL
+```
+
+Expected migration output:
+```
+============================================================
+Starting migration: Add Candidate Role and Fix Inventory Table
+============================================================
+
+PART 1: Adding 'candidate' role to user tables
+------------------------------------------------------------
+✓ Successfully added 'candidate' role to users table
+✓ Successfully added 'candidate' role to invitation_tokens table
+
+PART 2: Fixing inventory table structure
+------------------------------------------------------------
+Found 'inventory_items' table (full schema)
+Checking and updating inventory_items table structure...
+  - Adding missing column: image_path...
+    ✓ Added image_path column
+✓ inventory_items table structure updated successfully
+
+============================================================
+✓ Migration completed successfully!
+
+Summary:
+  - Added 'candidate' role to users table
+  - Added 'candidate' role to invitation_tokens table
+  - Fixed inventory_items table structure
+  - Ensured image_path column exists
+```
 php tests/test_candidate_role_inventory_migration.php
 ```
 
@@ -104,49 +147,42 @@ SUCCESSES (X):
 The migration script is **idempotent** - it can be run multiple times safely:
 - Checks if changes already exist before applying them
 - Won't fail if run on an already-migrated database
+- Automatically detects which inventory table schema is in use
 - Provides clear output about what was changed
 
 ## Schema Design Notes
 
-### Why Two Location Columns?
-The inventory table has both `location_id` and `location`:
-- **location_id**: Foreign key reference to the `locations` table for internal location management
-- **location**: Text field synced from easyVerein for flexible location descriptions
+### Role Simplification
+The new role structure uses 6 core roles:
+- `admin`: Full system access
+- `board`: Board member access
+- `head`: Department head access
+- `member`: Standard member access
+- `alumni`: Alumni access
+- `candidate`: Probationary/candidate member access (new)
 
-This dual approach supports:
-1. Manual inventory entries using structured locations (`location_id`)
-2. easyVerein synced items with arbitrary location text (`location`)
+### Inventory Table Flexibility
+The migration supports both inventory table schemas:
+- **inventory_items**: Used in full schema installations
+- **inventory**: Used in modern/modular schema installations
 
-### Why Nullable easyverein_id?
-The `easyverein_id` is nullable to support:
-1. Items synced from easyVerein (have an ID)
-2. Manually added items (no easyVerein ID)
-
-Items with an `easyverein_id` are protected from manual editing to preserve sync integrity.
+The script automatically detects which table exists and applies the fix accordingly.
 
 ## Files Changed
 
 ### Migration Script
 - `sql/migrate_add_candidate_role_fix_inventory.php` - Main migration logic
 
-### Schema Files
-- `sql/user_database_schema.sql` - Updated user role ENUMs
-- `sql/full_user_schema.sql` - Updated full user schema
-- `sql/content_database_schema.sql` - Updated inventory table structure
-
-### Deployment
-- `deploy_migrations.php` - Added migration to execution list
-
-### Tests
-- `tests/test_candidate_role_inventory_migration.php` - Comprehensive validation
+### Documentation
+- `sql/MIGRATION_CANDIDATE_INVENTORY.md` - Migration documentation
 
 ## Rollback
 
-⚠️ **Warning**: This migration modifies ENUMs and column types. Rolling back requires careful consideration.
+⚠️ **Warning**: This migration modifies ENUMs. Rolling back requires careful consideration.
 
 If you need to rollback:
-1. Remove 'candidate' from role ENUMs (but only if no users have this role)
-2. Revert inventory column changes (but data may be lost)
+1. Remove 'candidate' and 'head' from role ENUMs (but only if no users have these roles)
+2. Remove image_path column from inventory table (but only if not in use)
 
 It's safer to move forward with the migration rather than attempt rollback. Test on a staging environment first!
 
@@ -154,12 +190,11 @@ It's safer to move forward with the migration rather than attempt rollback. Test
 
 If you encounter issues:
 1. Check the error message from the migration script
-2. Run the test script to see which checks fail
-3. Verify database credentials in `.env` file
-4. Check database user permissions (needs ALTER TABLE rights)
+2. Verify database credentials in `.env` file
+3. Check database user permissions (needs ALTER TABLE rights)
+4. Ensure the correct inventory table exists (inventory or inventory_items)
 
 ## References
 
-- Problem Statement: See original SQL code in issue description
-- easyVerein Integration: Inventory sync with easyVerein requires specific column structure
-- Role System: Candidate role allows for probationary membership tracking
+- Problem Statement: Fix 'Column not found' error for image_path
+- Role System: Added candidate role for probationary membership tracking
