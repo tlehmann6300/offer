@@ -33,8 +33,10 @@ class Member {
         
         // Add search filter if provided
         if ($search !== null && $search !== '') {
-            $whereClauses[] = "(ap.first_name LIKE ? OR ap.last_name LIKE ? OR ap.company LIKE ? OR ap.industry LIKE ?)";
+            $whereClauses[] = "(ap.first_name LIKE ? OR ap.last_name LIKE ? OR ap.company LIKE ? OR ap.industry LIKE ? OR ap.study_program LIKE ? OR ap.studiengang LIKE ?)";
             $searchTerm = '%' . $search . '%';
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
             $params[] = $searchTerm;
             $params[] = $searchTerm;
             $params[] = $searchTerm;
@@ -66,8 +68,11 @@ class Member {
                 ap.company,
                 ap.position,
                 ap.studiengang,
+                ap.study_program,
                 ap.semester,
                 ap.angestrebter_abschluss,
+                ap.degree,
+                ap.graduation_year,
                 ap.about_me,
                 ap.image_path,
                 ap.created_at,
