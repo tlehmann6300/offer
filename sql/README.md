@@ -75,6 +75,35 @@ The script prints status messages for each operation and completes with:
 - Clear status messages for each operation
 - Handles missing tables gracefully
 
+### `migrate_add_candidate_role.php`
+Migration script to add the 'candidate' role to the users table.
+
+**Changes Made:**
+1. **Role ENUM Update**: Modifies the `users` table role ENUM to include: 'admin', 'board', 'head', 'member', 'alumni', 'candidate'
+2. **Default Value**: Sets the default role to 'member'
+
+**Usage:**
+```bash
+php sql/migrate_add_candidate_role.php
+```
+
+**Output:**
+The script prints status messages and completes with:
+```
+✅ Rolle Anwärter (candidate) erfolgreich zur Datenbank hinzugefügt
+```
+
+**Testing:**
+```bash
+php tests/test_add_candidate_role_migration.php
+```
+
+**Features:**
+- Idempotent: Can be run multiple times safely
+- Checks if 'candidate' role already exists before making changes
+- Clear status messages in German
+- Uses exact ENUM value matching with quotes to prevent false positives
+
 ### `migrate_add_candidate_role_fix_inventory.php`
 Legacy migration script for adding candidate role and fixing inventory table structure.
 
