@@ -102,6 +102,11 @@ try {
         ");
         echo "✓ Successfully created inventory table\n";
     } else {
+        // Validate table name to prevent SQL injection
+        if (!in_array($tableToFix, ['inventory', 'inventory_items'], true)) {
+            throw new Exception("Invalid table name: {$tableToFix}");
+        }
+        
         echo "Checking and updating {$tableToFix} table structure...\n";
         
         // Get current columns
@@ -112,6 +117,7 @@ try {
         // Check if image_path column exists
         if (!in_array('image_path', $columnNames)) {
             echo "  - Adding missing column: image_path...\n";
+            // Safe to use $tableToFix here as it's validated above
             $contentDB->exec("ALTER TABLE {$tableToFix} ADD COLUMN image_path VARCHAR(255) DEFAULT NULL");
             echo "    ✓ Added image_path column\n";
         } else {
