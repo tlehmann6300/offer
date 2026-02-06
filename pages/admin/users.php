@@ -149,9 +149,9 @@ ob_start();
                     name="validity_hours" 
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
-                    <option value="24">24 Hours</option>
-                    <option value="48">48 Hours</option>
-                    <option value="168" selected>7 Days</option>
+                    <option value="24">24 hours</option>
+                    <option value="168" selected>7 days</option>
+                    <option value="720">30 days</option>
                 </select>
             </div>
             <div class="flex items-end">
