@@ -4,7 +4,8 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/models/Alumni.php';
 require_once __DIR__ . '/../../includes/utils/SecureImageUpload.php';
 
-// Check authentication - redirect if not logged in
+// Access Control: Allow all logged-in users (Admin, Board, Head, Member, Candidate, Alumni)
+// No role restrictions - any authenticated user can edit their own profile
 if (!Auth::check()) {
     header('Location: ../auth/login.php');
     exit;
