@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'board', 'member', 'alumni') NOT NULL DEFAULT 'member',
+    role ENUM('admin', 'board', 'alumni_board', 'manager', 'member', 'alumni', 'candidate') NOT NULL DEFAULT 'member',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_email (email),

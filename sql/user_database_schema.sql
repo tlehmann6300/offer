@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS invitation_tokens (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     token VARCHAR(64) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL,
-    role ENUM('admin', 'board', 'alumni_board', 'manager', 'member', 'alumni')
+    role ENUM('admin', 'board', 'alumni_board', 'manager', 'member', 'alumni', 'candidate')
         NOT NULL DEFAULT 'member',
     created_by INT UNSIGNED NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
