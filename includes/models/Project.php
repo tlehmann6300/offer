@@ -237,14 +237,16 @@ class Project {
             
             $callToAction = '<a href="' . $projectUrl . '" style="display: inline-block; background-color: #6D9744; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0;">Projekt ansehen</a>';
             
+            // Build complete HTML email using template
+            $htmlBody = MailService::getTemplate('Neues Projekt', $bodyContent, $callToAction);
+            
             // Send email to each user
             foreach ($users as $user) {
                 try {
-                    MailService::sendMail(
+                    MailService::sendEmail(
                         $user['email'],
                         'Neues Projekt: ' . $projectTitle,
-                        $bodyContent,
-                        $callToAction
+                        $htmlBody
                     );
                 } catch (Exception $e) {
                     // Log error but continue with other users
