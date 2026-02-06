@@ -291,7 +291,7 @@ class Event {
                 $formattedDate = $startDate->format('d.m.Y H:i');
                 
                 // Build event link
-                $eventLink = BASE_URL . '/pages/events/view.php?id=' . $eventId;
+                $eventLink = BASE_URL . '/pages/events/view.php?id=' . intval($eventId);
                 
                 // Send email to each recipient
                 foreach ($recipients as $recipient) {
@@ -300,8 +300,12 @@ class Event {
                         
                         // Build HTML body
                         $bodyContent = '<p class="email-text">Hallo,</p>
-                        <p class="email-text">es gibt ein neues Event: <strong>' . htmlspecialchars($event['title']) . '</strong> am ' . htmlspecialchars($formattedDate) . '.</p>
-                        <p class="email-text">Wir suchen noch Helfer!</p>';
+                        <p class="email-text">es gibt ein neues Event: <strong>' . htmlspecialchars($event['title']) . '</strong> am ' . htmlspecialchars($formattedDate) . '.</p>';
+                        
+                        // Add helper message only if event needs helpers
+                        if (!empty($event['needs_helpers'])) {
+                            $bodyContent .= '<p class="email-text">Wir suchen noch Helfer!</p>';
+                        }
                         
                         // Add call-to-action button
                         $callToAction = '<a href="' . htmlspecialchars($eventLink) . '" class="button">Hier klicken zum Ansehen</a>';
