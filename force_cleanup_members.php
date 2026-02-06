@@ -38,9 +38,9 @@ try {
         echo "⚠️ WARNING: DB Column study_program missing! Run migrations first!\n";
     }
     
-} catch (PDOException $e) {
-    echo "❌ Database error: " . $e->getMessage() . "\n";
-    echo "⚠️ WARNING: DB Column study_program missing! Run migrations first!\n";
+} catch (Exception $e) {
+    echo "❌ Database error: Unable to verify database schema.\n";
+    echo "   Error details: " . $e->getMessage() . "\n";
 }
 
 echo "\n=== Cleanup completed ===\n";
