@@ -26,7 +26,7 @@ if (!empty($user['firstname'])) {
 }
 
 // Determine greeting based on time of day (German time)
-// Note: timezone should ideally be set in config, but setting here for dashboard display
+// TODO: Move timezone configuration to config file in future refactoring
 $timezone = new DateTimeZone('Europe/Berlin');
 $now = new DateTime('now', $timezone);
 $hour = (int)$now->format('H');
@@ -252,7 +252,8 @@ endif;
     </div>
 </div>
 
-<!-- Hero Section - Legacy (moved below) -->
+<!-- Hero Section - Legacy (hidden, kept for reference during transition period) -->
+<!-- TODO: Remove after verifying new layout is stable (2 weeks from deployment) -->
 <div class="mb-12 hidden">
     <div class="text-center max-w-4xl mx-auto">
         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-4">
