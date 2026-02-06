@@ -128,6 +128,13 @@ require_once __DIR__ . '/../../src/Auth.php';
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar fixed left-0 top-0 h-screen w-64 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-40 text-white shadow-2xl flex flex-col">
         <?php $currentUser = Auth::user(); ?>
+        <?php 
+        // Helper function to determine if a path is active
+        function isActivePath($path) {
+            $currentUri = $_SERVER['REQUEST_URI'];
+            return strpos($currentUri, $path) !== false;
+        }
+        ?>
         <div class="p-6 flex-1 overflow-y-auto">
             <!-- IBC Logo in Navbar -->
             <div class="mb-8">
@@ -135,95 +142,98 @@ require_once __DIR__ . '/../../src/Auth.php';
             </div>
             
             <nav class="space-y-2">
-                <a href="<?php echo asset('pages/dashboard/index.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                    <i class="fas fa-home w-5"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="<?php echo asset('pages/blog/index.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                    <i class="fas fa-newspaper w-5"></i>
-                    <span>News / Blog</span>
-                </a>
-                <a href="<?php echo asset('pages/inventory/index.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                    <i class="fas fa-boxes w-5"></i>
-                    <span>Inventar</span>
-                </a>
-                <a href="<?php echo asset('pages/events/index.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                    <i class="fas fa-calendar-check w-5"></i>
-                    <span>Events</span>
-                </a>
-                <a href="<?php echo asset('pages/alumni/index.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                    <i class="fas fa-user-tie w-5"></i>
-                    <span>Alumni-Netzwerk</span>
-                </a>
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'head', 'member', 'candidate'])): ?>
-                <a href="<?php echo asset('pages/members/directory.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                    <i class="fas fa-users w-5"></i>
-                    <span>Vereinsmitglieder</span>
-                </a>
-                <?php endif; ?>
-                <a href="<?php echo asset('pages/projects/index.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                    <i class="fas fa-briefcase w-5"></i>
-                    <span>Projekte</span>
-                </a>
-                
-                <!-- Verwaltung Dropdown -->
-                <div class="pt-2">
-                    <button type="button"
-                            onclick="toggleVerwaltungDropdown()" 
-                            id="verwaltung-button"
-                            class="w-full flex items-center justify-between space-x-3 p-3 rounded-lg hover:bg-white/10 transition"
-                            aria-expanded="false"
-                            aria-controls="verwaltung-dropdown">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-cog w-5"></i>
-                            <span>Verwaltung</span>
-                        </div>
-                        <i id="verwaltung-arrow" class="fas fa-chevron-down text-sm transition-transform duration-300"></i>
-                    </button>
-                    <nav id="verwaltung-dropdown" 
-                         class="hidden bg-black/40 rounded-lg mt-2 ml-2 border-l-2 border-gray-600 overflow-hidden"
-                         aria-labelledby="verwaltung-button">
-                        <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" class="flex items-center pr-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
-                            <i class="fas fa-clipboard-list w-5 mr-2"></i>
-                            <span>Meine Ausleihen</span>
-                        </a>
-                        <?php if (Auth::hasPermission('manager')): ?>
-                        <a href="<?php echo asset('pages/events/manage.php'); ?>" class="flex items-center pr-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
-                            <i class="fas fa-calendar-alt w-5 mr-2"></i>
-                            <span>Event-Verwaltung</span>
-                        </a>
-                        <a href="<?php echo asset('pages/projects/manage.php'); ?>" class="flex items-center pr-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
-                            <i class="fas fa-tasks w-5 mr-2"></i>
-                            <span>Projekt-Verwaltung</span>
-                        </a>
-                        <a href="<?php echo asset('pages/inventory/manage.php'); ?>" class="flex items-center pr-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
-                            <i class="fas fa-cogs w-5 mr-2"></i>
-                            <span>Inventar-Verwaltung</span>
-                        </a>
-                        <?php endif; ?>
-                        <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
-                        <a href="<?php echo asset('pages/admin/users.php'); ?>" class="flex items-center pr-4 py-2 text-sm text-gray-300 pl-4 hover:bg-gray-700 hover:text-white transition-all">
-                            <i class="fas fa-users w-5 mr-2"></i>
-                            <span>Benutzerverwaltung</span>
-                        </a>
-                        <?php endif; ?>
-                    </nav>
+                <!-- Mein Bereich Section -->
+                <div class="mb-4">
+                    <h3 class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2 px-3">Mein Bereich</h3>
+                    <a href="<?php echo asset('pages/dashboard/index.php'); ?>" 
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/dashboard/') ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                        <i class="fas fa-home w-5"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="<?php echo asset('pages/auth/profile.php'); ?>" 
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/auth/profile.php') ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                        <i class="fas fa-user w-5"></i>
+                        <span>Profil</span>
+                    </a>
+                    <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" 
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/inventory/my_rentals.php') ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                        <i class="fas fa-clipboard-list w-5"></i>
+                        <span>Meine Ausleihen</span>
+                    </a>
+                </div>
+
+                <!-- Hauptmenü Section -->
+                <div class="mb-4">
+                    <h3 class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2 px-3">Hauptmenü</h3>
+                    <a href="<?php echo asset('pages/blog/index.php'); ?>" 
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/blog/') ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                        <i class="fas fa-newspaper w-5"></i>
+                        <span>News / Blog</span>
+                    </a>
+                    <a href="<?php echo asset('pages/inventory/index.php'); ?>" 
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo (isActivePath('/inventory/') && !isActivePath('/my_rentals.php')) ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                        <i class="fas fa-boxes w-5"></i>
+                        <span>Inventar</span>
+                    </a>
+                    <a href="<?php echo asset('pages/events/index.php'); ?>" 
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/events/') ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                        <i class="fas fa-calendar-check w-5"></i>
+                        <span>Events</span>
+                    </a>
+                    <a href="<?php echo asset('pages/projects/index.php'); ?>" 
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/projects/') ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                        <i class="fas fa-briefcase w-5"></i>
+                        <span>Projekte</span>
+                    </a>
+                    <a href="<?php echo asset('pages/alumni/index.php'); ?>" 
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/alumni/') ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                        <i class="fas fa-user-tie w-5"></i>
+                        <span>Alumni-Netzwerk</span>
+                    </a>
+                    <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'head', 'member', 'candidate'])): ?>
+                    <a href="<?php echo asset('pages/members/directory.php'); ?>" 
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/members/') ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                        <i class="fas fa-users w-5"></i>
+                        <span>Vereinsmitglieder</span>
+                    </a>
+                    <?php endif; ?>
                 </div>
                 
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
-                <!-- Admin Section (Audit-Logs kept separate) -->
-                <div class="pt-2">
-                    <a href="<?php echo asset('pages/admin/audit.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
+                <!-- Verwaltung Section -->
+                <?php if (Auth::hasPermission('manager') || (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board']))): ?>
+                <div class="mb-4">
+                    <h3 class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2 px-3">Verwaltung</h3>
+                    <?php if (Auth::hasPermission('manager')): ?>
+                    <a href="<?php echo asset('pages/events/manage.php'); ?>" 
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/events/manage.php') ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                        <i class="fas fa-calendar-alt w-5"></i>
+                        <span>Event-Verwaltung</span>
+                    </a>
+                    <a href="<?php echo asset('pages/projects/manage.php'); ?>" 
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/projects/manage.php') ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                        <i class="fas fa-tasks w-5"></i>
+                        <span>Projekt-Verwaltung</span>
+                    </a>
+                    <a href="<?php echo asset('pages/inventory/manage.php'); ?>" 
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/inventory/manage.php') ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                        <i class="fas fa-cogs w-5"></i>
+                        <span>Inventar-Verwaltung</span>
+                    </a>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
+                    <a href="<?php echo asset('pages/admin/users.php'); ?>" 
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/admin/users.php') ? 'bg-purple-700 shadow-lg' : ''; ?>">
+                        <i class="fas fa-users-cog w-5"></i>
+                        <span>Benutzerverwaltung</span>
+                    </a>
+                    <a href="<?php echo asset('pages/admin/audit.php'); ?>" 
+                       class="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-700 transition-all duration-200 <?php echo isActivePath('/admin/audit.php') ? 'bg-purple-700 shadow-lg' : ''; ?>">
                         <i class="fas fa-clipboard-list w-5"></i>
                         <span>Audit-Logs</span>
                     </a>
+                    <?php endif; ?>
                 </div>
                 <?php endif; ?>
-                
-                <a href="<?php echo asset('pages/auth/profile.php'); ?>" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition">
-                    <i class="fas fa-user w-5"></i>
-                    <span>Profil</span>
-                </a>
                 
             </nav>
         </div>
@@ -317,22 +327,6 @@ require_once __DIR__ . '/../../src/Auth.php';
                 sidebarOverlay.classList.add('hidden');
             }
         });
-
-        // Verwaltung dropdown toggle
-        function toggleVerwaltungDropdown() {
-            const dropdown = document.getElementById('verwaltung-dropdown');
-            const arrow = document.getElementById('verwaltung-arrow');
-            const button = document.getElementById('verwaltung-button');
-            const isHidden = dropdown.classList.contains('hidden');
-            
-            dropdown.classList.toggle('hidden');
-            arrow.classList.toggle('rotate-180');
-            
-            // Update aria-expanded for accessibility
-            if (button) {
-                button.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
-            }
-        }
     </script>
 </body>
 </html>

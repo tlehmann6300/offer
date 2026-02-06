@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
+require_once __DIR__ . '/../../includes/models/Event.php';
 require_once __DIR__ . '/../../includes/helpers.php';
 
 // Update event statuses (pseudo-cron)
@@ -14,6 +15,49 @@ if (!Auth::check()) {
 
 $user = Auth::user();
 $stats = Inventory::getDashboardStats();
+
+// Get user's first name for personalized greeting
+$firstname = 'Benutzer'; // Default fallback
+if (!empty($user['firstname'])) {
+    $firstname = $user['firstname'];
+} elseif (!empty($user['email']) && strpos($user['email'], '@') !== false) {
+    $emailParts = explode('@', $user['email']);
+    $firstname = $emailParts[0];
+}
+
+// Determine greeting based on time of day (German time)
+// TODO: Move timezone configuration to config file in future refactoring
+$timezone = new DateTimeZone('Europe/Berlin');
+$now = new DateTime('now', $timezone);
+$hour = (int)$now->format('H');
+if ($hour >= 5 && $hour < 12) {
+    $greeting = 'Guten Morgen';
+} elseif ($hour >= 12 && $hour < 18) {
+    $greeting = 'Guten Tag';
+} else {
+    $greeting = 'Guten Abend';
+}
+
+// Get user's upcoming events
+$userUpcomingEvents = Event::getUserSignups($user['id']);
+$nextEvent = null;
+if (!empty($userUpcomingEvents)) {
+    // Filter for upcoming events only and get the next one
+    $upcomingEvents = array_filter($userUpcomingEvents, function($signup) {
+        return !empty($signup['start_time']) && strtotime($signup['start_time']) > time();
+    });
+    if (!empty($upcomingEvents)) {
+        // Sort by start_time
+        usort($upcomingEvents, function($a, $b) {
+            return strtotime($a['start_time']) - strtotime($b['start_time']);
+        });
+        $nextEvent = $upcomingEvents[0];
+    }
+}
+
+// Get user's open tasks from inventory rentals
+$userRentals = Inventory::getUserCheckouts($user['id'], false); // false = only unreturned items
+$openTasksCount = count($userRentals);
 
 // Get extended statistics for board/managers
 $hasExtendedAccess = Auth::hasPermission('manager');
@@ -96,8 +140,121 @@ endif;
 <?php echo $securityWarning; ?>
 <?php endif; ?>
 
-<!-- Hero Section -->
-<div class="mb-12">
+<!-- Hero Section with Personalized Greeting -->
+<div class="mb-8">
+    <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-3">
+            <?php echo htmlspecialchars($greeting); ?>, <?php echo htmlspecialchars($firstname); ?>!
+        </h1>
+        <p class="text-lg md:text-xl text-gray-600">
+            Willkommen zurück im IBC Intranet
+        </p>
+    </div>
+</div>
+
+<!-- Quick Stats Widgets -->
+<div class="max-w-6xl mx-auto mb-8">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">
+        <i class="fas fa-tachometer-alt text-purple-600 mr-2"></i>
+        Schnellübersicht
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- My Open Tasks Widget -->
+        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-orange-50 hover:shadow-2xl transition-all duration-300">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-tasks text-orange-600 mr-2"></i>
+                    Meine offenen Aufgaben
+                </h3>
+                <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                    <span class="text-2xl font-bold text-orange-600"><?php echo $openTasksCount; ?></span>
+                </div>
+            </div>
+            <?php if ($openTasksCount > 0): ?>
+            <p class="text-gray-600 mb-3">Sie haben aktuell <?php echo $openTasksCount; ?> offene Ausleihen</p>
+            <a href="../inventory/my_rentals.php" class="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold">
+                Ausleihen verwalten <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+            <?php else: ?>
+            <p class="text-gray-600">Keine offenen Ausleihen</p>
+            <p class="text-sm text-gray-500 mt-2">Alle Artikel wurden zurückgegeben</p>
+            <?php endif; ?>
+        </div>
+
+        <!-- Next Event Widget -->
+        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-blue-50 hover:shadow-2xl transition-all duration-300">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-calendar-alt text-blue-600 mr-2"></i>
+                    Nächstes Event
+                </h3>
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
+                </div>
+            </div>
+            <?php if ($nextEvent): ?>
+            <h4 class="font-semibold text-gray-800 mb-2"><?php echo htmlspecialchars($nextEvent['title']); ?></h4>
+            <p class="text-gray-600 mb-3">
+                <i class="fas fa-clock mr-1"></i>
+                <?php echo date('d.m.Y H:i', strtotime($nextEvent['start_time'])); ?> Uhr
+            </p>
+            <a href="../events/view.php?id=<?php echo $nextEvent['event_id']; ?>" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold">
+                Details ansehen <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+            <?php else: ?>
+            <p class="text-gray-600 mb-3">Keine anstehenden Events</p>
+            <a href="../events/index.php" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold">
+                Events durchsuchen <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+<!-- Schnellzugriff Section -->
+<div class="max-w-6xl mx-auto mb-12">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">
+        <i class="fas fa-bolt text-yellow-500 mr-2"></i>
+        Schnellzugriff
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <a href="../projects/index.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-briefcase text-3xl"></i>
+            </div>
+            <h3 class="font-bold text-lg">Projekt melden</h3>
+            <p class="text-sm text-white/80 mt-1">Neues Projekt starten</p>
+        </a>
+
+        <a href="../events/index.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-door-open text-3xl"></i>
+            </div>
+            <h3 class="font-bold text-lg">Raum buchen</h3>
+            <p class="text-sm text-white/80 mt-1">Event erstellen</p>
+        </a>
+
+        <a href="../inventory/index.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-boxes text-3xl"></i>
+            </div>
+            <h3 class="font-bold text-lg">Inventar</h3>
+            <p class="text-sm text-white/80 mt-1">Artikel suchen</p>
+        </a>
+
+        <a href="../auth/profile.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-user-circle text-3xl"></i>
+            </div>
+            <h3 class="font-bold text-lg">Profil</h3>
+            <p class="text-sm text-white/80 mt-1">Einstellungen</p>
+        </a>
+    </div>
+</div>
+
+<!-- Hero Section - Legacy (hidden, kept for reference during transition period) -->
+<!-- TODO: Remove after verifying new layout is stable (2 weeks from deployment) -->
+<div class="mb-12 hidden">
     <div class="text-center max-w-4xl mx-auto">
         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-4">
             Willkommen im IBC Intranet
@@ -129,7 +286,7 @@ endif;
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         <!-- Tile 1: Available Items -->
-        <div class="card p-8 card-hover transition-all text-center bg-gradient-to-br from-white to-blue-50">
+        <div class="card p-8 rounded-xl shadow-lg transition-all hover:shadow-2xl text-center bg-gradient-to-br from-white to-blue-50">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
                 <i class="fas fa-box-open text-3xl text-blue-600"></i>
             </div>
@@ -139,7 +296,7 @@ endif;
         </div>
         
         <!-- Tile 2: Total Value -->
-        <div class="card p-8 card-hover transition-all text-center bg-gradient-to-br from-white to-green-50">
+        <div class="card p-8 rounded-xl shadow-lg transition-all hover:shadow-2xl text-center bg-gradient-to-br from-white to-green-50">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
                 <i class="fas fa-euro-sign text-3xl text-green-600"></i>
             </div>
@@ -149,7 +306,7 @@ endif;
         </div>
         
         <!-- Tile 3: Recent Activity -->
-        <div class="card p-8 card-hover transition-all text-center bg-gradient-to-br from-white to-purple-50">
+        <div class="card p-8 rounded-xl shadow-lg transition-all hover:shadow-2xl text-center bg-gradient-to-br from-white to-purple-50">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
                 <i class="fas fa-clock text-3xl text-purple-600"></i>
             </div>
@@ -163,7 +320,7 @@ endif;
 <!-- Additional Info Cards -->
 <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- Quick Actions Card -->
-    <div class="card p-6">
+    <div class="card p-6 rounded-xl shadow-lg">
         <h3 class="text-xl font-bold text-gray-800 mb-4">
             <i class="fas fa-bolt text-yellow-500 mr-2"></i>
             Schnellaktionen
@@ -195,7 +352,7 @@ endif;
     </div>
     
     <!-- Status Overview Card -->
-    <div class="card p-6">
+    <div class="card p-6 rounded-xl shadow-lg">
         <h3 class="text-xl font-bold text-gray-800 mb-4">
             <i class="fas fa-info-circle text-blue-500 mr-2"></i>
             Status-Übersicht
@@ -232,7 +389,7 @@ endif;
 
 <!-- Write-off Warning Box (if any this month) -->
 <?php if ($writeOffStats['total_writeoffs'] > 0): ?>
-<div class="max-w-6xl mx-auto mt-8 p-6 bg-red-50 border-l-4 border-red-500 rounded-lg">
+<div class="max-w-6xl mx-auto mt-8 p-6 bg-red-50 border-l-4 border-red-500 rounded-xl shadow-lg">
     <div class="flex items-center mb-4">
         <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
             <i class="fas fa-exclamation-circle text-red-600 text-2xl"></i>
@@ -242,7 +399,7 @@ endif;
             <p class="text-red-600"><?php echo $writeOffStats['total_writeoffs']; ?> Meldungen, <?php echo $writeOffStats['total_quantity_lost']; ?> Einheiten betroffen</p>
         </div>
     </div>
-    <div class="bg-white rounded-lg p-4 max-h-80 overflow-y-auto">
+    <div class="bg-white rounded-lg p-4 max-h-80 overflow-y-auto shadow-lg">
         <table class="w-full text-sm">
             <thead class="bg-gray-50 sticky top-0">
                 <tr>
@@ -284,7 +441,7 @@ endif;
 <!-- In Stock and On Route Tiles -->
 <div class="max-w-6xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Im Lager (In Stock) -->
-    <div class="card p-6">
+    <div class="card p-6 rounded-xl shadow-lg">
         <h2 class="text-xl font-bold text-gray-800 mb-4">
             <i class="fas fa-warehouse text-green-600 mr-2"></i>
             Im Lager
@@ -321,7 +478,7 @@ endif;
     </div>
 
     <!-- Unterwegs (On Route / Checked Out) -->
-    <div class="card p-6">
+    <div class="card p-6 rounded-xl shadow-lg">
         <h2 class="text-xl font-bold text-gray-800 mb-4">
             <i class="fas fa-truck text-orange-600 mr-2"></i>
             Unterwegs
