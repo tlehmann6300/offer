@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => '__root__',
-        'pretty_version' => 'dev-copilot/fix-smtpdebug-mode',
-        'version' => 'dev-copilot/fix-smtpdebug-mode',
-        'reference' => '16eaf77915007e4043b37fa4ca2150676a606ac6',
+        'pretty_version' => 'dev-copilot/review-mail-service-send-method',
+        'version' => 'dev-copilot/review-mail-service-send-method',
+        'reference' => 'a152b94f0191f27041580a4e45f5a09c781fb7d8',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => 'dev-copilot/fix-smtpdebug-mode',
-            'version' => 'dev-copilot/fix-smtpdebug-mode',
-            'reference' => '16eaf77915007e4043b37fa4ca2150676a606ac6',
+            'pretty_version' => 'dev-copilot/review-mail-service-send-method',
+            'version' => 'dev-copilot/review-mail-service-send-method',
+            'reference' => 'a152b94f0191f27041580a4e45f5a09c781fb7d8',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

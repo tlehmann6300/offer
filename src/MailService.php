@@ -184,25 +184,47 @@ class MailService {
         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
         
         try {
-            // SMTP configuration - load dynamically from constants or $_ENV
-            $mail->isSMTP();
-            $mail->Host = defined('SMTP_HOST') ? SMTP_HOST : ($_ENV['SMTP_HOST'] ?? 'localhost');
-            $mail->SMTPAuth = true;
-            $mail->Username = defined('SMTP_USER') ? SMTP_USER : ($_ENV['SMTP_USER'] ?? '');
-            $mail->Password = defined('SMTP_PASS') ? SMTP_PASS : ($_ENV['SMTP_PASS'] ?? '');
-            $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = defined('SMTP_PORT') ? SMTP_PORT : ($_ENV['SMTP_PORT'] ?? 587);
+            // Get SMTP Host from configuration
+            $smtpHost = defined('SMTP_HOST') ? SMTP_HOST : ($_ENV['SMTP_HOST'] ?? '');
             
-            // Validate SMTP credentials are configured
-            if (empty($mail->Username) || empty($mail->Password)) {
-                error_log("Warning: SMTP credentials are not configured. Email sending may fail.");
+            // Check if SMTP_HOST is configured
+            if (empty($smtpHost)) {
+                // Fallback: Check if PHP mail() function is available
+                if (function_exists('mail')) {
+                    error_log("Warning: SMTP_HOST not configured in .env. Falling back to PHP mail() function.");
+                    $mail->isMail(); // Use PHP's mail() function
+                } else {
+                    // Critical error: Neither SMTP nor mail() available
+                    error_log("CRITICAL ERROR: SMTP_HOST not configured and PHP mail() function is not available. Email sending will fail.");
+                    throw new \Exception("Email configuration error: SMTP_HOST not set and PHP mail() not available");
+                }
+                
+                // Set sender for mail() fallback
+                $mail->setFrom(
+                    defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : ($_ENV['SMTP_FROM_EMAIL'] ?? 'noreply@localhost'),
+                    defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : ($_ENV['SMTP_FROM_NAME'] ?? 'IBC Intranet')
+                );
+            } else {
+                // SMTP configuration - load dynamically from constants or $_ENV
+                $mail->isSMTP();
+                $mail->Host = $smtpHost;
+                $mail->SMTPAuth = true;
+                $mail->Username = defined('SMTP_USER') ? SMTP_USER : ($_ENV['SMTP_USER'] ?? '');
+                $mail->Password = defined('SMTP_PASS') ? SMTP_PASS : ($_ENV['SMTP_PASS'] ?? '');
+                $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = defined('SMTP_PORT') ? SMTP_PORT : ($_ENV['SMTP_PORT'] ?? 587);
+                
+                // Validate SMTP credentials are configured
+                if (empty($mail->Username) || empty($mail->Password)) {
+                    error_log("Warning: SMTP credentials are not configured. Email sending may fail.");
+                }
+                
+                // Set sender
+                $mail->setFrom(
+                    defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : ($_ENV['SMTP_FROM_EMAIL'] ?? ''),
+                    defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : ($_ENV['SMTP_FROM_NAME'] ?? 'IBC Intranet')
+                );
             }
-            
-            // Set sender
-            $mail->setFrom(
-                defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : ($_ENV['SMTP_FROM_EMAIL'] ?? ''),
-                defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : ($_ENV['SMTP_FROM_NAME'] ?? 'IBC Intranet')
-            );
             
             // Character encoding
             $mail->CharSet = 'UTF-8';
