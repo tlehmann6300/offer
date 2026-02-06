@@ -5,6 +5,7 @@
  */
 
 require_once __DIR__ . '/../utils/SecureImageUpload.php';
+require_once __DIR__ . '/../../src/MailService.php';
 
 class Event {
     
@@ -273,6 +274,57 @@ class Event {
             ]);
             
             $db->commit();
+            
+            // Send email notifications to users with notify_new_events = 1
+            // This is done after commit to ensure event is saved even if email fails
+            try {
+                $userDB = Database::getUserDB();
+                $stmt = $userDB->prepare("SELECT id, email FROM users WHERE notify_new_events = 1");
+                $stmt->execute();
+                $recipients = $stmt->fetchAll();
+                
+                // Get the newly created event details
+                $event = self::getById($eventId, false);
+                
+                // Format event date
+                $startDate = new DateTime($event['start_time']);
+                $formattedDate = $startDate->format('d.m.Y H:i');
+                
+                // Build event link
+                $eventLink = BASE_URL . '/pages/events/view.php?id=' . intval($eventId);
+                
+                // Send email to each recipient
+                foreach ($recipients as $recipient) {
+                    try {
+                        $subject = 'Neues Event: ' . $event['title'] . ' - Jetzt anmelden!';
+                        
+                        // Build HTML body
+                        $bodyContent = '<p class="email-text">Hallo,</p>
+                        <p class="email-text">es gibt ein neues Event: <strong>' . htmlspecialchars($event['title']) . '</strong> am ' . htmlspecialchars($formattedDate) . '.</p>';
+                        
+                        // Add helper message only if event needs helpers
+                        if (!empty($event['needs_helpers'])) {
+                            $bodyContent .= '<p class="email-text">Wir suchen noch Helfer!</p>';
+                        }
+                        
+                        // Add call-to-action button
+                        $callToAction = '<a href="' . htmlspecialchars($eventLink) . '" class="button">Hier klicken zum Ansehen</a>';
+                        
+                        // Use MailService template
+                        $htmlBody = MailService::getTemplate('Neues Event', $bodyContent, $callToAction);
+                        
+                        // Send email
+                        MailService::sendEmail($recipient['email'], $subject, $htmlBody);
+                    } catch (Exception $mailError) {
+                        // Log individual email errors but continue with other recipients
+                        error_log("Failed to send event notification to {$recipient['email']}: " . $mailError->getMessage());
+                    }
+                }
+            } catch (Exception $notificationError) {
+                // Log the error but don't throw - event was already created successfully
+                error_log("Failed to send event notifications: " . $notificationError->getMessage());
+            }
+            
             return $eventId;
         } catch (Exception $e) {
             $db->rollBack();
