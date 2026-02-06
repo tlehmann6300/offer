@@ -212,28 +212,27 @@ class Project {
             
             $bodyContent = '<p>Ein neues Projekt wurde veröffentlicht:</p>';
             $bodyContent .= '<div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">';
-            $bodyContent .= '<h3 style="color: #6D9744; margin: 0 0 10px 0;">' . $projectTitle . '</h3>';
-            $bodyContent .= '<p style="margin: 5px 0;"><strong>Typ:</strong> ' . $projectTypeLabel . '</p>';
+            $bodyContent .= '<h3 style="color: #4a7c2f; margin: 0 0 10px 0;">' . $projectTitle . '</h3>';
+            $bodyContent .= '<p style="margin: 5px 0; color: #1f2937;"><strong>Typ:</strong> ' . $projectTypeLabel . '</p>';
             
             if (!empty($projectData['description'])) {
                 $description = htmlspecialchars(substr($projectData['description'], 0, 200));
                 if (strlen($projectData['description']) > 200) {
                     $description .= '...';
                 }
-                $bodyContent .= '<p style="margin: 5px 0;"><strong>Beschreibung:</strong> ' . $description . '</p>';
+                $bodyContent .= '<p style="margin: 5px 0; color: #1f2937;"><strong>Beschreibung:</strong> ' . $description . '</p>';
             }
             
             if (!empty($projectData['start_date'])) {
-                $bodyContent .= '<p style="margin: 5px 0;"><strong>Start:</strong> ' . date('d.m.Y', strtotime($projectData['start_date'])) . '</p>';
+                $bodyContent .= '<p style="margin: 5px 0; color: #1f2937;"><strong>Start:</strong> ' . date('d.m.Y', strtotime($projectData['start_date'])) . '</p>';
             }
             
             $bodyContent .= '</div>';
             $bodyContent .= '<p>Klicken Sie auf den Button unten, um das Projekt anzusehen und sich zu bewerben.</p>';
             
-            // Create CTA button
-            $projectUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . 
-                          '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . 
-                          '/pages/projects/view.php?id=' . $projectId;
+            // Create CTA button - use BASE_URL if available
+            $baseUrl = defined('BASE_URL') ? BASE_URL : ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+            $projectUrl = rtrim($baseUrl, '/') . '/pages/projects/view.php?id=' . $projectId;
             
             $callToAction = '<a href="' . $projectUrl . '" style="display: inline-block; background-color: #6D9744; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0;">Projekt ansehen</a>';
             

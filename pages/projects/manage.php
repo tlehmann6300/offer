@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_project'])) {
             'client_name' => trim($_POST['client_name'] ?? ''),
             'client_contact_details' => trim($_POST['client_contact_details'] ?? ''),
             'priority' => $_POST['priority'] ?? 'medium',
-            'type' => $_POST['type'] ?? 'internal',
+            'type' => in_array($_POST['type'] ?? 'internal', ['internal', 'external']) ? $_POST['type'] : 'internal',
             'status' => $status,
             'max_consultants' => max(1, intval($_POST['max_consultants'] ?? 1)),
             'start_date' => !empty($_POST['start_date']) ? $_POST['start_date'] : null,
