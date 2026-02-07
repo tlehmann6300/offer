@@ -34,7 +34,7 @@ ADD COLUMN IF NOT EXISTS is_locked_permanently BOOLEAN NOT NULL DEFAULT 0;
 ALTER TABLE users 
 ADD COLUMN IF NOT EXISTS notify_new_projects BOOLEAN NOT NULL DEFAULT 1;
 
--- Add event notification preference (default TRUE - opt-in model)
+-- Add event notification preference (default TRUE - opt-out model)
 ALTER TABLE users 
 ADD COLUMN IF NOT EXISTS notify_new_events BOOLEAN NOT NULL DEFAULT 1;
 
