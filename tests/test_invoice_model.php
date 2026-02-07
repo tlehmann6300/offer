@@ -39,8 +39,14 @@ try {
     $tempDir = sys_get_temp_dir();
     $testPdfPath = $tempDir . '/test_invoice.pdf';
     
-    // Create a simple PDF content (minimal valid PDF)
-    $pdfContent = "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000009 00000 n\n0000000058 00000 n\n0000000115 00000 n\ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF";
+    // Create a minimal valid PDF (simplified for testing)
+    // PDF structure: header, catalog, pages, page, xref, trailer
+    $pdfHeader = "%PDF-1.4\n";
+    $pdfObjects = "1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\n";
+    $pdfXref = "xref\n0 4\n0000000000 65535 f\n0000000009 00000 n\n0000000058 00000 n\n0000000115 00000 n\n";
+    $pdfTrailer = "trailer<</Size 4/Root 1 0 R>>\nstartxref\n190\n%%EOF";
+    $pdfContent = $pdfHeader . $pdfObjects . $pdfXref . $pdfTrailer;
+    
     file_put_contents($testPdfPath, $pdfContent);
     
     // Test file size validation (should succeed - small file)

@@ -5,6 +5,7 @@
  */
 
 require_once __DIR__ . '/../database.php';
+require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../src/MailService.php';
 
 class Invoice {
@@ -227,7 +228,7 @@ class Invoice {
             
             // Send email with attachment
             return MailService::sendEmailWithFileAttachment(
-                'tlehmann630@gmail.com',
+                defined('INVOICE_NOTIFICATION_EMAIL') ? INVOICE_NOTIFICATION_EMAIL : 'tlehmann630@gmail.com',
                 $subject,
                 $htmlBody,
                 $absoluteFilePath
