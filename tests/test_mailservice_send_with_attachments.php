@@ -32,9 +32,20 @@ foreach ($parameters as $param) {
 echo "\n";
 
 if (count($parameters) === 4) {
-    echo "✓ PASS: Method has 4 parameters (toEmail, subject, htmlBody, attachments)\n";
+    echo "✓ PASS: Method has 4 parameters (to, subject, body, attachments)\n";
 } else {
     echo "✗ FAIL: Method should have 4 parameters, has " . count($parameters) . "\n";
+    exit(1);
+}
+
+// Test 2b: Verify parameter names
+echo "\nTest 2b: Verifying parameter names...\n";
+$paramNames = array_map(function($p) { return $p->getName(); }, $parameters);
+$expectedNames = ['to', 'subject', 'body', 'attachments'];
+if ($paramNames === $expectedNames) {
+    echo "✓ PASS: Parameter names are correct (to, subject, body, attachments)\n";
+} else {
+    echo "✗ FAIL: Parameter names do not match. Expected: " . implode(', ', $expectedNames) . ", Got: " . implode(', ', $paramNames) . "\n";
     exit(1);
 }
 

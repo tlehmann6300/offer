@@ -694,7 +694,7 @@ class MailService {
      * @param array $attachments Optional array of file paths to attach
      * @return bool Success status
      */
-    public static function send($toEmail, $subject, $htmlBody, $attachments = []) {
+    public static function send($to, $subject, $body, $attachments = []) {
         if (self::isVendorMissing()) {
             error_log("Cannot send email: Composer vendor missing");
             return false;
@@ -704,12 +704,12 @@ class MailService {
             $mail = self::createMailer();
             
             // Set recipient
-            $mail->addAddress($toEmail);
+            $mail->addAddress($to);
             
             // Email content
             $mail->isHTML(true);
             $mail->Subject = $subject;
-            $mail->Body = $htmlBody;
+            $mail->Body = $body;
             
             // Add attachments if provided
             if (!empty($attachments) && is_array($attachments)) {
@@ -729,7 +729,7 @@ class MailService {
             return true;
             
         } catch (\Exception $e) {
-            error_log("Error sending email to {$toEmail}: " . $e->getMessage());
+            error_log("Error sending email to {$to}: " . $e->getMessage());
             return false;
         }
     }
