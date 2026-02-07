@@ -317,13 +317,21 @@ class Invoice {
     
     /**
      * Update invoice status
+     * Only board members are allowed to update invoice status
      * 
      * @param int $invoiceId Invoice ID
      * @param string $status New status (pending, approved, rejected)
      * @param string|null $reason Optional reason for status change
+     * @param string $userRole Current user's role (must be 'board')
      * @return bool Success status
      */
-    public static function updateStatus($invoiceId, $status, $reason = null) {
+    public static function updateStatus($invoiceId, $status, $reason = null, $userRole = null) {
+        // Only board members can update status
+        if ($userRole !== 'board') {
+            error_log("Unauthorized attempt to update invoice status by role: " . ($userRole ?? 'unknown'));
+            return false;
+        }
+        
         try {
             $db = Database::getContentDB();
             

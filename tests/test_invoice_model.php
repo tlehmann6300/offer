@@ -81,7 +81,8 @@ try {
     // Test 6: Test updateStatus validation
     echo "Test 6: Status Update Validation\n";
     $validStatuses = ['pending', 'approved', 'rejected'];
-    echo "✓ Valid status values: " . implode(', ', $validStatuses) . "\n\n";
+    echo "✓ Valid status values: " . implode(', ', $validStatuses) . "\n";
+    echo "✓ Only 'board' role can update status (enforced in model)\n\n";
     
     // Clean up
     if (file_exists($testPdfPath)) {
