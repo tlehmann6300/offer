@@ -73,6 +73,7 @@ $whitelist = [
     'includes/models/Invoice.php',
     'api/submit_invoice.php',
     'api/export_invoices.php',
+    'api/update_invoice_status.php',
     'src/MailService.php',
     'uploads/invoices/'
 ];
