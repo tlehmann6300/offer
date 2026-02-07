@@ -18,10 +18,10 @@ This guide explains how to configure the production Content Database (used for I
    ```
 
 2. The script will display the hardcoded production credentials:
-   - **DB_CONTENT_HOST**: `db5019505323.hosting-data.io`
+   - **DB_CONTENT_HOST**: Production host URL
    - **DB_CONTENT_PORT**: `3306`
-   - **DB_CONTENT_USER**: `dbu387360`
-   - **DB_CONTENT_PASS**: `F9!qR7#L@2mZ$8KAS44` (displayed as dots for security)
+   - **DB_CONTENT_USER**: Production database user
+   - **DB_CONTENT_PASS**: (displayed as dots for security)
 
 3. Enter the **DB_CONTENT_NAME** in the form (e.g., `dbs12345678`)
    - The name must start with "dbs" followed by numbers
@@ -93,17 +93,18 @@ This will check:
 
 ## Production Credentials Reference
 
-The following credentials are configured by the setup script:
+The following credentials are configured by the setup script and stored in `.env`:
 
 | Variable | Value |
 |----------|-------|
-| DB_CONTENT_HOST | db5019505323.hosting-data.io |
+| DB_CONTENT_HOST | (configured in .env via setup script) |
 | DB_CONTENT_PORT | 3306 |
-| DB_CONTENT_USER | dbu387360 |
-| DB_CONTENT_PASS | F9!qR7#L@2mZ$8KAS44 |
+| DB_CONTENT_USER | (configured in .env via setup script) |
+| DB_CONTENT_PASS | (stored securely in .env) |
 | DB_CONTENT_NAME | (user-provided, e.g., dbs12345678) |
 
 **Note**: These credentials are for the Content Database only, which is separate from the User Database.
+**Security**: All credentials are hardcoded in `setup_production_db.php` and transferred to `.env` during setup.
 
 ## Database Schema
 

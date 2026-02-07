@@ -4,12 +4,9 @@
 -- SQL Schema for the Production Content Database (Invoices)
 -- This file should be run on the production Content DB after configuration
 -- 
--- Production Credentials (from .env after setup_production_db.php):
--- DB_CONTENT_HOST = db5019505323.hosting-data.io
--- DB_CONTENT_PORT = 3306
--- DB_CONTENT_USER = dbu387360
--- DB_CONTENT_PASS = F9!qR7#L@2mZ$8KAS44
--- DB_CONTENT_NAME = (provided by user during setup)
+-- Credentials Configuration:
+-- Run setup_production_db.php first to configure production credentials in .env
+-- All credentials will be stored securely in the .env file (not in version control)
 -- ============================================
 
 -- ============================================
