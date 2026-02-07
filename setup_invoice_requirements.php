@@ -37,7 +37,7 @@ try {
             MODIFY COLUMN role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
             NOT NULL DEFAULT 'member'
         ");
-        echo "✅ Role alumni_board added.\n\n";
+        echo "✅ Role alumni_board added to DB.\n\n";
     } else {
         echo "✅ Role alumni_board already exists.\n\n";
     }
@@ -63,40 +63,23 @@ try {
         }
     }
     
-    // Create .gitkeep file to ensure Git tracking
-    $gitkeepPath = $uploadsDir . '/.gitkeep';
-    if (!file_exists($gitkeepPath)) {
-        if (file_put_contents($gitkeepPath, '') === false) {
-            throw new Exception("Failed to create .gitkeep file");
+    // Create .htaccess file to prevent directory listing
+    $htaccessPath = $uploadsDir . '/.htaccess';
+    if (!file_exists($htaccessPath)) {
+        $htaccessContent = "Options -Indexes";
+        if (file_put_contents($htaccessPath, $htaccessContent) === false) {
+            throw new Exception("Failed to create .htaccess file");
         }
     }
     
-    echo "✅ Upload folder created and writable.\n\n";
-    
-    // ============================================
-    // PART 3: Security
-    // ============================================
-    echo "Part 3: Security Protection\n";
-    echo str_repeat('-', 60) . "\n";
-    
-    // Add index.php to prevent directory listing
-    $indexPath = $uploadsDir . '/index.php';
-    if (!file_exists($indexPath)) {
-        $indexContent = "<?php\n// Silence - prevents directory listing\n";
-        if (file_put_contents($indexPath, $indexContent) === false) {
-            throw new Exception("Failed to create index.php security file");
-        }
-        echo "✅ Security file (index.php) created to prevent directory listing.\n";
-    } else {
-        echo "✅ Security file already exists.\n";
-    }
+    echo "✅ Upload folder ready.\n";
     
     echo "\n" . str_repeat('=', 60) . "\n";
     echo "Setup completed successfully!\n\n";
     echo "Summary:\n";
     echo "- Database: 'alumni_board' role added to users table\n";
     echo "- Directory: uploads/invoices created with 0777 permissions\n";
-    echo "- Security: Directory listing protection enabled\n";
+    echo "- Security: .htaccess file created to prevent directory listing\n";
     
 } catch (PDOException $e) {
     echo "\n❌ Database Error: " . $e->getMessage() . "\n";
