@@ -147,11 +147,11 @@ Successfully tested with the following results:
 
 ✅ Configuration script named `setup_production_db.php` (already exists)
 ✅ Updates .env file with specific production database credentials
-✅ Uses hardcoded production credentials:
-  - DB_CONTENT_HOST = 'db5019505323.hosting-data.io'
-  - DB_CONTENT_PORT = '3306'
-  - DB_CONTENT_USER = 'dbu387360'
-  - DB_CONTENT_PASS = 'F9!qR7#L@2mZ$8KAS44'
+✅ Loads production credentials from .env file (DB_INVOICE_* or DB_RECH_* keys):
+  - DB_CONTENT_HOST (read from .env)
+  - DB_CONTENT_PORT (read from .env)
+  - DB_CONTENT_USER (read from .env)
+  - DB_CONTENT_PASS (read from .env)
 ✅ Asks user for DB_CONTENT_NAME via HTML input form
 ✅ On form submit, reads existing .env and updates/appends Content DB credentials
 ✅ Displays success message: "✅ Content Database configured. Now run migrations."
