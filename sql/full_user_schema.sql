@@ -47,6 +47,12 @@ CREATE TABLE IF NOT EXISTS users (
     -- Alumni validation
     is_alumni_validated TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Alumni status verification flag',
     
+    -- Email update management
+    pending_email_update_request TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Flag for pending email update request',
+    
+    -- Profile review prompts
+    prompt_profile_review TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Nudge users after role change to review profile',
+    
     -- Audit timestamps
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -107,6 +113,31 @@ CREATE TABLE IF NOT EXISTS user_sessions (
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
   COMMENT='User session management with IP and user-agent tracking';
+
+-- ============================================
+-- EMAIL CHANGE REQUESTS TABLE
+-- ============================================
+-- Tracks email change requests with token-based verification
+CREATE TABLE IF NOT EXISTS email_change_requests (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED NOT NULL COMMENT 'Links to users table',
+    new_email VARCHAR(100) NOT NULL COMMENT 'Requested new email address',
+    token VARCHAR(64) NOT NULL UNIQUE COMMENT 'Verification token',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Request creation timestamp',
+    expires_at DATETIME NOT NULL COMMENT 'Token expiration time',
+    
+    -- Foreign key to users table
+    CONSTRAINT fk_email_change_user
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    
+    -- Indexes for performance
+    INDEX idx_user_id (user_id),
+    INDEX idx_token (token),
+    INDEX idx_expires_at (expires_at)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Token-based email change verification system';
 
 -- ============================================
 -- NOTES FOR DEPLOYMENT
