@@ -141,7 +141,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deploy'])) {
             $inString = false;
             $stringChar = '';
             
-            for ($i = 0; $i < strlen($sqlContent); $i++) {
+            $length = strlen($sqlContent);
+            for ($i = 0; $i < $length; $i++) {
                 $char = $sqlContent[$i];
                 
                 // Handle string literals
@@ -207,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deploy'])) {
             $hasErrors = true;
             
             // Close connection on error too
-            if ($conn && !$conn->connect_error) {
+            if ($conn instanceof mysqli) {
                 $conn->close();
             }
         }
