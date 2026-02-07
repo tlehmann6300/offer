@@ -55,9 +55,9 @@ After configuring the `.env` file, apply the invoice system schema to the produc
 
 2. Run the schema file:
    ```bash
-   mysql -h db5019505323.hosting-data.io -u dbu387360 -p DB_NAME < sql/production_content_db_invoices.sql
+   mysql -h <DB_HOST> -u <DB_USER> -p <DB_NAME> < sql/production_content_db_invoices.sql
    ```
-   Replace `DB_NAME` with the actual database name you entered in Step 1.
+   Replace `<DB_HOST>`, `<DB_USER>`, and `<DB_NAME>` with your actual database credentials from .env file.
 
    Or use a database management tool (phpMyAdmin, MySQL Workbench, etc.) to import the file:
    ```

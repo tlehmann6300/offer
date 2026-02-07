@@ -49,11 +49,11 @@ Add the following to your `.env` file:
 
 ```env
 # Invoice/Rech Database (Dedicated database for invoices)
-DB_RECH_HOST=db5019505323.hosting-data.io
+DB_RECH_HOST=<your_database_host>
 DB_RECH_PORT=3306
 DB_RECH_NAME=<database_name>
-DB_RECH_USER=dbu387360
-DB_RECH_PASS=F9!qR7#L@2mZ$8KAS44
+DB_RECH_USER=<database_user>
+DB_RECH_PASS=<database_password>
 ```
 
 ## Verification
