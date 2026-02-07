@@ -136,6 +136,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deploy'])) {
             
             // Execute SQL statements
             // Split by semicolons but preserve semicolons in strings
+            // Note: This is a simplified string parser that handles most cases
+            // but may not correctly handle all edge cases like double-escaped backslashes
             $statements = [];
             $currentStatement = '';
             $inString = false;
