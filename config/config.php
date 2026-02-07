@@ -69,6 +69,9 @@ define('SMTP_FROM', $env['SMTP_FROM'] ?? $env['SMTP_USER'] ?? '');
 define('SMTP_FROM_EMAIL', $env['SMTP_FROM_EMAIL'] ?? $env['SMTP_FROM'] ?? $env['SMTP_USER'] ?? '');
 define('SMTP_FROM_NAME', $env['SMTP_FROM_NAME'] ?? 'IBC Intranet');
 
+// Invoice notification email
+define('INVOICE_NOTIFICATION_EMAIL', $env['INVOICE_NOTIFICATION_EMAIL'] ?? 'tlehmann630@gmail.com');
+
 // EasyVerein API Configuration
 define('EASYVEREIN_API_TOKEN', $env['EASYVEREIN_API_TOKEN'] ?? '');
 

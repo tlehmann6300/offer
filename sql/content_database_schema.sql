@@ -388,6 +388,26 @@ CREATE TABLE IF NOT EXISTS system_logs (
   COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
+-- INVOICES
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS invoices (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED NOT NULL,
+    description TEXT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    file_path VARCHAR(255) DEFAULT NULL,
+    reason TEXT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_user_id (user_id),
+    INDEX idx_status (status)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
 -- DEFAULT DATA
 -- ============================================
 
