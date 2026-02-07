@@ -34,9 +34,9 @@ ADD COLUMN IF NOT EXISTS is_locked_permanently BOOLEAN NOT NULL DEFAULT 0;
 ALTER TABLE users 
 ADD COLUMN IF NOT EXISTS notify_new_projects BOOLEAN NOT NULL DEFAULT 1;
 
--- Add event notification preference (default TRUE - opt-out model)
+-- Add event notification preference (default FALSE - opt-in model)
 ALTER TABLE users 
-ADD COLUMN IF NOT EXISTS notify_new_events BOOLEAN NOT NULL DEFAULT 1;
+ADD COLUMN IF NOT EXISTS notify_new_events BOOLEAN NOT NULL DEFAULT 0;
 
 -- Migration 5: Add expires_at column to user_invitations table
 ALTER TABLE user_invitations 
