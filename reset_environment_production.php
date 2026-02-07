@@ -86,13 +86,34 @@ $results = [];
 function deleteFile($filepath, &$results, $whitelist = []) {
     // Check if file is in whitelist - protect it from deletion
     foreach ($whitelist as $protected) {
-        if ($filepath === $protected || strpos($filepath, rtrim($protected, '/')) === 0) {
+        // For exact file matches
+        if ($filepath === $protected) {
             $results[] = [
                 'file' => $filepath,
                 'status' => 'Protected (Invoice Module)',
                 'class' => 'kept'
             ];
             return false;
+        }
+        
+        // For directory protection - check if filepath is within protected directory
+        // Ensure we match directory paths exactly by adding trailing slash
+        if (substr($protected, -1) === '/') {
+            $protectedDir = rtrim($protected, '/') . '/';
+            $filepathWithSlash = $filepath;
+            if (substr($filepath, -1) !== '/') {
+                $filepathWithSlash .= '/';
+            }
+            
+            // Check if filepath starts with the protected directory
+            if (strpos($filepathWithSlash, $protectedDir) === 0 || strpos($filepath . '/', $protectedDir) === 0) {
+                $results[] = [
+                    'file' => $filepath,
+                    'status' => 'Protected (Invoice Module)',
+                    'class' => 'kept'
+                ];
+                return false;
+            }
         }
     }
     
