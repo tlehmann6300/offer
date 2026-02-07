@@ -39,6 +39,27 @@ try {
     echo "\n";
     
     // ============================================
+    // STEP 1.5: Add 'alumni_board' role to user_invitations table
+    // ============================================
+    echo "Step 1.5: Adding 'alumni_board' role to user_invitations table...\n";
+    
+    $stmt = $userDB->query("SHOW COLUMNS FROM user_invitations LIKE 'role'");
+    $invitationRoleColumn = $stmt->fetch();
+    
+    if ($invitationRoleColumn && strpos($invitationRoleColumn['Type'], "'alumni_board'") === false) {
+        $userDB->exec("
+            ALTER TABLE user_invitations 
+            MODIFY COLUMN role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
+            NOT NULL DEFAULT 'member'
+        ");
+        echo "✅ Role 'alumni_board' successfully added to user_invitations table\n";
+    } else {
+        echo "✅ Role 'alumni_board' already exists in user_invitations table\n";
+    }
+    
+    echo "\n";
+    
+    // ============================================
     // STEP 2: Create invoices table
     // ============================================
     echo "Step 2: Creating invoices table...\n";
@@ -86,6 +107,7 @@ try {
     echo "\n";
     echo "Summary of changes:\n";
     echo "- Added 'alumni_board' role to users table\n";
+    echo "- Added 'alumni_board' role to user_invitations table\n";
     echo "- Created invoices table with all required fields\n";
     echo "\n";
     echo "Note: Remember to create the uploads/invoices/ directory manually\n";
