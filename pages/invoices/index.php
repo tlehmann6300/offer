@@ -101,7 +101,7 @@ ob_start();
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Diesen Monat ausgezahlt</p>
                     <p class="text-3xl font-bold text-gray-800">
-                        <?php echo number_format($stats['total_paid'], 2, ',', '.'); ?> €
+                        <?php echo number_format($stats['monthly_paid'], 2, ',', '.'); ?> €
                     </p>
                 </div>
                 <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
