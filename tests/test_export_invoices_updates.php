@@ -26,7 +26,7 @@ if (strpos($content, "'board'") !== false) {
 }
 
 // Test 3: Check if ZIP filename uses German 'rechnungen'
-echo "\nTest 2: Checking ZIP filename uses German 'rechnungen'...\n";
+echo "\nTest 3: Checking ZIP filename uses German 'rechnungen'...\n";
 if (strpos($content, "rechnungen_export_") !== false) {
     echo "✓ PASS: ZIP filename uses 'rechnungen_export_'\n";
 } else {
@@ -35,7 +35,7 @@ if (strpos($content, "rechnungen_export_") !== false) {
 }
 
 // Test 4: Check that old 'invoices_export_' is not used
-echo "\nTest 3: Checking old 'invoices_export_' is not used...\n";
+echo "\nTest 4: Checking old 'invoices_export_' is not used...\n";
 if (strpos($content, "invoices_export_") === false) {
     echo "✓ PASS: Old 'invoices_export_' is not present\n";
 } else {
@@ -44,7 +44,7 @@ if (strpos($content, "invoices_export_") === false) {
 }
 
 // Test 5: Check that ZipArchive is used
-echo "\nTest 4: Checking ZipArchive is used...\n";
+echo "\nTest 5: Checking ZipArchive is used...\n";
 if (strpos($content, "ZipArchive") !== false) {
     echo "✓ PASS: ZipArchive is used\n";
 } else {
@@ -53,7 +53,7 @@ if (strpos($content, "ZipArchive") !== false) {
 }
 
 // Test 6: Check file iteration logic exists
-echo "\nTest 5: Checking invoice iteration logic...\n";
+echo "\nTest 6: Checking invoice iteration logic...\n";
 if (strpos($content, "foreach") !== false && strpos($content, "invoices") !== false) {
     echo "✓ PASS: Invoice iteration logic is present\n";
 } else {
@@ -62,7 +62,7 @@ if (strpos($content, "foreach") !== false && strpos($content, "invoices") !== fa
 }
 
 // Test 7: Check force download headers are set
-echo "\nTest 6: Checking force download headers...\n";
+echo "\nTest 7: Checking force download headers...\n";
 if (strpos($content, "Content-Disposition: attachment") !== false) {
     echo "✓ PASS: Force download headers are set\n";
 } else {
