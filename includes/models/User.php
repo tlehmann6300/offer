@@ -43,7 +43,7 @@ class User {
         // This allows the isAlumniValidated() check to work correctly for all users
         $isAlumniValidated = ($role === 'alumni') ? 0 : 1;
         
-        $stmt = $db->prepare("INSERT INTO users (email, password_hash, role, is_alumni_validated) VALUES (?, ?, ?, ?)");
+        $stmt = $db->prepare("INSERT INTO users (email, password, role, is_alumni_validated) VALUES (?, ?, ?, ?)");
         $stmt->execute([$email, $passwordHash, $role, $isAlumniValidated]);
         
         return $db->lastInsertId();
@@ -119,7 +119,7 @@ class User {
         $db = Database::getUserDB();
         $passwordHash = password_hash($newPassword, HASH_ALGO);
         
-        $stmt = $db->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
+        $stmt = $db->prepare("UPDATE users SET password = ? WHERE id = ?");
         return $stmt->execute([$passwordHash, $userId]);
     }
 
