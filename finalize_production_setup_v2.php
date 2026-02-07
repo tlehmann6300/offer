@@ -90,16 +90,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deploy'])) {
             $conn = null;
             switch ($fileInfo['connection']) {
                 case 'user_db':
-                    $conn = getUserDB();
+                    $pdo = Database::getUserDB();
+                    // Convert PDO to mysqli for executing raw SQL
+                    $conn = new mysqli(
+                        DB_USER_HOST, 
+                        DB_USER_USER, 
+                        DB_USER_PASS, 
+                        DB_USER_NAME
+                    );
                     break;
                 case 'content_db':
-                    $conn = getContentDB();
+                    $conn = new mysqli(
+                        DB_CONTENT_HOST, 
+                        DB_CONTENT_USER, 
+                        DB_CONTENT_PASS, 
+                        DB_CONTENT_NAME
+                    );
                     break;
                 case 'invoice_db':
-                    $conn = getInvoiceDB();
+                    $conn = new mysqli(
+                        DB_RECH_HOST, 
+                        DB_RECH_USER, 
+                        DB_RECH_PASS, 
+                        DB_RECH_NAME
+                    );
+                    if (defined('DB_RECH_PORT')) {
+                        $conn = new mysqli(
+                            DB_RECH_HOST, 
+                            DB_RECH_USER, 
+                            DB_RECH_PASS, 
+                            DB_RECH_NAME,
+                            DB_RECH_PORT
+                        );
+                    }
                     break;
                 default:
                     throw new Exception('Unknown database connection: ' . $fileInfo['connection']);
+            }
+            
+            if ($conn->connect_error) {
+                throw new Exception('Connection failed: ' . $conn->connect_error);
             }
             
             // Execute SQL statements
@@ -165,11 +195,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deploy'])) {
             $result['message'] = 'Successfully deployed ' . count($statements) . ' SQL statements';
             $result['tables_created'] = $tablesCreated;
             
+            // Close the mysqli connection
+            $conn->close();
+            
         } catch (Exception $e) {
             $result['status'] = 'ERROR';
             $result['icon'] = '❌';
             $result['message'] = 'Deployment failed: ' . $e->getMessage();
             $hasErrors = true;
+            
+            // Close connection on error too
+            if ($conn && !$conn->connect_error) {
+                $conn->close();
+            }
         }
         
         $deploymentResults[] = $result;
@@ -179,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deploy'])) {
 // Verify database connections
 $connectionStatus = [];
 try {
-    $userDB = getUserDB();
+    $userDB = Database::getUserDB();
     $connectionStatus['user_db'] = [
         'name' => 'User Database (dbs15253086)',
         'status' => $userDB ? 'Connected' : 'Failed',
@@ -194,7 +232,7 @@ try {
 }
 
 try {
-    $contentDB = getContentDB();
+    $contentDB = Database::getContentDB();
     $connectionStatus['content_db'] = [
         'name' => 'Content Database (dbs15161271)',
         'status' => $contentDB ? 'Connected' : 'Failed',
@@ -209,7 +247,7 @@ try {
 }
 
 try {
-    $invoiceDB = getInvoiceDB();
+    $invoiceDB = Database::getRechDB();
     $connectionStatus['invoice_db'] = [
         'name' => 'Invoice Database (dbs15251284)',
         'status' => $invoiceDB ? 'Connected' : 'Failed',
