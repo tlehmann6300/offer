@@ -73,9 +73,7 @@ try {
             }
         } catch (PDOException $e) {
             // Some errors are acceptable (e.g., column already exists)
-            if (strpos($e->getMessage(), 'Duplicate column') !== false ||
-                strpos($e->getMessage(), 'Duplicate key') !== false ||
-                strpos($e->getMessage(), 'already exists') !== false) {
+            if (preg_match('/Duplicate (column|key)|already exists/i', $e->getMessage())) {
                 echo "  ℹ Skipped (already exists): " . substr($statement, 0, 50) . "...\n";
             } else {
                 $errors[] = "User DB: " . $e->getMessage();
@@ -141,10 +139,7 @@ try {
             }
         } catch (PDOException $e) {
             // Some errors are acceptable (e.g., column already exists)
-            if (strpos($e->getMessage(), 'Duplicate column') !== false ||
-                strpos($e->getMessage(), 'Duplicate key') !== false ||
-                strpos($e->getMessage(), "Can't DROP") !== false ||
-                strpos($e->getMessage(), 'already exists') !== false) {
+            if (preg_match('/Duplicate (column|key)|Can\'t DROP|already exists/i', $e->getMessage())) {
                 echo "  ℹ Skipped (already exists): " . substr($statement, 0, 50) . "...\n";
             } else {
                 $errors[] = "Content DB: " . $e->getMessage();
