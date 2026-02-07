@@ -79,8 +79,11 @@ try {
     
     // Cleanup on error
     if (isset($tempFilePath) && file_exists($tempFilePath)) {
-        unlink($tempFilePath);
-        echo "✓ Cleaned up temporary file after error\n";
+        if (unlink($tempFilePath)) {
+            echo "✓ Cleaned up temporary file after error\n";
+        } else {
+            echo "⚠ Warning: Could not delete temporary file after error: {$tempFilePath}\n";
+        }
     }
     
     exit(1);
