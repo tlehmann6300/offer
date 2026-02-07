@@ -128,8 +128,14 @@ class Auth {
             return ['success' => false, 'message' => 'Zu viele Versuche. Wartezeit läuft.'];
         }
         
+        // Check if password field exists and is valid
+        if (!isset($user['password']) || !is_string($user['password'])) {
+            error_log("Database error: password field missing or invalid for user: " . $user['email']);
+            return ['success' => false, 'message' => 'Systemfehler. Bitte Admin kontaktieren.'];
+        }
+        
         // Verify password
-        if (!isset($user['password']) || !is_string($user['password']) || !password_verify($password, $user['password'])) {
+        if (!password_verify($password, $user['password'])) {
             // Increment failed attempts
             $failedAttempts = ($user['failed_login_attempts'] ?? 0) + 1;
             $lockedUntil = null;
