@@ -92,7 +92,7 @@ class AuthHandler {
         }
         
         // Verify password
-        if (!password_verify($password, $user['password_hash'])) {
+        if (!password_verify($password, $user['password'])) {
             // Increment failed attempts
             $failedAttempts = $user['failed_login_attempts'] + 1;
             $lockedUntil = null;

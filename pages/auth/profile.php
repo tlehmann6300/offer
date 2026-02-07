@@ -142,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $fullUser = User::getByEmail($user['email']);
         
-        if (!password_verify($currentPassword, $fullUser['password_hash'])) {
+        if (!password_verify($currentPassword, $fullUser['password'])) {
             $error = 'Aktuelles Passwort ist falsch';
         } else if ($newPassword !== $confirmPassword) {
             $error = 'Neue Passwörter stimmen nicht überein';
