@@ -130,7 +130,7 @@ class Auth {
         
         // Check if password field exists and is valid
         if (!isset($user['password']) || !is_string($user['password'])) {
-            error_log("Database error: password field missing or invalid for user: " . $user['email']);
+            error_log("Database error: password field missing or invalid for user ID: " . $user['id']);
             return ['success' => false, 'message' => 'Systemfehler. Bitte Admin kontaktieren.'];
         }
         
