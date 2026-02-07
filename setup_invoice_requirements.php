@@ -26,14 +26,21 @@ try {
     // Connect to User Database
     $db = Database::getUserDB();
     
-    // Execute SQL query to update role column
-    $db->exec("
-        ALTER TABLE users 
-        MODIFY COLUMN role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
-        NOT NULL DEFAULT 'member'
-    ");
+    // Check if alumni_board role already exists
+    $stmt = $db->query("SHOW COLUMNS FROM users LIKE 'role'");
+    $roleColumn = $stmt->fetch();
     
-    echo "✅ Role alumni_board added.\n\n";
+    if ($roleColumn && strpos($roleColumn['Type'], "'alumni_board'") === false) {
+        // Execute SQL query to update role column
+        $db->exec("
+            ALTER TABLE users 
+            MODIFY COLUMN role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
+            NOT NULL DEFAULT 'member'
+        ");
+        echo "✅ Role alumni_board added.\n\n";
+    } else {
+        echo "✅ Role alumni_board already exists.\n\n";
+    }
     
     // ============================================
     // PART 2: Directory Fix (Permissions)
