@@ -1,0 +1,97 @@
+<?php
+/**
+ * API: Export Invoices
+ * Creates a ZIP file containing all invoice files for board members
+ */
+
+require_once __DIR__ . '/../src/Auth.php';
+require_once __DIR__ . '/../includes/models/Invoice.php';
+require_once __DIR__ . '/../includes/helpers.php';
+
+// Check authentication
+if (!Auth::check()) {
+    header('Location: ../pages/auth/login.php');
+    exit;
+}
+
+$user = Auth::user();
+$userRole = $user['role'] ?? '';
+
+// Only board members can export invoices
+if (!in_array($userRole, ['admin', 'board'])) {
+    header('Location: ../pages/dashboard/index.php');
+    exit;
+}
+
+// Get all invoices
+$invoices = Invoice::getAll($userRole, $user['id']);
+
+if (empty($invoices)) {
+    session_start();
+    $_SESSION['error_message'] = 'Keine Rechnungen zum Exportieren vorhanden';
+    header('Location: ' . asset('pages/invoices/index.php'));
+    exit;
+}
+
+// Create a temporary directory for the ZIP file
+$tempDir = sys_get_temp_dir();
+$zipFileName = 'invoices_export_' . date('Y-m-d_H-i-s') . '.zip';
+$zipFilePath = $tempDir . '/' . $zipFileName;
+
+// Create ZIP archive
+$zip = new ZipArchive();
+if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+    session_start();
+    $_SESSION['error_message'] = 'Fehler beim Erstellen der ZIP-Datei';
+    header('Location: ' . asset('pages/invoices/index.php'));
+    exit;
+}
+
+// Add files to ZIP
+$fileCount = 0;
+foreach ($invoices as $invoice) {
+    if (!empty($invoice['file_path'])) {
+        $filePath = __DIR__ . '/../' . $invoice['file_path'];
+        
+        if (file_exists($filePath)) {
+            // Create a meaningful filename
+            $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+            $safeDescription = preg_replace('/[^a-zA-Z0-9_-]/', '_', substr($invoice['description'], 0, 50));
+            $newFileName = sprintf(
+                '%s_%s_%s_%s.%s',
+                date('Y-m-d', strtotime($invoice['created_at'])),
+                $invoice['id'],
+                $safeDescription,
+                number_format($invoice['amount'], 2, '_', ''),
+                $extension
+            );
+            
+            $zip->addFile($filePath, $newFileName);
+            $fileCount++;
+        }
+    }
+}
+
+$zip->close();
+
+// Check if any files were added
+if ($fileCount === 0) {
+    unlink($zipFilePath);
+    session_start();
+    $_SESSION['error_message'] = 'Keine Dateien zum Exportieren gefunden';
+    header('Location: ' . asset('pages/invoices/index.php'));
+    exit;
+}
+
+// Send ZIP file to browser
+header('Content-Type: application/zip');
+header('Content-Disposition: attachment; filename="' . $zipFileName . '"');
+header('Content-Length: ' . filesize($zipFilePath));
+header('Cache-Control: no-cache, must-revalidate');
+header('Pragma: public');
+
+readfile($zipFilePath);
+
+// Clean up temporary file
+unlink($zipFilePath);
+exit;

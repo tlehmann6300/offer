@@ -171,6 +171,13 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <i class="fas fa-box w-5 mr-3"></i>
                     <span>Inventar</span>
                 </a>
+                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board', 'alumni_board', 'head'])): ?>
+                <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-file-invoice-dollar w-5 mr-3"></i>
+                    <span>Rechnungen</span>
+                </a>
+                <?php endif; ?>
 
                 <!-- NETZWERK Section -->
                 <div class="px-6 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
