@@ -110,8 +110,8 @@ try {
     echo "- Added 'alumni_board' role to user_invitations table\n";
     echo "- Created invoices table with all required fields\n";
     echo "\n";
-    echo "Note: Remember to create the uploads/invoices/ directory manually\n";
-    echo "      and add appropriate write permissions.\n";
+    echo "Note: The uploads/invoices/ directory has been created.\n";
+    echo "      Ensure appropriate write permissions are set for the web server.\n";
     
 } catch (Exception $e) {
     echo "\n";
