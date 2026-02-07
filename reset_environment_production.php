@@ -76,8 +76,19 @@ $results = [];
 function deleteFile($filepath, &$results) {
     $fullPath = __DIR__ . '/' . $filepath;
     
+    // Validate that the path is within the working directory
+    $realPath = realpath(dirname($fullPath));
+    if ($realPath === false || strpos($realPath, __DIR__) !== 0) {
+        $results[] = [
+            'file' => $filepath,
+            'status' => 'Invalid path',
+            'class' => 'error'
+        ];
+        return false;
+    }
+    
     if (file_exists($fullPath)) {
-        if (@unlink($fullPath)) {
+        if (unlink($fullPath)) {
             $results[] = [
                 'file' => $filepath,
                 'status' => 'Deleted',
@@ -85,9 +96,10 @@ function deleteFile($filepath, &$results) {
             ];
             return true;
         } else {
+            $error = error_get_last();
             $results[] = [
                 'file' => $filepath,
-                'status' => 'Failed to delete',
+                'status' => 'Failed to delete: ' . ($error['message'] ?? 'Unknown error'),
                 'class' => 'error'
             ];
             return false;
@@ -135,16 +147,17 @@ if (is_dir($sqlDir)) {
         }
         
         // Delete all other files
-        if (@unlink($fullPath)) {
+        if (unlink($fullPath)) {
             $results[] = [
                 'file' => $filepath,
                 'status' => 'Deleted',
                 'class' => 'deleted'
             ];
         } else {
+            $error = error_get_last();
             $results[] = [
                 'file' => $filepath,
-                'status' => 'Failed to delete',
+                'status' => 'Failed to delete: ' . ($error['message'] ?? 'Unknown error'),
                 'class' => 'error'
             ];
         }
@@ -261,9 +274,14 @@ if (is_dir($sqlDir)) {
 </html>
 <?php
 
+// Ensure output is sent to browser before self-destruct
+if (ob_get_level() > 0) {
+    ob_end_flush();
+}
+flush();
+
 // Self-destruct - delete this script
 $scriptPath = __FILE__;
 if (file_exists($scriptPath)) {
-    sleep(1); // Small delay to ensure output is sent
-    @unlink($scriptPath);
+    unlink($scriptPath);
 }
