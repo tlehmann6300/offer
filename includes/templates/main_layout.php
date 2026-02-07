@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../helpers.php';
 require_once __DIR__ . '/../../src/Auth.php';
+require_once __DIR__ . '/../handlers/AuthHandler.php';
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -171,9 +172,9 @@ require_once __DIR__ . '/../../src/Auth.php';
                     <i class="fas fa-box w-5 mr-3"></i>
                     <span>Inventar</span>
                 </a>
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board', 'alumni_board', 'head'])): ?>
+                <?php if (AuthHandler::hasRole('board') || AuthHandler::hasRole('head') || AuthHandler::hasRole('alumni_board')): ?>
                 <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo strpos($_SERVER['PHP_SELF'], 'invoices') !== false ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-file-invoice-dollar w-5 mr-3"></i>
                     <span>Rechnungen</span>
                 </a>
@@ -317,3 +318,4 @@ require_once __DIR__ . '/../../src/Auth.php';
     </script>
 </body>
 </html>
+<!-- ✅ Sidebar updated: Invoices visible for Board, Head & Alumni Board -->
