@@ -37,8 +37,9 @@ if (is_dir($uploadsInvoicesPath)) {
 // ============================================================
 // CHECK 2: MailService::send() accepts 4 arguments
 // ============================================================
-$mailServicePath = __DIR__ . '/src/MailService.php';
-if (file_exists($mailServicePath)) {
+$mailServicePath = realpath(__DIR__ . '/src/MailService.php');
+// Verify the path is within the expected directory for security
+if ($mailServicePath && strpos($mailServicePath, realpath(__DIR__)) === 0 && file_exists($mailServicePath)) {
     require_once $mailServicePath;
     
     if (class_exists('MailService')) {
@@ -51,9 +52,12 @@ if (file_exists($mailServicePath)) {
             
             // Check if method has exactly 4 parameters
             // Expected signature: send($to, $subject, $body, $attachments = [])
-            if ($paramCount === 4) {
+            $expectedParamCount = 4;
+            $attachmentsParamIndex = 3; // Zero-indexed: 4th parameter
+            
+            if ($paramCount === $expectedParamCount) {
                 // Verify the 4th parameter is named 'attachments' and has a default value
-                $fourthParam = $parameters[3];
+                $fourthParam = $parameters[$attachmentsParamIndex];
                 if ($fourthParam->getName() === 'attachments' && $fourthParam->isDefaultValueAvailable()) {
                     $checks[] = [
                         'name' => 'MailService::send() method signature',
