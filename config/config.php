@@ -54,6 +54,13 @@ define('DB_CONTENT_NAME', $env['DB_CONTENT_NAME'] ?? '');
 define('DB_CONTENT_USER', $env['DB_CONTENT_USER'] ?? '');
 define('DB_CONTENT_PASS', $env['DB_CONTENT_PASS'] ?? '');
 
+// Invoice Database (Dedicated database for invoices)
+define('DB_RECH_HOST', $env['DB_RECH_HOST'] ?? 'localhost');
+define('DB_RECH_PORT', $env['DB_RECH_PORT'] ?? 3306);
+define('DB_RECH_NAME', $env['DB_RECH_NAME'] ?? '');
+define('DB_RECH_USER', $env['DB_RECH_USER'] ?? '');
+define('DB_RECH_PASS', $env['DB_RECH_PASS'] ?? '');
+
 // Generic Database Constants (from .env if available, defaults to user DB)
 define('DB_HOST', $env['DB_HOST'] ?? $env['DB_USER_HOST'] ?? 'localhost');
 define('DB_NAME', $env['DB_NAME'] ?? $env['DB_USER_NAME'] ?? '');
