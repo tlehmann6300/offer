@@ -7,6 +7,11 @@
 class User {
     
     /**
+     * Email change token expiration time in hours
+     */
+    const EMAIL_CHANGE_TOKEN_EXPIRATION_HOURS = 24;
+    
+    /**
      * Get user by ID
      */
     public static function getById($id) {
@@ -204,7 +209,7 @@ class User {
         
         // Generate token
         $token = bin2hex(random_bytes(32));
-        $expiresAt = date('Y-m-d H:i:s', time() + (24 * 60 * 60)); // 24 hours
+        $expiresAt = date('Y-m-d H:i:s', time() + (self::EMAIL_CHANGE_TOKEN_EXPIRATION_HOURS * 60 * 60));
         
         // Delete any existing email change requests for this user
         $stmt = $db->prepare("DELETE FROM email_change_requests WHERE user_id = ?");

@@ -43,7 +43,7 @@ if (!isset($_GET['token']) || empty($_GET['token'])) {
 $redirectUrl = '../pages/auth/profile.php';
 if (!empty($success)) {
     $_SESSION['success_message'] = $success;
-} else if (!empty($error)) {
+} elseif (!empty($error)) {
     $_SESSION['error_message'] = $error;
 }
 
