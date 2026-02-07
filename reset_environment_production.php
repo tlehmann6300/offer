@@ -67,13 +67,35 @@ $sqlKeepFiles = [
     'full_content_schema.sql'
 ];
 
+// Whitelist - Files and directories that should NEVER be deleted (Invoice Module protection)
+$whitelist = [
+    'pages/invoices/',
+    'includes/models/Invoice.php',
+    'api/submit_invoice.php',
+    'api/export_invoices.php',
+    'src/MailService.php',
+    'uploads/invoices/'
+];
+
 // Initialize results array
 $results = [];
 
 /**
  * Delete a file and record the result
  */
-function deleteFile($filepath, &$results) {
+function deleteFile($filepath, &$results, $whitelist = []) {
+    // Check if file is in whitelist - protect it from deletion
+    foreach ($whitelist as $protected) {
+        if ($filepath === $protected || strpos($filepath, rtrim($protected, '/')) === 0) {
+            $results[] = [
+                'file' => $filepath,
+                'status' => 'Protected (Invoice Module)',
+                'class' => 'kept'
+            ];
+            return false;
+        }
+    }
+    
     $fullPath = __DIR__ . '/' . $filepath;
     
     // Validate that the path is within the working directory
@@ -116,7 +138,7 @@ function deleteFile($filepath, &$results) {
 
 // Delete blacklisted files
 foreach ($blacklist as $file) {
-    deleteFile($file, $results);
+    deleteFile($file, $results, $whitelist);
 }
 
 // Handle sql/ directory - delete all files except the ones to keep
