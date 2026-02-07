@@ -110,7 +110,7 @@ ob_start();
         
         <!-- Modal Footer -->
         <div class="px-6 py-4 bg-gray-50 flex flex-col sm:flex-row gap-3">
-            <a href="../auth/profile.php" class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg" onclick="dismissProfileReviewPrompt()">
+            <a href="../auth/profile.php" class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
                 <i class="fas fa-user-circle mr-2"></i>
                 Zum Profil
             </a>
@@ -124,8 +124,12 @@ ob_start();
 <script>
 // Dismiss profile review prompt and update database
 function dismissProfileReviewPrompt() {
+    // Construct API path relative to web root
+    const baseUrl = window.location.origin;
+    const apiPath = baseUrl + '/api/dismiss_profile_review.php';
+    
     // Make AJAX call to update database
-    fetch('../api/dismiss_profile_review.php', {
+    fetch(apiPath, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

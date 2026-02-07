@@ -33,6 +33,14 @@ try {
     }
 
     // Get current user ID from session
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Sitzung ungültig'
+        ]);
+        exit;
+    }
+    
     $userId = $_SESSION['user_id'];
 
     // Update prompt_profile_review to 0
