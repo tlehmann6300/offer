@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
+    role ENUM('board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
         NOT NULL DEFAULT 'member',
     tfa_enabled TINYINT(1) NOT NULL DEFAULT 0,
     failed_login_attempts INT NOT NULL DEFAULT 0,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS user_invitations (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(100) NOT NULL,
     token VARCHAR(64) NOT NULL UNIQUE,
-    role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
+    role ENUM('board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
         NOT NULL DEFAULT 'member',
     expires_at DATETIME NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
