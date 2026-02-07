@@ -17,8 +17,8 @@ if (!Auth::check()) {
 $user = Auth::user();
 $userRole = $user['role'] ?? '';
 
-// Only board members can export invoices
-if (!in_array($userRole, ['admin', 'board'])) {
+// Only board and alumni_board members can export invoices
+if (!in_array($userRole, ['admin', 'board', 'alumni_board'])) {
     header('Location: ../pages/dashboard/index.php');
     exit;
 }
@@ -35,7 +35,7 @@ if (empty($invoices)) {
 
 // Create a temporary directory for the ZIP file
 $tempDir = sys_get_temp_dir();
-$zipFileName = 'invoices_export_' . date('Y-m-d_H-i-s') . '.zip';
+$zipFileName = 'rechnungen_export_' . date('Y-m-d_H-i-s') . '.zip';
 $zipFilePath = $tempDir . '/' . $zipFileName;
 
 // Create ZIP archive

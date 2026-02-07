@@ -686,6 +686,55 @@ class MailService {
     }
     
     /**
+     * Generic send method with attachment support
+     * 
+     * @param string $toEmail Recipient email address
+     * @param string $subject Email subject
+     * @param string $htmlBody HTML email body
+     * @param array $attachments Optional array of file paths to attach
+     * @return bool Success status
+     */
+    public static function send($toEmail, $subject, $htmlBody, $attachments = []) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send email: Composer vendor missing");
+            return false;
+        }
+        
+        try {
+            $mail = self::createMailer();
+            
+            // Set recipient
+            $mail->addAddress($toEmail);
+            
+            // Email content
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body = $htmlBody;
+            
+            // Add attachments if provided
+            if (!empty($attachments) && is_array($attachments)) {
+                foreach ($attachments as $filePath) {
+                    if (file_exists($filePath)) {
+                        $mail->addAttachment($filePath);
+                    } else {
+                        error_log("Warning: Attachment file not found: {$filePath}");
+                    }
+                }
+            }
+            
+            // Send (with output buffering to capture any debug output)
+            ob_start();
+            $mail->send();
+            ob_end_clean();
+            return true;
+            
+        } catch (\Exception $e) {
+            error_log("Error sending email to {$toEmail}: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
      * Send project acceptance notification email
      * 
      * @param string $toEmail Recipient email address
