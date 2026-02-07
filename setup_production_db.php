@@ -22,7 +22,7 @@ if (!isset($_SESSION['csrf_token'])) {
 }
 
 // Handle form submission
-if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['db_content_name'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['db_content_name'])) {
     // Verify CSRF token
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $error = 'Invalid security token. Please try again.';
@@ -129,6 +129,10 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' &
             
             // Write back to .env file
             $content = implode(PHP_EOL, $updatedLines);
+            // Preserve final newline if it existed in the original file
+            if (!empty($lines) && substr(file_get_contents($envFile), -1) === "\n") {
+                $content .= PHP_EOL;
+            }
             if (file_put_contents($envFile, $content) === false) {
                 throw new Exception('Failed to write to .env file.');
             }
