@@ -60,7 +60,8 @@ CREATE TABLE IF NOT EXISTS alumni_profiles (
     INDEX idx_user_id (user_id),
     INDEX idx_last_name (last_name),
     INDEX idx_industry (industry),
-    INDEX idx_company (company)
+    INDEX idx_company (company),
+    INDEX idx_position (position)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
