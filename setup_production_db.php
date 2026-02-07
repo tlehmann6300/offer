@@ -6,11 +6,43 @@
  * IMPORTANT: Run this script once to configure production, then DELETE it for security!
  */
 
-// Production credentials (hardcoded as per requirements)
-define('PROD_DB_CONTENT_HOST', 'db5019505323.hosting-data.io');
-define('PROD_DB_CONTENT_PORT', '3306');
-define('PROD_DB_CONTENT_USER', 'dbu387360');
-define('PROD_DB_CONTENT_PASS', 'F9!qR7#L@2mZ$8KAS44');
+// Load credentials from .env file
+$envFile = __DIR__ . '/.env';
+$env = [];
+
+if (file_exists($envFile)) {
+    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    
+    foreach ($lines as $line) {
+        // Skip comments
+        if (strpos(trim($line), '#') === 0) {
+            continue;
+        }
+        
+        // Parse key=value pairs
+        if (strpos($line, '=') !== false) {
+            list($key, $value) = explode('=', $line, 2);
+            $key = trim($key);
+            $value = trim($value);
+            
+            // Remove quotes if present
+            if (strlen($value) >= 2) {
+                if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
+                    (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
+                    $value = substr($value, 1, -1);
+                }
+            }
+            
+            $env[$key] = $value;
+        }
+    }
+}
+
+// Load production credentials from .env (Invoice Database)
+define('PROD_DB_CONTENT_HOST', $env['DB_INVOICE_HOST'] ?? $env['DB_RECH_HOST'] ?? '');
+define('PROD_DB_CONTENT_PORT', $env['DB_INVOICE_PORT'] ?? $env['DB_RECH_PORT'] ?? '3306');
+define('PROD_DB_CONTENT_USER', $env['DB_INVOICE_USER'] ?? $env['DB_RECH_USER'] ?? '');
+define('PROD_DB_CONTENT_PASS', $env['DB_INVOICE_PASS'] ?? $env['DB_RECH_PASS'] ?? '');
 
 $success = false;
 $error = '';
