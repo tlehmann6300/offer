@@ -882,4 +882,59 @@ class MailService {
         // Send email (has its own exception handling)
         return self::sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody);
     }
+    
+    /**
+     * Send email with file attachment from file path
+     * 
+     * @param string $toEmail Recipient email address
+     * @param string $subject Email subject
+     * @param string $htmlBody HTML email body
+     * @param string $filePath Absolute path to file to attach
+     * @return bool Success status
+     */
+    public static function sendEmailWithFileAttachment($toEmail, $subject, $htmlBody, $filePath) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send email with file attachment: Composer vendor missing");
+            return false;
+        }
+        
+        try {
+            $mail = self::createMailer();
+            
+            // Set recipient
+            $mail->addAddress($toEmail);
+            
+            // Email content
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body = $htmlBody;
+            
+            // Embed logo
+            $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.webp';
+            if (!file_exists($imagePath)) {
+                $imagePath = __DIR__ . '/../assets/img/ibc_logo_original_navbar.png';
+            }
+            if (file_exists($imagePath)) {
+                $mail->addEmbeddedImage($imagePath, 'ibc_logo');
+            }
+            
+            // Add file attachment if it exists
+            if (file_exists($filePath)) {
+                $mail->addAttachment($filePath);
+            } else {
+                error_log("Warning: Attachment file not found: {$filePath}");
+            }
+            
+            // Send (with output buffering to capture any debug output)
+            ob_start();
+            $mail->send();
+            ob_end_clean();
+            error_log("Successfully sent email with attachment to {$toEmail}");
+            return true;
+            
+        } catch (\Exception $e) {
+            error_log("Error sending email with attachment to {$toEmail}: " . $e->getMessage());
+            return false;
+        }
+    }
 }
