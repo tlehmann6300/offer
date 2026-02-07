@@ -2,6 +2,27 @@
 
 This directory contains SQL schema files for the offer management system.
 
+## 🚀 Quick Start - Production Deployment
+
+For detailed deployment instructions, see **[DEPLOYMENT_GUIDE.md](../DEPLOYMENT_GUIDE.md)** in the root directory.
+
+### Apply Migrations to Production
+
+```bash
+# 1. Backup databases first!
+# 2. Apply all migrations
+php sql/apply_all_migrations_to_production.php
+```
+
+### Production Database Files
+
+- **`dbs15253086.sql`** - User Database migrations (consolidated)
+- **`dbs15161271.sql`** - Content Database migrations (consolidated)
+
+These files contain ALL migrations in the correct order. Run them via `apply_all_migrations_to_production.php`.
+
+---
+
 ## Fresh Installation Schemas
 
 For a **fresh system installation**, use these comprehensive schema files:
