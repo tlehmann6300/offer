@@ -86,8 +86,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Generate token and save to email_change_requests
                 $token = User::createEmailChangeRequest($user['id'], $newEmail);
                 
-                // Create confirmation link
-                $confirmLink = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/api/confirm_email.php?token=' . $token;
+                // Create confirmation link using BASE_URL for security
+                $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+                $confirmLink = $baseUrl . '/api/confirm_email.php?token=' . urlencode($token);
                 
                 // TODO: Send email to new address with confirmation link
                 // For now, we'll just show a message

@@ -196,6 +196,8 @@ class Alumni {
         $whereSQL = ' WHERE ' . implode(' AND ', $whereClauses);
         
         // Join with users table to filter by role
+        // Note: DB_USER_NAME is a configuration constant from config.php, not user input
+        // It's validated at application startup and is safe to use in queries
         $sql = "
             SELECT ap.id, ap.user_id, ap.first_name, ap.last_name, ap.email, ap.mobile_phone, 
                    ap.linkedin_url, ap.xing_url, ap.industry, ap.company, ap.position, 

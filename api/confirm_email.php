@@ -39,8 +39,9 @@ if (!isset($_GET['token']) || empty($_GET['token'])) {
     }
 }
 
-// Redirect to profile with message
-$redirectUrl = '../pages/auth/profile.php';
+// Redirect to profile with message using BASE_URL for security
+$baseUrl = defined('BASE_URL') ? BASE_URL : '';
+$redirectUrl = $baseUrl . '/pages/auth/profile.php';
 if (!empty($success)) {
     $_SESSION['success_message'] = $success;
 } elseif (!empty($error)) {
