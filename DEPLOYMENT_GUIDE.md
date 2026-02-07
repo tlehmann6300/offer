@@ -5,8 +5,12 @@ This guide explains how to apply database migrations to production and manage th
 ## Overview
 
 The system uses two production databases:
-- **User Database** (`dbs15253086`): Stores user accounts, authentication, and invoices
-- **Content Database** (`dbs15161271`): Stores projects, inventory, events, and alumni profiles
+- **User Database**: Configured in `.env` as `DB_USER_NAME` (default: `dbs15253086`)
+  - Stores user accounts, authentication, and invoices
+- **Content Database**: Configured in `.env` as `DB_CONTENT_NAME` (default: `dbs15161271`)
+  - Stores projects, inventory, events, and alumni profiles
+
+**Note**: Database connection details are stored in the `.env` file and should never be hard-coded in scripts or documentation.
 
 All migrations have been consolidated into SQL files named after each database for easy deployment.
 
@@ -48,11 +52,14 @@ This is the **recommended approach** for production systems with existing data.
 
 1. **Backup the databases** (CRITICAL!)
    ```bash
+   # Load environment variables from .env
+   source .env
+   
    # Backup user database
-   mysqldump -h db5019508945.hosting-data.io -u dbu4494103 -p dbs15253086 > backup_user_db_$(date +%Y%m%d_%H%M%S).sql
+   mysqldump -h ${DB_USER_HOST} -u ${DB_USER_USER} -p ${DB_USER_NAME} > backup_user_db_$(date +%Y%m%d_%H%M%S).sql
    
    # Backup content database
-   mysqldump -h db5019375140.hosting-data.io -u dbu2067984 -p dbs15161271 > backup_content_db_$(date +%Y%m%d_%H%M%S).sql
+   mysqldump -h ${DB_CONTENT_HOST} -u ${DB_CONTENT_USER} -p ${DB_CONTENT_NAME} > backup_content_db_$(date +%Y%m%d_%H%M%S).sql
    ```
 
 2. **Apply the migrations**
@@ -79,9 +86,12 @@ This is the **recommended approach** for production systems with existing data.
 
 1. **Backup everything** (if you have data you might need later)
    ```bash
+   # Load environment variables from .env
+   source .env
+   
    # Backup databases
-   mysqldump -h db5019508945.hosting-data.io -u dbu4494103 -p dbs15253086 > backup_user_db_$(date +%Y%m%d_%H%M%S).sql
-   mysqldump -h db5019375140.hosting-data.io -u dbu2067984 -p dbs15161271 > backup_content_db_$(date +%Y%m%d_%H%M%S).sql
+   mysqldump -h ${DB_USER_HOST} -u ${DB_USER_USER} -p ${DB_USER_NAME} > backup_user_db_$(date +%Y%m%d_%H%M%S).sql
+   mysqldump -h ${DB_CONTENT_HOST} -u ${DB_CONTENT_USER} -p ${DB_CONTENT_NAME} > backup_content_db_$(date +%Y%m%d_%H%M%S).sql
    
    # Backup uploads directory
    tar -czf backup_uploads_$(date +%Y%m%d_%H%M%S).tar.gz uploads/
@@ -96,11 +106,14 @@ This is the **recommended approach** for production systems with existing data.
 
 3. **Install fresh schema**
    ```bash
+   # Load environment variables from .env
+   source .env
+   
    # Import user database schema
-   mysql -h db5019508945.hosting-data.io -u dbu4494103 -p dbs15253086 < sql/full_user_schema.sql
+   mysql -h ${DB_USER_HOST} -u ${DB_USER_USER} -p ${DB_USER_NAME} < sql/full_user_schema.sql
    
    # Import content database schema
-   mysql -h db5019375140.hosting-data.io -u dbu2067984 -p dbs15161271 < sql/full_content_schema.sql
+   mysql -h ${DB_CONTENT_HOST} -u ${DB_CONTENT_USER} -p ${DB_CONTENT_NAME} < sql/full_content_schema.sql
    ```
 
 4. **Apply all migrations** (to ensure everything is up-to-date)
@@ -192,11 +205,14 @@ If migrations cause issues:
 
 2. **Restore from backup**
    ```bash
+   # Load environment variables from .env
+   source .env
+   
    # Restore user database
-   mysql -h db5019508945.hosting-data.io -u dbu4494103 -p dbs15253086 < backup_user_db_TIMESTAMP.sql
+   mysql -h ${DB_USER_HOST} -u ${DB_USER_USER} -p ${DB_USER_NAME} < backup_user_db_TIMESTAMP.sql
    
    # Restore content database
-   mysql -h db5019375140.hosting-data.io -u dbu2067984 -p dbs15161271 < backup_content_db_TIMESTAMP.sql
+   mysql -h ${DB_CONTENT_HOST} -u ${DB_CONTENT_USER} -p ${DB_CONTENT_NAME} < backup_content_db_TIMESTAMP.sql
    ```
 
 3. **Restore uploaded files** (if they were cleaned)
