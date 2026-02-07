@@ -90,8 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deploy'])) {
             $conn = null;
             switch ($fileInfo['connection']) {
                 case 'user_db':
-                    $pdo = Database::getUserDB();
-                    // Convert PDO to mysqli for executing raw SQL
+                    // Create mysqli connection for User DB
                     $conn = new mysqli(
                         DB_USER_HOST, 
                         DB_USER_USER, 
@@ -100,6 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deploy'])) {
                     );
                     break;
                 case 'content_db':
+                    // Create mysqli connection for Content DB
                     $conn = new mysqli(
                         DB_CONTENT_HOST, 
                         DB_CONTENT_USER, 
@@ -108,19 +108,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['deploy'])) {
                     );
                     break;
                 case 'invoice_db':
-                    $conn = new mysqli(
-                        DB_RECH_HOST, 
-                        DB_RECH_USER, 
-                        DB_RECH_PASS, 
-                        DB_RECH_NAME
-                    );
-                    if (defined('DB_RECH_PORT')) {
+                    // Create mysqli connection for Invoice DB with optional port
+                    if (defined('DB_RECH_PORT') && DB_RECH_PORT != 3306) {
                         $conn = new mysqli(
                             DB_RECH_HOST, 
                             DB_RECH_USER, 
                             DB_RECH_PASS, 
                             DB_RECH_NAME,
                             DB_RECH_PORT
+                        );
+                    } else {
+                        $conn = new mysqli(
+                            DB_RECH_HOST, 
+                            DB_RECH_USER, 
+                            DB_RECH_PASS, 
+                            DB_RECH_NAME
                         );
                     }
                     break;
