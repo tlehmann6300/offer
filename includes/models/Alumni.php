@@ -155,52 +155,61 @@ class Alumni {
     
     /**
      * Search profiles with filters
+     * Only shows profiles where user role is 'alumni'
      * 
-     * @param array $filters Array of filters: search (name), industry, company
+     * @param array $filters Array of filters: search (name/position/company/industry), industry
      * @return array Array of matching profiles
      */
     public static function searchProfiles(array $filters = []): array {
-        $db = Database::getContentDB();
+        $contentDb = Database::getContentDB();
+        $userDb = Database::getUserDB();
         
         $whereClauses = [];
         $params = [];
         
-        // Search term for name (first_name or last_name)
+        // Always filter by 'alumni' role
+        $whereClauses[] = "u.role = 'alumni'";
+        
+        // Search term filters by: Name OR Position OR Company OR Industry
         if (!empty($filters['search'])) {
-            $whereClauses[] = "(first_name LIKE ? OR last_name LIKE ?)";
+            $whereClauses[] = "(ap.first_name LIKE ? OR ap.last_name LIKE ? OR ap.position LIKE ? OR ap.company LIKE ? OR ap.industry LIKE ?)";
             $searchTerm = '%' . $filters['search'] . '%';
             $params[] = $searchTerm;
             $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
         }
         
-        // Filter by industry
+        // Additional filter by industry (for dropdown filter)
         if (!empty($filters['industry'])) {
-            $whereClauses[] = "industry LIKE ?";
+            $whereClauses[] = "ap.industry LIKE ?";
             $params[] = '%' . $filters['industry'] . '%';
         }
         
-        // Filter by company
+        // Additional filter by company (if needed)
         if (!empty($filters['company'])) {
-            $whereClauses[] = "company LIKE ?";
+            $whereClauses[] = "ap.company LIKE ?";
             $params[] = '%' . $filters['company'] . '%';
         }
         
-        $whereSQL = '';
-        if (!empty($whereClauses)) {
-            $whereSQL = ' WHERE ' . implode(' AND ', $whereClauses);
-        }
+        $whereSQL = ' WHERE ' . implode(' AND ', $whereClauses);
         
+        // Join with users table to filter by role
+        // Note: DB_USER_NAME is a configuration constant from config.php, not user input
+        // It's validated at application startup and is safe to use in queries
         $sql = "
-            SELECT id, user_id, first_name, last_name, email, mobile_phone, 
-                   linkedin_url, xing_url, industry, company, position, 
-                   studiengang, study_program, semester, angestrebter_abschluss, 
-                   degree, graduation_year, about_me,
-                   image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
-            FROM alumni_profiles" . $whereSQL . "
-            ORDER BY last_name ASC, first_name ASC
+            SELECT ap.id, ap.user_id, ap.first_name, ap.last_name, ap.email, ap.mobile_phone, 
+                   ap.linkedin_url, ap.xing_url, ap.industry, ap.company, ap.position, 
+                   ap.studiengang, ap.study_program, ap.semester, ap.angestrebter_abschluss, 
+                   ap.degree, ap.graduation_year, ap.about_me,
+                   ap.image_path, ap.last_verified_at, ap.last_reminder_sent_at, ap.created_at, ap.updated_at
+            FROM alumni_profiles ap
+            INNER JOIN " . DB_USER_NAME . ".users u ON ap.user_id = u.id" . $whereSQL . "
+            ORDER BY ap.last_name ASC, ap.first_name ASC
         ";
         
-        $stmt = $db->prepare($sql);
+        $stmt = $contentDb->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
     }

@@ -206,6 +206,7 @@ class AuthHandler {
 
     /**
      * Check if user has specific role (exact match, not hierarchical)
+     * Special case: 'admin' role check also returns true for 'board' users
      * 
      * @param string $role Required role
      * @return bool True if user has exact role
@@ -216,7 +217,39 @@ class AuthHandler {
             return false;
         }
         
+        // Special case: board has equal privileges to admin
+        if ($role === 'admin' && isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'board') {
+            return true;
+        }
+        
         return isset($_SESSION['user_role']) && $_SESSION['user_role'] === $role;
+    }
+
+    /**
+     * Check if user is admin or board (equal privileges)
+     * 
+     * @return bool True if user is admin or board
+     */
+    public static function isAdmin() {
+        self::startSession();
+        if (!self::isAuthenticated()) {
+            return false;
+        }
+        
+        return isset($_SESSION['user_role']) && 
+               ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'board');
+    }
+
+    /**
+     * Require admin privileges (admin or board)
+     * Redirects to login if not authorized
+     */
+    public static function requireAdmin() {
+        if (!self::isAdmin()) {
+            $loginUrl = (defined('BASE_URL') && BASE_URL) ? BASE_URL . '/pages/auth/login.php' : '/pages/auth/login.php';
+            header('Location: ' . $loginUrl);
+            exit;
+        }
     }
 
     /**

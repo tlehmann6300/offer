@@ -57,8 +57,14 @@ if ($userId === $_SESSION['user_id']) {
     exit;
 }
 
-    // Update the role
-    if (User::update($userId, ['role' => $newRole])) {
+    // Update the role and set prompt_profile_review flag
+    // When role is updated by Board/Admin, prompt user to review their profile
+    $updateData = [
+        'role' => $newRole,
+        'prompt_profile_review' => 1
+    ];
+    
+    if (User::update($userId, $updateData)) {
         echo json_encode([
             'success' => true,
             'message' => 'Rolle erfolgreich geändert'

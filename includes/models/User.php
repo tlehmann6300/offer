@@ -7,6 +7,11 @@
 class User {
     
     /**
+     * Email change token expiration time in hours
+     */
+    const EMAIL_CHANGE_TOKEN_EXPIRATION_HOURS = 24;
+    
+    /**
      * Get user by ID
      */
     public static function getById($id) {
@@ -176,5 +181,98 @@ class User {
             $notifyNewEvents ? 1 : 0,
             $userId
         ]);
+    }
+    
+    /**
+     * Create email change request with token
+     * @param int $userId The ID of the user requesting email change
+     * @param string $newEmail The new email address
+     * @return string The generated token
+     * @throws Exception If email is invalid or already in use
+     */
+    public static function createEmailChangeRequest($userId, $newEmail) {
+        $db = Database::getUserDB();
+        
+        // Validate email format
+        if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+            throw new Exception('Ungültige E-Mail-Adresse');
+        }
+        
+        // Check if email is already used by another user
+        $stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE email = ? AND id != ?");
+        $stmt->execute([$newEmail, $userId]);
+        $count = $stmt->fetchColumn();
+        
+        if ($count > 0) {
+            throw new Exception('E-Mail bereits vergeben');
+        }
+        
+        // Generate token
+        $token = bin2hex(random_bytes(32));
+        $expiresAt = date('Y-m-d H:i:s', time() + (self::EMAIL_CHANGE_TOKEN_EXPIRATION_HOURS * 60 * 60));
+        
+        // Delete any existing email change requests for this user
+        $stmt = $db->prepare("DELETE FROM email_change_requests WHERE user_id = ?");
+        $stmt->execute([$userId]);
+        
+        // Insert new request
+        $stmt = $db->prepare("
+            INSERT INTO email_change_requests (user_id, new_email, token, expires_at)
+            VALUES (?, ?, ?, ?)
+        ");
+        $stmt->execute([$userId, $newEmail, $token, $expiresAt]);
+        
+        return $token;
+    }
+    
+    /**
+     * Confirm email change with token
+     * @param string $token The confirmation token
+     * @return bool Returns true on success
+     * @throws Exception If token is invalid or expired
+     */
+    public static function confirmEmailChange($token) {
+        $db = Database::getUserDB();
+        
+        // Find request by token
+        $stmt = $db->prepare("
+            SELECT user_id, new_email, expires_at 
+            FROM email_change_requests 
+            WHERE token = ?
+        ");
+        $stmt->execute([$token]);
+        $request = $stmt->fetch();
+        
+        if (!$request) {
+            throw new Exception('Ungültiger Bestätigungslink');
+        }
+        
+        // Check if expired
+        if (strtotime($request['expires_at']) < time()) {
+            throw new Exception('Bestätigungslink ist abgelaufen');
+        }
+        
+        // Check if email is still available
+        $stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE email = ? AND id != ?");
+        $stmt->execute([$request['new_email'], $request['user_id']]);
+        $count = $stmt->fetchColumn();
+        
+        if ($count > 0) {
+            throw new Exception('E-Mail bereits vergeben');
+        }
+        
+        // Update user email
+        $stmt = $db->prepare("UPDATE users SET email = ? WHERE id = ?");
+        $result = $stmt->execute([$request['new_email'], $request['user_id']]);
+        
+        if (!$result) {
+            throw new Exception('Fehler beim Aktualisieren der E-Mail-Adresse');
+        }
+        
+        // Delete the request
+        $stmt = $db->prepare("DELETE FROM email_change_requests WHERE token = ?");
+        $stmt->execute([$token]);
+        
+        return true;
     }
 }
