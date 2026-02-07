@@ -1,8 +1,8 @@
 -- ============================================
--- CONTENT DATABASE LEGACY (dbs15161271) - DEFINITIVE SCHEMA
+-- CONTENT DATABASE NEW (dbs15251284) - DEFINITIVE SCHEMA
 -- ============================================
 -- This file contains the complete content database schema
--- Database: content_db (dbs15161271)
+-- Database: content_db_new (dbs15251284)
 -- ============================================
 
 -- ============================================

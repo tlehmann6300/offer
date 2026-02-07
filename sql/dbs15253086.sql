@@ -1,75 +1,74 @@
 -- ============================================
--- USER DATABASE (dbs15253086) - ALL MIGRATIONS CONSOLIDATED
+-- USER DATABASE (dbs15253086) - DEFINITIVE SCHEMA
 -- ============================================
--- This file contains all migration changes for the User Database
--- Apply this file to apply all migrations to production
+-- This file contains the complete user database schema
+-- Database: user_db (dbs15253086)
 -- ============================================
 
--- Migration 1: Add 'candidate' and 'alumni_board' roles to users table
--- Changes the role ENUM to include: 'admin', 'board', 'head', 'member', 'alumni', 'candidate', 'alumni_board'
-ALTER TABLE users 
-MODIFY COLUMN role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
-NOT NULL DEFAULT 'member';
-
--- Migration 2: Add 'candidate' and 'alumni_board' roles to user_invitations table
-ALTER TABLE user_invitations 
-MODIFY COLUMN role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
-NOT NULL DEFAULT 'member';
-
--- Migration 3: Add security features to users table
--- Add failed login attempts tracking
-ALTER TABLE users 
-ADD COLUMN IF NOT EXISTS failed_login_attempts INT NOT NULL DEFAULT 0;
-
--- Add temporary lock timestamp
-ALTER TABLE users 
-ADD COLUMN IF NOT EXISTS locked_until DATETIME DEFAULT NULL;
-
--- Add permanent lock flag
-ALTER TABLE users 
-ADD COLUMN IF NOT EXISTS is_locked_permanently BOOLEAN NOT NULL DEFAULT 0;
-
--- Migration 4: Add notification preferences to users table
--- Add project notification preference (default TRUE - opt-out model)
-ALTER TABLE users 
-ADD COLUMN IF NOT EXISTS notify_new_projects BOOLEAN NOT NULL DEFAULT 1;
-
--- Add event notification preference (default FALSE - opt-in model)
-ALTER TABLE users 
-ADD COLUMN IF NOT EXISTS notify_new_events BOOLEAN NOT NULL DEFAULT 0;
-
--- Migration 5: Add expires_at column to user_invitations table
-ALTER TABLE user_invitations 
-ADD COLUMN IF NOT EXISTS expires_at DATETIME DEFAULT NULL;
-
--- Migration 6: Create invoices table for invoice management
-CREATE TABLE IF NOT EXISTS invoices (
+-- ============================================
+-- USERS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS users (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id INT UNSIGNED NOT NULL COMMENT 'Foreign key to users table',
-    description VARCHAR(255) NOT NULL COMMENT 'Short purpose description',
-    amount DECIMAL(10,2) NOT NULL COMMENT 'Invoice amount',
-    date_of_receipt DATE NOT NULL COMMENT 'Date the receipt was received',
-    file_path VARCHAR(255) DEFAULT NULL COMMENT 'Path to uploaded receipt image/pdf',
-    status ENUM('pending', 'approved', 'rejected', 'paid') 
-        NOT NULL DEFAULT 'pending' 
-        COMMENT 'Invoice processing status',
-    rejection_reason TEXT DEFAULT NULL COMMENT 'Reason for rejection if applicable',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Invoice creation timestamp',
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
+        NOT NULL DEFAULT 'member',
+    tfa_enabled TINYINT(1) NOT NULL DEFAULT 0,
+    failed_login_attempts INT NOT NULL DEFAULT 0,
+    locked_until DATETIME DEFAULT NULL,
+    is_locked_permanently TINYINT(1) NOT NULL DEFAULT 0,
+    is_alumni_validated TINYINT(1) NOT NULL DEFAULT 0,
+    pending_email_update_request TINYINT(1) NOT NULL DEFAULT 0,
+    prompt_profile_review TINYINT(1) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    -- Foreign key constraint
-    CONSTRAINT fk_invoice_user
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    
-    -- Indexes for performance
-    INDEX idx_user_id (user_id),
-    INDEX idx_status (status),
-    INDEX idx_date_of_receipt (date_of_receipt),
-    INDEX idx_created_at (created_at)
+    INDEX idx_email (email),
+    INDEX idx_role (role)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
-  COMMENT='Invoice management system for receipt tracking and approval';
+  COMMENT='Core user accounts with authentication and security';
 
 -- ============================================
--- END OF USER DATABASE MIGRATIONS
+-- USER INVITATIONS TABLE
 -- ============================================
+CREATE TABLE IF NOT EXISTS user_invitations (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(100) NOT NULL,
+    token VARCHAR(64) NOT NULL UNIQUE,
+    role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
+        NOT NULL DEFAULT 'member',
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_email (email),
+    INDEX idx_token (token),
+    INDEX idx_expires_at (expires_at)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Token-based invitation system';
+
+-- ============================================
+-- EMAIL CHANGE REQUESTS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS email_change_requests (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED NOT NULL,
+    new_email VARCHAR(100) NOT NULL,
+    token VARCHAR(64) NOT NULL UNIQUE,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_email_change_user
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    
+    INDEX idx_user_id (user_id),
+    INDEX idx_token (token),
+    INDEX idx_expires_at (expires_at)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Token-based email change verification';

@@ -81,10 +81,17 @@ user_db_result=$?
 
 echo ""
 echo ""
-echo "Step 2: Validating Content Database SQL"
+echo "Step 2: Validating Content Database Legacy SQL"
 echo "════════════════════════════════════════════════════════════"
-validate_sql "sql/dbs15161271.sql" "Content Database"
-content_db_result=$?
+validate_sql "sql/dbs15161271.sql" "Content Database Legacy"
+content_db_legacy_result=$?
+
+echo ""
+echo ""
+echo "Step 3: Validating Content Database New SQL"
+echo "════════════════════════════════════════════════════════════"
+validate_sql "sql/dbs15251284.sql" "Content Database New"
+content_db_new_result=$?
 
 echo ""
 echo ""
@@ -92,7 +99,7 @@ echo "════════════════════════�
 echo "Summary"
 echo "════════════════════════════════════════════════════════════"
 
-if [ $user_db_result -eq 0 ] && [ $content_db_result -eq 0 ]; then
+if [ $user_db_result -eq 0 ] && [ $content_db_legacy_result -eq 0 ] && [ $content_db_new_result -eq 0 ]; then
     echo -e "${GREEN}✓ All SQL files validated successfully${NC}"
     echo ""
     echo "Next steps:"
