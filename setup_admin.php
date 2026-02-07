@@ -43,8 +43,8 @@ try {
     } else {
         $passwordHash = password_hash($adminPassword, PASSWORD_ARGON2ID);
         
-        // Spaltenname 'password_hash' laut deinem SQL Schema
-        $sqlUser = "INSERT INTO users (email, password_hash, role, is_alumni_validated) 
+        // Column name 'password' according to database schema
+        $sqlUser = "INSERT INTO users (email, password, role, is_alumni_validated) 
                     VALUES (?, ?, ?, 1)";
         
         $stmt = $db->prepare($sqlUser);

@@ -129,7 +129,7 @@ class Auth {
         }
         
         // Verify password
-        if (!password_verify($password, $user['password_hash'])) {
+        if (!isset($user['password']) || !is_string($user['password']) || !password_verify($password, $user['password'])) {
             // Increment failed attempts
             $failedAttempts = ($user['failed_login_attempts'] ?? 0) + 1;
             $lockedUntil = null;
