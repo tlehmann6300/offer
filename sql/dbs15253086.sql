@@ -5,13 +5,13 @@
 -- Apply this file to apply all migrations to production
 -- ============================================
 
--- Migration 1: Add 'candidate' role to users table
--- Changes the role ENUM to include: 'admin', 'board', 'head', 'member', 'alumni', 'candidate'
+-- Migration 1: Add 'candidate' and 'alumni_board' roles to users table
+-- Changes the role ENUM to include: 'admin', 'board', 'head', 'member', 'alumni', 'candidate', 'alumni_board'
 ALTER TABLE users 
 MODIFY COLUMN role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
 NOT NULL DEFAULT 'member';
 
--- Migration 2: Add 'candidate' and 'alumni_board' role to user_invitations table
+-- Migration 2: Add 'candidate' and 'alumni_board' roles to user_invitations table
 ALTER TABLE user_invitations 
 MODIFY COLUMN role ENUM('admin', 'board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
 NOT NULL DEFAULT 'member';

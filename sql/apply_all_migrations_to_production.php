@@ -139,7 +139,7 @@ try {
             }
         } catch (PDOException $e) {
             // Some errors are acceptable (e.g., column already exists)
-            if (preg_match('/Duplicate (column|key)|Can\'t DROP|already exists/i', $e->getMessage())) {
+            if (preg_match('/Duplicate (column|key)|already exists/i', $e->getMessage())) {
                 echo "  ℹ Skipped (already exists): " . substr($statement, 0, 50) . "...\n";
             } else {
                 $errors[] = "Content DB: " . $e->getMessage();
