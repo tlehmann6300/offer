@@ -134,6 +134,20 @@ ob_start();
                 <p class="text-gray-500">Erstellen Sie Ihre erste Einreichung</p>
             </div>
         <?php else: ?>
+            <?php
+            // Fetch all submitter info in one query to avoid N+1 problem
+            $userIds = array_unique(array_column($invoices, 'user_id'));
+            $userInfoMap = [];
+            if (!empty($userIds)) {
+                $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
+                $submitterStmt = $userDb->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
+                $submitterStmt->execute($userIds);
+                $submitters = $submitterStmt->fetchAll();
+                foreach ($submitters as $submitter) {
+                    $userInfoMap[$submitter['id']] = $submitter['email'];
+                }
+            }
+            ?>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -166,11 +180,8 @@ ob_start();
                     <tbody class="bg-white divide-y divide-gray-200">
                         <?php foreach ($invoices as $invoice): ?>
                             <?php
-                            // Get submitter info
-                            $submitterStmt = $userDb->prepare("SELECT email FROM users WHERE id = ?");
-                            $submitterStmt->execute([$invoice['user_id']]);
-                            $submitter = $submitterStmt->fetch();
-                            $submitterEmail = $submitter ? $submitter['email'] : 'Unknown';
+                            // Get submitter info from pre-fetched map
+                            $submitterEmail = $userInfoMap[$invoice['user_id']] ?? 'Unknown';
                             
                             // Extract name from email (first part before @)
                             $submitterName = explode('@', $submitterEmail)[0];

@@ -57,12 +57,13 @@ foreach ($invoices as $invoice) {
             // Create a meaningful filename
             $extension = pathinfo($filePath, PATHINFO_EXTENSION);
             $safeDescription = preg_replace('/[^a-zA-Z0-9_-]/', '_', substr($invoice['description'], 0, 50));
+            $amountCents = (int)($invoice['amount'] * 100);
             $newFileName = sprintf(
-                '%s_%s_%s_%s.%s',
+                '%s_%s_%s_%dc.%s',
                 date('Y-m-d', strtotime($invoice['created_at'])),
                 $invoice['id'],
                 $safeDescription,
-                number_format($invoice['amount'], 2, '_', ''),
+                $amountCents,
                 $extension
             );
             
