@@ -18,22 +18,34 @@ if (file_exists(__DIR__ . '/src/Database.php')) {
 
 $adminEmail = 'tom.lehmann@business-consulting.de';
 $adminPassword = 'Tomi#2004';
-$adminRole = 'admin';
+$adminRole = 'board';
 $firstName = 'Tom';
 $lastName = 'Lehmann';
 
 echo "<h1>Admin Setup</h1>";
 
 try {
-    // FIX: Wir nutzen direkt getUserDB(), da diese Methode in deinem Projekt existiert
-    if (method_exists('Database', 'getUserDB')) {
-        $db = Database::getUserDB();
-    } else {
-        throw new Exception("Die Methode Database::getUserDB() wurde nicht gefunden. Bitte prüfe deine Database.php");
-    }
+    // Get separate database connections for user and content databases
+    $dbUser = Database::getConnection('user');
+    $dbContent = Database::getConnection('content');
+
+    // Safety check: Ensure alumni_profiles table exists in content database
+    $createTableSQL = "CREATE TABLE IF NOT EXISTS alumni_profiles (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        first_name VARCHAR(100),
+        last_name VARCHAR(100),
+        email VARCHAR(100),
+        company VARCHAR(100),
+        position VARCHAR(100),
+        industry VARCHAR(100),
+        image_path VARCHAR(255),
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )";
+    $dbContent->exec($createTableSQL);
 
     // --- SCHRITT 1: User prüfen/erstellen ---
-    $stmt = $db->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt = $dbUser->prepare("SELECT id FROM users WHERE email = ?");
     $stmt->execute([$adminEmail]);
     $existingUser = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -47,16 +59,16 @@ try {
         $sqlUser = "INSERT INTO users (email, password, role, is_alumni_validated) 
                     VALUES (?, ?, ?, 1)";
         
-        $stmt = $db->prepare($sqlUser);
+        $stmt = $dbUser->prepare($sqlUser);
         $stmt->execute([$adminEmail, $passwordHash, $adminRole]);
         
-        $userId = $db->lastInsertId();
+        $userId = $dbUser->lastInsertId();
         echo "<p>✅ User erfolgreich angelegt (ID: $userId).</p>";
     }
 
     // --- SCHRITT 2: Profil prüfen/erstellen ---
     if ($userId) {
-        $stmt = $db->prepare("SELECT id FROM alumni_profiles WHERE user_id = ?");
+        $stmt = $dbContent->prepare("SELECT id FROM alumni_profiles WHERE user_id = ?");
         $stmt->execute([$userId]);
         
         if ($stmt->fetch()) {
@@ -66,7 +78,7 @@ try {
                 user_id, first_name, last_name, email, company, position, industry
             ) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-            $stmt = $db->prepare($sqlProfile);
+            $stmt = $dbContent->prepare($sqlProfile);
             $stmt->execute([
                 $userId, 
                 $firstName, 
