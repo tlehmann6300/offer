@@ -70,14 +70,14 @@ ob_start();
             <div class="flex-1">
                 <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
                     <i class="fas fa-search mr-1 text-purple-600"></i>
-                    Search by Name
+                    Search by Name, Position, Company or Industry
                 </label>
                 <input 
                     type="text" 
                     id="search" 
                     name="search" 
                     value="<?php echo htmlspecialchars($searchKeyword); ?>"
-                    placeholder="Enter name to search..."
+                    placeholder="Enter search term..."
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 >
             </div>

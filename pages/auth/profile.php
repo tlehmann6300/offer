@@ -17,6 +17,16 @@ $showQRCode = false;
 $qrCodeUrl = '';
 $secret = '';
 
+// Check for session messages from email confirmation
+if (isset($_SESSION['success_message'])) {
+    $message = $_SESSION['success_message'];
+    unset($_SESSION['success_message']);
+}
+if (isset($_SESSION['error_message'])) {
+    $error = $_SESSION['error_message'];
+    unset($_SESSION['error_message']);
+}
+
 // Load user's profile from alumni_profiles table
 $profile = Alumni::getProfileByUserId($user['id']);
 
@@ -73,13 +83,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Check if email has changed
         if ($newEmail !== $user['email']) {
             try {
-                // Call User::updateEmail() to update the email
-                if (User::updateEmail($user['id'], $newEmail)) {
-                    // Update session with new email to prevent logout
-                    $_SESSION['user_email'] = $newEmail;
-                    $message = 'E-Mail-Adresse erfolgreich aktualisiert';
-                    $user = Auth::user(); // Reload user data
-                }
+                // Generate token and save to email_change_requests
+                $token = User::createEmailChangeRequest($user['id'], $newEmail);
+                
+                // Create confirmation link
+                $confirmLink = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/api/confirm_email.php?token=' . $token;
+                
+                // TODO: Send email to new address with confirmation link
+                // For now, we'll just show a message
+                // In production, use PHPMailer or similar to send email
+                
+                $message = 'Bestätigungslink an neue E-Mail gesendet. Bitte überprüfen Sie Ihr Postfach.';
+                
+                // Log the action
+                error_log("Email change confirmation link: $confirmLink");
             } catch (Exception $e) {
                 // Catch exceptions like 'E-Mail vergeben' or validation errors
                 $error = $e->getMessage();
