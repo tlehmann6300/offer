@@ -172,7 +172,7 @@ class Invoice {
         chmod($uploadPath, 0644);
         
         // Return relative path for database storage
-        $relativePath = rtrim(self::UPLOAD_DIR, '/') . '/' . $randomFilename;
+        $relativePath = self::UPLOAD_DIR . $randomFilename;
         
         return [
             'success' => true,
@@ -228,7 +228,7 @@ class Invoice {
             
             // Send email with attachment
             return MailService::sendEmailWithFileAttachment(
-                defined('INVOICE_NOTIFICATION_EMAIL') ? INVOICE_NOTIFICATION_EMAIL : 'tlehmann630@gmail.com',
+                INVOICE_NOTIFICATION_EMAIL,
                 $subject,
                 $htmlBody,
                 $absoluteFilePath
