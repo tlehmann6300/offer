@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => '__root__',
-        'pretty_version' => 'dev-copilot/review-mail-service-send-method',
-        'version' => 'dev-copilot/review-mail-service-send-method',
-        'reference' => 'a152b94f0191f27041580a4e45f5a09c781fb7d8',
+        'pretty_version' => 'dev-copilot/create-test-mail-attachment-script',
+        'version' => 'dev-copilot/create-test-mail-attachment-script',
+        'reference' => '7c1015acb0faaa089292f7608a4dd97ad83adb7f',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => 'dev-copilot/review-mail-service-send-method',
-            'version' => 'dev-copilot/review-mail-service-send-method',
-            'reference' => 'a152b94f0191f27041580a4e45f5a09c781fb7d8',
+            'pretty_version' => 'dev-copilot/create-test-mail-attachment-script',
+            'version' => 'dev-copilot/create-test-mail-attachment-script',
+            'reference' => '7c1015acb0faaa089292f7608a4dd97ad83adb7f',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
