@@ -61,6 +61,9 @@ class Database {
 
     /**
      * Get Invoice/Rech Database Connection
+     * 
+     * @return PDO Database connection instance
+     * @throws Exception If database connection fails
      */
     public static function getRechDB() {
         if (self::$rechConnection === null) {

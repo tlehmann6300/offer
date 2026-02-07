@@ -154,6 +154,7 @@ try {
             echo "✓ Invoice::getStats() works with new connection\n";
             echo "  Total Pending: " . number_format($stats['total_pending'], 2) . "€\n";
             echo "  Total Paid: " . number_format($stats['total_paid'], 2) . "€\n";
+            echo "  Monthly Paid: " . number_format($stats['monthly_paid'], 2) . "€\n";
         } else {
             echo "✗ Invoice::getStats() did not return expected structure\n";
         }
