@@ -78,6 +78,79 @@ $title = 'Dashboard - IBC Intranet';
 ob_start();
 ?>
 
+<?php if (!empty($user['prompt_profile_review']) && $user['prompt_profile_review'] == 1): ?>
+<!-- Profile Review Prompt Modal -->
+<div id="profile-review-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden transform transition-all">
+        <!-- Modal Header -->
+        <div class="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-4">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-user-edit text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Deine Rolle wurde geändert!</h3>
+            </div>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="px-6 py-6">
+            <p class="text-gray-700 text-lg mb-6">
+                Bitte überprüfe deine Daten (besonders E-Mail und Job-Daten), damit wir in Kontakt bleiben können.
+            </p>
+            
+            <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-purple-600 mt-1 mr-3"></i>
+                    <p class="text-sm text-gray-700">
+                        Es ist wichtig, dass deine Kontaktdaten aktuell sind, damit du alle wichtigen Informationen erhältst.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 bg-gray-50 flex flex-col sm:flex-row gap-3">
+            <a href="../auth/profile.php" class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg" onclick="dismissProfileReviewPrompt()">
+                <i class="fas fa-user-circle mr-2"></i>
+                Zum Profil
+            </a>
+            <button onclick="dismissProfileReviewPrompt()" class="flex-1 px-6 py-3 bg-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-400 transition-all duration-300">
+                Später
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Dismiss profile review prompt and update database
+function dismissProfileReviewPrompt() {
+    // Make AJAX call to update database
+    fetch('../api/dismiss_profile_review.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Hide modal
+            document.getElementById('profile-review-modal').style.display = 'none';
+        } else {
+            console.error('Failed to dismiss prompt:', data.message);
+            // Hide modal anyway to prevent blocking user
+            document.getElementById('profile-review-modal').style.display = 'none';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Hide modal anyway to prevent blocking user
+        document.getElementById('profile-review-modal').style.display = 'none';
+    });
+}
+</script>
+<?php endif; ?>
+
 <?php if (isset($_SESSION['show_2fa_nudge']) && $_SESSION['show_2fa_nudge']): ?>
 <!-- 2FA Nudge Modal -->
 <div id="tfa-nudge-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
