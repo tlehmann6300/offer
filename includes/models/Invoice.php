@@ -361,7 +361,7 @@ class Invoice {
     /**
      * Calculate invoice statistics
      * 
-     * @return array ['total_pending' => float, 'total_paid' => float]
+     * @return array ['total_pending' => float, 'total_paid' => float, 'monthly_paid' => float]
      */
     public static function getStats() {
         try {
@@ -387,16 +387,30 @@ class Invoice {
             $paidResult = $stmt->fetch();
             $totalPaid = (float) $paidResult['total'];
             
+            // Calculate this month's approved amount
+            $stmt = $db->prepare("
+                SELECT COALESCE(SUM(amount), 0) as total
+                FROM invoices
+                WHERE status = 'approved'
+                AND YEAR(updated_at) = YEAR(CURRENT_DATE)
+                AND MONTH(updated_at) = MONTH(CURRENT_DATE)
+            ");
+            $stmt->execute();
+            $monthlyResult = $stmt->fetch();
+            $monthlyPaid = (float) $monthlyResult['total'];
+            
             return [
                 'total_pending' => $totalPending,
-                'total_paid' => $totalPaid
+                'total_paid' => $totalPaid,
+                'monthly_paid' => $monthlyPaid
             ];
             
         } catch (Exception $e) {
             error_log("Error calculating invoice stats: " . $e->getMessage());
             return [
                 'total_pending' => 0,
-                'total_paid' => 0
+                'total_paid' => 0,
+                'monthly_paid' => 0
             ];
         }
     }
