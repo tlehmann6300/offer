@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS alumni_profiles (
     
     -- Status tracking
     status VARCHAR(50) DEFAULT NULL COMMENT 'Profile status',
-    last_verified_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Last verification date',
+    last_verified_at DATETIME DEFAULT NULL COMMENT 'Last verification date',
     last_reminder_sent_at DATETIME DEFAULT NULL COMMENT 'Last annual reminder sent to alumni',
     
     -- Audit timestamps
