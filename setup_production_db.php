@@ -10,31 +10,33 @@
 $envFile = __DIR__ . '/.env';
 $env = [];
 
-if (file_exists($envFile)) {
-    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+if (!file_exists($envFile)) {
+    die('Error: .env file not found. Cannot load database credentials.');
+}
+
+$lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+foreach ($lines as $line) {
+    // Skip comments
+    if (strpos(trim($line), '#') === 0) {
+        continue;
+    }
     
-    foreach ($lines as $line) {
-        // Skip comments
-        if (strpos(trim($line), '#') === 0) {
-            continue;
+    // Parse key=value pairs
+    if (strpos($line, '=') !== false) {
+        list($key, $value) = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value);
+        
+        // Remove quotes if present
+        if (strlen($value) >= 2) {
+            if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
+                (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
+                $value = substr($value, 1, -1);
+            }
         }
         
-        // Parse key=value pairs
-        if (strpos($line, '=') !== false) {
-            list($key, $value) = explode('=', $line, 2);
-            $key = trim($key);
-            $value = trim($value);
-            
-            // Remove quotes if present
-            if (strlen($value) >= 2) {
-                if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
-                    (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
-                    $value = substr($value, 1, -1);
-                }
-            }
-            
-            $env[$key] = $value;
-        }
+        $env[$key] = $value;
     }
 }
 
@@ -43,6 +45,16 @@ define('PROD_DB_CONTENT_HOST', $env['DB_INVOICE_HOST'] ?? $env['DB_RECH_HOST'] ?
 define('PROD_DB_CONTENT_PORT', $env['DB_INVOICE_PORT'] ?? $env['DB_RECH_PORT'] ?? '3306');
 define('PROD_DB_CONTENT_USER', $env['DB_INVOICE_USER'] ?? $env['DB_RECH_USER'] ?? '');
 define('PROD_DB_CONTENT_PASS', $env['DB_INVOICE_PASS'] ?? $env['DB_RECH_PASS'] ?? '');
+
+// Validate required credentials are present
+$missingCredentials = [];
+if (empty(PROD_DB_CONTENT_HOST)) $missingCredentials[] = 'DB_INVOICE_HOST or DB_RECH_HOST';
+if (empty(PROD_DB_CONTENT_USER)) $missingCredentials[] = 'DB_INVOICE_USER or DB_RECH_USER';
+if (empty(PROD_DB_CONTENT_PASS)) $missingCredentials[] = 'DB_INVOICE_PASS or DB_RECH_PASS';
+
+if (!empty($missingCredentials)) {
+    die('Error: Missing required credentials in .env file: ' . implode(', ', $missingCredentials));
+}
 
 $success = false;
 $error = '';
