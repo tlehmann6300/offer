@@ -15,14 +15,26 @@ define('PROD_DB_CONTENT_PASS', 'F9!qR7#L@2mZ$8KAS44');
 $success = false;
 $error = '';
 
+// Simple token-based CSRF protection
+session_start();
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Handle form submission
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['db_content_name'])) {
-    $dbContentName = trim($_POST['db_content_name']);
-    
-    // Validate input
-    if (empty($dbContentName)) {
-        $error = 'Database name cannot be empty.';
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $error = 'Invalid security token. Please try again.';
     } else {
+        $dbContentName = trim($_POST['db_content_name']);
+        
+        // Server-side validation
+        if (empty($dbContentName)) {
+            $error = 'Database name cannot be empty.';
+        } elseif (!preg_match('/^dbs[0-9]+$/', $dbContentName)) {
+            $error = 'Database name must start with "dbs" followed by numbers.';
+        } else {
         try {
             $envFile = __DIR__ . '/.env';
             
@@ -116,7 +128,7 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' &
             }
             
             // Write back to .env file
-            $content = implode("\n", $updatedLines);
+            $content = implode(PHP_EOL, $updatedLines);
             if (file_put_contents($envFile, $content) === false) {
                 throw new Exception('Failed to write to .env file.');
             }
@@ -125,6 +137,7 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' &
             
         } catch (Exception $e) {
             $error = 'Error: ' . $e->getMessage();
+        }
         }
     }
 }
@@ -335,6 +348,7 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' &
             </div>
             
             <form method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                 <div class="form-group">
                     <label for="db_content_name">Database Name (DB_CONTENT_NAME)</label>
                     <input 
@@ -355,6 +369,11 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' &
             <div class="warning-box">
                 <strong>⚠️ Important:</strong>
                 This will update your .env file with production credentials. Make sure you have a backup before proceeding.
+            </div>
+            
+            <div class="warning-box" style="border-left-color: #dc3545; margin-top: 15px;">
+                <strong>🔒 SECURITY NOTICE:</strong>
+                This script contains hardcoded production credentials. Delete this file immediately after use to prevent unauthorized access!
             </div>
         <?php endif; ?>
     </div>
