@@ -53,7 +53,7 @@ class Invoice {
         
         try {
             // Insert into database
-            $db = Database::getContentDB();
+            $db = Database::getConnection('rech');
             $stmt = $db->prepare("
                 INSERT INTO invoices (user_id, description, amount, file_path, status)
                 VALUES (?, ?, ?, ?, 'pending')
@@ -249,7 +249,7 @@ class Invoice {
      * @return array Array of invoices
      */
     public static function getAll($userRole, $currentUserId) {
-        $db = Database::getContentDB();
+        $db = Database::getConnection('rech');
         
         // Board and alumni_board see all invoices
         if ($userRole === 'board' || $userRole === 'alumni_board') {
@@ -334,7 +334,7 @@ class Invoice {
         }
         
         try {
-            $db = Database::getContentDB();
+            $db = Database::getConnection('rech');
             
             // Validate status
             $validStatuses = ['pending', 'approved', 'rejected'];
@@ -365,7 +365,7 @@ class Invoice {
      */
     public static function getStats() {
         try {
-            $db = Database::getContentDB();
+            $db = Database::getConnection('rech');
             
             // Calculate total pending amount
             $stmt = $db->prepare("
@@ -423,7 +423,7 @@ class Invoice {
      */
     public static function getById($id) {
         try {
-            $db = Database::getContentDB();
+            $db = Database::getConnection('rech');
             $stmt = $db->prepare("
                 SELECT 
                     id,
