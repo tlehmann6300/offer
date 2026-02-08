@@ -88,23 +88,27 @@ ob_start();
             </h1>
             <p class="text-gray-600"><?php echo count($items); ?> Artikel gefunden</p>
         </div>
-        <!-- EasyVerein Sync Button - Admin/Board only -->
-        <?php if (AuthHandler::isAdmin()): ?>
+        <!-- Action Buttons -->
         <div class="mt-4 md:mt-0 flex gap-2">
+            <!-- Neuer Artikel Button -->
+            <a href="add.php" class="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition flex items-center">
+                <i class="fas fa-plus mr-2"></i>
+                Neuer Artikel
+            </a>
+            <!-- EasyVerein Sync Button - Admin/Board only -->
+            <?php if (AuthHandler::isAdmin()): ?>
             <a href="sync.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
                 <i class="fas fa-sync-alt mr-2"></i> EasyVerein Sync
             </a>
-        </div>
-        <?php endif; ?>
-        <!-- Import Button - Manager level and above -->
-        <?php if (Auth::hasPermission('manager')): ?>
-        <div class="mt-4 md:mt-0 flex gap-2">
-            <button type="button" onclick="document.getElementById('importModal').classList.remove('hidden')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+            <?php endif; ?>
+            <!-- Import Button - Manager level and above -->
+            <?php if (Auth::hasPermission('manager')): ?>
+            <button type="button" onclick="document.getElementById('importModal').classList.remove('hidden')" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
                 <i class="fas fa-file-import mr-2"></i>
                 Massenimport
             </button>
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
     </div>
 </div>
 

@@ -445,4 +445,33 @@ class Invoice {
             return null;
         }
     }
+    
+    /**
+     * Mark invoice as paid
+     * Can only be called by board members with 'Finanzen und Recht' position
+     * 
+     * @param int $invoiceId The invoice ID
+     * @param int $userId The user ID marking as paid
+     * @return bool True on success
+     */
+    public static function markAsPaid($invoiceId, $userId) {
+        try {
+            $db = Database::getConnection('rech');
+            
+            $stmt = $db->prepare("
+                UPDATE invoices
+                SET status = 'paid', 
+                    paid_at = NOW(), 
+                    paid_by_user_id = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            ");
+            
+            return $stmt->execute([$userId, $invoiceId]);
+            
+        } catch (Exception $e) {
+            error_log("Error marking invoice as paid: " . $e->getMessage());
+            return false;
+        }
+    }
 }

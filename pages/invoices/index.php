@@ -20,6 +20,27 @@ if (!in_array($userRole, $allowedRoles)) {
     exit;
 }
 
+// Check if user has permission to mark invoices as paid
+// Only board members with 'Finanzen und Recht' position can mark as paid
+$canMarkAsPaid = false;
+if ($userRole === 'board') {
+    $contentDb = Database::getContentDB();
+    $stmt = $contentDb->prepare("
+        SELECT position 
+        FROM alumni_profiles 
+        WHERE user_id = ?
+    ");
+    $stmt->execute([$user['id']]);
+    $profile = $stmt->fetch();
+    
+    if ($profile && !empty($profile['position'])) {
+        // Check if position contains 'Finanzen und Recht' (case-insensitive)
+        if (stripos($profile['position'], 'Finanzen und Recht') !== false) {
+            $canMarkAsPaid = true;
+        }
+    }
+}
+
 // Get invoices based on role
 $invoices = Invoice::getAll($userRole, $user['id']);
 
@@ -192,13 +213,15 @@ ob_start();
                             $statusColors = [
                                 'pending' => 'bg-yellow-100 text-yellow-800 border-yellow-300',
                                 'approved' => 'bg-green-100 text-green-800 border-green-300',
-                                'rejected' => 'bg-red-100 text-red-800 border-red-300'
+                                'rejected' => 'bg-red-100 text-red-800 border-red-300',
+                                'paid' => 'bg-blue-100 text-blue-800 border-blue-300'
                             ];
                             
                             $statusLabels = [
                                 'pending' => 'Ausstehend',
-                                'approved' => 'Bezahlt',
-                                'rejected' => 'Abgelehnt'
+                                'approved' => 'Genehmigt',
+                                'rejected' => 'Abgelehnt',
+                                'paid' => 'Bezahlt'
                             ];
                             
                             $statusClass = $statusColors[$invoice['status']] ?? 'bg-gray-100 text-gray-800 border-gray-300';
@@ -260,6 +283,15 @@ ob_start();
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </div>
+                                    <?php elseif ($invoice['status'] === 'approved' && $canMarkAsPaid): ?>
+                                        <button 
+                                            onclick="markInvoiceAsPaid(<?php echo $invoice['id']; ?>)"
+                                            class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs"
+                                            title="Als Bezahlt markieren"
+                                        >
+                                            <i class="fas fa-check-double mr-1"></i>
+                                            Als Bezahlt markieren
+                                        </button>
                                     <?php else: ?>
                                         <span class="text-gray-400 text-xs">-</span>
                                     <?php endif; ?>
@@ -499,6 +531,34 @@ function updateInvoiceStatus(invoiceId, status) {
     .catch(error => {
         console.error('Error:', error);
         alert('Fehler beim Aktualisieren des Status');
+    });
+}
+
+// Mark invoice as paid function
+function markInvoiceAsPaid(invoiceId) {
+    if (!confirm('Möchtest du diese Rechnung wirklich als bezahlt markieren?')) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('invoice_id', invoiceId);
+    
+    fetch('<?php echo asset('api/mark_invoice_paid.php'); ?>', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Rechnung wurde als bezahlt markiert');
+            window.location.reload();
+        } else {
+            alert('Fehler: ' + (data.error || 'Unbekannter Fehler'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Fehler beim Markieren als bezahlt');
     });
 }
 </script>
