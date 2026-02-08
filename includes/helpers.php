@@ -107,7 +107,7 @@ function asset($path) {
 function translateRole($role) {
     $roleTranslations = [
         'board' => 'Vorstand',
-        'head' => 'Vorstand',
+        'head' => 'Vorstandsvorsitzender',
         'member' => 'Mitglied',
         'alumni' => 'Alumni',
         'candidate' => 'Anwärter',

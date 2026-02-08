@@ -75,11 +75,12 @@ $isBoardLevel = in_array($user['role'], ['board', 'head', 'alumni_board']);
 if ($isBoardLevel) {
     $db = Database::getUserDB();
     
-    // Active Users (7 days)
-    $stmt = $db->query("SELECT COUNT(*) as active_users FROM users WHERE last_login > DATE_SUB(NOW(), INTERVAL 7 DAY)");
+    // Active Users (7 days) - users with last_login in the last 7 days
+    $stmt = $db->query("SELECT COUNT(*) as active_users FROM users WHERE last_login IS NOT NULL AND last_login > DATE_SUB(NOW(), INTERVAL 7 DAY)");
     $activeUsersCount = $stmt->fetch()['active_users'] ?? 0;
     
-    // Open Invitations
+    // Open Invitations - tokens that haven't expired
+    // Note: used_at column may not exist in all deployments, so we only check expiration
     $stmt = $db->query("SELECT COUNT(*) as open_invitations FROM invitation_tokens WHERE expires_at > NOW()");
     $openInvitationsCount = $stmt->fetch()['open_invitations'] ?? 0;
     
@@ -410,7 +411,7 @@ endif;
             <div class="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
                 <i class="fas fa-user-friends text-3xl text-purple-600"></i>
             </div>
-            <h3 class="text-lg font-semibold text-gray-700 mb-2">Gesamt User</h3>
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Gesamt Benutzer</h3>
             <p class="text-4xl font-bold text-purple-600 mb-2"><?php echo number_format($totalUsersCount); ?></p>
             <p class="text-sm text-gray-500">Registrierte Benutzer</p>
         </div>
