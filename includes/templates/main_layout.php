@@ -177,7 +177,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <div class="px-6 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                     Netzwerk
                 </div>
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board', 'head', 'member', 'candidate'])): ?>
+                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'head', 'member', 'candidate'])): ?>
                 <a href="<?php echo BASE_URL; ?>/pages/members/index.php" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/members/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-users w-5 mr-3"></i>
@@ -205,15 +205,10 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <i class="fas fa-user-cog w-5 mr-3"></i>
                     <span>Benutzer</span>
                 </a>
-                <a href="<?php echo asset('pages/admin/db_maintenance.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/db_maintenance.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-database w-5 mr-3"></i>
-                    <span>Datenbank</span>
-                </a>
-                <a href="<?php echo asset('pages/admin/audit.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/audit.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-clipboard-list w-5 mr-3"></i>
-                    <span>Audit-Protokoll</span>
+                <a href="<?php echo asset('pages/admin/settings.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/settings.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-cog w-5 mr-3"></i>
+                    <span>Einstellungen</span>
                 </a>
                 <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
@@ -225,12 +220,32 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <i class="fas fa-calendar-alt w-5 mr-3"></i>
                     <span>Veranstaltungen</span>
                 </a>
-                <a href="<?php echo asset('pages/inventory/manage.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/inventory/manage.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-boxes w-5 mr-3"></i>
+                <?php endif; ?>
+
+                <!-- SCHNELLZUGRIFF Section (Quick Access) -->
+                <div class="px-6 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Schnellzugriff
+                </div>
+                <a href="<?php echo asset('pages/auth/profile.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/auth/profile.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-user w-5 mr-3"></i>
+                    <span>Mein Profil</span>
+                </a>
+                <a href="<?php echo asset('pages/inventory/index.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/inventory/index.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-box w-5 mr-3"></i>
                     <span>Inventar</span>
                 </a>
-                <?php endif; ?>
+                <a href="<?php echo asset('pages/events/index.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/events/index.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-calendar w-5 mr-3"></i>
+                    <span>Events ansehen</span>
+                </a>
+                <a href="<?php echo asset('pages/projects/index.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/projects/index.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-folder w-5 mr-3"></i>
+                    <span>Projekte</span>
+                </a>
                 
             </nav>
         </div>
