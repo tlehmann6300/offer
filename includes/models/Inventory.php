@@ -345,15 +345,15 @@ class Inventory {
         
         // Total items
         $stmt = $db->query("SELECT COUNT(*) as total FROM inventory_items");
-        $stats['total_items'] = $stmt->fetch()['total'];
+        $stats['total_items'] = (int)($stmt->fetch()['total'] ?? 0);
         
         // Total value
         $stmt = $db->query("SELECT SUM(quantity * unit_price) as total_value FROM inventory_items");
-        $stats['total_value'] = $stmt->fetch()['total_value'] ?? 0;
+        $stats['total_value'] = (float)($stmt->fetch()['total_value'] ?? 0);
         
         // Low stock items
         $stmt = $db->query("SELECT COUNT(*) as low_stock FROM inventory_items WHERE quantity <= min_stock AND min_stock > 0");
-        $stats['low_stock'] = $stmt->fetch()['low_stock'];
+        $stats['low_stock'] = (int)($stmt->fetch()['low_stock'] ?? 0);
         
         // Recently moved items
         $stmt = $db->query("
@@ -657,15 +657,15 @@ class Inventory {
         
         // Total items in stock (sum of all quantity)
         $stmt = $db->query("SELECT SUM(quantity) as total_in_stock FROM inventory_items");
-        $stats['total_in_stock'] = $stmt->fetch()['total_in_stock'] ?? 0;
+        $stats['total_in_stock'] = (float)($stmt->fetch()['total_in_stock'] ?? 0);
         
         // Total unique items in stock
         $stmt = $db->query("SELECT COUNT(*) as unique_items FROM inventory_items WHERE quantity > 0");
-        $stats['unique_items_in_stock'] = $stmt->fetch()['unique_items'];
+        $stats['unique_items_in_stock'] = (int)($stmt->fetch()['unique_items'] ?? 0);
         
         // Total value in stock
         $stmt = $db->query("SELECT SUM(quantity * unit_price) as total_value FROM inventory_items");
-        $stats['total_value_in_stock'] = $stmt->fetch()['total_value'] ?? 0;
+        $stats['total_value_in_stock'] = (float)($stmt->fetch()['total_value'] ?? 0);
         
         return $stats;
     }
