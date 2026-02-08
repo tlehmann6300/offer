@@ -185,8 +185,26 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <span>Blog</span>
                 </a>
 
-                <!-- Rechnungen (Visible for board and alumni_board) -->
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'alumni_board'])): ?>
+                <!-- Mitglieder (Visible for board, head, member) -->
+                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'head', 'member'])): ?>
+                <a href="<?php echo asset('pages/members/index.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/members/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-users w-5 mr-3"></i>
+                    <span>Mitglieder</span>
+                </a>
+                <?php endif; ?>
+
+                <!-- Alumni (Visible for board, head, member) -->
+                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'head', 'member'])): ?>
+                <a href="<?php echo asset('pages/alumni/index.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/alumni/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-user-graduate w-5 mr-3"></i>
+                    <span>Alumni</span>
+                </a>
+                <?php endif; ?>
+
+                <!-- Rechnungen (Visible ONLY for board) -->
+                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'board'): ?>
                 <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-file-invoice-dollar w-5 mr-3"></i>
@@ -315,11 +333,11 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <span>Abmelden</span>
             </a>
             
-            <!-- Dynamic Date/Time Display -->
+            <!-- Live Clock -->
             <div class='mt-4 pt-4 border-t border-white/20 text-center'>
-                <p id="current-datetime" class='text-xs text-gray-300'>
+                <div id="live-clock" class='text-xs text-gray-300 font-mono'>
                     <!-- JavaScript will update this -->
-                </p>
+                </div>
             </div>
         </div>
     </aside>
@@ -419,25 +437,26 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             }
         });
         
-        // Dynamic Date/Time Display
-        function updateDateTime() {
+        // Live Clock - Updates every second
+        function updateLiveClock() {
             const now = new Date();
             const day = String(now.getDate()).padStart(2, '0');
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const year = now.getFullYear();
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
             
-            const dateTimeString = `${day}.${month}.${year} ${hours}:${minutes}`;
-            const dateTimeElement = document.getElementById('current-datetime');
-            if (dateTimeElement) {
-                dateTimeElement.textContent = dateTimeString;
+            const dateTimeString = `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
+            const clockElement = document.getElementById('live-clock');
+            if (clockElement) {
+                clockElement.textContent = dateTimeString;
             }
         }
         
-        // Update immediately and then every minute
-        updateDateTime();
-        setInterval(updateDateTime, 60000);
+        // Update immediately and then every second
+        updateLiveClock();
+        setInterval(updateLiveClock, 1000);
         
         // Verwaltung Dropdown Toggle
         const verwaltungBtn = document.getElementById('verwaltung-dropdown-btn');
