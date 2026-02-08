@@ -39,8 +39,8 @@ $profile = $stmt->fetch();
 
 $hasFinancePosition = false;
 if ($profile && !empty($profile['position'])) {
-    // Check if position contains 'Finanzen und Recht' (case-insensitive)
-    if (stripos($profile['position'], 'Finanzen und Recht') !== false) {
+    // Check if position contains 'Finanzen' (flexible matching with strpos)
+    if (strpos($profile['position'], 'Finanzen') !== false) {
         $hasFinancePosition = true;
     }
 }
@@ -49,7 +49,7 @@ if (!$hasFinancePosition) {
     http_response_code(403);
     echo json_encode([
         'success' => false, 
-        'error' => 'Keine Berechtigung - Position "Finanzen und Recht" erforderlich'
+        'error' => 'Keine Berechtigung - Position mit "Finanzen" erforderlich'
     ]);
     exit;
 }
