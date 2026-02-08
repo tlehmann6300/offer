@@ -39,8 +39,9 @@ $profile = $stmt->fetch();
 
 $hasFinancePosition = false;
 if ($profile && !empty($profile['position'])) {
-    // Check if position contains 'Finanzen und Recht' (case-insensitive)
-    if (stripos($profile['position'], 'Finanzen und Recht') !== false) {
+    // Check if position contains 'Finanzen' as a word (not as part of another word)
+    // Use word boundary matching to avoid false positives like 'Nicht-Finanzen'
+    if (preg_match('/\bFinanzen\b/i', $profile['position'])) {
         $hasFinancePosition = true;
     }
 }
@@ -49,7 +50,7 @@ if (!$hasFinancePosition) {
     http_response_code(403);
     echo json_encode([
         'success' => false, 
-        'error' => 'Keine Berechtigung - Position "Finanzen und Recht" erforderlich'
+        'error' => 'Keine Berechtigung - Position mit "Finanzen" erforderlich'
     ]);
     exit;
 }

@@ -23,7 +23,7 @@ if (!in_array($userRole, $allowedRoles)) {
 // Check if user has permission to mark invoices as paid
 // Only board members with 'Finanzen' in position can mark as paid
 $canMarkAsPaid = false;
-if (Auth::hasRole('board')) {
+if ($userRole === 'board') {
     $contentDb = Database::getContentDB();
     $stmt = $contentDb->prepare("
         SELECT position 
@@ -34,8 +34,9 @@ if (Auth::hasRole('board')) {
     $profile = $stmt->fetch();
     
     if ($profile && !empty($profile['position'])) {
-        // Check if position contains 'Finanzen' (flexible matching with strpos)
-        if (strpos($profile['position'], 'Finanzen') !== false) {
+        // Check if position contains 'Finanzen' as a word (not as part of another word)
+        // Use word boundary matching to avoid false positives like 'Nicht-Finanzen'
+        if (preg_match('/\bFinanzen\b/i', $profile['position'])) {
             $canMarkAsPaid = true;
         }
     }

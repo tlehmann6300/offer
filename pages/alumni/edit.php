@@ -4,8 +4,12 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/models/Alumni.php';
 require_once __DIR__ . '/../../includes/utils/SecureImageUpload.php';
 
-// Access Control: Allow all logged-in users (Admin, Board, Head, Member, Candidate, Alumni)
-// No role restrictions - any authenticated user can edit their own profile
+// Access Control: Users can edit their own profile based on their role
+// - Alumni and alumni_board roles can edit their own profiles (alumni status)
+// - Board, head, candidate, member roles can edit their own profiles (active member status)
+// - Admin can edit their own profile
+// Note: All profiles use the alumni_profiles table regardless of user role
+// Note: This page only allows users to edit their own profile (no cross-user editing)
 if (!Auth::check()) {
     header('Location: ../auth/login.php');
     exit;
@@ -14,8 +18,17 @@ if (!Auth::check()) {
 // Get current user info
 $user = Auth::user();
 $userId = $_SESSION['user_id'];
+$userRole = $user['role'] ?? '';
 
-// Fetch existing profile for the current user only
+// Check permission: All authenticated users with these roles can edit their own profile
+$allowedRoles = ['admin', 'alumni', 'alumni_board', 'board', 'head', 'candidate', 'member'];
+if (!in_array($userRole, $allowedRoles)) {
+    $_SESSION['error_message'] = 'Sie haben keine Berechtigung, Profile zu bearbeiten.';
+    header('Location: ../dashboard/index.php');
+    exit;
+}
+
+// Fetch profile for current user only ($userId from session) - this prevents cross-user edits
 $profile = Alumni::getProfileByUserId($userId);
 
 $message = '';
