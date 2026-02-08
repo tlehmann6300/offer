@@ -499,7 +499,11 @@ endif;
                         </a>
                     </td>
                     <td class="px-3 py-2 whitespace-nowrap">
-                        <span class="text-red-600 font-semibold"><?php echo abs((float)($writeoff['change_amount'] ?? 0)); ?> <?php echo htmlspecialchars($writeoff['unit']); ?></span>
+                        <?php 
+                        // Ensure change_amount is a valid number before displaying
+                        $changeAmount = (float)($writeoff['change_amount'] ?? 0);
+                        ?>
+                        <span class="text-red-600 font-semibold"><?php echo abs($changeAmount); ?> <?php echo htmlspecialchars($writeoff['unit']); ?></span>
                     </td>
                     <td class="px-3 py-2">
                         <?php echo htmlspecialchars($writeoff['reported_by_email']); ?>

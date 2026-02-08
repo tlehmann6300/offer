@@ -55,6 +55,8 @@ try {
         'invitations' => $invitations
     ]);
 } catch (Exception $e) {
+    // Log the full error for debugging
+    error_log('Error in get_invitations.php: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => $e->getMessage()]);
+    echo json_encode(['error' => 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.']);
 }
