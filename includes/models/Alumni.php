@@ -17,10 +17,10 @@ class Alumni {
      * @return array|false Profile data or false if not found
      */
     public static function getProfileById(int $id) {
-        $db = Database::getContentDB();
+        $db = Database::getConnection('content');
         $stmt = $db->prepare("SELECT * FROM alumni_profiles WHERE id = ?");
         $stmt->execute([$id]);
-        return $stmt->fetch();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
     /**
