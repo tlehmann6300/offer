@@ -7,6 +7,12 @@
 class Inventory {
     
     /**
+     * Master Data fields that are synced with EasyVerein
+     * These fields are protected from manual editing for synced items
+     */
+    const MASTER_DATA_FIELDS = ['name', 'description', 'quantity', 'unit_price'];
+    
+    /**
      * Get item by ID
      */
     public static function getById($id) {
@@ -100,6 +106,8 @@ class Inventory {
         }
         
         // Build ORDER BY clause based on sort parameter
+        // Using a whitelist switch statement to prevent SQL injection
+        // Only predefined column/direction combinations are allowed
         $orderBy = 'i.name ASC';
         if (!empty($filters['sort'])) {
             switch ($filters['sort']) {
@@ -187,7 +195,7 @@ class Inventory {
      * Update item
      * 
      * Protects EasyVerein-synced items from direct Master Data modifications
-     * Master Data fields: name, description, quantity
+     * Master Data fields are defined in self::MASTER_DATA_FIELDS constant
      * Local Operational fields: location_id, notes, category_id, etc.
      * 
      * When updating items with easyverein_id, triggers bidirectional sync to EasyVerein API.
@@ -212,15 +220,14 @@ class Inventory {
         if (!$isSyncUpdate && $item && !empty($item['easyverein_id'])) {
             // This item is synced with EasyVerein
             // Check if trying to modify Master Data fields
-            $masterDataFields = ['name', 'description', 'quantity', 'unit_price'];
-            $attemptedMasterDataChanges = array_intersect(array_keys($data), $masterDataFields);
+            $attemptedMasterDataChanges = array_intersect(array_keys($data), self::MASTER_DATA_FIELDS);
             
             if (!empty($attemptedMasterDataChanges)) {
                 // Trigger bidirectional sync to EasyVerein
                 require_once __DIR__ . '/../services/EasyVereinSync.php';
                 
                 // Extract only the Master Data fields for sync
-                $syncData = array_intersect_key($data, array_flip($masterDataFields));
+                $syncData = array_intersect_key($data, array_flip(self::MASTER_DATA_FIELDS));
                 
                 $syncResult = EasyVereinSync::updateItem($item['easyverein_id'], $syncData);
                 
