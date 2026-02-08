@@ -16,7 +16,7 @@ class Alumni {
      * @param int $id The primary key ID
      * @return array|false Profile data or false if not found
      */
-    public static function getProfileById($id) {
+    public static function getProfileById(int $id) {
         $db = Database::getConnection('content');
         $stmt = $db->prepare("SELECT * FROM alumni_profiles WHERE id = ?");
         $stmt->execute([$id]);
