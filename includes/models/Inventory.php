@@ -14,8 +14,8 @@ class Inventory {
         $stmt = $db->prepare("
             SELECT i.*, c.name as category_name, c.color as category_color, 
                    l.name as location_name,
-                   i.current_stock as quantity,
-                   (i.current_stock - COALESCE(SUM(r.amount), 0)) as available_quantity
+                   i.quantity as quantity,
+                   (i.quantity - COALESCE(SUM(r.amount), 0)) as available_quantity
             FROM inventory_items i
             LEFT JOIN categories c ON i.category_id = c.id
             LEFT JOIN locations l ON i.location_id = l.id
@@ -42,12 +42,12 @@ class Inventory {
         // Note: r.actual_return IS NULL identifies active (unreturned) rentals
         $stmt = $db->prepare("
             SELECT 
-                i.current_stock,
+                i.quantity,
                 COALESCE(SUM(r.amount), 0) as active_rentals
             FROM inventory_items i
             LEFT JOIN rentals r ON i.id = r.item_id AND r.actual_return IS NULL
             WHERE i.id = ?
-            GROUP BY i.id, i.current_stock
+            GROUP BY i.id, i.quantity
         ");
         $stmt->execute([$id]);
         $result = $stmt->fetch();
@@ -57,7 +57,7 @@ class Inventory {
         }
         
         // Formula: Total Stock - Active Rentals
-        $availableStock = $result['current_stock'] - $result['active_rentals'];
+        $availableStock = $result['quantity'] - $result['active_rentals'];
         
         // Ensure non-negative
         return max(0, $availableStock);
@@ -91,7 +91,7 @@ class Inventory {
         }
         
         if (!empty($filters['low_stock'])) {
-            $whereClauses[] = "i.current_stock <= i.min_stock AND i.min_stock > 0";
+            $whereClauses[] = "i.quantity <= i.min_stock AND i.min_stock > 0";
         }
         
         $whereSQL = '';
@@ -100,21 +100,21 @@ class Inventory {
         }
         
         // SQL query with correct table and column names
-        // Note: quantity is an alias for current_stock for backward compatibility
-        // available_quantity = current_stock - active rentals
+        // Note: quantity is an alias for quantity for backward compatibility
+        // available_quantity = quantity - active rentals
         $sql = "SELECT i.*, 
                        c.name as category_name, 
                        c.color as category_color,
                        l.name as location_name,
-                       i.current_stock as quantity,
-                       (i.current_stock - COALESCE(SUM(r.amount), 0)) as available_quantity
+                       i.quantity as quantity,
+                       (i.quantity - COALESCE(SUM(r.amount), 0)) as available_quantity
                 FROM inventory_items i
                 LEFT JOIN categories c ON i.category_id = c.id
                 LEFT JOIN locations l ON i.location_id = l.id
                 LEFT JOIN rentals r ON i.id = r.item_id AND r.actual_return IS NULL" 
                 . $whereSQL . "
                 GROUP BY i.id, i.easyverein_id, i.name, i.description, i.serial_number, i.category_id, i.location_id, 
-                         i.status, i.current_stock, i.min_stock, i.unit, i.unit_price, i.purchase_date, 
+                         i.status, i.quantity, i.min_stock, i.unit, i.unit_price, i.purchase_date, 
                          i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at, i.is_archived_in_easyverein,
                          c.name, c.color, l.name
                 ORDER BY i.name ASC";
@@ -131,7 +131,7 @@ class Inventory {
         $db = Database::getContentDB();
         
         $stmt = $db->prepare("
-            INSERT INTO inventory_items (name, description, category_id, location_id, current_stock, min_stock, unit, unit_price, image_path, notes)
+            INSERT INTO inventory_items (name, description, category_id, location_id, quantity, min_stock, unit, unit_price, image_path, notes)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         
@@ -140,7 +140,7 @@ class Inventory {
             $data['description'] ?? null,
             $data['category_id'] ?? null,
             $data['location_id'] ?? null,
-            $data['current_stock'] ?? 0,
+            $data['quantity'] ?? 0,
             $data['min_stock'] ?? 0,
             $data['unit'] ?? 'Stück',
             $data['unit_price'] ?? 0,
@@ -151,7 +151,7 @@ class Inventory {
         $itemId = $db->lastInsertId();
         
         // Log creation
-        self::logHistory($itemId, $userId, 'create', null, $data['current_stock'] ?? 0, null, 'Item created', null);
+        self::logHistory($itemId, $userId, 'create', null, $data['quantity'] ?? 0, null, 'Item created', null);
         
         return $itemId;
     }
@@ -160,7 +160,7 @@ class Inventory {
      * Update item
      * 
      * Protects EasyVerein-synced items from direct Master Data modifications
-     * Master Data fields: name, description, current_stock
+     * Master Data fields: name, description, quantity
      * Local Operational fields: location_id, notes, category_id, etc.
      * 
      * @param int $id Item ID
@@ -182,7 +182,7 @@ class Inventory {
             if ($item && !empty($item['easyverein_id'])) {
                 // This item is synced with EasyVerein
                 // Check if trying to modify Master Data fields
-                $masterDataFields = ['name', 'description', 'current_stock'];
+                $masterDataFields = ['name', 'description', 'quantity'];
                 $attemptedMasterDataChanges = array_intersect(array_keys($data), $masterDataFields);
                 
                 if (!empty($attemptedMasterDataChanges)) {
@@ -237,7 +237,7 @@ class Inventory {
         $db = Database::getContentDB();
         
         // Get current stock
-        $stmt = $db->prepare("SELECT current_stock FROM inventory_items WHERE id = ?");
+        $stmt = $db->prepare("SELECT quantity FROM inventory_items WHERE id = ?");
         $stmt->execute([$id]);
         $item = $stmt->fetch();
         
@@ -245,7 +245,7 @@ class Inventory {
             return false;
         }
         
-        $oldStock = $item['current_stock'];
+        $oldStock = $item['quantity'];
         $newStock = $oldStock + $amount;
         
         // Prevent negative stock
@@ -254,7 +254,7 @@ class Inventory {
         }
         
         // Update stock
-        $stmt = $db->prepare("UPDATE inventory_items SET current_stock = ? WHERE id = ?");
+        $stmt = $db->prepare("UPDATE inventory_items SET quantity = ? WHERE id = ?");
         $stmt->execute([$newStock, $id]);
         
         // Log adjustment
@@ -303,11 +303,11 @@ class Inventory {
         $stats['total_items'] = $stmt->fetch()['total'];
         
         // Total value
-        $stmt = $db->query("SELECT SUM(current_stock * unit_price) as total_value FROM inventory_items");
+        $stmt = $db->query("SELECT SUM(quantity * unit_price) as total_value FROM inventory_items");
         $stats['total_value'] = $stmt->fetch()['total_value'] ?? 0;
         
         // Low stock items
-        $stmt = $db->query("SELECT COUNT(*) as low_stock FROM inventory_items WHERE current_stock <= min_stock AND min_stock > 0");
+        $stmt = $db->query("SELECT COUNT(*) as low_stock FROM inventory_items WHERE quantity <= min_stock AND min_stock > 0");
         $stats['low_stock'] = $stmt->fetch()['low_stock'];
         
         // Recently moved items
@@ -366,7 +366,7 @@ class Inventory {
         $db = Database::getContentDB();
         
         // Get current stock
-        $stmt = $db->prepare("SELECT current_stock, name FROM inventory_items WHERE id = ?");
+        $stmt = $db->prepare("SELECT quantity, name FROM inventory_items WHERE id = ?");
         $stmt->execute([$itemId]);
         $item = $stmt->fetch();
         
@@ -375,7 +375,7 @@ class Inventory {
         }
         
         // Check if enough stock available
-        if ($item['current_stock'] < $quantity) {
+        if ($item['quantity'] < $quantity) {
             return ['success' => false, 'message' => 'Nicht genügend Bestand verfügbar'];
         }
         
@@ -391,13 +391,13 @@ class Inventory {
             $stmt->execute([$itemId, $userId, $quantity, $expectedReturnDate]);
             
             // Update stock
-            $newStock = $item['current_stock'] - $quantity;
-            $stmt = $db->prepare("UPDATE inventory_items SET current_stock = ? WHERE id = ?");
+            $newStock = $item['quantity'] - $quantity;
+            $stmt = $db->prepare("UPDATE inventory_items SET quantity = ? WHERE id = ?");
             $stmt->execute([$newStock, $itemId]);
             
             // Log checkout in history
             // Note: change_amount is negative to indicate stock reduction
-            self::logHistory($itemId, $userId, 'checkout', $item['current_stock'], $newStock, -$quantity, 'Ausgeliehen', $purpose . ($destination ? ' - ' . $destination : ''));
+            self::logHistory($itemId, $userId, 'checkout', $item['quantity'], $newStock, -$quantity, 'Ausgeliehen', $purpose . ($destination ? ' - ' . $destination : ''));
             
             $db->commit();
             return ['success' => true, 'message' => 'Artikel erfolgreich ausgeliehen'];
@@ -415,7 +415,7 @@ class Inventory {
         
         // Get rental record (using rentals table)
         $stmt = $db->prepare("
-            SELECT r.*, i.current_stock, i.name 
+            SELECT r.*, i.quantity, i.name 
             FROM rentals r
             JOIN inventory_items i ON r.item_id = i.id
             WHERE r.id = ? AND r.actual_return IS NULL
@@ -441,7 +441,7 @@ class Inventory {
         
         try {
             $goodQuantity = $returnedQuantity - $defectiveQuantity;
-            $newStock = $rental['current_stock'] + $goodQuantity;
+            $newStock = $rental['quantity'] + $goodQuantity;
             
             // Update rental record
             $status = $isDefective && $defectiveQuantity > 0 ? 'defective' : 'returned';
@@ -453,7 +453,7 @@ class Inventory {
             $stmt->execute([$defectiveReason, $status, $rentalId]);
             
             // Update stock (only add back good items)
-            $stmt = $db->prepare("UPDATE inventory_items SET current_stock = ? WHERE id = ?");
+            $stmt = $db->prepare("UPDATE inventory_items SET quantity = ? WHERE id = ?");
             $stmt->execute([$newStock, $rental['item_id']]);
             
             // Log check-in
@@ -461,7 +461,7 @@ class Inventory {
             if ($defectiveQuantity > 0) {
                 $comment .= " (davon {$defectiveQuantity} defekt: {$defectiveReason})";
             }
-            self::logHistory($rental['item_id'], $rental['user_id'], 'checkin', $rental['current_stock'], $newStock, $goodQuantity, 'Zurückgegeben', $comment);
+            self::logHistory($rental['item_id'], $rental['user_id'], 'checkin', $rental['quantity'], $newStock, $goodQuantity, 'Zurückgegeben', $comment);
             
             // If items are defective, log write-off
             if ($defectiveQuantity > 0) {
@@ -580,7 +580,7 @@ class Inventory {
     public static function getCheckoutById($rentalId) {
         $db = Database::getContentDB();
         $stmt = $db->prepare("
-            SELECT r.*, i.name as item_name, i.unit, i.current_stock
+            SELECT r.*, i.name as item_name, i.unit, i.quantity
             FROM rentals r
             JOIN inventory_items i ON r.item_id = i.id
             WHERE r.id = ?
@@ -598,16 +598,16 @@ class Inventory {
         
         $stats = [];
         
-        // Total items in stock (sum of all current_stock)
-        $stmt = $db->query("SELECT SUM(current_stock) as total_in_stock FROM inventory_items");
+        // Total items in stock (sum of all quantity)
+        $stmt = $db->query("SELECT SUM(quantity) as total_in_stock FROM inventory_items");
         $stats['total_in_stock'] = $stmt->fetch()['total_in_stock'] ?? 0;
         
         // Total unique items in stock
-        $stmt = $db->query("SELECT COUNT(*) as unique_items FROM inventory_items WHERE current_stock > 0");
+        $stmt = $db->query("SELECT COUNT(*) as unique_items FROM inventory_items WHERE quantity > 0");
         $stats['unique_items_in_stock'] = $stmt->fetch()['unique_items'];
         
         // Total value in stock
-        $stmt = $db->query("SELECT SUM(current_stock * unit_price) as total_value FROM inventory_items");
+        $stmt = $db->query("SELECT SUM(quantity * unit_price) as total_value FROM inventory_items");
         $stats['total_value_in_stock'] = $stmt->fetch()['total_value'] ?? 0;
         
         return $stats;
@@ -847,7 +847,7 @@ class Inventory {
                 $stmt = $db->prepare("
                     INSERT INTO inventory_items (
                         name, description, serial_number, category_id, location_id, 
-                        status, current_stock, purchase_date
+                        status, quantity, purchase_date
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ");
                 
