@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/User.php';
 
-if (!Auth::check() || !Auth::hasPermission('admin')) {
+if (!Auth::check() || !Auth::hasPermission('board')) {
     header('Location: ../auth/login.php');
     exit;
 }
