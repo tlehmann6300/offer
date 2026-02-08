@@ -20,13 +20,12 @@ class BlogPost {
         $userDb = Database::getUserDB();
         
         // Build the query with category filter if provided
-        // Note: external_link column is not queried to prevent crashes on databases
-        // where it hasn't been added yet. Run migration_fix_schemas.sql to add it.
         $sql = "SELECT 
                     p.id,
                     p.title,
                     p.content,
                     p.image_path,
+                    p.external_link,
                     p.category,
                     p.author_id,
                     p.created_at,
@@ -87,14 +86,13 @@ class BlogPost {
         $userDb = Database::getUserDB();
         
         // Get the post
-        // Note: external_link column is not queried to prevent crashes on databases
-        // where it hasn't been added yet. Run migration_fix_schemas.sql to add it.
         $stmt = $contentDb->prepare("
             SELECT 
                 p.id,
                 p.title,
                 p.content,
                 p.image_path,
+                p.external_link,
                 p.category,
                 p.author_id,
                 p.created_at,
