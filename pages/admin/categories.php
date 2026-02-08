@@ -111,7 +111,7 @@ ob_start();
                             value="#3B82F6"
                             class="h-10 w-20 border border-gray-300 rounded cursor-pointer"
                         >
-                        <span class="text-sm text-gray-500">Wählen Sie eine Farbe für die Kategorie</span>
+                        <span class="text-sm text-gray-500">Wähle eine Farbe für die Kategorie</span>
                     </div>
                 </div>
 

@@ -85,7 +85,7 @@ ob_start();
                 <i class="fas fa-file-invoice-dollar mr-3 text-blue-600"></i>
                 Rechnungsmanagement
             </h1>
-            <p class="text-gray-600">Verwalten Sie Belege und Erstattungen</p>
+            <p class="text-gray-600 dark:text-gray-300">Verwalte Belege und Erstattungen</p>
         </div>
         
         <!-- New Submission Button -->
@@ -152,7 +152,7 @@ ob_start();
             <div class="p-12 text-center">
                 <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
                 <p class="text-xl text-gray-600 mb-2">Keine Rechnungen vorhanden</p>
-                <p class="text-gray-500">Erstellen Sie Ihre erste Einreichung</p>
+                <p class="text-gray-500">Erstelle Deine erste Einreichung</p>
             </div>
         <?php else: ?>
             <?php
@@ -509,7 +509,7 @@ function updateFileInfo() {
 
 // Update invoice status function
 function updateInvoiceStatus(invoiceId, status) {
-    if (!confirm(`Möchten Sie diese Rechnung wirklich ${status === 'approved' ? 'genehmigen' : 'ablehnen'}?`)) {
+    if (!confirm(`Möchtest Du diese Rechnung wirklich ${status === 'approved' ? 'genehmigen' : 'ablehnen'}?`)) {
         return;
     }
     

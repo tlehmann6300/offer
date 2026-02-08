@@ -304,7 +304,7 @@ ob_start();
                 Helfer-Bereich
             </h2>
             
-            <p class="text-gray-600 mb-6">Unterstützen Sie uns als Helfer! Wählen Sie einen freien Slot aus.</p>
+            <p class="text-gray-600 dark:text-gray-300 mb-6">Unterstütze uns als Helfer! Wähle einen freien Slot aus.</p>
             
             <?php foreach ($helperTypes as $helperType): ?>
                 <div class="mb-6 last:mb-0">
@@ -469,7 +469,7 @@ function signupForSlot(eventId, slotId, slotStart, slotEnd) {
 }
 
 // Cancel signup (general or helper slot)
-function cancelSignup(signupId, message = 'Möchten Sie Ihre Anmeldung wirklich stornieren?', successMessage = 'Abmeldung erfolgreich') {
+function cancelSignup(signupId, message = 'Möchtest Du Deine Anmeldung wirklich stornieren?', successMessage = 'Abmeldung erfolgreich') {
     if (!confirm(message)) {
         return;
     }
@@ -500,7 +500,7 @@ function cancelSignup(signupId, message = 'Möchten Sie Ihre Anmeldung wirklich 
 
 // Cancel helper slot (wrapper for consistency)
 function cancelHelperSlot(signupId) {
-    cancelSignup(signupId, 'Möchten Sie sich wirklich austragen?', 'Erfolgreich ausgetragen');
+    cancelSignup(signupId, 'Möchtest Du Dich wirklich austragen?', 'Erfolgreich ausgetragen');
 }
 </script>
 

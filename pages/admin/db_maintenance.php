@@ -189,7 +189,7 @@ ob_start();
         <i class="fas fa-database text-blue-600 mr-2"></i>
         Datenbank-Wartung
     </h1>
-    <p class="text-gray-600">Verwalten Sie Speicherplatz und bereinigen Sie alte Daten</p>
+    <p class="text-gray-600 dark:text-gray-300">Verwalte Speicherplatz und bereinige alte Daten</p>
 </div>
 
 <?php if (!empty($actionResult)): ?>
@@ -306,7 +306,7 @@ ob_start();
                     <li>Event History älter als 1 Jahr</li>
                 </ul>
             </div>
-            <form method="POST" onsubmit="return confirm('Möchten Sie wirklich alte Logs löschen? Diese Aktion kann nicht rückgängig gemacht werden.');">
+            <form method="POST" onsubmit="return confirm('Möchtest Du wirklich alte Logs löschen? Diese Aktion kann nicht rückgängig gemacht werden.');">
                 <button type="submit" name="clean_logs" class="w-full btn-primary flex items-center justify-center">
                     <i class="fas fa-trash-alt mr-2"></i>
                     Logs bereinigen
@@ -330,7 +330,7 @@ ob_start();
                     <li>Beeinflusst keine Datenbanken</li>
                 </ul>
             </div>
-            <form method="POST" onsubmit="return confirm('Möchten Sie wirklich den Cache leeren?');">
+            <form method="POST" onsubmit="return confirm('Möchtest Du wirklich den Cache leeren?');">
                 <button type="submit" name="clear_cache" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition flex items-center justify-center">
                     <i class="fas fa-eraser mr-2"></i>
                     Cache leeren
@@ -344,7 +344,7 @@ ob_start();
 <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
     <p class="text-yellow-800 text-sm">
         <i class="fas fa-exclamation-triangle mr-2"></i>
-        <strong>Hinweis:</strong> Wartungsaktionen können nicht rückgängig gemacht werden. Stellen Sie sicher, dass Sie vor dem Bereinigen wichtiger Daten ein Backup erstellt haben.
+        <strong>Hinweis:</strong> Wartungsaktionen können nicht rückgängig gemacht werden. Stelle sicher, dass Du vor dem Bereinigen wichtiger Daten ein Backup erstellt hast.
     </p>
 </div>
 

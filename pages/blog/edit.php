@@ -187,7 +187,7 @@ ob_start();
                 <?php echo $isEdit ? 'Beitrag bearbeiten' : 'Neuen Beitrag erstellen'; ?>
             </h1>
             <p class="text-gray-600 mt-2">
-                <?php echo $isEdit ? 'Bearbeiten Sie die Details Ihres Beitrags.' : 'Erstellen Sie einen neuen Beitrag für News & Updates.'; ?>
+                <?php echo $isEdit ? 'Bearbeite die Details Deines Beitrags.' : 'Erstelle einen neuen Beitrag für News & Updates.'; ?>
             </p>
         </div>
 
@@ -232,7 +232,7 @@ ob_start();
                     name="content" 
                     required 
                     rows="10"
-                    placeholder="Schreiben Sie Ihren Beitrag hier..."
+                    placeholder="Schreibe Deinen Beitrag hier..."
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
                     style="resize: vertical; min-height: 200px;"
                 ><?php echo htmlspecialchars($content); ?></textarea>

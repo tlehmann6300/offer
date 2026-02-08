@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_project'])) 
     CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
     
     if (!$canComplete) {
-        $error = 'Sie haben keine Berechtigung, dieses Projekt abzuschließen';
+        $error = 'Du hast keine Berechtigung, dieses Projekt abzuschließen';
     } elseif ($project['status'] !== 'running') {
         $error = 'Nur laufende Projekte können abgeschlossen werden';
     } else {
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply'])) {
             // Validate motivation
             $motivation = trim($_POST['motivation'] ?? '');
             if (empty($motivation)) {
-                throw new Exception('Bitte geben Sie Ihre Motivation an');
+                throw new Exception('Bitte gib Deine Motivation an');
             }
             
             // Validate experience count confirmation checkbox
@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply'])) {
             ];
             
             Project::apply($projectId, $user['id'], $applicationData);
-            $message = 'Ihre Bewerbung wurde erfolgreich eingereicht';
+            $message = 'Deine Bewerbung wurde erfolgreich eingereicht';
             
             // Reload application status
             $userApplication = Project::getUserApplication($projectId, $user['id']);
@@ -404,7 +404,7 @@ ob_start();
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">
                         <i class="fas fa-check-circle text-blue-600 mr-2"></i>
-                        Ihre Bewerbung
+                        Deine Bewerbung
                     </h2>
                     
                     <div class="space-y-3">
@@ -439,7 +439,7 @@ ob_start();
                         
                         <?php if (!empty($userApplication['motivation'])): ?>
                         <div class="mt-4">
-                            <span class="text-sm font-semibold text-gray-700">Ihre Motivation:</span>
+                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Deine Motivation:</span>
                             <div class="mt-2 p-3 bg-white rounded border border-gray-200 text-gray-700 whitespace-pre-line">
                                 <?php echo htmlspecialchars($userApplication['motivation']); ?>
                             </div>

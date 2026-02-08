@@ -31,7 +31,7 @@ if ($isEdit) {
     if (!$lockResult['success']) {
         $readOnly = true;
         $lockedUser = User::getById($lockResult['locked_by']);
-        $lockWarning = 'Dieses Event wird gerade von ' . htmlspecialchars($lockedUser['first_name'] . ' ' . $lockedUser['last_name']) . ' bearbeitet. Sie befinden sich im Nur-Lesen-Modus.';
+        $lockWarning = 'Dieses Event wird gerade von ' . htmlspecialchars($lockedUser['first_name'] . ' ' . $lockedUser['last_name']) . ' bearbeitet. Du befindest Dich im Nur-Lesen-Modus.';
     }
     
     // Get history
@@ -595,8 +595,8 @@ ob_start();
             
             <div class="mb-4">
                 <p class="text-sm text-gray-600">
-                    Definieren Sie die verschiedenen Helfer-Rollen und deren Zeitslots für dieses Event.
-                    Jede Rolle kann mehrere Zeitslots haben, und für jeden Slot können Sie die benötigte Anzahl an Helfern festlegen.
+                    Definiere die verschiedenen Helfer-Rollen und deren Zeitslots für dieses Event.
+                    Jede Rolle kann mehrere Zeitslots haben, und für jeden Slot kannst Du die benötigte Anzahl an Helfern festlegen.
                 </p>
             </div>
 
@@ -838,7 +838,7 @@ function addHelperType() {
  * Remove a helper type
  */
 function removeHelperType(typeIndex) {
-    if (confirm('Möchten Sie diese Helfer-Rolle wirklich entfernen? Alle Zeitslots werden ebenfalls gelöscht.')) {
+    if (confirm('Möchtest Du diese Helfer-Rolle wirklich entfernen? Alle Zeitslots werden ebenfalls gelöscht.')) {
         const element = document.getElementById(`helper-type-${typeIndex}`);
         if (element) {
             element.remove();
@@ -1004,7 +1004,7 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
         
         if (!title) {
             e.preventDefault();
-            alert('Bitte geben Sie einen Titel für alle Helfer-Rollen ein!');
+            alert('Bitte gib einen Titel für alle Helfer-Rollen ein!');
             titleInput?.focus();
             validationFailed = true;
             break;
@@ -1049,7 +1049,7 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
                         `Helfer-Slot Zeitfenster muss innerhalb der Event-Zeit liegen!\n\n` +
                         `Event: ${formattedEventStart} bis ${formattedEventEnd}\n` +
                         `Slot: ${formattedSlotStart} bis ${formattedSlotEnd}\n\n` +
-                        `Bitte passen Sie die Slot-Zeiten an.`;
+                        `Bitte passe die Slot-Zeiten an.`;
                     
                     alert(errorMessage);
                     validationFailed = true;
@@ -1084,7 +1084,7 @@ document.getElementById('eventForm')?.addEventListener('submit', function(e) {
     if (document.getElementById('needs_helpers')?.checked) {
         if (helperTypes.length === 0) {
             e.preventDefault();
-            alert('Bitte fügen Sie mindestens eine Helfer-Rolle hinzu oder deaktivieren Sie die "Helfer benötigt" Option!');
+            alert('Bitte füge mindestens eine Helfer-Rolle hinzu oder deaktiviere die "Helfer benötigt" Option!');
             return false;
         }
     }
