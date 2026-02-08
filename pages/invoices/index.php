@@ -34,8 +34,8 @@ if ($userRole === 'board') {
     $profile = $stmt->fetch();
     
     if ($profile && !empty($profile['position'])) {
-        // Check if position contains 'Finanzen' (flexible matching with strpos)
-        if (strpos($profile['position'], 'Finanzen') !== false) {
+        // Check if position contains 'Finanzen' (case-insensitive matching with stripos)
+        if (stripos($profile['position'], 'Finanzen') !== false) {
             $canMarkAsPaid = true;
         }
     }

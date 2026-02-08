@@ -4,9 +4,11 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/models/Alumni.php';
 require_once __DIR__ . '/../../includes/utils/SecureImageUpload.php';
 
-// Access Control: Users can edit their own profile
-// Alumni profiles: Editable by Alumni and Alumni-Board
-// Member profiles: Editable by Board, Head, Candidate (active members)
+// Access Control: Users can edit their own profile based on their role
+// - Alumni and alumni_board roles can edit their profiles (alumni status)
+// - Board, head, candidate, member roles can edit their profiles (active member status)
+// - Admin can edit any profile
+// Note: All profiles use the alumni_profiles table regardless of user role
 if (!Auth::check()) {
     header('Location: ../auth/login.php');
     exit;
@@ -17,10 +19,7 @@ $user = Auth::user();
 $userId = $_SESSION['user_id'];
 $userRole = $user['role'] ?? '';
 
-// Check permission based on role
-// Alumni and alumni_board can edit (alumni profiles)
-// Board, head, candidate, member can edit (member profiles)
-// Admin can edit any profile
+// Check permission: All authenticated users with these roles can edit their own profile
 $allowedRoles = ['admin', 'alumni', 'alumni_board', 'board', 'head', 'candidate', 'member'];
 if (!in_array($userRole, $allowedRoles)) {
     $_SESSION['error_message'] = 'Sie haben keine Berechtigung, Profile zu bearbeiten.';
