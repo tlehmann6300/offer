@@ -283,17 +283,17 @@ ob_start();
             </select>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Sortierung</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Sortieren nach</label>
             <select 
                 name="sort" 
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
                 <option value="name_asc" <?php echo ($sort == 'name_asc') ? 'selected' : ''; ?>>Name (A-Z)</option>
                 <option value="name_desc" <?php echo ($sort == 'name_desc') ? 'selected' : ''; ?>>Name (Z-A)</option>
-                <option value="quantity_asc" <?php echo ($sort == 'quantity_asc') ? 'selected' : ''; ?>>Anzahl (Aufsteigend)</option>
-                <option value="quantity_desc" <?php echo ($sort == 'quantity_desc') ? 'selected' : ''; ?>>Anzahl (Absteigend)</option>
-                <option value="price_asc" <?php echo ($sort == 'price_asc') ? 'selected' : ''; ?>>Preis (Aufsteigend)</option>
-                <option value="price_desc" <?php echo ($sort == 'price_desc') ? 'selected' : ''; ?>>Preis (Absteigend)</option>
+                <option value="quantity_desc" <?php echo ($sort == 'quantity_desc') ? 'selected' : ''; ?>>Menge (Hoch-Niedrig)</option>
+                <option value="quantity_asc" <?php echo ($sort == 'quantity_asc') ? 'selected' : ''; ?>>Menge (Niedrig-Hoch)</option>
+                <option value="price_desc" <?php echo ($sort == 'price_desc') ? 'selected' : ''; ?>>Preis (Hoch-Niedrig)</option>
+                <option value="price_asc" <?php echo ($sort == 'price_asc') ? 'selected' : ''; ?>>Preis (Niedrig-Hoch)</option>
             </select>
         </div>
         <div class="flex items-end space-x-2">

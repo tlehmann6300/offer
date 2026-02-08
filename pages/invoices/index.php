@@ -4,8 +4,7 @@ require_once __DIR__ . '/../../includes/models/Invoice.php';
 require_once __DIR__ . '/../../includes/models/User.php';
 require_once __DIR__ . '/../../includes/helpers.php';
 
-// Access Control: Allow only 'board', 'alumni_board', 'head'
-// Deny: 'member', 'candidate', 'alumni'
+// Access Control: Allow 'board', 'alumni_board', 'head', 'alumni' (read-only)
 if (!Auth::check()) {
     header('Location: ../auth/login.php');
     exit;
@@ -15,7 +14,7 @@ $user = Auth::user();
 $userRole = $user['role'] ?? '';
 
 // Check if user has one of the allowed roles
-$allowedRoles = ['admin', 'board', 'alumni_board', 'head'];
+$allowedRoles = ['admin', 'board', 'alumni_board', 'head', 'alumni'];
 if (!in_array($userRole, $allowedRoles)) {
     header('Location: ../dashboard/index.php');
     exit;
