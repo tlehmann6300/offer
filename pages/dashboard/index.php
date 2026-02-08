@@ -68,8 +68,8 @@ if ($hasExtendedAccess) {
     $writeOffStats = Inventory::getWriteOffStatsThisMonth();
 }
 
-// Check if user is board-level (board, head, or alumni_board)
-$isBoardLevel = in_array($user['role'], ['board', 'head', 'alumni_board']);
+// Check if user is board-level (board, head only for stats section)
+$isBoardLevel = in_array($user['role'], ['board', 'head']);
 
 // Get board-specific statistics
 if ($isBoardLevel) {
@@ -310,47 +310,6 @@ endif;
     </div>
 </div>
 
-<!-- Schnellzugriff Section -->
-<div class="max-w-6xl mx-auto mb-12">
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">
-        <i class="fas fa-bolt text-yellow-500 mr-2"></i>
-        Schnellzugriff
-    </h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <a href="../auth/profile.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
-            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <i class="fas fa-user-circle text-3xl"></i>
-            </div>
-            <h3 class="font-bold text-lg">Mein Profil</h3>
-            <p class="text-sm text-white/80 mt-1">Profil anzeigen</p>
-        </a>
-
-        <a href="../inventory/index.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
-            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <i class="fas fa-boxes text-3xl"></i>
-            </div>
-            <h3 class="font-bold text-lg">Inventar</h3>
-            <p class="text-sm text-white/80 mt-1">Artikel suchen</p>
-        </a>
-
-        <a href="../events/index.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
-            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <i class="fas fa-calendar text-3xl"></i>
-            </div>
-            <h3 class="font-bold text-lg">Events ansehen</h3>
-            <p class="text-sm text-white/80 mt-1">Kommende Events</p>
-        </a>
-
-        <a href="../projects/index.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
-            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <i class="fas fa-folder text-3xl"></i>
-            </div>
-            <h3 class="font-bold text-lg">Projekte</h3>
-            <p class="text-sm text-white/80 mt-1">Projekte anzeigen</p>
-        </a>
-    </div>
-</div>
-
 <!-- Hero Section - Legacy (hidden, kept for reference during transition period) -->
 <!-- TODO: Remove after verifying new layout is stable (2 weeks from deployment) -->
 <div class="mb-12 hidden">
@@ -433,8 +392,8 @@ endif;
 </div>
 
 <!-- Dashboard Teaser - Role-Based Statistics -->
-<?php if ($isBoardLevel): ?>
-<!-- Board-Level Statistics for board, head, alumni_board -->
+<?php if (Auth::hasRole('board') || Auth::hasRole('head')): ?>
+<!-- Board-Level Statistics for board, head -->
 <div class="max-w-6xl mx-auto">
     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
         <i class="fas fa-chart-line text-purple-600 mr-2"></i>
