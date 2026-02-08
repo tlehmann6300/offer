@@ -44,8 +44,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'linkedin_url' => trim($_POST['linkedin_url'] ?? ''),
                 'xing_url' => trim($_POST['xing_url'] ?? ''),
                 'about_me' => trim($_POST['about_me'] ?? ''),
-                'image_path' => trim($_POST['image_path'] ?? '')
+                'image_path' => $profile['image_path'] ?? '' // Keep existing image by default
             ];
+            
+            // Handle profile picture upload
+            if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = __DIR__ . '/../../uploads/profile/';
+                
+                // Create directory if it doesn't exist
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+                
+                // Validate file type
+                $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                $fileType = $_FILES['profile_picture']['type'];
+                
+                if (!in_array($fileType, $allowedTypes)) {
+                    throw new Exception('Ungültiger Dateityp. Nur JPG, PNG, GIF und WEBP sind erlaubt.');
+                }
+                
+                // Validate file size (max 5MB)
+                if ($_FILES['profile_picture']['size'] > 5 * 1024 * 1024) {
+                    throw new Exception('Datei ist zu groß. Maximale Größe ist 5MB.');
+                }
+                
+                // Generate unique filename
+                $extension = pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
+                $filename = 'profile_' . $user['id'] . '_' . time() . '.' . $extension;
+                $targetPath = $uploadDir . $filename;
+                
+                // Move uploaded file
+                if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetPath)) {
+                    // Delete old profile picture if exists
+                    if (!empty($profile['image_path']) && file_exists(__DIR__ . '/../../' . $profile['image_path'])) {
+                        @unlink(__DIR__ . '/../../' . $profile['image_path']);
+                    }
+                    
+                    $profileData['image_path'] = 'uploads/profile/' . $filename;
+                } else {
+                    throw new Exception('Fehler beim Hochladen der Datei.');
+                }
+            }
             
             // Add role-specific fields based on user role
             // Student View: member, candidate, head, board -> Show study fields
@@ -284,7 +324,7 @@ ob_start();
                 Aktualisieren Sie Ihre persönlichen Informationen und Kontaktdaten
             </p>
             
-            <form method="POST" class="space-y-6">
+            <form method="POST" enctype="multipart/form-data" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Common Fields -->
                     <div>
@@ -353,15 +393,20 @@ ob_start();
                         >
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Profilbild Pfad</label>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Profilbild</label>
+                        <?php if (!empty($profile['image_path'])): ?>
+                        <div class="mb-2">
+                            <img src="<?php echo asset($profile['image_path']); ?>" alt="Profilbild" class="w-32 h-32 object-cover rounded-lg border-2 border-gray-300">
+                        </div>
+                        <?php endif; ?>
                         <input 
-                            type="text" 
-                            name="image_path" 
-                            value="<?php echo htmlspecialchars($profile['image_path'] ?? ''); ?>"
+                            type="file" 
+                            name="profile_picture" 
+                            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            placeholder="uploads/profile/image.jpg"
                         >
+                        <p class="text-xs text-gray-500 mt-1">JPG, PNG, GIF oder WEBP (Max. 5MB)</p>
                     </div>
                     
                     <?php if (in_array($userRole, ['candidate', 'member', 'board', 'head'])): ?>
