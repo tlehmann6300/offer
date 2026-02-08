@@ -115,7 +115,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50" data-user-theme="<?php echo $currentUser['theme_preference'] ?? 'auto'; ?>">
     <!-- Mobile Menu Overlay -->
     <div id="sidebar-overlay" class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden transition-opacity duration-300"></div>
 
@@ -196,15 +196,15 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
 
                 <!-- Verwaltung Dropdown (Visible ONLY for board) -->
                 <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'board'): ?>
-                <div class="relative group">
-                    <button class="flex items-center justify-between w-full px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                <div class="relative">
+                    <button id="verwaltung-dropdown-btn" class="flex items-center justify-between w-full px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                         <div class="flex items-center">
                             <i class="fas fa-user-cog w-5 mr-3"></i>
                             <span>Verwaltung</span>
                         </div>
-                        <i class="fas fa-chevron-down text-xs"></i>
+                        <i id="verwaltung-chevron" class="fas fa-chevron-down text-xs transition-transform"></i>
                     </button>
-                    <div class="hidden group-hover:block absolute left-0 w-full bg-gray-800 shadow-lg z-50">
+                    <div id="verwaltung-dropdown" class="hidden bg-gray-800 shadow-lg z-50">
                         <a href="<?php echo asset('pages/admin/users.php'); ?>" 
                            class="flex items-center px-8 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
                             <i class="fas fa-users w-5 mr-3"></i>
@@ -365,15 +365,44 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         const themeIcon = document.getElementById('theme-icon');
         const themeText = document.getElementById('theme-text');
         
-        // Load saved theme preference or default to light mode
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark-mode');
-            themeIcon.classList.remove('fa-moon');
-            themeIcon.classList.add('fa-sun');
-            themeText.textContent = 'Hellmodus';
+        // Get user's saved theme preference from database (via data attribute)
+        const userThemePreference = document.body.getAttribute('data-user-theme') || 'auto';
+        
+        // Load theme preference (localStorage overrides database preference)
+        let currentTheme = localStorage.getItem('theme') || userThemePreference;
+        
+        // Apply theme based on preference
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeText.textContent = 'Hellmodus';
+            } else if (theme === 'light') {
+                document.body.classList.remove('dark-mode');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeText.textContent = 'Dunkelmodus';
+            } else { // auto
+                // Check system preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.body.classList.add('dark-mode');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                    themeText.textContent = 'Hellmodus';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                    themeText.textContent = 'Dunkelmodus';
+                }
+            }
         }
         
+        // Apply initial theme
+        applyTheme(currentTheme);
+        
+        // Toggle theme on button click
         themeToggle?.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
             
@@ -409,6 +438,27 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         // Update immediately and then every minute
         updateDateTime();
         setInterval(updateDateTime, 60000);
+        
+        // Verwaltung Dropdown Toggle
+        const verwaltungBtn = document.getElementById('verwaltung-dropdown-btn');
+        const verwaltungDropdown = document.getElementById('verwaltung-dropdown');
+        const verwaltungChevron = document.getElementById('verwaltung-chevron');
+        
+        verwaltungBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+            verwaltungDropdown.classList.toggle('hidden');
+            verwaltungChevron.classList.toggle('rotate-180');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (verwaltungBtn && verwaltungDropdown && 
+                !verwaltungBtn.contains(e.target) && 
+                !verwaltungDropdown.contains(e.target)) {
+                verwaltungDropdown.classList.add('hidden');
+                verwaltungChevron?.classList.remove('rotate-180');
+            }
+        });
     </script>
 </body>
 </html>
