@@ -25,7 +25,6 @@ class BlogPost {
                     p.title,
                     p.content,
                     p.image_path,
-                    p.external_link,
                     p.category,
                     p.author_id,
                     p.created_at,
@@ -92,7 +91,6 @@ class BlogPost {
                 p.title,
                 p.content,
                 p.image_path,
-                p.external_link,
                 p.category,
                 p.author_id,
                 p.created_at,
@@ -159,14 +157,14 @@ class BlogPost {
     /**
      * Create a new blog post
      * 
-     * @param array $data Post data (title, content, category, author_id, external_link, image_path)
+     * @param array $data Post data (title, content, category, author_id, image_path)
      * @return int The ID of the newly created post
      */
     public static function create($data) {
         $db = Database::getContentDB();
         
-        $sql = "INSERT INTO blog_posts (title, content, category, author_id, external_link, image_path) 
-                VALUES (?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO blog_posts (title, content, category, author_id, image_path) 
+                VALUES (?, ?, ?, ?, ?)";
         
         $stmt = $db->prepare($sql);
         $stmt->execute([
@@ -174,7 +172,6 @@ class BlogPost {
             $data['content'],
             $data['category'],
             $data['author_id'],
-            $data['external_link'] ?? null,
             $data['image_path'] ?? null
         ]);
         
@@ -185,14 +182,14 @@ class BlogPost {
      * Update an existing blog post
      * 
      * @param int $id Post ID
-     * @param array $data Post data to update (title, content, category, external_link, image_path)
+     * @param array $data Post data to update (title, content, category, image_path)
      * @return bool Success status
      */
     public static function update($id, $data) {
         $db = Database::getContentDB();
         
         // Whitelist of allowed fields
-        $allowedFields = ['title', 'content', 'category', 'external_link', 'image_path'];
+        $allowedFields = ['title', 'content', 'category', 'image_path'];
         
         $fields = [];
         $values = [];

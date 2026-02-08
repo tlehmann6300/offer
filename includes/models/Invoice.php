@@ -265,7 +265,7 @@ class Invoice {
                     i.amount,
                     i.status,
                     i.file_path,
-                    i.reason,
+                    i.rejection_reason,
                     i.created_at,
                     i.updated_at
                 FROM invoices i
@@ -301,7 +301,7 @@ class Invoice {
                     amount,
                     status,
                     file_path,
-                    reason,
+                    rejection_reason,
                     created_at,
                     updated_at
                 FROM invoices
@@ -344,7 +344,7 @@ class Invoice {
             
             $stmt = $db->prepare("
                 UPDATE invoices
-                SET status = ?, reason = ?, updated_at = CURRENT_TIMESTAMP
+                SET status = ?, rejection_reason = ?, updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
             ");
             
@@ -432,7 +432,7 @@ class Invoice {
                     amount,
                     status,
                     file_path,
-                    reason,
+                    rejection_reason,
                     created_at,
                     updated_at
                 FROM invoices

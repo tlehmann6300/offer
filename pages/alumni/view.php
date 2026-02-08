@@ -102,8 +102,10 @@ ob_start();
                 $roleNames = [
                     'admin' => 'Administrator',
                     'board' => 'Vorstand',
+                    'alumni_board' => 'Alumni-Vorstand',
                     'head' => 'Ressortleiter',
                     'member' => 'Mitglied',
+                    'alumni' => 'Alumni',
                     'candidate' => 'Anwärter'
                 ];
                 

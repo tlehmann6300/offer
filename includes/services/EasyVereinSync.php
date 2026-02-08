@@ -168,8 +168,8 @@ class EasyVereinSync {
                     
                     // Check if item exists locally by easyverein_id
                     $stmt = $db->prepare("
-                        SELECT id, name, description, current_stock, serial_number
-                        FROM inventory
+                        SELECT id, name, description, quantity, serial_number
+                        FROM inventory_items
                         WHERE easyverein_id = ?
                     ");
                     $stmt->execute([$easyvereinId]);
@@ -181,7 +181,7 @@ class EasyVereinSync {
                         $updateData = [
                             'name' => $name,
                             'description' => $description,
-                            'current_stock' => $totalQuantity,
+                            'quantity' => $totalQuantity,
                             'serial_number' => $serialNumber,
                             'is_archived_in_easyverein' => 0
                         ];
@@ -205,7 +205,7 @@ class EasyVereinSync {
                             $existingItem['id'],
                             $userId,
                             'sync_update',
-                            $existingItem['current_stock'],
+                            $existingItem['quantity'],
                             $totalQuantity,
                             'Synchronized from EasyVerein',
                             json_encode([
@@ -223,7 +223,7 @@ class EasyVereinSync {
                                 name,
                                 description,
                                 serial_number,
-                                current_stock,
+                                quantity,
                                 image_path,
                                 is_archived_in_easyverein,
                                 last_synced_at
@@ -270,7 +270,7 @@ class EasyVereinSync {
                 // Find items with easyverein_id that are not in the current sync
                 $stmt = $db->prepare("
                     SELECT id, easyverein_id, name
-                    FROM inventory
+                    FROM inventory_items
                     WHERE easyverein_id IS NOT NULL
                     AND easyverein_id NOT IN ($placeholders)
                     AND is_archived_in_easyverein = 0
@@ -281,7 +281,7 @@ class EasyVereinSync {
                 // If EasyVerein returns no items, archive all items with easyverein_id
                 $stmt = $db->prepare("
                     SELECT id, easyverein_id, name
-                    FROM inventory
+                    FROM inventory_items
                     WHERE easyverein_id IS NOT NULL
                     AND is_archived_in_easyverein = 0
                 ");
@@ -293,7 +293,7 @@ class EasyVereinSync {
             foreach ($itemsToArchive as $item) {
                 // Mark as archived (soft delete)
                 $stmt = $db->prepare("
-                    UPDATE inventory
+                    UPDATE inventory_items
                     SET is_archived_in_easyverein = 1,
                         last_synced_at = NOW()
                     WHERE id = ?

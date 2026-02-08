@@ -222,8 +222,11 @@ ob_start();
                         $roleNames = [
                             'admin' => 'Administrator',
                             'board' => 'Vorstand',
+                            'alumni_board' => 'Alumni-Vorstand',
                             'manager' => 'Ressortleiter',
+                            'head' => 'Ressortleiter',
                             'member' => 'Mitglied',
+                            'alumni' => 'Alumni',
                             'candidate' => 'Anwärter'
                         ];
                         echo $roleNames[$user['role']] ?? ucfirst($user['role']);
