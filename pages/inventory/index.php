@@ -351,11 +351,11 @@ ob_start();
             <div class="mb-4">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-sm text-gray-600">Bestand:</span>
-                    <span class="font-bold text-lg <?php echo $item['current_stock'] <= $item['min_stock'] && $item['min_stock'] > 0 ? 'text-red-600' : 'text-gray-800'; ?>">
-                        <?php echo $item['current_stock']; ?> <?php echo htmlspecialchars($item['unit']); ?>
+                    <span class="font-bold text-lg <?php echo $item['quantity'] <= $item['min_stock'] && $item['min_stock'] > 0 ? 'text-red-600' : 'text-gray-800'; ?>">
+                        <?php echo $item['quantity']; ?> <?php echo htmlspecialchars($item['unit']); ?>
                     </span>
                 </div>
-                <?php if ($item['current_stock'] <= $item['min_stock'] && $item['min_stock'] > 0): ?>
+                <?php if ($item['quantity'] <= $item['min_stock'] && $item['min_stock'] > 0): ?>
                 <div class="text-xs text-red-600 flex items-center">
                     <i class="fas fa-exclamation-triangle mr-1"></i>
                     Unter Mindestbestand (<?php echo $item['min_stock']; ?>)
