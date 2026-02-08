@@ -61,7 +61,6 @@ class Member {
                 ap.angestrebter_abschluss,
                 ap.degree,
                 ap.graduation_year,
-                ap.about_me,
                 ap.image_path,
                 ap.created_at,
                 ap.updated_at
