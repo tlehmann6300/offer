@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS invoices (
         NOT NULL DEFAULT 'pending',
     rejection_reason TEXT DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     INDEX idx_user_id (user_id),
     INDEX idx_status (status),

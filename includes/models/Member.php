@@ -26,9 +26,8 @@ class Member {
         $userDb = Database::getUserDB();
         $contentDb = Database::getContentDB();
         
-        // Build the query with cross-database JOIN
-        $roleList = "'" . implode("', '", self::ACTIVE_ROLES) . "'";
-        $whereClauses = ["u.role IN ($roleList)"];
+        // Step 1: Get alumni profiles from Content DB with search filters
+        $whereClauses = [];
         $params = [];
         
         // Add search filter if provided
@@ -43,21 +42,12 @@ class Member {
             $params[] = $searchTerm;
         }
         
-        // Add role filter if provided
-        if ($filterRole !== null && $filterRole !== '') {
-            $whereClauses[] = "u.role = ?";
-            $params[] = $filterRole;
-        }
+        $whereSQL = !empty($whereClauses) ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
         
-        $whereSQL = implode(' AND ', $whereClauses);
-        
-        // Query using content_db connection with database prefix for user table
+        // Query to get all alumni profiles
         $sql = "
             SELECT 
-                u.id as user_id,
-                u.email,
-                u.role,
-                u.created_at as user_created_at,
+                ap.user_id,
                 ap.id as profile_id,
                 ap.first_name,
                 ap.last_name,
@@ -77,15 +67,75 @@ class Member {
                 ap.image_path,
                 ap.created_at,
                 ap.updated_at
-            FROM " . DB_USER_NAME . ".users u
-            INNER JOIN alumni_profiles ap ON u.id = ap.user_id
-            WHERE " . $whereSQL . "
+            FROM alumni_profiles ap
+            " . $whereSQL . "
             ORDER BY ap.last_name ASC, ap.first_name ASC
         ";
         
         $stmt = $contentDb->prepare($sql);
         $stmt->execute($params);
-        return $stmt->fetchAll();
+        $profiles = $stmt->fetchAll();
+        
+        if (empty($profiles)) {
+            return [];
+        }
+        
+        // Step 2: Collect all user_ids from profiles
+        $userIds = array_column($profiles, 'user_id');
+        
+        // Step 3: Query User DB to get user information (email, role) for these user_ids
+        // Apply role filter at this stage
+        $roleList = "'" . implode("', '", self::ACTIVE_ROLES) . "'";
+        $userWhereClauses = ["u.id IN (" . implode(',', array_fill(0, count($userIds), '?')) . ")", "u.role IN ($roleList)"];
+        $userParams = $userIds;
+        
+        // Add role filter if provided
+        if ($filterRole !== null && $filterRole !== '') {
+            $userWhereClauses[] = "u.role = ?";
+            $userParams[] = $filterRole;
+        }
+        
+        $userWhereSQL = implode(' AND ', $userWhereClauses);
+        
+        $userSql = "
+            SELECT 
+                u.id,
+                u.email,
+                u.role,
+                u.created_at
+            FROM users u
+            WHERE " . $userWhereSQL . "
+        ";
+        
+        $userStmt = $userDb->prepare($userSql);
+        $userStmt->execute($userParams);
+        $users = $userStmt->fetchAll();
+        
+        // Step 4: Create a map of user_id => user data
+        $userMap = [];
+        foreach ($users as $user) {
+            $userMap[$user['id']] = $user;
+        }
+        
+        // Step 5: Merge profiles with user data
+        $result = [];
+        foreach ($profiles as $profile) {
+            $userId = $profile['user_id'];
+            
+            // Only include if user exists and meets criteria
+            if (isset($userMap[$userId])) {
+                $user = $userMap[$userId];
+                
+                // Merge user data into profile
+                $profile['email'] = $user['email'];
+                $profile['role'] = $user['role'];
+                $profile['user_created_at'] = $user['created_at'];
+                
+                $result[] = $profile;
+            }
+        }
+        
+        return $result;
     }
     
     /**

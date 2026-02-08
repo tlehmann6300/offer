@@ -203,7 +203,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </a>
 
                 <!-- VERWALTUNG Section (Only visible for admin/board) -->
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board'])): ?>
+                <?php if (AuthHandler::isAdmin()): ?>
                 <div class="px-6 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                     Verwaltung
                 </div>

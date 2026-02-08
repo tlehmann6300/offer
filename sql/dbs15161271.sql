@@ -217,6 +217,7 @@ CREATE TABLE IF NOT EXISTS blog_posts (
     title VARCHAR(255) NOT NULL,
     content LONGTEXT NOT NULL,
     image_path VARCHAR(255) DEFAULT NULL,
+    external_link VARCHAR(255) DEFAULT NULL,
     category ENUM('Allgemein', 'IT', 'Marketing', 'Human Resources', 'Qualitätsmanagement', 'Akquise') 
         NOT NULL DEFAULT 'Allgemein',
     author_id INT UNSIGNED NOT NULL,
