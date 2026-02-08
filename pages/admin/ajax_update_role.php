@@ -52,7 +52,7 @@ if (!in_array($newRole, ['member', 'alumni', 'manager', 'alumni_board', 'board',
 if ($userId === $_SESSION['user_id']) {
     echo json_encode([
         'success' => false,
-        'message' => 'Sie können Ihre eigene Rolle nicht ändern'
+        'message' => 'Du kannst Deine eigene Rolle nicht ändern'
     ]);
     exit;
 }
@@ -82,6 +82,6 @@ if ($userId === $_SESSION['user_id']) {
     // Return generic JSON error response (don't expose internal details)
     echo json_encode([
         'success' => false,
-        'message' => 'Server Fehler: Es ist ein interner Fehler aufgetreten. Bitte versuchen Sie es später erneut.'
+        'message' => 'Server Fehler: Es ist ein interner Fehler aufgetreten. Bitte versuche es später erneut.'
     ]);
 }

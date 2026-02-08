@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newRole = $_POST['new_role'] ?? '';
         
         if ($userId == $_SESSION['user_id']) {
-            $error = 'Sie können Ihre eigene Rolle nicht ändern';
+            $error = 'Du kannst Deine eigene Rolle nicht ändern';
         } else if (User::update($userId, ['role' => $newRole])) {
             $message = 'Rolle erfolgreich geändert';
         } else {

@@ -84,7 +84,7 @@ try {
     $existingRegistration = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($existingRegistration && $existingRegistration['status'] === 'confirmed') {
-        throw new Exception('Sie sind bereits für dieses Event angemeldet');
+        throw new Exception('Du bist bereits für dieses Event angemeldet');
     }
     
     // Save registration in event_registrations table

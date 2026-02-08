@@ -96,7 +96,7 @@ try {
                 
                 if (!empty($conflicts)) {
                     $conflictEvent = $conflicts[0];
-                    throw new Exception('Sie haben bereits einen Helfer-Slot zur gleichen Zeit: ' . 
+                    throw new Exception('Du hast bereits einen Helfer-Slot zur gleichen Zeit: ' . 
                                       htmlspecialchars($conflictEvent['title']));
                 }
                 
@@ -305,7 +305,7 @@ try {
             $existingRegistration = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($existingRegistration && $existingRegistration['status'] === 'confirmed') {
-                throw new Exception('Sie sind bereits für dieses Event angemeldet');
+                throw new Exception('Du bist bereits für dieses Event angemeldet');
             }
             
             // Save registration in event_registrations table

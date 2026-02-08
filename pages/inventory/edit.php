@@ -314,7 +314,7 @@ ob_start();
 
 <script>
 function confirmDelete() {
-    if (confirm('Sind Sie sicher, dass Sie diesen Artikel löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.')) {
+    if (confirm('Bist Du sicher, dass Du diesen Artikel löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.')) {
         document.getElementById('deleteForm').submit();
     }
 }
