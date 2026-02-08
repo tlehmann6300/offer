@@ -195,7 +195,7 @@ class EasyVereinSync {
                         Inventory::update($existingItem['id'], $updateData, $userId, true);
                         
                         // Update last_synced_at separately using MySQL NOW() for timezone consistency
-                        $stmt = $db->prepare("UPDATE inventory SET last_synced_at = NOW() WHERE id = ?");
+                        $stmt = $db->prepare("UPDATE inventory_items SET last_synced_at = NOW() WHERE id = ?");
                         $stmt->execute([$existingItem['id']]);
                         
                         $stats['updated']++;
@@ -218,7 +218,7 @@ class EasyVereinSync {
                     } else {
                         // Create new item with explicit field list for security
                         $stmt = $db->prepare("
-                            INSERT INTO inventory (
+                            INSERT INTO inventory_items (
                                 easyverein_id,
                                 name,
                                 description,

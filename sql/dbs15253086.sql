@@ -10,15 +10,16 @@
 -- ============================================
 CREATE TABLE IF NOT EXISTS users (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(100) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role ENUM('board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
         NOT NULL DEFAULT 'member',
-    tfa_enabled TINYINT(1) NOT NULL DEFAULT 0,
+    is_alumni_validated TINYINT(1) NOT NULL DEFAULT 0,
+    last_login DATETIME DEFAULT NULL,
     failed_login_attempts INT NOT NULL DEFAULT 0,
     locked_until DATETIME DEFAULT NULL,
     is_locked_permanently TINYINT(1) NOT NULL DEFAULT 0,
-    is_alumni_validated TINYINT(1) NOT NULL DEFAULT 0,
+    tfa_enabled TINYINT(1) NOT NULL DEFAULT 0,
     pending_email_update_request TINYINT(1) NOT NULL DEFAULT 0,
     prompt_profile_review TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -36,7 +37,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- ============================================
 CREATE TABLE IF NOT EXISTS user_invitations (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
     token VARCHAR(64) NOT NULL UNIQUE,
     role ENUM('board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
         NOT NULL DEFAULT 'member',
@@ -57,7 +58,7 @@ CREATE TABLE IF NOT EXISTS user_invitations (
 CREATE TABLE IF NOT EXISTS email_change_requests (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNSIGNED NOT NULL,
-    new_email VARCHAR(100) NOT NULL,
+    new_email VARCHAR(255) NOT NULL,
     token VARCHAR(64) NOT NULL UNIQUE,
     expires_at DATETIME NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
