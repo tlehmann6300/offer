@@ -61,7 +61,8 @@ try {
 
     foreach ($invitations as &$invitation) {
         $invitation['link'] = $protocol . '://' . $host . '/pages/auth/register.php?token=' . $invitation['token'];
-        $invitation['created_by_email'] = $creatorEmailMap[$invitation['created_by']] ?? null;
+        // Use 'Deleted User' as fallback when creator no longer exists
+        $invitation['created_by_email'] = $creatorEmailMap[$invitation['created_by']] ?? 'Deleted User';
     }
 
     echo json_encode([

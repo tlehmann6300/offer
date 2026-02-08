@@ -195,7 +195,8 @@ class Alumni extends Database {
     
     /**
      * Search profiles with filters
-     * Returns all alumni profiles matching search criteria
+     * Returns all profiles from alumni_profiles table matching search criteria
+     * Note: Does not filter by user role - role filtering should be handled by caller if needed
      * 
      * @param array $filters Array of filters: search (name/position/company/industry), industry
      * @return array Array of matching profiles
