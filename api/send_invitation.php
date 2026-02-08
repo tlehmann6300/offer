@@ -169,6 +169,6 @@ $invitationLink = $protocol . '://' . $host . '/pages/auth/register.php?token=' 
     // Return generic JSON error response (don't expose internal details)
     echo json_encode([
         'success' => false,
-        'message' => 'Server Fehler: Es ist ein interner Fehler aufgetreten. Bitte versuchen Sie es später erneut.'
+        'message' => 'Server Fehler: Es ist ein interner Fehler aufgetreten. Bitte versuche es später erneut.'
     ]);
 }

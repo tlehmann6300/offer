@@ -170,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['return_rental'])) {
         $db->commit();
         
         if ($isDefective) {
-            $_SESSION['rental_success'] = 'Artikel als defekt gemeldet. Vielen Dank für Ihre Rückmeldung.';
+            $_SESSION['rental_success'] = 'Artikel als defekt gemeldet. Vielen Dank für Deine Rückmeldung.';
         } else {
             $_SESSION['rental_success'] = 'Artikel erfolgreich zurückgegeben!';
         }

@@ -71,7 +71,7 @@ ob_start();
                 <i class="fas fa-briefcase mr-3 text-purple-600"></i>
                 Projekte
             </h1>
-            <p class="text-gray-600">Entdecken Sie aktuelle Projekte und bewerben Sie sich</p>
+            <p class="text-gray-600 dark:text-gray-300">Entdecke aktuelle Projekte und bewirb Dich</p>
         </div>
         
         <!-- Neues Projekt Button - Board/Head only -->

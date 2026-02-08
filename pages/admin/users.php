@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newRole = $_POST['new_role'] ?? '';
         
         if ($userId == $_SESSION['user_id']) {
-            $error = 'Sie können Ihre eigene Rolle nicht ändern';
+            $error = 'Du kannst Deine eigene Rolle nicht ändern';
         } else if (User::update($userId, ['role' => $newRole])) {
             $message = 'Rolle erfolgreich geändert';
         } else {
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $userId = $_POST['user_id'] ?? 0;
         
         if ($userId == $_SESSION['user_id']) {
-            $error = 'Sie können sich nicht selbst löschen';
+            $error = 'Du kannst Dich nicht selbst löschen';
         } else if (User::delete($userId)) {
             $message = 'Benutzer erfolgreich gelöscht';
         } else {
@@ -187,7 +187,7 @@ ob_start();
                                 <div class="text-sm font-medium text-gray-900">
                                     <?php echo htmlspecialchars($user['email']); ?>
                                     <?php if ($user['id'] == $_SESSION['user_id']): ?>
-                                    <span class="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Sie</span>
+                                    <span class="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Du</span>
                                     <?php endif; ?>
                                 </div>
                                 <div class="text-xs text-gray-500">ID: <?php echo $user['id']; ?></div>
@@ -241,7 +241,7 @@ ob_start();
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                         <?php if ($user['id'] != $_SESSION['user_id']): ?>
-                        <form method="POST" class="inline" onsubmit="return confirm('Sind Sie sicher, dass Sie diesen Benutzer löschen möchten?');">
+                        <form method="POST" class="inline" onsubmit="return confirm('Bist Du sicher, dass Du diesen Benutzer löschen möchtest?');">
                             <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
                             <button type="submit" name="delete_user" class="text-red-600 hover:text-red-800">
                                 <i class="fas fa-trash"></i>

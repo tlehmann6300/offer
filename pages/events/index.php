@@ -63,7 +63,7 @@ ob_start();
                 <i class="fas fa-calendar-alt mr-3 text-purple-600"></i>
                 Events
             </h1>
-            <p class="text-gray-600">Entdecken Sie kommende Events und melden Sie sich an</p>
+            <p class="text-gray-600 dark:text-gray-300">Entdecke kommende Events und melde Dich an</p>
         </div>
         
         <!-- Neues Event Button - Board/Head only -->

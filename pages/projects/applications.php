@@ -484,7 +484,7 @@ ob_start();
             Bewerbung ablehnen
         </h3>
         <p class="text-gray-600 mb-6">
-            Möchten Sie die Bewerbung von "<span id="rejectUserEmail" class="font-semibold"></span>" wirklich ablehnen?
+            Möchtest Du die Bewerbung von "<span id="rejectUserEmail" class="font-semibold"></span>" wirklich ablehnen?
         </p>
         <form method="POST" id="rejectForm">
             <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">

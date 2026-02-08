@@ -245,7 +245,7 @@ ob_start();
             Artikel löschen
         </h3>
         <p class="text-gray-600 mb-6">
-            Möchten Sie den Artikel "<span id="deleteItemName" class="font-semibold"></span>" wirklich löschen? 
+            Möchtest Du den Artikel "<span id="deleteItemName" class="font-semibold"></span>" wirklich löschen? 
             Diese Aktion kann nicht rückgängig gemacht werden.
         </p>
         <form method="POST" id="deleteForm">

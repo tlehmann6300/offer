@@ -280,7 +280,7 @@ ob_start();
                         required 
                         rows="4"
                         maxlength="2000"
-                        placeholder="Schreiben Sie Ihren Kommentar hier..."
+                        placeholder="Schreibe Deinen Kommentar hier..."
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
                         style="resize: vertical; min-height: 100px;"
                     ></textarea>
