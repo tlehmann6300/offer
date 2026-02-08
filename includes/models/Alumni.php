@@ -21,7 +21,7 @@ class Alumni {
         $stmt = $db->prepare("
             SELECT id, user_id, first_name, last_name, email, mobile_phone, 
                    linkedin_url, xing_url, industry, company, position, 
-                   studiengang, study_program, semester, angestrebter_abschluss, 
+                   study_program, semester, angestrebter_abschluss, 
                    degree, graduation_year, about_me,
                    image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
             FROM alumni_profiles 
@@ -58,7 +58,7 @@ class Alumni {
             $allowedFields = [
                 'first_name', 'last_name', 'email', 'mobile_phone',
                 'linkedin_url', 'xing_url', 'industry', 'company', 
-                'position', 'image_path', 'studiengang', 'study_program', 
+                'position', 'image_path', 'study_program', 
                 'semester', 'angestrebter_abschluss', 'degree', 
                 'graduation_year', 'about_me'
             ];
@@ -93,9 +93,9 @@ class Alumni {
                 INSERT INTO alumni_profiles 
                 (user_id, first_name, last_name, email, mobile_phone, 
                  linkedin_url, xing_url, industry, company, position, image_path,
-                 studiengang, study_program, semester, angestrebter_abschluss, 
+                 study_program, semester, angestrebter_abschluss, 
                  degree, graduation_year, about_me)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             
             return $stmt->execute([
@@ -110,7 +110,6 @@ class Alumni {
                 $data['company'] ?? null,
                 $data['position'] ?? null,
                 $data['image_path'] ?? null,
-                $data['studiengang'] ?? null,
                 $data['study_program'] ?? null,
                 $data['semester'] ?? null,
                 $data['angestrebter_abschluss'] ?? null,
@@ -201,7 +200,7 @@ class Alumni {
         $sql = "
             SELECT ap.id, ap.user_id, ap.first_name, ap.last_name, ap.email, ap.mobile_phone, 
                    ap.linkedin_url, ap.xing_url, ap.industry, ap.company, ap.position, 
-                   ap.studiengang, ap.study_program, ap.semester, ap.angestrebter_abschluss, 
+                   ap.study_program, ap.semester, ap.angestrebter_abschluss, 
                    ap.degree, ap.graduation_year, ap.about_me,
                    ap.image_path, ap.last_verified_at, ap.last_reminder_sent_at, ap.created_at, ap.updated_at
             FROM alumni_profiles ap
@@ -248,7 +247,7 @@ class Alumni {
         $stmt = $db->prepare("
             SELECT id, user_id, first_name, last_name, email, mobile_phone, 
                    linkedin_url, xing_url, industry, company, position, 
-                   studiengang, study_program, semester, angestrebter_abschluss, 
+                   study_program, semester, angestrebter_abschluss, 
                    degree, graduation_year, about_me,
                    image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
             FROM alumni_profiles 
