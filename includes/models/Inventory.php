@@ -371,11 +371,11 @@ class Inventory {
      */
     public static function getCategories() {
         $db = Database::getContentDB();
-        // Use DISTINCT to only show categories that are used in inventory_items
+        // Use EXISTS for better performance - only show categories that are used in inventory_items
         $stmt = $db->query("
-            SELECT DISTINCT c.* 
+            SELECT c.* 
             FROM categories c
-            INNER JOIN inventory_items i ON c.id = i.category_id
+            WHERE EXISTS (SELECT 1 FROM inventory_items i WHERE i.category_id = c.id)
             ORDER BY c.name ASC
         ");
         return $stmt->fetchAll();
@@ -386,11 +386,11 @@ class Inventory {
      */
     public static function getLocations() {
         $db = Database::getContentDB();
-        // Use DISTINCT to only show locations that are used in inventory_items
+        // Use EXISTS for better performance - only show locations that are used in inventory_items
         $stmt = $db->query("
-            SELECT DISTINCT l.* 
+            SELECT l.* 
             FROM locations l
-            INNER JOIN inventory_items i ON l.id = i.location_id
+            WHERE EXISTS (SELECT 1 FROM inventory_items i WHERE i.location_id = l.id)
             ORDER BY l.name ASC
         ");
         return $stmt->fetchAll();
