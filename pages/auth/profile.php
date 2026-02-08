@@ -165,6 +165,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $error = 'Fehler beim Aktualisieren der Benachrichtigungseinstellungen';
         }
+    } else if (isset($_POST['update_theme'])) {
+        $theme = $_POST['theme'] ?? 'auto';
+        
+        // Validate theme value
+        if (!in_array($theme, ['auto', 'light', 'dark'])) {
+            $error = 'Ungültiger Theme-Wert';
+        } else {
+            if (User::updateThemePreference($user['id'], $theme)) {
+                $message = 'Theme-Einstellungen erfolgreich aktualisiert';
+                $user = Auth::user(); // Reload user data
+            } else {
+                $error = 'Fehler beim Aktualisieren der Theme-Einstellungen';
+            }
+        }
     }
 }
 
@@ -634,6 +648,87 @@ ob_start();
 
                 <button type="submit" name="update_notifications" class="w-full btn-primary">
                     <i class="fas fa-save mr-2"></i>Benachrichtigungseinstellungen speichern
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Theme Settings -->
+    <div class="lg:col-span-2">
+        <div class="card p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-palette text-purple-600 mr-2"></i>
+                Theme-Einstellungen
+            </h2>
+            <p class="text-gray-600 mb-6">
+                Wählen Sie Ihr bevorzugtes Farbschema für die Anwendung
+            </p>
+            
+            <form method="POST" class="space-y-4">
+                <div class="space-y-4">
+                    <!-- Auto Theme -->
+                    <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-purple-400 transition cursor-pointer">
+                        <input 
+                            type="radio" 
+                            name="theme" 
+                            value="auto" 
+                            id="theme_auto"
+                            <?php echo ($user['theme_preference'] ?? 'auto') === 'auto' ? 'checked' : ''; ?>
+                            class="mt-1 h-5 w-5 text-purple-600 border-gray-300 focus:ring-purple-500"
+                        >
+                        <label for="theme_auto" class="ml-3 flex-1 cursor-pointer">
+                            <span class="block text-sm font-medium text-gray-900">
+                                <i class="fas fa-adjust mr-2"></i>Automatisch
+                            </span>
+                            <span class="block text-sm text-gray-600">
+                                Verwendet die Systemeinstellungen Ihres Geräts
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Light Theme -->
+                    <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-purple-400 transition cursor-pointer">
+                        <input 
+                            type="radio" 
+                            name="theme" 
+                            value="light" 
+                            id="theme_light"
+                            <?php echo ($user['theme_preference'] ?? 'auto') === 'light' ? 'checked' : ''; ?>
+                            class="mt-1 h-5 w-5 text-purple-600 border-gray-300 focus:ring-purple-500"
+                        >
+                        <label for="theme_light" class="ml-3 flex-1 cursor-pointer">
+                            <span class="block text-sm font-medium text-gray-900">
+                                <i class="fas fa-sun mr-2"></i>Hell
+                            </span>
+                            <span class="block text-sm text-gray-600">
+                                Immer den hellen Modus verwenden
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Dark Theme -->
+                    <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-purple-400 transition cursor-pointer">
+                        <input 
+                            type="radio" 
+                            name="theme" 
+                            value="dark" 
+                            id="theme_dark"
+                            <?php echo ($user['theme_preference'] ?? 'auto') === 'dark' ? 'checked' : ''; ?>
+                            class="mt-1 h-5 w-5 text-purple-600 border-gray-300 focus:ring-purple-500"
+                        >
+                        <label for="theme_dark" class="ml-3 flex-1 cursor-pointer">
+                            <span class="block text-sm font-medium text-gray-900">
+                                <i class="fas fa-moon mr-2"></i>Dunkel
+                            </span>
+                            <span class="block text-sm text-gray-600">
+                                Immer den dunklen Modus verwenden
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" name="update_theme" class="w-full btn-primary">
+                    <i class="fas fa-save mr-2"></i>Theme-Einstellungen speichern
                 </button>
             </form>
         </div>

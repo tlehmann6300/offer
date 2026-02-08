@@ -184,6 +184,29 @@ class User {
     }
     
     /**
+     * Update theme preference for user
+     * @param int $userId The ID of the user
+     * @param string $theme The theme preference ('auto', 'light', or 'dark')
+     * @return bool Returns true on success
+     */
+    public static function updateThemePreference($userId, $theme) {
+        $db = Database::getUserDB();
+        
+        // Validate theme value
+        if (!in_array($theme, ['auto', 'light', 'dark'])) {
+            return false;
+        }
+        
+        $stmt = $db->prepare("
+            UPDATE users 
+            SET theme_preference = ? 
+            WHERE id = ?
+        ");
+        
+        return $stmt->execute([$theme, $userId]);
+    }
+    
+    /**
      * Create email change request with token
      * @param int $userId The ID of the user requesting email change
      * @param string $newEmail The new email address

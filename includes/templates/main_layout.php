@@ -115,7 +115,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50" data-user-theme="<?php echo $currentUser['theme_preference'] ?? 'auto'; ?>">
     <!-- Mobile Menu Overlay -->
     <div id="sidebar-overlay" class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden transition-opacity duration-300"></div>
 
@@ -150,27 +150,11 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <span>Dashboard</span>
                 </a>
 
-                <!-- Mitglieder (Visible for: board, head, member) -->
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'head', 'member'])): ?>
-                <a href="<?php echo asset('pages/members/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/members/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-users w-5 mr-3"></i>
-                    <span>Mitglieder</span>
-                </a>
-                <?php endif; ?>
-
-                <!-- Projekte (Visible for everyone) -->
-                <a href="<?php echo asset('pages/projects/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/projects/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-folder w-5 mr-3"></i>
-                    <span>Projekte</span>
-                </a>
-
-                <!-- Events (Visible for everyone) -->
-                <a href="<?php echo asset('pages/events/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/events/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-calendar w-5 mr-3"></i>
-                    <span>Events</span>
+                <!-- Profil (Visible for everyone) -->
+                <a href="<?php echo asset('pages/auth/profile.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/auth/profile.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-user w-5 mr-3"></i>
+                    <span>Profil</span>
                 </a>
 
                 <!-- Inventar (Visible for everyone) -->
@@ -180,6 +164,20 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <span>Inventar</span>
                 </a>
 
+                <!-- Events (Visible for everyone) -->
+                <a href="<?php echo asset('pages/events/index.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/events/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-calendar w-5 mr-3"></i>
+                    <span>Events</span>
+                </a>
+
+                <!-- Projekte (Visible for everyone) -->
+                <a href="<?php echo asset('pages/projects/index.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/projects/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-folder w-5 mr-3"></i>
+                    <span>Projekte</span>
+                </a>
+
                 <!-- Blog (Visible for everyone) -->
                 <a href="<?php echo asset('pages/blog/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/blog/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
@@ -187,20 +185,43 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <span>Blog</span>
                 </a>
 
-                <!-- Rechnungen (Visible ONLY for board) -->
-                <?php if (AuthHandler::hasRole('board')): ?>
+                <!-- Rechnungen (Visible for board and alumni_board) -->
+                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'alumni_board'])): ?>
                 <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-file-invoice-dollar w-5 mr-3"></i>
                     <span>Rechnungen</span>
                 </a>
+                <?php endif; ?>
 
-                <!-- Verwaltung (Visible ONLY for board) -->
-                <a href="<?php echo asset('pages/admin/users.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-user-cog w-5 mr-3"></i>
-                    <span>Verwaltung</span>
-                </a>
+                <!-- Verwaltung Dropdown (Visible ONLY for board) -->
+                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'board'): ?>
+                <div class="relative">
+                    <button id="verwaltung-dropdown-btn" class="flex items-center justify-between w-full px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                        <div class="flex items-center">
+                            <i class="fas fa-user-cog w-5 mr-3"></i>
+                            <span>Verwaltung</span>
+                        </div>
+                        <i id="verwaltung-chevron" class="fas fa-chevron-down text-xs transition-transform"></i>
+                    </button>
+                    <div id="verwaltung-dropdown" class="hidden bg-gray-800 shadow-lg z-50">
+                        <a href="<?php echo asset('pages/admin/users.php'); ?>" 
+                           class="flex items-center px-8 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                            <i class="fas fa-users w-5 mr-3"></i>
+                            <span>Benutzer</span>
+                        </a>
+                        <a href="<?php echo asset('pages/admin/settings.php'); ?>" 
+                           class="flex items-center px-8 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                            <i class="fas fa-cog w-5 mr-3"></i>
+                            <span>Einstellungen</span>
+                        </a>
+                        <a href="<?php echo asset('pages/admin/db_maintenance.php'); ?>" 
+                           class="flex items-center px-8 py-2 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                            <i class="fas fa-database w-5 mr-3"></i>
+                            <span>System-Check</span>
+                        </a>
+                    </div>
+                </div>
                 <?php endif; ?>
                 
             </nav>
@@ -210,10 +231,36 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         <div class='mt-auto border-t border-white/20 pt-8 pb-6 px-5 bg-gradient-to-b from-black/30 to-black/40'>
             <?php 
             $currentUser = Auth::user();
-            $firstname = !empty($currentUser['firstname']) ? $currentUser['firstname'] : '';
-            $lastname = !empty($currentUser['lastname']) ? $currentUser['lastname'] : '';
+            
+            // Try to get name from alumni_profiles table first
+            require_once __DIR__ . '/../models/Alumni.php';
+            $profile = Alumni::getProfileByUserId($currentUser['id']);
+            
+            $firstname = '';
+            $lastname = '';
+            
+            if ($profile && !empty($profile['first_name'])) {
+                $firstname = $profile['first_name'];
+                $lastname = $profile['last_name'] ?? '';
+            } elseif (!empty($currentUser['firstname'])) {
+                $firstname = $currentUser['firstname'];
+                $lastname = $currentUser['lastname'] ?? '';
+            }
+            
             $email = $currentUser['email'] ?? '';
             $role = $currentUser['role'] ?? 'User';
+            
+            // Generate greeting
+            $greeting = 'Guten Tag';
+            if (!empty($firstname) && !empty($lastname)) {
+                $greetingName = $firstname . ' ' . $lastname;
+            } elseif (!empty($firstname)) {
+                $greetingName = $firstname;
+            } elseif (!empty($lastname)) {
+                $greetingName = $lastname;
+            } else {
+                $greetingName = $email;
+            }
             
             // Generate initials with proper fallbacks
             if (!empty($firstname) && !empty($lastname)) {
@@ -227,10 +274,6 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             } else {
                 $initials = 'U';
             }
-            
-            // Generate display name
-            $fullname = trim($firstname . ' ' . $lastname);
-            $displayName = !empty($fullname) ? $fullname : $email;
             ?>
             <!-- User Info -->
             <div class='flex items-center gap-3 mb-5'>
@@ -238,29 +281,46 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <?php echo $initials; ?>
                 </div>
                 <div class='flex-1 min-w-0'>
-                    <p class='text-sm font-semibold text-white truncate leading-snug mb-0.5' title='<?php echo htmlspecialchars($displayName); ?>'>
-                        <?php echo htmlspecialchars($displayName); ?>
+                    <p class='text-sm font-semibold text-white truncate leading-snug mb-0.5' title='<?php echo htmlspecialchars($greeting . ', ' . $greetingName); ?>'>
+                        <?php echo htmlspecialchars($greeting . ', ' . $greetingName); ?>
                     </p>
-                    <?php if (!empty($email)): ?>
-                    <p class='text-xs text-gray-300 truncate leading-relaxed' title='<?php echo htmlspecialchars($email); ?>'>
-                        <?php echo htmlspecialchars($email); ?>
-                    </p>
-                    <?php endif; ?>
                     <span class='inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-white/10 text-white border border-white/20'>
                         <?php 
-                        // Translate candidate role to German
-                        $roleDisplay = $role === 'candidate' ? 'Anwärter' : ucfirst($role);
+                        // Translate role to German
+                        $roleTranslations = [
+                            'candidate' => 'Anwärter',
+                            'member' => 'Mitglied',
+                            'head' => 'Ressortleiter',
+                            'board' => 'Vorstand',
+                            'alumni' => 'Alumni',
+                            'alumni_board' => 'Alumni Vorstand'
+                        ];
+                        $roleDisplay = $roleTranslations[$role] ?? ucfirst($role);
                         echo htmlspecialchars($roleDisplay); 
                         ?>
                     </span>
                 </div>
             </div>
+            
+            <!-- Dark/Light Mode Toggle -->
+            <button id="theme-toggle" class='flex items-center justify-center w-full px-4 py-2 mb-3 text-xs font-medium text-white/90 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm'>
+                <i id="theme-icon" class='fas fa-moon text-xs mr-2'></i>
+                <span id="theme-text">Dunkelmodus</span>
+            </button>
+            
             <!-- Logout Button -->
             <a href='<?php echo asset('pages/auth/logout.php'); ?>' 
                class='flex items-center justify-center w-full px-4 py-2 text-xs font-medium text-white/90 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm'>
                 <i class='fas fa-sign-out-alt text-xs mr-2 group-hover:translate-x-0.5 transition-transform'></i> 
                 <span>Abmelden</span>
             </a>
+            
+            <!-- Dynamic Date/Time Display -->
+            <div class='mt-4 pt-4 border-t border-white/20 text-center'>
+                <p id="current-datetime" class='text-xs text-gray-300'>
+                    <!-- JavaScript will update this -->
+                </p>
+            </div>
         </div>
     </aside>
 
@@ -297,6 +357,106 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 !sidebar.classList.contains('-translate-x-full')) {
                 sidebar.classList.add('-translate-x-full');
                 sidebarOverlay.classList.add('hidden');
+            }
+        });
+        
+        // Dark/Light Mode Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+        
+        // Get user's saved theme preference from database (via data attribute)
+        const userThemePreference = document.body.getAttribute('data-user-theme') || 'auto';
+        
+        // Load theme preference (localStorage overrides database preference)
+        let currentTheme = localStorage.getItem('theme') || userThemePreference;
+        
+        // Apply theme based on preference
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeText.textContent = 'Hellmodus';
+            } else if (theme === 'light') {
+                document.body.classList.remove('dark-mode');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeText.textContent = 'Dunkelmodus';
+            } else { // auto
+                // Check system preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.body.classList.add('dark-mode');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                    themeText.textContent = 'Hellmodus';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                    themeText.textContent = 'Dunkelmodus';
+                }
+            }
+        }
+        
+        // Apply initial theme
+        applyTheme(currentTheme);
+        
+        // Toggle theme on button click
+        themeToggle?.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeText.textContent = 'Hellmodus';
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeText.textContent = 'Dunkelmodus';
+            }
+        });
+        
+        // Dynamic Date/Time Display
+        function updateDateTime() {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            const dateTimeString = `${day}.${month}.${year} ${hours}:${minutes}`;
+            const dateTimeElement = document.getElementById('current-datetime');
+            if (dateTimeElement) {
+                dateTimeElement.textContent = dateTimeString;
+            }
+        }
+        
+        // Update immediately and then every minute
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+        
+        // Verwaltung Dropdown Toggle
+        const verwaltungBtn = document.getElementById('verwaltung-dropdown-btn');
+        const verwaltungDropdown = document.getElementById('verwaltung-dropdown');
+        const verwaltungChevron = document.getElementById('verwaltung-chevron');
+        
+        verwaltungBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+            verwaltungDropdown.classList.toggle('hidden');
+            verwaltungChevron.classList.toggle('rotate-180');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (verwaltungBtn && verwaltungDropdown && 
+                !verwaltungBtn.contains(e.target) && 
+                !verwaltungDropdown.contains(e.target)) {
+                verwaltungDropdown.classList.add('hidden');
+                verwaltungChevron?.classList.remove('rotate-180');
             }
         });
     </script>
