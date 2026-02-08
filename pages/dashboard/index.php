@@ -68,7 +68,8 @@ if ($hasExtendedAccess) {
     $writeOffStats = Inventory::getWriteOffStatsThisMonth();
 }
 
-// Check if user is board-level (board, head only for stats section)
+// Restrict board-level statistics to board and head roles only
+// (alumni_board explicitly excluded per requirements)
 $isBoardLevel = in_array($user['role'], ['board', 'head']);
 
 // Get board-specific statistics
