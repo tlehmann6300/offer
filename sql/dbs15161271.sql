@@ -49,18 +49,25 @@ CREATE TABLE IF NOT EXISTS projects (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT DEFAULT NULL,
+    client_name VARCHAR(255) DEFAULT NULL,
+    client_contact_details TEXT DEFAULT NULL,
+    priority ENUM('low', 'medium', 'high', 'urgent') NOT NULL DEFAULT 'medium',
     manager_id INT UNSIGNED DEFAULT NULL,
     type ENUM('internal', 'external') NOT NULL DEFAULT 'internal',
     status ENUM('draft', 'open', 'assigned', 'running', 'completed', 'archived') 
         NOT NULL DEFAULT 'draft',
+    max_consultants INT UNSIGNED DEFAULT NULL,
     start_date DATE DEFAULT NULL,
     end_date DATE DEFAULT NULL,
+    image_path VARCHAR(255) DEFAULT NULL,
+    documentation VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     INDEX idx_manager_id (manager_id),
     INDEX idx_type (type),
     INDEX idx_status (status),
+    INDEX idx_priority (priority),
     INDEX idx_start_date (start_date)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
@@ -118,76 +125,35 @@ CREATE TABLE IF NOT EXISTS project_files (
 -- ============================================
 CREATE TABLE IF NOT EXISTS inventory_items (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    easyverein_id INT UNSIGNED NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
     description TEXT DEFAULT NULL,
+    serial_number VARCHAR(100) DEFAULT NULL,
+    category_id INT UNSIGNED DEFAULT NULL,
+    location_id INT UNSIGNED DEFAULT NULL,
+    status ENUM('available', 'reserved', 'unavailable', 'maintenance') 
+        NOT NULL DEFAULT 'available',
     quantity INT NOT NULL DEFAULT 0,
-    total_stock INT NOT NULL DEFAULT 0,
-    category VARCHAR(100) DEFAULT NULL,
-    location VARCHAR(255) DEFAULT NULL,
+    min_stock INT NOT NULL DEFAULT 0,
+    unit VARCHAR(50) DEFAULT 'Stück',
+    unit_price DECIMAL(10,2) DEFAULT 0.00,
+    purchase_date DATE DEFAULT NULL,
     image_path VARCHAR(255) DEFAULT NULL,
-    easyverein_id INT UNSIGNED NULL UNIQUE,
+    notes TEXT DEFAULT NULL,
     last_synced_at DATETIME DEFAULT NULL,
+    is_archived_in_easyverein TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    INDEX idx_category (category),
-    INDEX idx_location (location),
-    INDEX idx_easyverein_id (easyverein_id)
+    INDEX idx_category_id (category_id),
+    INDEX idx_location_id (location_id),
+    INDEX idx_easyverein_id (easyverein_id),
+    INDEX idx_status (status),
+    INDEX idx_name (name)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
   COMMENT='Inventory items with EasyVerein integration';
-
--- ============================================
--- INVENTORY TRANSACTIONS TABLE
--- ============================================
-CREATE TABLE IF NOT EXISTS inventory_transactions (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    item_id INT UNSIGNED NOT NULL,
-    user_id INT UNSIGNED NOT NULL,
-    transaction_type ENUM('checkout', 'return', 'adjustment', 'purchase', 'disposal') 
-        NOT NULL,
-    quantity_change INT NOT NULL,
-    notes TEXT DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
-    FOREIGN KEY (item_id) REFERENCES inventory_items(id) ON DELETE CASCADE,
-    
-    INDEX idx_item_id (item_id),
-    INDEX idx_user_id (user_id),
-    INDEX idx_created_at (created_at)
-) ENGINE=InnoDB
-  DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_unicode_ci
-  COMMENT='Audit log for inventory changes';
-
--- ============================================
--- INVENTORY RENTALS TABLE
--- ============================================
-CREATE TABLE IF NOT EXISTS inventory_rentals (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    item_id INT UNSIGNED NOT NULL,
-    user_id INT UNSIGNED NOT NULL,
-    quantity INT NOT NULL DEFAULT 1,
-    rented_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expected_return_date DATE DEFAULT NULL,
-    actual_return_date TIMESTAMP DEFAULT NULL,
-    status ENUM('active', 'returned', 'overdue', 'defective') 
-        NOT NULL DEFAULT 'active',
-    notes TEXT DEFAULT NULL,
-    defect_notes TEXT DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
-    FOREIGN KEY (item_id) REFERENCES inventory_items(id) ON DELETE CASCADE,
-    
-    INDEX idx_item_id (item_id),
-    INDEX idx_user_id (user_id),
-    INDEX idx_status (status)
-) ENGINE=InnoDB
-  DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_unicode_ci
-  COMMENT='Active rentals of inventory items';
 
 -- ============================================
 -- EVENTS TABLE
@@ -196,18 +162,25 @@ CREATE TABLE IF NOT EXISTS events (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT DEFAULT NULL,
-    start_date DATETIME NOT NULL,
-    end_date DATETIME NOT NULL,
     location VARCHAR(255) DEFAULT NULL,
+    maps_link VARCHAR(500) DEFAULT NULL,
+    start_time DATETIME NOT NULL,
+    end_time DATETIME NOT NULL,
+    registration_start DATETIME DEFAULT NULL,
+    registration_end DATETIME DEFAULT NULL,
+    contact_person VARCHAR(255) DEFAULT NULL,
+    status ENUM('planned', 'open', 'closed', 'running', 'past') 
+        NOT NULL DEFAULT 'planned',
+    is_external TINYINT(1) NOT NULL DEFAULT 0,
+    external_link VARCHAR(500) DEFAULT NULL,
+    needs_helpers TINYINT(1) NOT NULL DEFAULT 0,
     image_path VARCHAR(255) DEFAULT NULL,
-    max_participants INT UNSIGNED DEFAULT NULL,
-    status ENUM('draft', 'published', 'cancelled', 'completed') 
-        NOT NULL DEFAULT 'draft',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     INDEX idx_status (status),
-    INDEX idx_start_date (start_date)
+    INDEX idx_start_time (start_time),
+    INDEX idx_end_time (end_time)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
@@ -293,3 +266,237 @@ CREATE TABLE IF NOT EXISTS blog_likes (
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
   COMMENT='User likes on blog posts';
+
+-- ============================================
+-- CATEGORIES TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS categories (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT DEFAULT NULL,
+    color VARCHAR(7) DEFAULT '#3B82F6',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_name (name)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Categories for inventory items';
+
+-- ============================================
+-- LOCATIONS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS locations (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT DEFAULT NULL,
+    address VARCHAR(500) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_name (name)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Storage locations for inventory items';
+
+-- ============================================
+-- RENTALS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS rentals (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    item_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    amount INT NOT NULL DEFAULT 1,
+    rented_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expected_return DATE DEFAULT NULL,
+    actual_return TIMESTAMP DEFAULT NULL,
+    status ENUM('active', 'returned', 'overdue', 'defective') 
+        NOT NULL DEFAULT 'active',
+    defect_notes TEXT DEFAULT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (item_id) REFERENCES inventory_items(id) ON DELETE CASCADE,
+    
+    INDEX idx_item_id (item_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_status (status),
+    INDEX idx_rented_at (rented_at)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Active and historical rentals of inventory items';
+
+-- ============================================
+-- INVENTORY HISTORY TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS inventory_history (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    item_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    change_type ENUM('create', 'update', 'delete', 'checkout', 'return', 'adjustment') 
+        NOT NULL,
+    old_stock INT DEFAULT NULL,
+    new_stock INT DEFAULT NULL,
+    change_amount INT DEFAULT NULL,
+    reason VARCHAR(255) DEFAULT NULL,
+    comment TEXT DEFAULT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (item_id) REFERENCES inventory_items(id) ON DELETE CASCADE,
+    
+    INDEX idx_item_id (item_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_timestamp (timestamp),
+    INDEX idx_change_type (change_type)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Audit log for all inventory changes';
+
+-- ============================================
+-- PROJECT ASSIGNMENTS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS project_assignments (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    project_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    role ENUM('member', 'lead', 'manager') NOT NULL DEFAULT 'member',
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_assignment (project_id, user_id),
+    
+    INDEX idx_project_id (project_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_role (role)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='User assignments to projects with roles';
+
+-- ============================================
+-- EVENT HELPER TYPES TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS event_helper_types (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id INT UNSIGNED NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    
+    INDEX idx_event_id (event_id)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Types of helper roles needed for events';
+
+-- ============================================
+-- EVENT SLOTS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS event_slots (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    helper_type_id INT UNSIGNED NOT NULL,
+    start_time DATETIME NOT NULL,
+    end_time DATETIME NOT NULL,
+    quantity_needed INT UNSIGNED NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (helper_type_id) REFERENCES event_helper_types(id) ON DELETE CASCADE,
+    
+    INDEX idx_helper_type_id (helper_type_id),
+    INDEX idx_start_time (start_time)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Time slots for event helper signups';
+
+-- ============================================
+-- EVENT SIGNUPS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS event_signups (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    slot_id INT UNSIGNED DEFAULT NULL,
+    status ENUM('pending', 'confirmed', 'cancelled', 'rejected') 
+        NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (slot_id) REFERENCES event_slots(id) ON DELETE SET NULL,
+    
+    INDEX idx_event_id (event_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_slot_id (slot_id),
+    INDEX idx_status (status)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='User signups for event helper slots';
+
+-- ============================================
+-- EVENT ROLES TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS event_roles (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id INT UNSIGNED NOT NULL,
+    role ENUM('board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
+        NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    
+    INDEX idx_event_id (event_id),
+    INDEX idx_role (role)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Allowed roles for event participation';
+
+-- ============================================
+-- EVENT HISTORY TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS event_history (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED DEFAULT NULL,
+    change_type VARCHAR(50) NOT NULL,
+    change_details TEXT DEFAULT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    
+    INDEX idx_event_id (event_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_timestamp (timestamp),
+    INDEX idx_change_type (change_type)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Audit log for event changes and activities';
+
+-- ============================================
+-- SYSTEM LOGS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS system_logs (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED DEFAULT NULL,
+    action VARCHAR(100) NOT NULL,
+    entity_type VARCHAR(50) DEFAULT NULL,
+    entity_id INT UNSIGNED DEFAULT NULL,
+    details TEXT DEFAULT NULL,
+    ip_address VARCHAR(45) DEFAULT NULL,
+    user_agent VARCHAR(500) DEFAULT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_user_id (user_id),
+    INDEX idx_action (action),
+    INDEX idx_entity_type (entity_type),
+    INDEX idx_timestamp (timestamp)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='System-wide audit log for security and tracking';

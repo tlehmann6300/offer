@@ -33,20 +33,22 @@ CREATE TABLE IF NOT EXISTS users (
   COMMENT='Core user accounts with authentication and security';
 
 -- ============================================
--- USER INVITATIONS TABLE
+-- INVITATION TOKENS TABLE
 -- ============================================
-CREATE TABLE IF NOT EXISTS user_invitations (
+CREATE TABLE IF NOT EXISTS invitation_tokens (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(255) NOT NULL,
     token VARCHAR(64) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL,
     role ENUM('board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
         NOT NULL DEFAULT 'member',
+    created_by INT UNSIGNED DEFAULT NULL,
     expires_at DATETIME NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     INDEX idx_email (email),
     INDEX idx_token (token),
-    INDEX idx_expires_at (expires_at)
+    INDEX idx_expires_at (expires_at),
+    INDEX idx_created_by (created_by)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
@@ -73,3 +75,27 @@ CREATE TABLE IF NOT EXISTS email_change_requests (
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
   COMMENT='Token-based email change verification';
+
+-- ============================================
+-- USER SESSIONS TABLE (OPTIONAL)
+-- ============================================
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED NOT NULL,
+    session_token VARCHAR(255) NOT NULL,
+    ip_address VARCHAR(45) DEFAULT NULL,
+    user_agent VARCHAR(500) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_session_user
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    
+    INDEX idx_user_id (user_id),
+    INDEX idx_session_token (session_token),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Optional session tracking for security auditing';
+
