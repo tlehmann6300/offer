@@ -85,7 +85,7 @@ ob_start();
             <p class="text-gray-600"><?php echo count($items); ?> Artikel gefunden</p>
         </div>
         <!-- EasyVerein Sync Button - Admin/Board only -->
-        <?php if (AuthHandler::hasRole('admin') || AuthHandler::hasRole('board')): ?>
+        <?php if (AuthHandler::isAdmin()): ?>
         <div class="mt-4 md:mt-0 flex gap-2">
             <a href="sync.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
                 <i class="fas fa-sync-alt mr-2"></i> EasyVerein Sync
@@ -295,7 +295,7 @@ ob_start();
     <div class="col-span-full card p-12 text-center">
         <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
         <p class="text-gray-500 text-lg">Keine Artikel gefunden</p>
-        <?php if (AuthHandler::hasRole('admin') || AuthHandler::hasRole('board')): ?>
+        <?php if (AuthHandler::isAdmin()): ?>
         <a href="sync.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-flex items-center mt-4">
             <i class="fas fa-sync-alt mr-2"></i> EasyVerein Sync
         </a>

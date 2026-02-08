@@ -241,7 +241,7 @@ endif;
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-xl font-bold text-gray-800">
                     <i class="fas fa-tasks text-orange-600 mr-2"></i>
-                    Meine offenen Aufgaben
+                    Meine offenen Ausleihen
                 </h3>
                 <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
                     <span class="text-2xl font-bold text-orange-600"><?php echo $openTasksCount; ?></span>
