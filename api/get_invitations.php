@@ -23,31 +23,46 @@ if (!AuthHandler::isAuthenticated() || !AuthHandler::hasPermission('board')) {
 }
 
 try {
-    // Get all open invitations
+    // Get all open invitations from user DB
     $db = Database::getConnection('user');
     $stmt = $db->prepare("
         SELECT 
-            it.id,
-            it.token,
-            it.email,
-            it.role,
-            it.created_at,
-            it.expires_at,
-            u.email as created_by_email
-        FROM invitation_tokens it
-        LEFT JOIN users u ON it.created_by = u.id
-        WHERE it.used_at IS NULL AND it.expires_at > NOW()
-        ORDER BY it.created_at DESC
+            id,
+            token,
+            email,
+            role,
+            created_by,
+            created_at,
+            expires_at
+        FROM invitation_tokens
+        WHERE used_at IS NULL AND expires_at > NOW()
+        ORDER BY created_at DESC
     ");
     $stmt->execute();
     $invitations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Build invitation links
+    // Fetch creator emails in a separate query (no JOIN)
+    $creatorIds = array_unique(array_column($invitations, 'created_by'));
+    $creatorEmailMap = [];
+    
+    if (!empty($creatorIds)) {
+        $placeholders = implode(',', array_fill(0, count($creatorIds), '?'));
+        $userStmt = $db->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
+        $userStmt->execute($creatorIds);
+        $creators = $userStmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($creators as $creator) {
+            $creatorEmailMap[$creator['id']] = $creator['email'];
+        }
+    }
+
+    // Build invitation links and add creator emails
     $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'];
 
     foreach ($invitations as &$invitation) {
         $invitation['link'] = $protocol . '://' . $host . '/pages/auth/register.php?token=' . $invitation['token'];
+        // Use 'Deleted User' as fallback when creator no longer exists
+        $invitation['created_by_email'] = $creatorEmailMap[$invitation['created_by']] ?? 'Deleted User';
     }
 
     echo json_encode([
