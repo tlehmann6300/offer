@@ -77,18 +77,19 @@ This document describes all changes made to fix role logic, database queries, an
 ### Part 4: SQL Schema Updates
 
 #### 4.1 Content Database Schema (`sql/dbs15161271.sql`)
-**Added**: `external_link VARCHAR(255) DEFAULT NULL` column to `blog_posts` table after `image_path`
+**Status**: Complete and definitive schema with all required columns:
+- `external_link VARCHAR(255) DEFAULT NULL` column in `blog_posts` table
+- `angestrebter_abschluss VARCHAR(255) DEFAULT NULL` column in `alumni_profiles` table
 
 #### 4.2 Invoice Database Schema (`sql/dbs15251284.sql`)
-**Added**: `updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP` column to `invoices` table
+**Status**: Complete and definitive schema with all required columns:
+- `updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP` column in `invoices` table
+- `rejection_reason TEXT DEFAULT NULL` column in `invoices` table
 
-**Status**: `rejection_reason` column was already present (no changes needed)
+#### 4.3 User Database Schema (`sql/dbs15253086.sql`)
+**Status**: Complete and definitive schema with all required columns
 
-#### 4.3 Migration Script (`sql/migration_fix_schemas.sql`)
-**Created**: New migration script to update existing databases with:
-- `external_link` column for blog_posts
-- `updated_at` column for invoices
-- Column rename from `reason` to `rejection_reason` (if needed)
+**Note**: All schema changes have been integrated into the definitive database schema files. The migration script (`migration_fix_schemas.sql`) has been removed as it's no longer needed.
 
 ## How to Apply Changes
 
@@ -100,20 +101,23 @@ This document describes all changes made to fix role logic, database queries, an
    git pull
    ```
 
-2. **Run the migration script** on your databases:
+2. **For new installations**, use the definitive schema files:
    ```bash
    # For Content DB (dbs15161271)
-   mysql -u [username] -p dbs15161271 < sql/migration_fix_schemas.sql
+   mysql -u [username] -p dbs15161271 < sql/dbs15161271.sql
    
    # For Invoice DB (dbs15251284)
-   mysql -u [username] -p dbs15251284 < sql/migration_fix_schemas.sql
+   mysql -u [username] -p dbs15251284 < sql/dbs15251284.sql
+   
+   # For User DB (dbs15253086)
+   mysql -u [username] -p dbs15253086 < sql/dbs15253086.sql
    ```
 
 3. **Verify the changes**:
    - Test admin/board user access to 'Verwaltung' menu
    - Test inventory sync functionality
    - Test invoice listing
-   - Test blog post display
+   - Test blog post display with external links
    - Test member directory
 
 ### For Production Environment
@@ -122,11 +126,12 @@ This document describes all changes made to fix role logic, database queries, an
    ```bash
    mysqldump -u [username] -p dbs15161271 > backup_content_$(date +%Y%m%d).sql
    mysqldump -u [username] -p dbs15251284 > backup_invoice_$(date +%Y%m%d).sql
+   mysqldump -u [username] -p dbs15253086 > backup_user_$(date +%Y%m%d).sql
    ```
 
-2. **Review the migration script** and adjust if needed for your MySQL version
+2. **If you have existing databases**, manually add any missing columns as needed
 
-3. **Apply the migration** during a maintenance window
+3. **For new production installations**, use the definitive schema files during setup
 
 4. **Deploy the updated code**
 
