@@ -47,7 +47,6 @@ $stmt = $userDb->query("SELECT COUNT(*) as total_users FROM users");
 $totalUsersCount = $stmt->fetch()['total_users'] ?? 0;
 
 // List 1: 'Wer hat was ausgeliehen?' (Active Checkouts with User Names)
-$activeCheckouts = [];
 $stmt = $contentDb->query("
     SELECT 
         ic.id,
@@ -64,20 +63,37 @@ $stmt = $contentDb->query("
 ");
 $checkouts = $stmt->fetchAll();
 
-// Get user information for checkouts
+// Get all user IDs and fetch user information in bulk
+$userIds = array_unique(array_column($checkouts, 'user_id'));
+$userInfoMap = [];
+
+if (!empty($userIds)) {
+    $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
+    $userStmt = $userDb->prepare("SELECT id, email, firstname, lastname FROM users WHERE id IN ($placeholders)");
+    $userStmt->execute($userIds);
+    $users = $userStmt->fetchAll();
+    
+    foreach ($users as $u) {
+        $userInfoMap[$u['id']] = $u;
+    }
+}
+
+// Build active checkouts array with user information
+$activeCheckouts = [];
 foreach ($checkouts as $checkout) {
-    $userStmt = $userDb->prepare("SELECT id, email, firstname, lastname FROM users WHERE id = ?");
-    $userStmt->execute([$checkout['user_id']]);
-    $userInfo = $userStmt->fetch();
+    $userInfo = $userInfoMap[$checkout['user_id']] ?? null;
     
     $userName = 'Unbekannt';
+    $userEmail = '';
+    
     if ($userInfo) {
+        $userEmail = $userInfo['email'] ?? '';
         if (!empty($userInfo['firstname']) && !empty($userInfo['lastname'])) {
             $userName = $userInfo['firstname'] . ' ' . $userInfo['lastname'];
         } elseif (!empty($userInfo['firstname'])) {
             $userName = $userInfo['firstname'];
-        } elseif (!empty($userInfo['email'])) {
-            $userName = explode('@', $userInfo['email'])[0];
+        } elseif (!empty($userEmail)) {
+            $userName = explode('@', $userEmail)[0];
         }
     }
     
@@ -85,7 +101,7 @@ foreach ($checkouts as $checkout) {
         'checkout_id' => $checkout['id'],
         'item_name' => $checkout['item_name'],
         'user_name' => $userName,
-        'user_email' => $userInfo['email'] ?? '',
+        'user_email' => $userEmail,
         'checked_out_at' => $checkout['checked_out_at'],
         'due_date' => $checkout['due_date'],
         'is_overdue' => !empty($checkout['due_date']) && strtotime($checkout['due_date']) < time()

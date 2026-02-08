@@ -70,6 +70,24 @@ if (empty($invoiceId)) {
     exit;
 }
 
+// Get invoice and check if it exists and is in approved status
+$invoice = Invoice::getById($invoiceId);
+
+if (!$invoice) {
+    http_response_code(404);
+    echo json_encode(['success' => false, 'error' => 'Rechnung nicht gefunden']);
+    exit;
+}
+
+if ($invoice['status'] !== 'approved') {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false, 
+        'error' => 'Nur genehmigte Rechnungen können als bezahlt markiert werden. Aktueller Status: ' . $invoice['status']
+    ]);
+    exit;
+}
+
 // Mark invoice as paid
 $result = Invoice::markAsPaid($invoiceId, $user['id']);
 
