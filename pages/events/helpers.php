@@ -11,23 +11,30 @@ if (!Auth::check()) {
 $user = Auth::user();
 $userRole = $_SESSION['user_role'] ?? 'member';
 
-// Get all events that need helpers
-$filters = [
-    'needs_helpers' => true,
-    'include_helpers' => true
-];
+// Initialize empty arrays for alumni
+$events = [];
+$mySlotIds = [];
 
-// Get events where helpers are needed (not for alumni)
-$events = Event::getEvents($filters, $userRole);
-
-// Filter to only show events that are open, planned, or running (not past)
-$events = array_filter($events, function($event) {
-    return in_array($event['status'], ['open', 'planned', 'running']);
-});
-
-// Get user's signups to show which slots they're already signed up for
-$userSignups = Event::getUserSignups($user['id']);
-$mySlotIds = array_column($userSignups, 'slot_id');
+// Only fetch events if user is not alumni (they can't access helper system)
+if ($userRole !== 'alumni') {
+    // Get all events that need helpers
+    $filters = [
+        'needs_helpers' => true,
+        'include_helpers' => true
+    ];
+    
+    // Get events where helpers are needed
+    $events = Event::getEvents($filters, $userRole);
+    
+    // Filter to only show events that are open, planned, or running (not past)
+    $events = array_filter($events, function($event) {
+        return in_array($event['status'], ['open', 'planned', 'running']);
+    });
+    
+    // Get user's signups to show which slots they're already signed up for
+    $userSignups = Event::getUserSignups($user['id']);
+    $mySlotIds = array_column($userSignups, 'slot_id');
+}
 
 $title = 'Helfersystem - IBC Intranet';
 ob_start();
@@ -143,7 +150,7 @@ ob_start();
                     
                     <!-- Event Description -->
                     <?php if (!empty($event['description'])): ?>
-                        <div class="mb-6 text-gray-700 dark:text-gray-300">
+                        <div class="mb-6 text-gray-800 dark:text-gray-300">
                             <?php echo nl2br(htmlspecialchars($event['description'])); ?>
                         </div>
                     <?php endif; ?>
