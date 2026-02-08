@@ -31,7 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $current_stock = intval($_POST['current_stock'] ?? 0);
     $min_stock = intval($_POST['min_stock'] ?? 0);
     $unit = $_POST['unit'] ?? 'Stück';
-    $unit_price = floatval($_POST['unit_price'] ?? 0);
+    // Handle German decimal format (comma) by replacing it with dot for float conversion
+    $unit_price = floatval(str_replace(',', '.', $_POST['unit_price'] ?? '0'));
     $notes = $_POST['notes'] ?? '';
     
     if (empty($name)) {

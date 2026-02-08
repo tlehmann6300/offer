@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../src/Auth.php';
+require_once __DIR__ . '/../../src/Database.php';
 require_once __DIR__ . '/../../includes/models/Inventory.php';
 require_once __DIR__ . '/../../includes/models/Event.php';
 require_once __DIR__ . '/../../includes/helpers.php';
@@ -65,6 +66,27 @@ if ($hasExtendedAccess) {
     $inStockStats = Inventory::getInStockStats();
     $checkedOutStats = Inventory::getCheckedOutStats();
     $writeOffStats = Inventory::getWriteOffStatsThisMonth();
+}
+
+// Check if user is board-level (board, head, or alumni_board)
+$isBoardLevel = in_array($user['role'], ['board', 'head', 'alumni_board']);
+
+// Get board-specific statistics
+if ($isBoardLevel) {
+    $db = Database::getUserDB();
+    
+    // Active Users (7 days) - users with last_login in the last 7 days
+    $stmt = $db->query("SELECT COUNT(*) as active_users FROM users WHERE last_login IS NOT NULL AND last_login > DATE_SUB(NOW(), INTERVAL 7 DAY)");
+    $activeUsersCount = $stmt->fetch()['active_users'] ?? 0;
+    
+    // Open Invitations - tokens that haven't expired
+    // Note: used_at column may not exist in all deployments, so we only check expiration
+    $stmt = $db->query("SELECT COUNT(*) as open_invitations FROM invitation_tokens WHERE expires_at > NOW()");
+    $openInvitationsCount = $stmt->fetch()['open_invitations'] ?? 0;
+    
+    // Total Users
+    $stmt = $db->query("SELECT COUNT(*) as total_users FROM users");
+    $totalUsersCount = $stmt->fetch()['total_users'] ?? 0;
 }
 
 // Security Audit - nur für Admins
@@ -354,7 +376,9 @@ endif;
     </div>
 </div>
 
-<!-- Dashboard Teaser - 3 Live Statistics Tiles -->
+<!-- Dashboard Teaser - Role-Based Statistics -->
+<?php if ($isBoardLevel): ?>
+<!-- Board-Level Statistics for board, head, alumni_board -->
 <div class="max-w-6xl mx-auto">
     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
         <i class="fas fa-chart-line text-purple-600 mr-2"></i>
@@ -362,37 +386,94 @@ endif;
     </h2>
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <!-- Tile 1: Available Items -->
+        <!-- Tile 1: Active Users (7 Days) -->
         <div class="card p-8 rounded-xl shadow-lg transition-all hover:shadow-2xl text-center bg-gradient-to-br from-white to-blue-50">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                <i class="fas fa-box-open text-3xl text-blue-600"></i>
+                <i class="fas fa-users text-3xl text-blue-600"></i>
             </div>
-            <h3 class="text-lg font-semibold text-gray-700 mb-2">Verfügbare Artikel</h3>
-            <p class="text-4xl font-bold text-blue-600 mb-2"><?php echo number_format($stats['total_items']); ?></p>
-            <p class="text-sm text-gray-500">Artikel im System</p>
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Aktive Nutzer (7 Tage)</h3>
+            <p class="text-4xl font-bold text-blue-600 mb-2"><?php echo number_format($activeUsersCount); ?></p>
+            <p class="text-sm text-gray-500">Mit Login in letzten 7 Tagen</p>
         </div>
         
-        <!-- Tile 2: Total Value -->
+        <!-- Tile 2: Open Invitations -->
         <div class="card p-8 rounded-xl shadow-lg transition-all hover:shadow-2xl text-center bg-gradient-to-br from-white to-green-50">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                <i class="fas fa-euro-sign text-3xl text-green-600"></i>
+                <i class="fas fa-envelope-open-text text-3xl text-green-600"></i>
             </div>
-            <h3 class="text-lg font-semibold text-gray-700 mb-2">Gesamtwert</h3>
-            <p class="text-4xl font-bold text-green-600 mb-2"><?php echo number_format($stats['total_value'], 2); ?> €</p>
-            <p class="text-sm text-gray-500">Inventarwert</p>
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Offene Einladungen</h3>
+            <p class="text-4xl font-bold text-green-600 mb-2"><?php echo number_format($openInvitationsCount); ?></p>
+            <p class="text-sm text-gray-500">Noch nicht verwendet</p>
         </div>
         
-        <!-- Tile 3: Recent Activity -->
+        <!-- Tile 3: Total Users -->
         <div class="card p-8 rounded-xl shadow-lg transition-all hover:shadow-2xl text-center bg-gradient-to-br from-white to-purple-50">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
-                <i class="fas fa-clock text-3xl text-purple-600"></i>
+                <i class="fas fa-user-friends text-3xl text-purple-600"></i>
             </div>
-            <h3 class="text-lg font-semibold text-gray-700 mb-2">Letzte 7 Tage</h3>
-            <p class="text-4xl font-bold text-purple-600 mb-2"><?php echo number_format($stats['recent_moves']); ?></p>
-            <p class="text-sm text-gray-500">Bewegungen</p>
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Gesamt Benutzer</h3>
+            <p class="text-4xl font-bold text-purple-600 mb-2"><?php echo number_format($totalUsersCount); ?></p>
+            <p class="text-sm text-gray-500">Registrierte Benutzer</p>
         </div>
     </div>
 </div>
+<?php else: ?>
+<!-- Basic Statistics for member, alumni, candidate -->
+<div class="max-w-6xl mx-auto">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+        <i class="fas fa-calendar-alt text-purple-600 mr-2"></i>
+        Anstehende Events
+    </h2>
+    
+    <div class="grid grid-cols-1 gap-6 mb-12">
+        <?php 
+        // Get upcoming events (upcoming status, ordered by start time)
+        $upcomingEventsForBasicUsers = Event::getEvents([
+            'status' => ['upcoming', 'registration_open'],
+            'start_date' => date('Y-m-d H:i:s')
+        ], $user['role']);
+        
+        // Limit to 5 events
+        $upcomingEventsForBasicUsers = array_slice($upcomingEventsForBasicUsers, 0, 5);
+        
+        if (!empty($upcomingEventsForBasicUsers)): 
+        ?>
+        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-blue-50">
+            <div class="space-y-4">
+                <?php foreach ($upcomingEventsForBasicUsers as $event): ?>
+                <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-gray-800 mb-1"><?php echo htmlspecialchars($event['title']); ?></h3>
+                        <p class="text-sm text-gray-600">
+                            <i class="fas fa-clock mr-1"></i>
+                            <?php echo date('d.m.Y H:i', strtotime($event['start_time'])); ?> Uhr
+                        </p>
+                        <?php if (!empty($event['location'])): ?>
+                        <p class="text-sm text-gray-500 mt-1">
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            <?php echo htmlspecialchars($event['location']); ?>
+                        </p>
+                        <?php endif; ?>
+                    </div>
+                    <a href="../events/view.php?id=<?php echo $event['id']; ?>" class="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all">
+                        Details
+                    </a>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php else: ?>
+        <div class="card p-8 rounded-xl shadow-lg text-center bg-gradient-to-br from-white to-gray-50">
+            <i class="fas fa-calendar-times text-4xl mb-3 text-gray-400"></i>
+            <p class="text-gray-600 text-lg">Keine anstehenden Events</p>
+            <a href="../events/index.php" class="inline-flex items-center mt-4 text-blue-600 hover:text-blue-700 font-semibold">
+                Alle Events ansehen <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>
+<?php endif; ?>
 
 <!-- Additional Info Cards -->
 <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">

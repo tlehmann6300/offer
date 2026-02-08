@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../src/Auth.php';
+require_once __DIR__ . '/../../includes/helpers.php';
 require_once __DIR__ . '/../../includes/handlers/GoogleAuthenticator.php';
 require_once __DIR__ . '/../../includes/models/User.php';
 require_once __DIR__ . '/../../includes/models/Alumni.php';
@@ -232,16 +233,7 @@ ob_start();
                 <label class="text-sm text-gray-500">Rolle</label>
                 <p class="text-lg">
                     <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full">
-                        <?php 
-                        $roleNames = [
-                            'admin' => 'Administrator',
-                            'board' => 'Vorstand',
-                            'manager' => 'Ressortleiter',
-                            'member' => 'Mitglied',
-                            'candidate' => 'Anwärter'
-                        ];
-                        echo $roleNames[$user['role']] ?? ucfirst($user['role']);
-                        ?>
+                        <?php echo translateRole($user['role']); ?>
                     </span>
                 </p>
             </div>

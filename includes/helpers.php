@@ -97,3 +97,24 @@ function asset_url($path) {
 function asset($path) {
     return asset_url($path);
 }
+
+/**
+ * Translate role from English to German
+ * 
+ * @param string $role Role identifier
+ * @return string German translation of the role
+ */
+function translateRole($role) {
+    $roleTranslations = [
+        'board' => 'Vorstand',
+        'head' => 'Vorstandsvorsitzender',
+        'member' => 'Mitglied',
+        'alumni' => 'Alumni',
+        'candidate' => 'Anwärter',
+        'alumni_board' => 'Alumni-Vorstand',
+        'manager' => 'Ressortleiter',
+        'admin' => 'Administrator'
+    ];
+    
+    return $roleTranslations[$role] ?? ucfirst($role);
+}
