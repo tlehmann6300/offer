@@ -151,11 +151,12 @@ class EasyVereinSync {
             foreach ($easyvereinItems as $evItem) {
                 try {
                     // Map API fields to our expected format
-                    // Map: name -> name, note -> description, pieces -> quantity (DB: quantity)
+                    // Map: name -> name, note -> description, pieces -> quantity (DB: quantity), price -> unit_price
                     $easyvereinId = $evItem['id'] ?? $evItem['EasyVereinID'] ?? null;
                     $name = $evItem['name'] ?? $evItem['Name'] ?? 'Unnamed Item';
                     $description = $evItem['note'] ?? $evItem['description'] ?? $evItem['Description'] ?? '';
                     $totalQuantity = $evItem['pieces'] ?? $evItem['quantity'] ?? $evItem['total_stock'] ?? $evItem['TotalQuantity'] ?? 0;
+                    $unitPrice = $evItem['price'] ?? $evItem['unit_price'] ?? 0;
                     $serialNumber = $evItem['serial_number'] ?? $evItem['SerialNumber'] ?? null;
                     $imagePath = $evItem['image'] ?? $evItem['image_path'] ?? null;
                     
@@ -182,6 +183,7 @@ class EasyVereinSync {
                             'name' => $name,
                             'description' => $description,
                             'quantity' => $totalQuantity,
+                            'unit_price' => $unitPrice,
                             'serial_number' => $serialNumber,
                             'is_archived_in_easyverein' => 0
                         ];
@@ -224,10 +226,11 @@ class EasyVereinSync {
                                 description,
                                 serial_number,
                                 quantity,
+                                unit_price,
                                 image_path,
                                 is_archived_in_easyverein,
                                 last_synced_at
-                            ) VALUES (?, ?, ?, ?, ?, ?, 0, NOW())
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, NOW())
                         ");
                         
                         $stmt->execute([
@@ -236,6 +239,7 @@ class EasyVereinSync {
                             $description,
                             $serialNumber,
                             $totalQuantity,
+                            $unitPrice,
                             $imagePath
                         ]);
                         
