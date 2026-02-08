@@ -23,7 +23,7 @@ if (!in_array($userRole, $allowedRoles)) {
 // Check if user has permission to mark invoices as paid
 // Only board members with 'Finanzen' in position can mark as paid
 $canMarkAsPaid = false;
-if (Auth::hasRole('board')) {
+if ($userRole === 'board') {
     $contentDb = Database::getContentDB();
     $stmt = $contentDb->prepare("
         SELECT position 
