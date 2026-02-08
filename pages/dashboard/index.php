@@ -295,20 +295,12 @@ endif;
         Schnellzugriff
     </h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <a href="../projects/index.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
+        <a href="../auth/profile.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
             <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <i class="fas fa-briefcase text-3xl"></i>
+                <i class="fas fa-user-circle text-3xl"></i>
             </div>
-            <h3 class="font-bold text-lg">Projekt melden</h3>
-            <p class="text-sm text-white/80 mt-1">Neues Projekt starten</p>
-        </a>
-
-        <a href="../events/index.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
-            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <i class="fas fa-door-open text-3xl"></i>
-            </div>
-            <h3 class="font-bold text-lg">Raum buchen</h3>
-            <p class="text-sm text-white/80 mt-1">Event erstellen</p>
+            <h3 class="font-bold text-lg">Mein Profil</h3>
+            <p class="text-sm text-white/80 mt-1">Profil anzeigen</p>
         </a>
 
         <a href="../inventory/index.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
@@ -319,12 +311,20 @@ endif;
             <p class="text-sm text-white/80 mt-1">Artikel suchen</p>
         </a>
 
-        <a href="../auth/profile.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
+        <a href="../events/index.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
             <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <i class="fas fa-user-circle text-3xl"></i>
+                <i class="fas fa-calendar text-3xl"></i>
             </div>
-            <h3 class="font-bold text-lg">Profil</h3>
-            <p class="text-sm text-white/80 mt-1">Einstellungen</p>
+            <h3 class="font-bold text-lg">Events ansehen</h3>
+            <p class="text-sm text-white/80 mt-1">Kommende Events</p>
+        </a>
+
+        <a href="../projects/index.php" class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-center">
+            <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-folder text-3xl"></i>
+            </div>
+            <h3 class="font-bold text-lg">Projekte</h3>
+            <p class="text-sm text-white/80 mt-1">Projekte anzeigen</p>
         </a>
     </div>
 </div>
