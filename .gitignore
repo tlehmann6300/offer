@@ -45,3 +45,4 @@ tests/sample_*.html
 test_smtp.php
 layout_preview.html
 *.backup
+verify_repair.php
