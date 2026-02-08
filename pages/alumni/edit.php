@@ -28,6 +28,7 @@ if (!in_array($userRole, $allowedRoles)) {
 }
 
 // Fetch existing profile for the current user only
+// Note: Users can only edit their own profile (fetched by $userId = current session user ID)
 $profile = Alumni::getProfileByUserId($userId);
 
 $message = '';

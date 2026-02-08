@@ -34,8 +34,9 @@ if ($userRole === 'board') {
     $profile = $stmt->fetch();
     
     if ($profile && !empty($profile['position'])) {
-        // Check if position contains 'Finanzen' (case-insensitive matching with stripos)
-        if (stripos($profile['position'], 'Finanzen') !== false) {
+        // Check if position contains 'Finanzen' as a word (not as part of another word)
+        // Use word boundary matching to avoid false positives like 'Nicht-Finanzen'
+        if (preg_match('/\bFinanzen\b/i', $profile['position'])) {
             $canMarkAsPaid = true;
         }
     }
