@@ -7,6 +7,12 @@
 class Inventory {
     
     /**
+     * Master Data fields that are synced with EasyVerein
+     * These fields are protected from manual editing for synced items
+     */
+    const MASTER_DATA_FIELDS = ['name', 'description', 'quantity', 'unit_price'];
+    
+    /**
      * Get item by ID
      */
     public static function getById($id) {
@@ -99,6 +105,35 @@ class Inventory {
             $whereSQL = ' WHERE ' . implode(' AND ', $whereClauses);
         }
         
+        // Build ORDER BY clause based on sort parameter
+        // Using a whitelist switch statement to prevent SQL injection
+        // Only predefined column/direction combinations are allowed
+        $orderBy = 'i.name ASC';
+        if (!empty($filters['sort'])) {
+            switch ($filters['sort']) {
+                case 'name_asc':
+                    $orderBy = 'i.name ASC';
+                    break;
+                case 'name_desc':
+                    $orderBy = 'i.name DESC';
+                    break;
+                case 'quantity_asc':
+                    $orderBy = 'i.quantity ASC';
+                    break;
+                case 'quantity_desc':
+                    $orderBy = 'i.quantity DESC';
+                    break;
+                case 'price_asc':
+                    $orderBy = 'i.unit_price ASC';
+                    break;
+                case 'price_desc':
+                    $orderBy = 'i.unit_price DESC';
+                    break;
+                default:
+                    $orderBy = 'i.name ASC';
+            }
+        }
+        
         // SQL query with correct table and column names
         // Note: quantity is an alias for quantity for backward compatibility
         // available_quantity = quantity - active rentals
@@ -117,7 +152,7 @@ class Inventory {
                          i.status, i.quantity, i.min_stock, i.unit, i.unit_price, i.purchase_date, 
                          i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at, i.is_archived_in_easyverein,
                          c.name, c.color, l.name
-                ORDER BY i.name ASC";
+                ORDER BY " . $orderBy;
         
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
@@ -160,8 +195,11 @@ class Inventory {
      * Update item
      * 
      * Protects EasyVerein-synced items from direct Master Data modifications
-     * Master Data fields: name, description, quantity
+     * Master Data fields are defined in self::MASTER_DATA_FIELDS constant
      * Local Operational fields: location_id, notes, category_id, etc.
+     * 
+     * When updating items with easyverein_id, triggers bidirectional sync to EasyVerein API.
+     * If API sync fails, local update still proceeds but a warning is logged.
      * 
      * @param int $id Item ID
      * @param array $data Fields to update
@@ -173,24 +211,31 @@ class Inventory {
     public static function update($id, $data, $userId, $isSyncUpdate = false) {
         $db = Database::getContentDB();
         
+        // Get item info including easyverein_id
+        $stmt = $db->prepare("SELECT easyverein_id FROM inventory_items WHERE id = ?");
+        $stmt->execute([$id]);
+        $item = $stmt->fetch();
+        
         // Check if this item is synced with EasyVerein (unless this IS a sync update)
-        if (!$isSyncUpdate) {
-            $stmt = $db->prepare("SELECT easyverein_id FROM inventory_items WHERE id = ?");
-            $stmt->execute([$id]);
-            $item = $stmt->fetch();
+        if (!$isSyncUpdate && $item && !empty($item['easyverein_id'])) {
+            // This item is synced with EasyVerein
+            // Check if trying to modify Master Data fields
+            $attemptedMasterDataChanges = array_intersect(array_keys($data), self::MASTER_DATA_FIELDS);
             
-            if ($item && !empty($item['easyverein_id'])) {
-                // This item is synced with EasyVerein
-                // Check if trying to modify Master Data fields
-                $masterDataFields = ['name', 'description', 'quantity'];
-                $attemptedMasterDataChanges = array_intersect(array_keys($data), $masterDataFields);
+            if (!empty($attemptedMasterDataChanges)) {
+                // Trigger bidirectional sync to EasyVerein
+                require_once __DIR__ . '/../services/EasyVereinSync.php';
                 
-                if (!empty($attemptedMasterDataChanges)) {
-                    throw new Exception(
-                        "Cannot modify Master Data fields (" . implode(', ', $attemptedMasterDataChanges) . ") " .
-                        "for EasyVerein-synced items. These fields are managed by EasyVerein sync. " .
-                        "You can only modify Local Operational Data (location_id, notes, category_id, etc.)."
-                    );
+                // Extract only the Master Data fields for sync
+                $syncData = array_intersect_key($data, array_flip(self::MASTER_DATA_FIELDS));
+                
+                $syncResult = EasyVereinSync::updateItem($item['easyverein_id'], $syncData);
+                
+                if (!$syncResult['success']) {
+                    // Log warning but allow local update to proceed
+                    error_log('Warning: Failed to sync update to EasyVerein (Item ID: ' . $id . ', EV ID: ' . $item['easyverein_id'] . '): ' . $syncResult['error']);
+                    // Optionally, you could throw an exception here to block the update
+                    // throw new Exception("Failed to sync with EasyVerein: " . $syncResult['error']);
                 }
             }
         }
