@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_rental'])) {
         
         // Update inventory stock
         $newStock = $item['current_stock'] - $amount;
-        $stmt = $db->prepare("UPDATE inventory SET current_stock = ? WHERE id = ?");
+        $stmt = $db->prepare("UPDATE inventory_items SET current_stock = ? WHERE id = ?");
         $stmt->execute([$newStock, $itemId]);
         
         // Log the change
@@ -148,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['return_rental'])) {
         $returnAmount = $isDefective ? 0 : $rental['amount'];
         $newStock = $rental['current_stock'] + $returnAmount;
         
-        $stmt = $db->prepare("UPDATE inventory SET current_stock = ? WHERE id = ?");
+        $stmt = $db->prepare("UPDATE inventory_items SET current_stock = ? WHERE id = ?");
         $stmt->execute([$newStock, $rental['item_id']]);
         
         // Log the change
