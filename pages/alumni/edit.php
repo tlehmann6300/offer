@@ -5,10 +5,11 @@ require_once __DIR__ . '/../../includes/models/Alumni.php';
 require_once __DIR__ . '/../../includes/utils/SecureImageUpload.php';
 
 // Access Control: Users can edit their own profile based on their role
-// - Alumni and alumni_board roles can edit their profiles (alumni status)
-// - Board, head, candidate, member roles can edit their profiles (active member status)
-// - Admin can edit any profile
+// - Alumni and alumni_board roles can edit their own profiles (alumni status)
+// - Board, head, candidate, member roles can edit their own profiles (active member status)
+// - Admin can edit their own profile
 // Note: All profiles use the alumni_profiles table regardless of user role
+// Note: This page only allows users to edit their own profile (no cross-user editing)
 if (!Auth::check()) {
     header('Location: ../auth/login.php');
     exit;
@@ -27,8 +28,7 @@ if (!in_array($userRole, $allowedRoles)) {
     exit;
 }
 
-// Fetch existing profile for the current user only
-// Note: Users can only edit their own profile (fetched by $userId = current session user ID)
+// Fetch profile for current user only ($userId from session) - this prevents cross-user edits
 $profile = Alumni::getProfileByUserId($userId);
 
 $message = '';
