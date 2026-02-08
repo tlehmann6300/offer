@@ -14,14 +14,15 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     role ENUM('board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
         NOT NULL DEFAULT 'member',
-    is_alumni_validated TINYINT(1) NOT NULL DEFAULT 0,
+    -- 'BOOLEAN' ersetzt 'TINYINT(1)' um Warnings zu vermeiden
+    is_alumni_validated BOOLEAN NOT NULL DEFAULT 0, 
     last_login DATETIME DEFAULT NULL,
     failed_login_attempts INT NOT NULL DEFAULT 0,
     locked_until DATETIME DEFAULT NULL,
-    is_locked_permanently TINYINT(1) NOT NULL DEFAULT 0,
-    tfa_enabled TINYINT(1) NOT NULL DEFAULT 0,
-    pending_email_update_request TINYINT(1) NOT NULL DEFAULT 0,
-    prompt_profile_review TINYINT(1) NOT NULL DEFAULT 0,
+    is_locked_permanently BOOLEAN NOT NULL DEFAULT 0,
+    tfa_enabled BOOLEAN NOT NULL DEFAULT 0,
+    pending_email_update_request BOOLEAN NOT NULL DEFAULT 0,
+    prompt_profile_review BOOLEAN NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
@@ -98,4 +99,3 @@ CREATE TABLE IF NOT EXISTS user_sessions (
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
   COMMENT='Optional session tracking for security auditing';
-
