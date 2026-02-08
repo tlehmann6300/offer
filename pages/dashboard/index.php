@@ -205,7 +205,7 @@ function dismissProfileReviewPrompt() {
                 <div class="flex items-start">
                     <i class="fas fa-info-circle text-blue-600 mt-1 mr-3"></i>
                     <p class="text-sm text-gray-700">
-                        Die 2-Faktor-Authentifizierung macht Ihr Konto deutlich sicherer, indem bei der Anmeldung ein zusätzlicher Code erforderlich ist.
+                        Die 2-Faktor-Authentifizierung macht dein Konto deutlich sicherer, indem bei der Anmeldung ein zusätzlicher Code erforderlich ist.
                     </p>
                 </div>
             </div>
