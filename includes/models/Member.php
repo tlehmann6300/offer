@@ -85,11 +85,15 @@ class Member {
         
         // Step 3: Query User DB to get user information (email, role) for these user_ids
         // Apply role filter at this stage
-        $roleList = "'" . implode("', '", self::ACTIVE_ROLES) . "'";
-        $userWhereClauses = ["u.id IN (" . implode(',', array_fill(0, count($userIds), '?')) . ")", "u.role IN ($roleList)"];
+        $userWhereClauses = ["u.id IN (" . implode(',', array_fill(0, count($userIds), '?')) . ")"];
         $userParams = $userIds;
         
-        // Add role filter if provided
+        // Add role filter for ACTIVE_ROLES (using placeholders for safety)
+        $rolePlaceholders = implode(',', array_fill(0, count(self::ACTIVE_ROLES), '?'));
+        $userWhereClauses[] = "u.role IN ($rolePlaceholders)";
+        $userParams = array_merge($userParams, self::ACTIVE_ROLES);
+        
+        // Add specific role filter if provided
         if ($filterRole !== null && $filterRole !== '') {
             $userWhereClauses[] = "u.role = ?";
             $userParams[] = $filterRole;
