@@ -319,11 +319,11 @@ ob_start();
                 <tr class="hover:bg-gray-50 <?php echo $item['is_archived_in_easyverein'] ? 'opacity-60' : ''; ?>">
                     <!-- Image -->
                     <td class="px-4 py-4 whitespace-nowrap">
-                        <div class="h-16 w-16 flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-100 rounded <?php echo $item['is_archived_in_easyverein'] ? 'grayscale' : ''; ?>">
+                        <div class="h-16 w-16 flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-100 rounded <?php echo $item['is_archived_in_easyverein'] ? 'grayscale' : ''; ?>" <?php if (empty($item['image_path'])): ?>aria-label="Kein Bild verfügbar"<?php endif; ?>>
                             <?php if (!empty($item['image_path'])): ?>
                             <img src="/<?php echo htmlspecialchars($item['image_path']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="h-full w-full object-cover rounded">
                             <?php else: ?>
-                            <span class="text-gray-400 text-xs">Kein Bild</span>
+                            <i class="fas fa-image text-gray-400 text-2xl" aria-hidden="true"></i>
                             <?php endif; ?>
                         </div>
                     </td>
