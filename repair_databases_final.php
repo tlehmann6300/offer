@@ -190,9 +190,9 @@ try {
 echo "\n=== INVOICE DATABASE (dbs15251284) ===\n";
 try {
     $invoiceDb = new PDO(
-        "mysql:host=" . DB_INVOICE_HOST . ";port=" . DB_INVOICE_PORT . ";dbname=" . DB_INVOICE_NAME . ";charset=utf8mb4",
-        DB_INVOICE_USER,
-        DB_INVOICE_PASS,
+        "mysql:host=" . DB_RECH_HOST . ";port=" . DB_RECH_PORT . ";dbname=" . DB_RECH_NAME . ";charset=utf8mb4",
+        DB_RECH_USER,
+        DB_RECH_PASS,
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
     echo "✅ Connected to Invoice Database\n\n";
