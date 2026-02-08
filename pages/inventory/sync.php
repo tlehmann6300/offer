@@ -15,7 +15,7 @@ if (!Auth::check()) {
 }
 
 // Only admin and board members can perform synchronization
-if (!AuthHandler::hasRole('admin') && !AuthHandler::hasRole('board')) {
+if (!AuthHandler::isAdmin()) {
     $_SESSION['error'] = 'Sie haben keine Berechtigung, diese Aktion auszuführen.';
     header('Location: index.php');
     exit;
