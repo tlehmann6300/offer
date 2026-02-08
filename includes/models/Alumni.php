@@ -11,6 +11,27 @@ require_once __DIR__ . '/../database.php';
 class Alumni {
     
     /**
+     * Get profile by primary key ID
+     * 
+     * @param int $id The primary key ID
+     * @return array|false Profile data or false if not found
+     */
+    public static function getProfileById(int $id) {
+        $db = Database::getContentDB();
+        $stmt = $db->prepare("
+            SELECT id, user_id, first_name, last_name, email, mobile_phone, 
+                   linkedin_url, xing_url, industry, company, position, 
+                   study_program, semester, angestrebter_abschluss, 
+                   degree, graduation_year,
+                   image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
+            FROM alumni_profiles 
+            WHERE id = ?
+        ");
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    }
+    
+    /**
      * Get profile by user ID
      * 
      * @param int $userId The user ID

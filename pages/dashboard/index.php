@@ -195,10 +195,10 @@ function dismissProfileReviewPrompt() {
         <!-- Modal Body -->
         <div class="px-6 py-6">
             <p class="text-gray-700 text-lg mb-2 font-semibold">
-                Erhöhen Sie Ihre Sicherheit!
+                Erhöhe deine Sicherheit!
             </p>
             <p class="text-gray-600 mb-6">
-                Aktivieren Sie jetzt die 2-Faktor-Authentifizierung für zusätzlichen Schutz Ihres Kontos.
+                Aktiviere jetzt die 2-Faktor-Authentifizierung für zusätzlichen Schutz deines Kontos.
             </p>
             
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -271,7 +271,7 @@ endif;
                 </div>
             </div>
             <?php if ($openTasksCount > 0): ?>
-            <p class="text-gray-600 mb-3">Sie haben aktuell <?php echo $openTasksCount; ?> offene Ausleihen</p>
+            <p class="text-gray-600 mb-3">Du hast aktuell <?php echo $openTasksCount; ?> offene Ausleihen</p>
             <a href="../inventory/my_rentals.php" class="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold">
                 Ausleihen verwalten <i class="fas fa-arrow-right ml-2"></i>
             </a>
@@ -319,7 +319,7 @@ endif;
             Willkommen im IBC Intranet
         </h1>
         <p class="text-lg md:text-xl text-gray-600 mb-8">
-            Verwalten Sie Ihr Inventar effizient und behalten Sie alles im Blick
+            Verwalte dein Inventar effizient und behalte alles im Blick
         </p>
         
         <!-- Primary Action Buttons -->
@@ -590,7 +590,7 @@ endif;
             <div class="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Wert im Lager</p>
-                    <p class="text-2xl font-bold text-purple-700"><?php echo number_format($inStockStats['total_value_in_stock'], 2); ?> €</p>
+                    <p class="text-2xl font-bold text-purple-700"><?php echo number_format((float)$inStockStats['total_value_in_stock'], 2); ?> €</p>
                 </div>
                 <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                     <i class="fas fa-euro-sign text-purple-600 text-xl"></i>
