@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../database.php';
 
-class Alumni {
+class Alumni extends Database {
     
     /**
      * Get profile by primary key ID
@@ -45,6 +45,103 @@ class Alumni {
     }
     
     /**
+     * Create a new alumni profile
+     * 
+     * @param array $data Profile data to create
+     * @return bool True on success
+     * @throws Exception On database error
+     */
+    public static function create(array $data): bool {
+        $db = Database::getContentDB();
+        
+        // Sanitize image_path if provided
+        if (isset($data['image_path'])) {
+            $data['image_path'] = self::sanitizeImagePath($data['image_path']);
+        }
+        
+        // Required fields validation
+        $requiredFields = ['user_id', 'first_name', 'last_name', 'email'];
+        foreach ($requiredFields as $field) {
+            if (empty($data[$field])) {
+                throw new Exception("Missing required field: $field");
+            }
+        }
+        
+        $stmt = $db->prepare("
+            INSERT INTO alumni_profiles 
+            (user_id, first_name, last_name, email, mobile_phone, 
+             linkedin_url, xing_url, industry, company, position, image_path,
+             study_program, semester, angestrebter_abschluss, 
+             degree, graduation_year)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        
+        return $stmt->execute([
+            $data['user_id'],
+            $data['first_name'],
+            $data['last_name'],
+            $data['email'],
+            $data['mobile_phone'] ?? null,
+            $data['linkedin_url'] ?? null,
+            $data['xing_url'] ?? null,
+            $data['industry'] ?? null,
+            $data['company'] ?? null,
+            $data['position'] ?? null,
+            $data['image_path'] ?? null,
+            $data['study_program'] ?? null,
+            $data['semester'] ?? null,
+            $data['angestrebter_abschluss'] ?? null,
+            $data['degree'] ?? null,
+            $data['graduation_year'] ?? null
+        ]);
+    }
+    
+    /**
+     * Update an existing alumni profile
+     * 
+     * @param int $userId The user ID
+     * @param array $data Profile data to update
+     * @return bool True on success
+     * @throws Exception On database error
+     */
+    public static function update(int $userId, array $data): bool {
+        $db = Database::getContentDB();
+        
+        // Sanitize image_path if provided
+        if (isset($data['image_path'])) {
+            $data['image_path'] = self::sanitizeImagePath($data['image_path']);
+        }
+        
+        $fields = [];
+        $values = [];
+        
+        $allowedFields = [
+            'first_name', 'last_name', 'email', 'mobile_phone',
+            'linkedin_url', 'xing_url', 'industry', 'company', 
+            'position', 'image_path', 'study_program', 
+            'semester', 'angestrebter_abschluss', 'degree', 
+            'graduation_year'
+        ];
+        
+        foreach ($allowedFields as $field) {
+            if (array_key_exists($field, $data)) {
+                $fields[] = "$field = ?";
+                $values[] = $data[$field];
+            }
+        }
+        
+        if (empty($fields)) {
+            return true; // No fields to update
+        }
+        
+        $values[] = $userId;
+        $sql = "UPDATE alumni_profiles SET " . implode(', ', $fields) . " WHERE user_id = ?";
+        
+        $stmt = $db->prepare($sql);
+        return $stmt->execute($values);
+    }
+    
+    /**
      * Update or create profile (upsert)
      * 
      * @param int $userId The user ID
@@ -53,82 +150,14 @@ class Alumni {
      * @throws Exception On database error
      */
     public static function updateOrCreateProfile(int $userId, array $data): bool {
-        $db = Database::getContentDB();
-        
-        // Sanitize image_path if provided
-        if (isset($data['image_path'])) {
-            $data['image_path'] = self::sanitizeImagePath($data['image_path']);
-        }
-        
         // Check if profile exists
         $existing = self::getProfileByUserId($userId);
         
         if ($existing) {
-            // Update existing profile
-            $fields = [];
-            $values = [];
-            
-            $allowedFields = [
-                'first_name', 'last_name', 'email', 'mobile_phone',
-                'linkedin_url', 'xing_url', 'industry', 'company', 
-                'position', 'image_path', 'study_program', 
-                'semester', 'angestrebter_abschluss', 'degree', 
-                'graduation_year'
-            ];
-            
-            foreach ($allowedFields as $field) {
-                if (array_key_exists($field, $data)) {
-                    $fields[] = "$field = ?";
-                    $values[] = $data[$field];
-                }
-            }
-            
-            if (empty($fields)) {
-                return true; // No fields to update
-            }
-            
-            $values[] = $userId;
-            $sql = "UPDATE alumni_profiles SET " . implode(', ', $fields) . " WHERE user_id = ?";
-            
-            $stmt = $db->prepare($sql);
-            return $stmt->execute($values);
+            return self::update($userId, $data);
         } else {
-            // Insert new profile - only first_name, last_name, email are required
-            // company and position are optional now for candidates/members
-            $requiredFields = ['first_name', 'last_name', 'email'];
-            foreach ($requiredFields as $field) {
-                if (empty($data[$field])) {
-                    throw new Exception("Missing required field: $field");
-                }
-            }
-            
-            $stmt = $db->prepare("
-                INSERT INTO alumni_profiles 
-                (user_id, first_name, last_name, email, mobile_phone, 
-                 linkedin_url, xing_url, industry, company, position, image_path,
-                 study_program, semester, angestrebter_abschluss, 
-                 degree, graduation_year)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ");
-            
-            return $stmt->execute([
-                $userId,
-                $data['first_name'],
-                $data['last_name'],
-                $data['email'],
-                $data['mobile_phone'] ?? null,
-                $data['linkedin_url'] ?? null,
-                $data['xing_url'] ?? null,
-                $data['industry'] ?? null,
-                $data['company'] ?? null,
-                $data['position'] ?? null,
-                $data['image_path'] ?? null,
-                $data['study_program'] ?? null,
-                $data['semester'] ?? null,
-                $data['angestrebter_abschluss'] ?? null,
-                $data['degree'] ?? null,
-                $data['graduation_year'] ?? null
-            ]);
+            $data['user_id'] = $userId;
+            return self::create($data);
         }
     }
     
@@ -166,7 +195,7 @@ class Alumni {
     
     /**
      * Search profiles with filters
-     * Only shows profiles where user role is 'alumni'
+     * Returns all alumni profiles matching search criteria
      * 
      * @param array $filters Array of filters: search (name/position/company/industry), industry
      * @return array Array of matching profiles
@@ -202,7 +231,7 @@ class Alumni {
         
         $whereSQL = !empty($whereClauses) ? ' WHERE ' . implode(' AND ', $whereClauses) : '';
         
-        // Step 1: Fetch alumni profiles from content DB
+        // Fetch alumni profiles from content DB (no cross-DB queries)
         $sql = "
             SELECT ap.id, ap.user_id, ap.first_name, ap.last_name, ap.email, ap.mobile_phone, 
                    ap.linkedin_url, ap.xing_url, ap.industry, ap.company, ap.position, 
@@ -216,35 +245,6 @@ class Alumni {
         $stmt = $contentDb->prepare($sql);
         $stmt->execute($params);
         $profiles = $stmt->fetchAll();
-        
-        // Step 2: Filter by user role 'alumni' by fetching from users DB
-        if (!empty($profiles)) {
-            $userDb = Database::getUserDB();
-            $userIds = array_column($profiles, 'user_id');
-            
-            // Create placeholders for IN clause
-            $placeholders = implode(',', array_fill(0, count($userIds), '?'));
-            
-            // Fetch users with role 'alumni'
-            $userStmt = $userDb->prepare("
-                SELECT id, role 
-                FROM users 
-                WHERE id IN ($placeholders) AND role = 'alumni'
-            ");
-            $userStmt->execute($userIds);
-            $alumniUserIds = array_column($userStmt->fetchAll(), 'id');
-            
-            // Convert to associative array for O(1) lookup performance
-            $alumniUserIdsMap = array_flip($alumniUserIds);
-            
-            // Filter profiles to only include those with alumni role
-            $profiles = array_filter($profiles, function($profile) use ($alumniUserIdsMap) {
-                return isset($alumniUserIdsMap[$profile['user_id']]);
-            });
-            
-            // Re-index array to remove gaps
-            $profiles = array_values($profiles);
-        }
         
         return $profiles;
     }

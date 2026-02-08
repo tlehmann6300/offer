@@ -95,7 +95,7 @@ $contentDb = Database::getContentDB();
 $stmt = $contentDb->query("
     SELECT e.id, e.title, e.description, e.start_time, e.end_time, e.location
     FROM events e
-    WHERE e.needs_helpers = 1 
+    WHERE e.helper_slots > 0
     AND e.status IN ('open', 'planned')
     AND e.end_time >= NOW()
     ORDER BY e.start_time ASC
