@@ -210,7 +210,7 @@ class Alumni {
             $userIds = array_column($profiles, 'user_id');
             
             // Create placeholders for IN clause
-            $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
+            $placeholders = implode(',', array_fill(0, count($userIds), '?'));
             
             // Fetch users with role 'alumni'
             $userStmt = $userDb->prepare("
@@ -221,9 +221,12 @@ class Alumni {
             $userStmt->execute($userIds);
             $alumniUserIds = array_column($userStmt->fetchAll(), 'id');
             
+            // Convert to associative array for O(1) lookup performance
+            $alumniUserIdsMap = array_flip($alumniUserIds);
+            
             // Filter profiles to only include those with alumni role
-            $profiles = array_filter($profiles, function($profile) use ($alumniUserIds) {
-                return in_array($profile['user_id'], $alumniUserIds);
+            $profiles = array_filter($profiles, function($profile) use ($alumniUserIdsMap) {
+                return isset($alumniUserIdsMap[$profile['user_id']]);
             });
             
             // Re-index array to remove gaps
