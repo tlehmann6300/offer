@@ -53,15 +53,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Create directory if it doesn't exist
                 if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0755, true);
+                    mkdir($uploadDir, 0750, true);
                 }
                 
-                // Validate file type
-                $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-                $fileType = $_FILES['profile_picture']['type'];
+                // Validate file extension
+                $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                $extension = strtolower(pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION));
                 
-                if (!in_array($fileType, $allowedTypes)) {
+                if (!in_array($extension, $allowedExtensions)) {
                     throw new Exception('Ungültiger Dateityp. Nur JPG, PNG, GIF und WEBP sind erlaubt.');
+                }
+                
+                // Validate actual file type using finfo
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mimeType = finfo_file($finfo, $_FILES['profile_picture']['tmp_name']);
+                finfo_close($finfo);
+                
+                $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!in_array($mimeType, $allowedMimeTypes)) {
+                    throw new Exception('Ungültiger Dateityp. Die Datei ist kein gültiges Bild.');
                 }
                 
                 // Validate file size (max 5MB)
@@ -69,16 +79,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception('Datei ist zu groß. Maximale Größe ist 5MB.');
                 }
                 
-                // Generate unique filename
-                $extension = pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
+                // Verify it's a valid image
+                $imageInfo = @getimagesize($_FILES['profile_picture']['tmp_name']);
+                if ($imageInfo === false) {
+                    throw new Exception('Die Datei ist kein gültiges Bild.');
+                }
+                
+                // Generate unique filename with validated extension
                 $filename = 'profile_' . $user['id'] . '_' . time() . '.' . $extension;
                 $targetPath = $uploadDir . $filename;
                 
                 // Move uploaded file
                 if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetPath)) {
                     // Delete old profile picture if exists
-                    if (!empty($profile['image_path']) && file_exists(__DIR__ . '/../../' . $profile['image_path'])) {
-                        @unlink(__DIR__ . '/../../' . $profile['image_path']);
+                    if (!empty($profile['image_path'])) {
+                        $oldFilePath = __DIR__ . '/../../' . $profile['image_path'];
+                        // Validate that the old file is within the uploads directory
+                        $realUploadDir = realpath(__DIR__ . '/../../uploads/');
+                        $realOldFile = realpath($oldFilePath);
+                        
+                        if ($realOldFile && $realUploadDir && strpos($realOldFile, $realUploadDir) === 0 && file_exists($realOldFile)) {
+                            if (!unlink($realOldFile)) {
+                                error_log("Failed to delete old profile picture: " . $oldFilePath);
+                            }
+                        }
                     }
                     
                     $profileData['image_path'] = 'uploads/profile/' . $filename;
