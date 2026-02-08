@@ -289,10 +289,10 @@ ob_start();
     </form>
 </div>
 
-<!-- Items Grid (Mobile-First Card Layout) -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Items Table Layout -->
+<div class="card overflow-hidden">
     <?php if (empty($items)): ?>
-    <div class="col-span-full card p-12 text-center">
+    <div class="p-12 text-center">
         <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
         <p class="text-gray-500 text-lg">Keine Artikel gefunden</p>
         <?php if (AuthHandler::isAdmin()): ?>
@@ -302,81 +302,102 @@ ob_start();
         <?php endif; ?>
     </div>
     <?php else: ?>
-    <?php foreach ($items as $item): ?>
-    <div class="card overflow-hidden card-hover <?php echo $item['is_archived_in_easyverein'] ? 'opacity-60' : ''; ?>">
-        <!-- Image -->
-        <div class="h-48 bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center <?php echo $item['is_archived_in_easyverein'] ? 'grayscale' : ''; ?>">
-            <?php if ($item['image_path']): ?>
-            <img src="/<?php echo htmlspecialchars($item['image_path']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="w-full h-full object-cover">
-            <?php else: ?>
-            <i class="fas fa-box-open text-6xl text-purple-300"></i>
-            <?php endif; ?>
-        </div>
-
-        <!-- Content -->
-        <div class="p-4">
-            <h3 class="font-bold text-lg text-gray-800 mb-2 line-clamp-2"><?php echo htmlspecialchars($item['name']); ?></h3>
-            
-            <!-- Category & Location -->
-            <div class="flex flex-wrap gap-2 mb-3">
-                <?php if ($item['category_name']): ?>
-                <span class="px-2 py-1 text-xs rounded-full" style="background-color: <?php echo htmlspecialchars($item['category_color']); ?>20; color: <?php echo htmlspecialchars($item['category_color']); ?>">
-                    <?php echo htmlspecialchars($item['category_name']); ?>
-                </span>
-                <?php endif; ?>
-                <?php if ($item['location_name']): ?>
-                <span class="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-full">
-                    <i class="fas fa-map-marker-alt mr-1"></i><?php echo htmlspecialchars($item['location_name']); ?>
-                </span>
-                <?php endif; ?>
-                <!-- Sync Status Badge -->
-                <?php if (!empty($item['easyverein_id'])): ?>
-                <span class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full" title="Synchronized with EasyVerein">
-                    <i class="fas fa-sync-alt mr-1"></i>Synced
-                </span>
-                <?php else: ?>
-                <span class="px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full" title="Local item only">
-                    <i class="fas fa-desktop mr-1"></i>Local only
-                </span>
-                <?php endif; ?>
-                <!-- Archived Badge -->
-                <?php if ($item['is_archived_in_easyverein']): ?>
-                <span class="px-2 py-1 text-xs bg-red-100 text-red-700 rounded-full" title="Archived in EasyVerein">
-                    <i class="fas fa-archive mr-1"></i>Archiviert
-                </span>
-                <?php endif; ?>
-            </div>
-
-            <!-- Stock Info -->
-            <div class="mb-4">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm text-gray-600">Bestand:</span>
-                    <span class="font-bold text-lg <?php echo $item['quantity'] <= $item['min_stock'] && $item['min_stock'] > 0 ? 'text-red-600' : 'text-gray-800'; ?>">
-                        <?php echo $item['quantity']; ?> <?php echo htmlspecialchars($item['unit']); ?>
-                    </span>
-                </div>
-                <?php if ($item['quantity'] <= $item['min_stock'] && $item['min_stock'] > 0): ?>
-                <div class="text-xs text-red-600 flex items-center">
-                    <i class="fas fa-exclamation-triangle mr-1"></i>
-                    Unter Mindestbestand (<?php echo $item['min_stock']; ?>)
-                </div>
-                <?php endif; ?>
-            </div>
-
-            <!-- Actions -->
-            <div class="flex space-x-2">
-                <a href="view.php?id=<?php echo $item['id']; ?>" class="flex-1 text-center px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm">
-                    <i class="fas fa-eye mr-1"></i>Details
-                </a>
-                <?php if (Auth::hasPermission('manager')): ?>
-                <a href="edit.php?id=<?php echo $item['id']; ?>" class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
-                    <i class="fas fa-edit"></i>
-                </a>
-                <?php endif; ?>
-            </div>
-        </div>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bild</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Artikel</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Anzahl</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preis</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lagerort</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aktionen</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                <?php foreach ($items as $item): ?>
+                <tr class="hover:bg-gray-50 <?php echo $item['is_archived_in_easyverein'] ? 'opacity-60' : ''; ?>">
+                    <!-- Image -->
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <div class="h-16 w-16 flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-100 rounded <?php echo $item['is_archived_in_easyverein'] ? 'grayscale' : ''; ?>">
+                            <?php if (!empty($item['image_path'])): ?>
+                            <img src="/<?php echo htmlspecialchars($item['image_path']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="h-full w-full object-cover rounded">
+                            <?php else: ?>
+                            <span class="text-gray-400 text-xs">Kein Bild</span>
+                            <?php endif; ?>
+                        </div>
+                    </td>
+                    
+                    <!-- Artikel -->
+                    <td class="px-4 py-4">
+                        <div class="flex flex-col">
+                            <span class="font-medium text-gray-900"><?php echo htmlspecialchars($item['name']); ?></span>
+                            <?php if ($item['category_name']): ?>
+                            <span class="text-xs text-gray-500 mt-1">
+                                <i class="fas fa-tag mr-1"></i><?php echo htmlspecialchars($item['category_name']); ?>
+                            </span>
+                            <?php endif; ?>
+                            <div class="flex gap-1 mt-1">
+                                <?php if (!empty($item['easyverein_id'])): ?>
+                                <span class="px-1.5 py-0.5 text-xs bg-blue-100 text-blue-700 rounded" title="Synchronized with EasyVerein">
+                                    <i class="fas fa-sync-alt"></i>
+                                </span>
+                                <?php endif; ?>
+                                <?php if ($item['is_archived_in_easyverein']): ?>
+                                <span class="px-1.5 py-0.5 text-xs bg-red-100 text-red-700 rounded" title="Archived in EasyVerein">
+                                    <i class="fas fa-archive"></i>
+                                </span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <!-- Anzahl -->
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <span class="font-semibold <?php echo $item['quantity'] <= $item['min_stock'] && $item['min_stock'] > 0 ? 'text-red-600' : 'text-gray-900'; ?>">
+                            <?php echo $item['quantity']; ?> <?php echo htmlspecialchars($item['unit']); ?>
+                        </span>
+                        <?php if ($item['quantity'] <= $item['min_stock'] && $item['min_stock'] > 0): ?>
+                        <div class="text-xs text-red-600 flex items-center mt-1">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>Niedrig
+                        </div>
+                        <?php endif; ?>
+                    </td>
+                    
+                    <!-- Preis -->
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <span class="text-gray-900"><?php echo number_format($item['unit_price'], 2, ',', '.') . ' €'; ?></span>
+                    </td>
+                    
+                    <!-- Lagerort -->
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <?php if ($item['location_name']): ?>
+                        <span class="text-gray-700">
+                            <i class="fas fa-map-marker-alt mr-1 text-gray-400"></i><?php echo htmlspecialchars($item['location_name']); ?>
+                        </span>
+                        <?php else: ?>
+                        <span class="text-gray-400">-</span>
+                        <?php endif; ?>
+                    </td>
+                    
+                    <!-- Aktionen -->
+                    <td class="px-4 py-4 whitespace-nowrap text-sm">
+                        <div class="flex space-x-2">
+                            <a href="view.php?id=<?php echo $item['id']; ?>" class="text-purple-600 hover:text-purple-900" title="Details anzeigen">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <?php if (Auth::hasPermission('manager')): ?>
+                            <a href="edit.php?id=<?php echo $item['id']; ?>" class="text-blue-600 hover:text-blue-900" title="Bearbeiten">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <?php endif; ?>
+                        </div>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     </div>
-    <?php endforeach; ?>
     <?php endif; ?>
 </div>
 

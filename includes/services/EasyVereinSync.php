@@ -151,11 +151,11 @@ class EasyVereinSync {
             foreach ($easyvereinItems as $evItem) {
                 try {
                     // Map API fields to our expected format
-                    // Map: name -> name, note -> description, quantity -> total_stock (DB: quantity)
+                    // Map: name -> name, note -> description, pieces -> quantity (DB: quantity)
                     $easyvereinId = $evItem['id'] ?? $evItem['EasyVereinID'] ?? null;
                     $name = $evItem['name'] ?? $evItem['Name'] ?? 'Unnamed Item';
                     $description = $evItem['note'] ?? $evItem['description'] ?? $evItem['Description'] ?? '';
-                    $totalQuantity = $evItem['quantity'] ?? $evItem['total_stock'] ?? $evItem['TotalQuantity'] ?? 0;
+                    $totalQuantity = $evItem['pieces'] ?? $evItem['quantity'] ?? $evItem['total_stock'] ?? $evItem['TotalQuantity'] ?? 0;
                     $serialNumber = $evItem['serial_number'] ?? $evItem['SerialNumber'] ?? null;
                     $imagePath = $evItem['image'] ?? $evItem['image_path'] ?? null;
                     
