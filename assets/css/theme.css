@@ -113,6 +113,14 @@ body.dark-mode .text-gray-700 {
     color: var(--text-primary) !important;
 }
 
+body.dark-mode .text-gray-800 {
+    color: #f0f0f0 !important; /* text-gray-100 equivalent */
+}
+
+body:not(.dark-mode) .text-gray-800 {
+    color: #1f2937 !important; /* Ensure light mode uses gray-800 */
+}
+
 body.dark-mode .bg-white {
     background-color: var(--bg-secondary) !important;
 }

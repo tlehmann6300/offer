@@ -142,33 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (Exception $e) {
             $error = $e->getMessage();
         }
-    } else if (isset($_POST['update_email'])) {
-        $newEmail = trim($_POST['email'] ?? '');
-        
-        // Check if email has changed
-        if ($newEmail !== $user['email']) {
-            try {
-                // Generate token and save to email_change_requests
-                $token = User::createEmailChangeRequest($user['id'], $newEmail);
-                
-                // Create confirmation link using BASE_URL for security
-                $baseUrl = defined('BASE_URL') ? BASE_URL : '';
-                $confirmLink = $baseUrl . '/api/confirm_email.php?token=' . urlencode($token);
-                
-                // TODO: Send email to new address with confirmation link
-                // For now, we'll just show a message
-                // In production, use PHPMailer or similar to send email
-                
-                $message = 'Bestätigungslink an neue E-Mail gesendet. Bitte überprüfen Sie Ihr Postfach.';
-                
-                // Log the action
-                error_log("Email change confirmation link: $confirmLink");
-            } catch (Exception $e) {
-                // Catch exceptions like 'E-Mail vergeben' or validation errors
-                $error = $e->getMessage();
-            }
-        }
-        // If email hasn't changed, just do nothing (user will see no message)
     } else if (isset($_POST['enable_2fa'])) {
         $ga = new PHPGangsta_GoogleAuthenticator();
         $secret = $ga->createSecret();
@@ -187,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = 'Fehler beim Aktivieren von 2FA';
             }
         } else {
-            $error = 'Ungültiger Code. Bitte versuchen Sie es erneut.';
+            $error = 'Ungültiger Code. Bitte versuche es erneut.';
             $secret = $_POST['secret'];
             $ga = new PHPGangsta_GoogleAuthenticator();
             $qrCodeUrl = $ga->getQRCodeGoogleUrl($user['email'], $secret, 'IBC Intranet');
@@ -199,50 +172,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = Auth::user(); // Reload user
         } else {
             $error = 'Fehler beim Deaktivieren von 2FA';
-        }
-    } else if (isset($_POST['change_password'])) {
-        $currentPassword = $_POST['current_password'] ?? '';
-        $newPassword = $_POST['new_password'] ?? '';
-        $confirmPassword = $_POST['confirm_password'] ?? '';
-        
-        $fullUser = User::getByEmail($user['email']);
-        
-        if (!password_verify($currentPassword, $fullUser['password'])) {
-            $error = 'Aktuelles Passwort ist falsch';
-        } else if ($newPassword !== $confirmPassword) {
-            $error = 'Neue Passwörter stimmen nicht überein';
-        } else if (strlen($newPassword) < 8) {
-            $error = 'Neues Passwort muss mindestens 8 Zeichen lang sein';
-        } else {
-            if (User::changePassword($user['id'], $newPassword)) {
-                $message = 'Passwort erfolgreich geändert';
-            } else {
-                $error = 'Fehler beim Ändern des Passworts';
-            }
-        }
-    } else if (isset($_POST['update_notifications'])) {
-        $notifyNewProjects = isset($_POST['notify_new_projects']) ? true : false;
-        $notifyNewEvents = isset($_POST['notify_new_events']) ? true : false;
-        
-        if (User::updateNotificationPreferences($user['id'], $notifyNewProjects, $notifyNewEvents)) {
-            $message = 'Benachrichtigungseinstellungen erfolgreich aktualisiert';
-            $user = Auth::user(); // Reload user data
-        } else {
-            $error = 'Fehler beim Aktualisieren der Benachrichtigungseinstellungen';
-        }
-    } else if (isset($_POST['update_theme'])) {
-        $theme = $_POST['theme'] ?? 'auto';
-        
-        // Validate theme value
-        if (!in_array($theme, ['auto', 'light', 'dark'])) {
-            $error = 'Ungültiger Theme-Wert';
-        } else {
-            if (User::updateThemePreference($user['id'], $theme)) {
-                $message = 'Theme-Einstellungen erfolgreich aktualisiert';
-                $user = Auth::user(); // Reload user data
-            } else {
-                $error = 'Fehler beim Aktualisieren der Theme-Einstellungen';
-            }
         }
     }
 }
@@ -258,7 +187,7 @@ ob_start();
                 <i class="fas fa-user text-purple-600 mr-2"></i>
                 Mein Profil
             </h1>
-            <p class="text-gray-600">Verwalten Sie Ihre Kontoinformationen und Sicherheitseinstellungen</p>
+            <p class="text-gray-600">Verwalte deine Kontoinformationen und Sicherheitseinstellungen</p>
         </div>
         <div class="mt-4 md:mt-0">
             <a href="../inventory/my_rentals.php" class="btn-primary inline-block">
@@ -314,29 +243,6 @@ ob_start();
         </div>
     </div>
 
-    <!-- Update Email -->
-    <div class="card p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">
-            <i class="fas fa-envelope text-blue-600 mr-2"></i>
-            E-Mail-Adresse ändern
-        </h2>
-        <form method="POST" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">E-Mail-Adresse</label>
-                <input 
-                    type="email" 
-                    name="email" 
-                    required 
-                    value="<?php echo htmlspecialchars($user['email']); ?>"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-            </div>
-            <button type="submit" name="update_email" class="w-full btn-primary">
-                <i class="fas fa-save mr-2"></i>E-Mail-Adresse aktualisieren
-            </button>
-        </form>
-    </div>
-
     <!-- Profile Information -->
     <div class="lg:col-span-2">
         <div class="card p-6">
@@ -345,7 +251,7 @@ ob_start();
                 Profilangaben
             </h2>
             <p class="text-gray-600 mb-6">
-                Aktualisieren Sie Ihre persönlichen Informationen und Kontaktdaten
+                Aktualisiere deine persönlichen Informationen und Kontaktdaten
             </p>
             
             <form method="POST" enctype="multipart/form-data" class="space-y-6">
@@ -513,7 +419,7 @@ ob_start();
                         name="about_me" 
                         rows="4"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder="Erzählen Sie etwas über sich..."
+                        placeholder="Erzähle etwas über dich..."
                     ><?php echo htmlspecialchars($profile['about_me'] ?? ''); ?></textarea>
                 </div>
                 
@@ -522,48 +428,6 @@ ob_start();
                 </button>
             </form>
         </div>
-    </div>
-
-    <!-- Change Password -->
-    <div class="card p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">
-            <i class="fas fa-key text-yellow-600 mr-2"></i>
-            Passwort ändern
-        </h2>
-        <form method="POST" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Aktuelles Passwort</label>
-                <input 
-                    type="password" 
-                    name="current_password" 
-                    required 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Neues Passwort</label>
-                <input 
-                    type="password" 
-                    name="new_password" 
-                    required 
-                    minlength="8"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Passwort bestätigen</label>
-                <input 
-                    type="password" 
-                    name="confirm_password" 
-                    required 
-                    minlength="8"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-            </div>
-            <button type="submit" name="change_password" class="w-full btn-primary">
-                <i class="fas fa-save mr-2"></i>Passwort ändern
-            </button>
-        </form>
     </div>
 
     <!-- 2FA Settings -->
@@ -590,12 +454,12 @@ ob_start();
                         <?php endif; ?>
                     </p>
                     <p class="text-sm text-gray-600">
-                        Schützen Sie Ihr Konto mit einer zusätzlichen Sicherheitsebene
+                        Schütze dein Konto mit einer zusätzlichen Sicherheitsebene
                     </p>
                 </div>
                 <div>
                     <?php if ($user['tfa_enabled']): ?>
-                    <form method="POST" onsubmit="return confirm('Möchten Sie 2FA wirklich deaktivieren?');">
+                    <form method="POST" onsubmit="return confirm('Möchtest du 2FA wirklich deaktivieren?');">
                         <button type="submit" name="disable_2fa" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
                             <i class="fas fa-times mr-2"></i>2FA deaktivieren
                         </button>
@@ -613,7 +477,7 @@ ob_start();
             <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
                 <p class="text-sm text-blue-700">
                     <i class="fas fa-info-circle mr-2"></i>
-                    <strong>Empfehlung:</strong> Aktivieren Sie 2FA für zusätzliche Sicherheit. Sie benötigen eine Authenticator-App wie Google Authenticator oder Authy.
+                    <strong>Empfehlung:</strong> Aktiviere 2FA für zusätzliche Sicherheit. Du benötigst eine Authenticator-App wie Google Authenticator oder Authy.
                 </p>
             </div>
             <?php else: ?>
@@ -622,7 +486,7 @@ ob_start();
                 <div class="text-center mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-2">2FA einrichten</h3>
                     <p class="text-sm text-gray-600 mb-4">
-                        Scannen Sie den QR-Code mit Ihrer Authenticator-App und geben Sie den generierten Code ein
+                        Scanne den QR-Code mit deiner Authenticator-App und gib den generierten Code ein
                     </p>
                     <img src="<?php echo $qrCodeUrl; ?>" alt="QR Code" class="mx-auto mb-4 border-4 border-gray-200 rounded-lg">
                     <p class="text-xs text-gray-500 mb-4">
@@ -659,143 +523,7 @@ ob_start();
         </div>
     </div>
 
-    <!-- Notification Settings -->
-    <div class="lg:col-span-2">
-        <div class="card p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">
-                <i class="fas fa-bell text-orange-600 mr-2"></i>
-                Benachrichtigungen
-            </h2>
-            <p class="text-gray-600 mb-6">
-                Wählen Sie aus, über welche Ereignisse Sie per E-Mail benachrichtigt werden möchten
-            </p>
-            
-            <form method="POST" class="space-y-4">
-                <div class="space-y-4">
-                    <!-- New Projects Notification -->
-                    <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <input 
-                            type="checkbox" 
-                            name="notify_new_projects" 
-                            id="notify_new_projects"
-                            <?php echo ($user['notify_new_projects'] ?? true) ? 'checked' : ''; ?>
-                            class="mt-1 h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                        >
-                        <label for="notify_new_projects" class="ml-3 flex-1 cursor-pointer">
-                            <span class="block text-sm font-medium text-gray-900">Neue Projekte</span>
-                            <span class="block text-sm text-gray-600">
-                                Erhalten Sie eine E-Mail-Benachrichtigung, wenn ein neues Projekt veröffentlicht wird
-                            </span>
-                        </label>
-                    </div>
-
-                    <!-- New Events Notification -->
-                    <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <input 
-                            type="checkbox" 
-                            name="notify_new_events" 
-                            id="notify_new_events"
-                            <?php echo ($user['notify_new_events'] ?? false) ? 'checked' : ''; ?>
-                            class="mt-1 h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                        >
-                        <label for="notify_new_events" class="ml-3 flex-1 cursor-pointer">
-                            <span class="block text-sm font-medium text-gray-900">Neue Events</span>
-                            <span class="block text-sm text-gray-600">
-                                Erhalten Sie eine E-Mail-Benachrichtigung, wenn ein neues Event erstellt wird
-                            </span>
-                        </label>
-                    </div>
-                </div>
-
-                <button type="submit" name="update_notifications" class="w-full btn-primary">
-                    <i class="fas fa-save mr-2"></i>Benachrichtigungseinstellungen speichern
-                </button>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Theme Settings -->
-    <div class="lg:col-span-2">
-        <div class="card p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">
-                <i class="fas fa-palette text-purple-600 mr-2"></i>
-                Theme-Einstellungen
-            </h2>
-            <p class="text-gray-600 mb-6">
-                Wählen Sie Ihr bevorzugtes Farbschema für die Anwendung
-            </p>
-            
-            <form method="POST" class="space-y-4">
-                <div class="space-y-4">
-                    <!-- Auto Theme -->
-                    <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-purple-400 transition cursor-pointer">
-                        <input 
-                            type="radio" 
-                            name="theme" 
-                            value="auto" 
-                            id="theme_auto"
-                            <?php echo ($user['theme_preference'] ?? 'auto') === 'auto' ? 'checked' : ''; ?>
-                            class="mt-1 h-5 w-5 text-purple-600 border-gray-300 focus:ring-purple-500"
-                        >
-                        <label for="theme_auto" class="ml-3 flex-1 cursor-pointer">
-                            <span class="block text-sm font-medium text-gray-900">
-                                <i class="fas fa-adjust mr-2"></i>Automatisch
-                            </span>
-                            <span class="block text-sm text-gray-600">
-                                Verwendet die Systemeinstellungen Ihres Geräts
-                            </span>
-                        </label>
-                    </div>
-
-                    <!-- Light Theme -->
-                    <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-purple-400 transition cursor-pointer">
-                        <input 
-                            type="radio" 
-                            name="theme" 
-                            value="light" 
-                            id="theme_light"
-                            <?php echo ($user['theme_preference'] ?? 'auto') === 'light' ? 'checked' : ''; ?>
-                            class="mt-1 h-5 w-5 text-purple-600 border-gray-300 focus:ring-purple-500"
-                        >
-                        <label for="theme_light" class="ml-3 flex-1 cursor-pointer">
-                            <span class="block text-sm font-medium text-gray-900">
-                                <i class="fas fa-sun mr-2"></i>Hell
-                            </span>
-                            <span class="block text-sm text-gray-600">
-                                Immer den hellen Modus verwenden
-                            </span>
-                        </label>
-                    </div>
-
-                    <!-- Dark Theme -->
-                    <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-purple-400 transition cursor-pointer">
-                        <input 
-                            type="radio" 
-                            name="theme" 
-                            value="dark" 
-                            id="theme_dark"
-                            <?php echo ($user['theme_preference'] ?? 'auto') === 'dark' ? 'checked' : ''; ?>
-                            class="mt-1 h-5 w-5 text-purple-600 border-gray-300 focus:ring-purple-500"
-                        >
-                        <label for="theme_dark" class="ml-3 flex-1 cursor-pointer">
-                            <span class="block text-sm font-medium text-gray-900">
-                                <i class="fas fa-moon mr-2"></i>Dunkel
-                            </span>
-                            <span class="block text-sm text-gray-600">
-                                Immer den dunklen Modus verwenden
-                            </span>
-                        </label>
-                    </div>
-                </div>
-
-                <button type="submit" name="update_theme" class="w-full btn-primary">
-                    <i class="fas fa-save mr-2"></i>Theme-Einstellungen speichern
-                </button>
-            </form>
-        </div>
-    </div>
 </div>
 
 <?php
 $content = ob_get_clean();
-include __DIR__ . '/../../includes/templates/main_layout.php';
