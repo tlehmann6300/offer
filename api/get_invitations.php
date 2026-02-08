@@ -24,7 +24,7 @@ if (!AuthHandler::isAuthenticated() || !AuthHandler::hasPermission('board')) {
 
 try {
     // Get all open invitations
-    $db = Database::getUserDB();
+    $db = Database::getConnection('user');
     $stmt = $db->prepare("
         SELECT 
             it.id,
