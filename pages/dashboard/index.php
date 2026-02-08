@@ -90,6 +90,19 @@ if ($isBoardLevel) {
     $totalUsersCount = $stmt->fetch()['total_users'] ?? 0;
 }
 
+// Get events that need helpers (for all users)
+$contentDb = Database::getContentDB();
+$stmt = $contentDb->query("
+    SELECT e.id, e.title, e.description, e.start_time, e.end_time, e.location
+    FROM events e
+    WHERE e.needs_helpers = 1 
+    AND e.status IN ('open', 'planned')
+    AND e.end_time >= NOW()
+    ORDER BY e.start_time ASC
+    LIMIT 5
+");
+$helperEvents = $stmt->fetchAll();
+
 // Security Audit - nur für Admins
 $securityWarning = '';
 if (Auth::hasPermission('admin')) {
@@ -272,7 +285,7 @@ endif;
             </div>
             <?php if ($openTasksCount > 0): ?>
             <p class="text-gray-600 mb-3">Du hast aktuell <?php echo $openTasksCount; ?> offene Ausleihen</p>
-            <a href="../inventory/my_rentals.php" class="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold">
+            <a href="../inventory/my_checkouts.php" class="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold">
                 Ausleihen verwalten <i class="fas fa-arrow-right ml-2"></i>
             </a>
             <?php else: ?>
@@ -392,48 +405,57 @@ endif;
     </div>
 </div>
 
-<!-- Dashboard Teaser - Role-Based Statistics -->
-<?php if ($isBoardLevel): ?>
-<!-- Board-Level Statistics for board, head -->
-<div class="max-w-6xl mx-auto">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
-        <i class="fas fa-chart-line text-purple-600 mr-2"></i>
-        Aktuelle Statistiken
+<!-- Dashboard Section - Wir suchen Helfer -->
+<div class="max-w-6xl mx-auto mb-12">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+        <i class="fas fa-hands-helping text-green-600 mr-2"></i>
+        Wir suchen Helfer
     </h2>
     
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <!-- Tile 1: Active Users (7 Days) -->
-        <div class="card p-8 rounded-xl shadow-lg transition-all hover:shadow-2xl text-center bg-gradient-to-br from-white to-blue-50">
-            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                <i class="fas fa-users text-3xl text-blue-600"></i>
+    <?php if (!empty($helperEvents)): ?>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <?php foreach ($helperEvents as $event): ?>
+        <div class="card p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-white to-green-50 border-l-4 border-green-500">
+            <div class="mb-4">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">
+                    <i class="fas fa-calendar-alt text-green-600 mr-2"></i>
+                    <?php echo htmlspecialchars($event['title']); ?>
+                </h3>
+                <?php if (!empty($event['description'])): ?>
+                <p class="text-sm text-gray-600 mb-2">
+                    <?php echo htmlspecialchars(substr($event['description'], 0, 100)) . (strlen($event['description']) > 100 ? '...' : ''); ?>
+                </p>
+                <?php endif; ?>
             </div>
-            <h3 class="text-lg font-semibold text-gray-700 mb-2">Aktive Nutzer (7 Tage)</h3>
-            <p class="text-4xl font-bold text-blue-600 mb-2"><?php echo number_format($activeUsersCount); ?></p>
-            <p class="text-sm text-gray-500">Mit Login in letzten 7 Tagen</p>
-        </div>
-        
-        <!-- Tile 2: Open Invitations -->
-        <div class="card p-8 rounded-xl shadow-lg transition-all hover:shadow-2xl text-center bg-gradient-to-br from-white to-green-50">
-            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                <i class="fas fa-envelope-open-text text-3xl text-green-600"></i>
+            <div class="text-sm text-gray-600 mb-3">
+                <div class="flex items-center mb-1">
+                    <i class="fas fa-clock mr-2 text-green-600"></i>
+                    <?php echo date('d.m.Y H:i', strtotime($event['start_time'])); ?> Uhr
+                </div>
+                <?php if (!empty($event['location'])): ?>
+                <div class="flex items-center">
+                    <i class="fas fa-map-marker-alt mr-2 text-green-600"></i>
+                    <?php echo htmlspecialchars($event['location']); ?>
+                </div>
+                <?php endif; ?>
             </div>
-            <h3 class="text-lg font-semibold text-gray-700 mb-2">Offene Einladungen</h3>
-            <p class="text-4xl font-bold text-green-600 mb-2"><?php echo number_format($openInvitationsCount); ?></p>
-            <p class="text-sm text-gray-500">Noch nicht verwendet</p>
+            <a href="../events/view.php?id=<?php echo $event['id']; ?>" 
+               class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all font-semibold">
+                Mehr erfahren <i class="fas fa-arrow-right ml-2"></i>
+            </a>
         </div>
-        
-        <!-- Tile 3: Total Users -->
-        <div class="card p-8 rounded-xl shadow-lg transition-all hover:shadow-2xl text-center bg-gradient-to-br from-white to-purple-50">
-            <div class="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
-                <i class="fas fa-user-friends text-3xl text-purple-600"></i>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-700 mb-2">Gesamtanzahl User</h3>
-            <p class="text-4xl font-bold text-purple-600 mb-2"><?php echo number_format($totalUsersCount); ?></p>
-            <p class="text-sm text-gray-500">Registrierte Benutzer</p>
-        </div>
+        <?php endforeach; ?>
     </div>
+    <?php else: ?>
+    <div class="card p-8 rounded-xl shadow-lg text-center bg-gradient-to-br from-white to-gray-50">
+        <i class="fas fa-hands-helping text-4xl mb-3 text-gray-400"></i>
+        <p class="text-gray-600 text-lg">Aktuell werden keine Helfer gesucht</p>
+        <a href="../events/index.php" class="inline-flex items-center mt-4 text-green-600 hover:text-green-700 font-semibold">
+            Alle Events ansehen <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+    </div>
+    <?php endif; ?>
 </div>
-<?php endif; ?>
 
 <!-- Additional Info Cards -->
 <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">

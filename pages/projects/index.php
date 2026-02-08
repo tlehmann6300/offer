@@ -65,12 +65,22 @@ ob_start();
     <?php endif; ?>
     
     <!-- Header -->
-    <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-800 mb-2">
-            <i class="fas fa-briefcase mr-3 text-purple-600"></i>
-            Projekte
-        </h1>
-        <p class="text-gray-600">Entdecken Sie aktuelle Projekte und bewerben Sie sich</p>
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-briefcase mr-3 text-purple-600"></i>
+                Projekte
+            </h1>
+            <p class="text-gray-600">Entdecken Sie aktuelle Projekte und bewerben Sie sich</p>
+        </div>
+        
+        <!-- Neues Projekt Button - Board/Head only -->
+        <?php if (in_array($userRole, ['admin', 'board', 'head', 'alumni_board'])): ?>
+        <a href="manage.php" class="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl">
+            <i class="fas fa-plus mr-2"></i>
+            Neues Projekt
+        </a>
+        <?php endif; ?>
     </div>
 
     <!-- Filter Bar -->
