@@ -141,7 +141,7 @@ CREATE TABLE IF NOT EXISTS inventory_items (
     image_path VARCHAR(255) DEFAULT NULL,
     notes TEXT DEFAULT NULL,
     last_synced_at DATETIME DEFAULT NULL,
-    is_archived_in_easyverein TINYINT(1) NOT NULL DEFAULT 0,
+    is_archived_in_easyverein TINYINT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
@@ -171,9 +171,9 @@ CREATE TABLE IF NOT EXISTS events (
     contact_person VARCHAR(255) DEFAULT NULL,
     status ENUM('planned', 'open', 'closed', 'running', 'past') 
         NOT NULL DEFAULT 'planned',
-    is_external TINYINT(1) NOT NULL DEFAULT 0,
+    is_external TINYINT NOT NULL DEFAULT 0,
     external_link VARCHAR(500) DEFAULT NULL,
-    needs_helpers TINYINT(1) NOT NULL DEFAULT 0,
+    needs_helpers TINYINT NOT NULL DEFAULT 0,
     image_path VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
