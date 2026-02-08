@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 
                 // Verify it's a valid image
-                $imageInfo = @getimagesize($_FILES['profile_picture']['tmp_name']);
+                $imageInfo = getimagesize($_FILES['profile_picture']['tmp_name']);
                 if ($imageInfo === false) {
                     throw new Exception('Die Datei ist kein gültiges Bild.');
                 }
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         
                         if ($realOldFile && $realUploadDir && strpos($realOldFile, $realUploadDir) === 0 && file_exists($realOldFile)) {
                             if (!unlink($realOldFile)) {
-                                error_log("Failed to delete old profile picture: " . $oldFilePath);
+                                error_log("Failed to delete old profile picture: " . $realOldFile);
                             }
                         }
                     }
