@@ -22,7 +22,7 @@ class Alumni {
             SELECT id, user_id, first_name, last_name, email, mobile_phone, 
                    linkedin_url, xing_url, industry, company, position, 
                    study_program, semester, angestrebter_abschluss, 
-                   degree, graduation_year, about_me,
+                   degree, graduation_year,
                    image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
             FROM alumni_profiles 
             WHERE user_id = ?
@@ -60,7 +60,7 @@ class Alumni {
                 'linkedin_url', 'xing_url', 'industry', 'company', 
                 'position', 'image_path', 'study_program', 
                 'semester', 'angestrebter_abschluss', 'degree', 
-                'graduation_year', 'about_me'
+                'graduation_year'
             ];
             
             foreach ($allowedFields as $field) {
@@ -94,8 +94,8 @@ class Alumni {
                 (user_id, first_name, last_name, email, mobile_phone, 
                  linkedin_url, xing_url, industry, company, position, image_path,
                  study_program, semester, angestrebter_abschluss, 
-                 degree, graduation_year, about_me)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 degree, graduation_year)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             
             return $stmt->execute([
@@ -114,8 +114,7 @@ class Alumni {
                 $data['semester'] ?? null,
                 $data['angestrebter_abschluss'] ?? null,
                 $data['degree'] ?? null,
-                $data['graduation_year'] ?? null,
-                $data['about_me'] ?? null
+                $data['graduation_year'] ?? null
             ]);
         }
     }
@@ -161,13 +160,9 @@ class Alumni {
      */
     public static function searchProfiles(array $filters = []): array {
         $contentDb = Database::getContentDB();
-        $userDb = Database::getUserDB();
         
         $whereClauses = [];
         $params = [];
-        
-        // Always filter by 'alumni' role
-        $whereClauses[] = "u.role = 'alumni'";
         
         // Search term filters by: Name OR Position OR Company OR Industry
         if (!empty($filters['search'])) {
@@ -192,25 +187,53 @@ class Alumni {
             $params[] = '%' . $filters['company'] . '%';
         }
         
-        $whereSQL = ' WHERE ' . implode(' AND ', $whereClauses);
+        $whereSQL = !empty($whereClauses) ? ' WHERE ' . implode(' AND ', $whereClauses) : '';
         
-        // Join with users table to filter by role
-        // Note: DB_USER_NAME is a configuration constant from config.php, not user input
-        // It's validated at application startup and is safe to use in queries
+        // Step 1: Fetch alumni profiles from content DB
         $sql = "
             SELECT ap.id, ap.user_id, ap.first_name, ap.last_name, ap.email, ap.mobile_phone, 
                    ap.linkedin_url, ap.xing_url, ap.industry, ap.company, ap.position, 
                    ap.study_program, ap.semester, ap.angestrebter_abschluss, 
-                   ap.degree, ap.graduation_year, ap.about_me,
+                   ap.degree, ap.graduation_year,
                    ap.image_path, ap.last_verified_at, ap.last_reminder_sent_at, ap.created_at, ap.updated_at
-            FROM alumni_profiles ap
-            INNER JOIN " . DB_USER_NAME . ".users u ON ap.user_id = u.id" . $whereSQL . "
+            FROM alumni_profiles ap" . $whereSQL . "
             ORDER BY ap.last_name ASC, ap.first_name ASC
         ";
         
         $stmt = $contentDb->prepare($sql);
         $stmt->execute($params);
-        return $stmt->fetchAll();
+        $profiles = $stmt->fetchAll();
+        
+        // Step 2: Filter by user role 'alumni' by fetching from users DB
+        if (!empty($profiles)) {
+            $userDb = Database::getUserDB();
+            $userIds = array_column($profiles, 'user_id');
+            
+            // Create placeholders for IN clause
+            $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+            
+            // Fetch users with role 'alumni'
+            $userStmt = $userDb->prepare("
+                SELECT id, role 
+                FROM users 
+                WHERE id IN ($placeholders) AND role = 'alumni'
+            ");
+            $userStmt->execute($userIds);
+            $alumniUserIds = array_column($userStmt->fetchAll(), 'id');
+            
+            // Convert to associative array for O(1) lookup performance
+            $alumniUserIdsMap = array_flip($alumniUserIds);
+            
+            // Filter profiles to only include those with alumni role
+            $profiles = array_filter($profiles, function($profile) use ($alumniUserIdsMap) {
+                return isset($alumniUserIdsMap[$profile['user_id']]);
+            });
+            
+            // Re-index array to remove gaps
+            $profiles = array_values($profiles);
+        }
+        
+        return $profiles;
     }
     
     /**
@@ -248,7 +271,7 @@ class Alumni {
             SELECT id, user_id, first_name, last_name, email, mobile_phone, 
                    linkedin_url, xing_url, industry, company, position, 
                    study_program, semester, angestrebter_abschluss, 
-                   degree, graduation_year, about_me,
+                   degree, graduation_year,
                    image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
             FROM alumni_profiles 
             WHERE last_verified_at < DATE_SUB(NOW(), INTERVAL ? MONTH)
