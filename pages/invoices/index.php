@@ -198,7 +198,7 @@ ob_start();
                             
                             $statusLabels = [
                                 'pending' => 'Ausstehend',
-                                'approved' => 'Genehmigt',
+                                'approved' => 'Bezahlt',
                                 'rejected' => 'Abgelehnt'
                             ];
                             

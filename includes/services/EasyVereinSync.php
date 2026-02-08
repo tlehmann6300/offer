@@ -367,4 +367,87 @@ class EasyVereinSync {
             $comment
         ]);
     }
+    
+    /**
+     * Update item in EasyVerein (Write-Back)
+     * 
+     * Sends a PATCH request to EasyVerein API to update an inventory item
+     * 
+     * @param int $easyvereinId EasyVerein item ID
+     * @param array $data Fields to update (name, quantity, note/description)
+     * @return array Result with success status and any error messages
+     */
+    public static function updateItem($easyvereinId, $data) {
+        $apiUrl = "https://easyverein.com/api/v2.0/inventory-object/{$easyvereinId}";
+        // Hardcoded token as per requirements
+        $apiToken = '0277d541c6bb7044e901a8a985ea74a9894df724';
+        
+        try {
+            // Map our fields to EasyVerein API fields
+            $apiData = [];
+            if (isset($data['name'])) {
+                $apiData['name'] = $data['name'];
+            }
+            if (isset($data['quantity'])) {
+                $apiData['pieces'] = $data['quantity'];
+            }
+            if (isset($data['description'])) {
+                $apiData['note'] = $data['description'];
+            }
+            if (isset($data['unit_price'])) {
+                $apiData['price'] = $data['unit_price'];
+            }
+            
+            // Initialize cURL
+            $ch = curl_init();
+            
+            // Set cURL options for PATCH request
+            curl_setopt($ch, CURLOPT_URL, $apiUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $apiToken,
+                'Content-Type: application/json'
+            ]);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($apiData));
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+            
+            // Execute the request
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+            
+            // Check for cURL errors
+            if ($response === false) {
+                throw new Exception('cURL error: ' . $curlError);
+            }
+            
+            // Check HTTP status code (200 or 204 for successful PATCH)
+            if ($httpCode !== 200 && $httpCode !== 204) {
+                $errorMsg = "API returned HTTP {$httpCode}";
+                if ($httpCode === 401) {
+                    $errorMsg .= ' - Unauthorized: Invalid API token';
+                } elseif ($httpCode === 404) {
+                    $errorMsg .= ' - Not Found: Item not found in EasyVerein';
+                }
+                throw new Exception($errorMsg);
+            }
+            
+            return [
+                'success' => true,
+                'message' => 'Item updated in EasyVerein successfully'
+            ];
+            
+        } catch (Exception $e) {
+            // Log the error
+            error_log('EasyVerein API Update Error (ID: ' . $easyvereinId . '): ' . $e->getMessage());
+            
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
 }
