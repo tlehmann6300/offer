@@ -392,7 +392,7 @@ endif;
 </div>
 
 <!-- Dashboard Teaser - Role-Based Statistics -->
-<?php if (Auth::hasRole('board') || Auth::hasRole('head')): ?>
+<?php if ($isBoardLevel): ?>
 <!-- Board-Level Statistics for board, head -->
 <div class="max-w-6xl mx-auto">
     <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
