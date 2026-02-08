@@ -172,13 +172,6 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <i class="fas fa-box w-5 mr-3"></i>
                     <span>Inventar</span>
                 </a>
-                <?php if (AuthHandler::hasRole('board') || AuthHandler::hasRole('head') || AuthHandler::hasRole('alumni_board')): ?>
-                <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo strpos($_SERVER['PHP_SELF'], 'invoices') !== false ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-file-invoice-dollar w-5 mr-3"></i>
-                    <span>Rechnungen</span>
-                </a>
-                <?php endif; ?>
 
                 <!-- NETZWERK Section -->
                 <div class="px-6 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -202,20 +195,40 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <span>Blog</span>
                 </a>
 
-                <!-- VERWALTUNG Section (Only visible for admin/board) -->
-                <?php if (AuthHandler::isAdmin()): ?>
+                <!-- VERWALTUNG Section (Only visible for board) -->
+                <?php if (AuthHandler::hasRole('board')): ?>
                 <div class="px-6 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                     Verwaltung
                 </div>
                 <a href="<?php echo asset('pages/admin/users.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/users.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-user-cog w-5 mr-3"></i>
-                    <span>Benutzer</span>
+                    <span>Users</span>
+                </a>
+                <a href="<?php echo asset('pages/admin/db_maintenance.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/db_maintenance.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-database w-5 mr-3"></i>
+                    <span>Database</span>
                 </a>
                 <a href="<?php echo asset('pages/admin/audit.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/audit.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-shield-alt w-5 mr-3"></i>
-                    <span>Einstellungen</span>
+                    <i class="fas fa-clipboard-list w-5 mr-3"></i>
+                    <span>Audit Log</span>
+                </a>
+                <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-file-invoice-dollar w-5 mr-3"></i>
+                    <span>Invoices</span>
+                </a>
+                <a href="<?php echo asset('pages/events/manage.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/events/manage.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-calendar-alt w-5 mr-3"></i>
+                    <span>Events</span>
+                </a>
+                <a href="<?php echo asset('pages/inventory/manage.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/inventory/manage.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-boxes w-5 mr-3"></i>
+                    <span>Inventory</span>
                 </a>
                 <?php endif; ?>
                 
