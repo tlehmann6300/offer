@@ -46,9 +46,20 @@ function executeSql($pdo, $sql, $description) {
 
 /**
  * Check if column exists in a table
+ * 
+ * Note: SHOW COLUMNS does not support prepared statements for table names.
+ * Table name is validated with a strict regex whitelist to prevent SQL injection.
  */
 function columnExists($pdo, $table, $column) {
     try {
+        // Validate table name to prevent SQL injection
+        // Only allow alphanumeric characters and underscores
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) {
+            throw new InvalidArgumentException("Invalid table name: $table");
+        }
+        
+        // Table name is validated and safe to use in query
+        // SHOW COLUMNS doesn't support prepared statements for table names
         $stmt = $pdo->prepare("SHOW COLUMNS FROM `$table` LIKE ?");
         $stmt->execute([$column]);
         return $stmt->rowCount() > 0;
@@ -59,9 +70,20 @@ function columnExists($pdo, $table, $column) {
 
 /**
  * Check if table exists
+ * 
+ * Note: SHOW TABLES does not support prepared statements for table names.
+ * Table name is validated with a strict regex whitelist to prevent SQL injection.
  */
 function tableExists($pdo, $table) {
     try {
+        // Validate table name to prevent SQL injection
+        // Only allow alphanumeric characters and underscores
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) {
+            throw new InvalidArgumentException("Invalid table name: $table");
+        }
+        
+        // Table name is validated and safe to use in query
+        // SHOW TABLES doesn't support prepared statements for table names
         $stmt = $pdo->query("SHOW TABLES LIKE '$table'");
         return $stmt->rowCount() > 0;
     } catch (PDOException $e) {
