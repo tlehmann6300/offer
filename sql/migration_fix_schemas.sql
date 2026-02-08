@@ -13,6 +13,11 @@ ALTER TABLE blog_posts
 ADD COLUMN IF NOT EXISTS external_link VARCHAR(255) DEFAULT NULL 
 AFTER image_path;
 
+-- Add angestrebter_abschluss column to alumni_profiles if it doesn't exist
+ALTER TABLE alumni_profiles 
+ADD COLUMN IF NOT EXISTS angestrebter_abschluss VARCHAR(255) DEFAULT NULL 
+AFTER semester;
+
 -- Fix Invoice DB (dbs15251284)
 -- ============================================
 
