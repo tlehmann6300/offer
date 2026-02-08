@@ -143,109 +143,65 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             </div>
             
             <nav>
-                <!-- DURCHSTARTEN Section -->
-                <div class="px-6 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Durchstarten
-                </div>
+                <!-- Dashboard -->
                 <a href="<?php echo asset('pages/dashboard/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/dashboard/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-home w-5 mr-3"></i>
                     <span>Dashboard</span>
                 </a>
 
-                <!-- ORGANISATION Section -->
-                <div class="px-6 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Organisation
-                </div>
+                <!-- Mitglieder (Visible for: board, head, member) -->
+                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'head', 'member'])): ?>
+                <a href="<?php echo asset('pages/members/index.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/members/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-users w-5 mr-3"></i>
+                    <span>Mitglieder</span>
+                </a>
+                <?php endif; ?>
+
+                <!-- Projekte (Visible for everyone) -->
                 <a href="<?php echo asset('pages/projects/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/projects/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-folder w-5 mr-3"></i>
                     <span>Projekte</span>
                 </a>
+
+                <!-- Events (Visible for everyone) -->
                 <a href="<?php echo asset('pages/events/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/events/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-calendar w-5 mr-3"></i>
                     <span>Events</span>
                 </a>
+
+                <!-- Inventar (Visible for everyone) -->
                 <a href="<?php echo asset('pages/inventory/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo (isActivePath('/inventory/') && !isActivePath('/my_rentals.php')) ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-box w-5 mr-3"></i>
                     <span>Inventar</span>
                 </a>
 
-                <!-- NETZWERK Section -->
-                <div class="px-6 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Netzwerk
-                </div>
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'head', 'member', 'candidate'])): ?>
-                <a href="<?php echo BASE_URL; ?>/pages/members/index.php" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/members/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-users w-5 mr-3"></i>
-                    <span>Mitglieder</span>
-                </a>
-                <?php endif; ?>
-                <a href="<?php echo asset('pages/alumni/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/alumni/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-graduation-cap w-5 mr-3"></i>
-                    <span>Alumni</span>
-                </a>
+                <!-- Blog (Visible for everyone) -->
                 <a href="<?php echo asset('pages/blog/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/blog/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-newspaper w-5 mr-3"></i>
                     <span>Blog</span>
                 </a>
 
-                <!-- VERWALTUNG Section (Only visible for board) -->
+                <!-- Rechnungen (Visible ONLY for board) -->
                 <?php if (AuthHandler::hasRole('board')): ?>
-                <div class="px-6 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Verwaltung
-                </div>
-                <a href="<?php echo asset('pages/admin/users.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/users.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-user-cog w-5 mr-3"></i>
-                    <span>Benutzer</span>
-                </a>
-                <a href="<?php echo asset('pages/admin/settings.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/settings.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-cog w-5 mr-3"></i>
-                    <span>Einstellungen</span>
-                </a>
                 <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-file-invoice-dollar w-5 mr-3"></i>
                     <span>Rechnungen</span>
                 </a>
-                <a href="<?php echo asset('pages/events/manage.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/events/manage.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-calendar-alt w-5 mr-3"></i>
-                    <span>Veranstaltungen</span>
+
+                <!-- Verwaltung (Visible ONLY for board) -->
+                <a href="<?php echo asset('pages/admin/users.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-user-cog w-5 mr-3"></i>
+                    <span>Verwaltung</span>
                 </a>
                 <?php endif; ?>
-
-                <!-- SCHNELLZUGRIFF Section (Quick Access) -->
-                <div class="px-6 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Schnellzugriff
-                </div>
-                <a href="<?php echo asset('pages/auth/profile.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/auth/profile.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-user w-5 mr-3"></i>
-                    <span>Mein Profil</span>
-                </a>
-                <a href="<?php echo asset('pages/inventory/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/inventory/index.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-box w-5 mr-3"></i>
-                    <span>Inventar</span>
-                </a>
-                <a href="<?php echo asset('pages/events/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/events/index.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-calendar w-5 mr-3"></i>
-                    <span>Events ansehen</span>
-                </a>
-                <a href="<?php echo asset('pages/projects/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/projects/index.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-folder w-5 mr-3"></i>
-                    <span>Projekte</span>
-                </a>
                 
             </nav>
         </div>
