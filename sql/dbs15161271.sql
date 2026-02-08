@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS alumni_profiles (
     industry VARCHAR(255) DEFAULT NULL,
     study_program VARCHAR(255) DEFAULT NULL,
     semester INT DEFAULT NULL,
+    angestrebter_abschluss VARCHAR(255) DEFAULT NULL,
     degree VARCHAR(255) DEFAULT NULL,
     graduation_year INT DEFAULT NULL,
     status VARCHAR(50) DEFAULT NULL,
