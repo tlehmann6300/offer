@@ -162,9 +162,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Reload profile based on role
                 if (isMemberRole($userRole)) {
                     $profile = Member::getProfileByUserId($user['id']);
-                } else {
+                } elseif (isAlumniRole($userRole)) {
                     $profile = Alumni::getProfileByUserId($user['id']);
                 }
+                // If neither member nor alumni role, profile will remain as-is
             } else {
                 $error = 'Fehler beim Aktualisieren des Profils';
             }
