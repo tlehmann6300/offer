@@ -1,7 +1,14 @@
 <?php
+/**
+ * SECURITY WARNING: This file contains temporary debug HTML comments (lines 289, 299)
+ * that expose internal authorization states. These MUST be removed before production deployment.
+ * The debug comments are for development/troubleshooting purposes only.
+ */
+
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Invoice.php';
 require_once __DIR__ . '/../../includes/models/User.php';
+require_once __DIR__ . '/../../includes/models/Member.php';
 require_once __DIR__ . '/../../includes/helpers.php';
 
 // Access Control: Allow 'board', 'alumni_board', 'head', 'alumni' (read-only)
@@ -21,8 +28,26 @@ if (!in_array($userRole, $allowedRoles)) {
 }
 
 // Check if user has permission to mark invoices as paid
-// ONLY vorstand_finanzen_recht can mark as paid
-$canMarkAsPaid = ($userRole === 'vorstand_finanzen_recht');
+// Requirements: Auth::hasRole('board') is TRUE AND position field contains 'Finanzen' (case-insensitive)
+$canMarkAsPaid = false;
+$debugInfo = ['hasBoard' => false, 'hasFinanzen' => false, 'position' => 'N/A'];
+
+if (Auth::hasRole('board')) {
+    $debugInfo['hasBoard'] = true;
+    
+    // Get user profile to check position field
+    $userProfile = Member::getProfileByUserId($user['id']);
+    if ($userProfile && isset($userProfile['position'])) {
+        $position = $userProfile['position'];
+        $debugInfo['position'] = $position;
+        
+        // Case-insensitive check for 'Finanzen' in position
+        if (stripos($position, 'Finanzen') !== false) {
+            $debugInfo['hasFinanzen'] = true;
+            $canMarkAsPaid = true;
+        }
+    }
+}
 
 // Get invoices based on role
 $invoices = Invoice::getAll($userRole, $user['id']);
@@ -267,6 +292,7 @@ ob_start();
                                             </button>
                                         </div>
                                     <?php elseif ($invoice['status'] === 'approved' && $canMarkAsPaid): ?>
+                                        <!-- TODO: REMOVE BEFORE PRODUCTION - Debug: hasBoard=<?php echo $debugInfo['hasBoard'] ? 'true' : 'false'; ?>, hasFinanzen=<?php echo $debugInfo['hasFinanzen'] ? 'true' : 'false'; ?>, position=<?php echo htmlspecialchars($debugInfo['position']); ?> -->
                                         <button 
                                             onclick="markInvoiceAsPaid(<?php echo $invoice['id']; ?>)"
                                             class="px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors text-xs"
@@ -276,6 +302,7 @@ ob_start();
                                             Als Bezahlt markieren
                                         </button>
                                     <?php else: ?>
+                                        <!-- TODO: REMOVE BEFORE PRODUCTION - Debug: Button hidden - hasBoard=<?php echo $debugInfo['hasBoard'] ? 'true' : 'false'; ?>, hasFinanzen=<?php echo $debugInfo['hasFinanzen'] ? 'true' : 'false'; ?>, position=<?php echo htmlspecialchars($debugInfo['position']); ?>, status=<?php echo htmlspecialchars($invoice['status']); ?> -->
                                         <span class="text-gray-400 dark:text-gray-500 text-xs">-</span>
                                     <?php endif; ?>
                                 </td>
