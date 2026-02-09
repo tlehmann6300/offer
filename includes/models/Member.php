@@ -181,13 +181,33 @@ class Member {
      * @throws Exception On database error
      */
     public static function update(int $userId, array $data): bool {
-        // Check permissions: only board, head, or candidate can update
+        // Check permissions
         require_once __DIR__ . '/../../src/Auth.php';
-        if (!Auth::check() || !in_array(Auth::user()['role'] ?? '', ['board', 'head', 'candidate', 'admin'])) {
+        if (!Auth::check()) {
+            throw new Exception("Keine Berechtigung zum Aktualisieren des Mitgliederprofils");
+        }
+        
+        $currentUser = Auth::user();
+        $currentRole = $currentUser['role'] ?? '';
+        
+        // Board, head, and admin can update any profile
+        // Candidates can only update their own profile
+        if ($currentRole === 'candidate') {
+            if ($currentUser['id'] !== $userId) {
+                throw new Exception("Keine Berechtigung zum Aktualisieren anderer Mitgliederprofile");
+            }
+        } elseif (!in_array($currentRole, ['board', 'head', 'admin'])) {
             throw new Exception("Keine Berechtigung zum Aktualisieren des Mitgliederprofils");
         }
         
         $db = Database::getContentDB();
+        
+        // Check if profile exists
+        $checkStmt = $db->prepare("SELECT id FROM alumni_profiles WHERE user_id = ?");
+        $checkStmt->execute([$userId]);
+        if (!$checkStmt->fetch()) {
+            throw new Exception("Profil nicht gefunden");
+        }
         
         $fields = [];
         $values = [];
