@@ -1,4 +1,10 @@
 <?php
+/**
+ * SECURITY WARNING: This file contains temporary debug HTML comments (lines 289, 299)
+ * that expose internal authorization states. These MUST be removed before production deployment.
+ * The debug comments are for development/troubleshooting purposes only.
+ */
+
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Invoice.php';
 require_once __DIR__ . '/../../includes/models/User.php';
@@ -286,7 +292,7 @@ ob_start();
                                             </button>
                                         </div>
                                     <?php elseif ($invoice['status'] === 'approved' && $canMarkAsPaid): ?>
-                                        <!-- Debug: hasBoard=<?php echo $debugInfo['hasBoard'] ? 'true' : 'false'; ?>, hasFinanzen=<?php echo $debugInfo['hasFinanzen'] ? 'true' : 'false'; ?>, position=<?php echo htmlspecialchars($debugInfo['position']); ?> -->
+                                        <!-- TODO: REMOVE BEFORE PRODUCTION - Debug: hasBoard=<?php echo $debugInfo['hasBoard'] ? 'true' : 'false'; ?>, hasFinanzen=<?php echo $debugInfo['hasFinanzen'] ? 'true' : 'false'; ?>, position=<?php echo htmlspecialchars($debugInfo['position']); ?> -->
                                         <button 
                                             onclick="markInvoiceAsPaid(<?php echo $invoice['id']; ?>)"
                                             class="px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors text-xs"
@@ -296,7 +302,7 @@ ob_start();
                                             Als Bezahlt markieren
                                         </button>
                                     <?php else: ?>
-                                        <!-- Debug: Button hidden - hasBoard=<?php echo $debugInfo['hasBoard'] ? 'true' : 'false'; ?>, hasFinanzen=<?php echo $debugInfo['hasFinanzen'] ? 'true' : 'false'; ?>, position=<?php echo htmlspecialchars($debugInfo['position']); ?>, status=<?php echo htmlspecialchars($invoice['status']); ?> -->
+                                        <!-- TODO: REMOVE BEFORE PRODUCTION - Debug: Button hidden - hasBoard=<?php echo $debugInfo['hasBoard'] ? 'true' : 'false'; ?>, hasFinanzen=<?php echo $debugInfo['hasFinanzen'] ? 'true' : 'false'; ?>, position=<?php echo htmlspecialchars($debugInfo['position']); ?>, status=<?php echo htmlspecialchars($invoice['status']); ?> -->
                                         <span class="text-gray-400 dark:text-gray-500 text-xs">-</span>
                                     <?php endif; ?>
                                 </td>
