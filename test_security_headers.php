@@ -49,7 +49,7 @@ $headers = headers_list();
     
     <h2>How to Verify:</h2>
     <p>Run from command line:</p>
-    <code>curl -I <?php echo (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $_SERVER['PHP_SELF']; ?></code>
+    <code>curl -I <?php echo htmlspecialchars((isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . $_SERVER['PHP_SELF'], ENT_QUOTES, 'UTF-8'); ?></code>
     
     <p>Or check browser developer tools → Network tab → Select this request → Headers</p>
 </body>

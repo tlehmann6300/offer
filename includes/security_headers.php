@@ -41,6 +41,8 @@ if (!headers_sent()) {
     
     // X-XSS-Protection: Enables browser's XSS filtering
     // mode=block prevents rendering of the page if XSS is detected
+    // NOTE: This header is deprecated in modern browsers which rely on CSP instead.
+    // It's included here for backwards compatibility with older browsers.
     if (!header_sent_check('X-XSS-Protection')) {
         header('X-XSS-Protection: 1; mode=block');
     }
@@ -56,7 +58,11 @@ if (!headers_sent()) {
     // - Tailwind CSS CDN (cdn.tailwindcss.com)
     // - Font Awesome CDN (cdnjs.cloudflare.com)
     // - Google Fonts (fonts.googleapis.com, fonts.gstatic.com)
-    // - Inline scripts and styles are allowed ('unsafe-inline') for Tailwind config
+    // NOTE: 'unsafe-inline' is required for:
+    //   - Inline Tailwind configuration script in layout templates
+    //   - Inline styles in various components
+    // This is a tradeoff between CSP strictness and development convenience.
+    // For better security, consider migrating to nonce-based CSP or external files.
     if (!header_sent_check('Content-Security-Policy')) {
         $csp_directives = [
             "default-src 'self'",
