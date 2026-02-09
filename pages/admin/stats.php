@@ -15,6 +15,7 @@ $user = Auth::user();
 $userRole = $user['role'] ?? '';
 
 // Check if user has one of the allowed roles
+// Note: 'admin' role removed - now only board, head, alumni, and alumni_board can access
 $allowedRoles = ['board', 'head', 'alumni', 'alumni_board'];
 if (!in_array($userRole, $allowedRoles)) {
     header('Location: ../dashboard/index.php');
