@@ -1,22 +1,16 @@
 <?php
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Alumni.php';
+require_once __DIR__ . '/../../includes/models/User.php';
 require_once __DIR__ . '/../../includes/helpers.php';
 
-// Access Control: Allow all logged-in active users
+// Access Control: Allow all logged-in users
 if (!Auth::check()) {
     header('Location: ../auth/login.php');
     exit;
 }
 
 $user = Auth::user();
-
-// Check if user has one of the allowed active roles
-$allowedRoles = ['admin', 'board', 'head', 'member', 'candidate'];
-if (!in_array($user['role'], $allowedRoles)) {
-    header('Location: ../dashboard/index.php');
-    exit;
-}
 
 // Get profile ID from URL
 $profileId = $_GET['id'] ?? null;
@@ -35,13 +29,15 @@ if (!$profile) {
     exit;
 }
 
-// Check if this profile belongs to an active member
-$allowedViewRoles = ['admin', 'board', 'head', 'member', 'candidate'];
-if (!in_array($profile['role'], $allowedViewRoles)) {
-    // This is an alumni profile, redirect to alumni view or directory
-    header('Location: ../alumni/index.php');
+// Get the user's role from the users table
+$profileUser = User::findById($profile['user_id']);
+if (!$profileUser) {
+    $_SESSION['error_message'] = 'Benutzer nicht gefunden';
+    header('Location: index.php');
     exit;
 }
+
+$profileUserRole = $profileUser['role'];
 
 $title = htmlspecialchars($profile['first_name'] . ' ' . $profile['last_name']) . ' - IBC Intranet';
 ob_start();
@@ -96,7 +92,10 @@ ob_start();
                     'head' => 'bg-blue-100 text-blue-800 border-blue-300',
                     'member' => 'bg-green-100 text-green-800 border-green-300',
                     'candidate' => 'bg-yellow-100 text-yellow-800 border-yellow-300',
-                    'admin' => 'bg-red-100 text-red-800 border-red-300'
+                    'admin' => 'bg-red-100 text-red-800 border-red-300',
+                    'alumni' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'alumni_board' => 'bg-indigo-100 text-indigo-800 border-indigo-300',
+                    'honorary_member' => 'bg-amber-100 text-amber-800 border-amber-300'
                 ];
                 
                 $roleNames = [
@@ -104,11 +103,14 @@ ob_start();
                     'board' => 'Vorstand',
                     'head' => 'Ressortleiter',
                     'member' => 'Mitglied',
-                    'candidate' => 'Anwärter'
+                    'candidate' => 'Anwärter',
+                    'alumni' => 'Alumni',
+                    'alumni_board' => 'Alumni Vorstand',
+                    'honorary_member' => 'Ehrenmitglied'
                 ];
                 
-                $badgeClass = $roleBadgeColors[$profile['role']] ?? 'bg-gray-100 text-gray-800 border-gray-300';
-                $roleName = $roleNames[$profile['role']] ?? ucfirst($profile['role']);
+                $badgeClass = $roleBadgeColors[$profileUserRole] ?? 'bg-gray-100 text-gray-800 border-gray-300';
+                $roleName = $roleNames[$profileUserRole] ?? ucfirst($profileUserRole);
                 ?>
                 <div class="mb-4">
                     <span class="inline-block px-4 py-2 text-sm font-semibold rounded-full border <?php echo $badgeClass; ?>">
