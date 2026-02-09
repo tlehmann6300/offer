@@ -28,7 +28,7 @@ class Database {
                     ]
                 );
             } catch (PDOException $e) {
-                error_log("User DB Connection Error: " . $e->getMessage());
+                error_log("Verbindung fehlgeschlagen: " . $e->getCode());
                 throw new Exception("Database connection failed");
             }
         }
@@ -52,7 +52,7 @@ class Database {
                     ]
                 );
             } catch (PDOException $e) {
-                error_log("Content DB Connection Error: " . $e->getMessage());
+                error_log("Verbindung fehlgeschlagen: " . $e->getCode());
                 throw new Exception("Database connection failed");
             }
         }
@@ -79,7 +79,7 @@ class Database {
                     ]
                 );
             } catch (PDOException $e) {
-                error_log("Rech DB Connection Error: " . $e->getMessage());
+                error_log("Verbindung fehlgeschlagen: " . $e->getCode());
                 throw new Exception("Database connection failed");
             }
         }
