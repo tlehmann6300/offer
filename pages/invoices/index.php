@@ -111,7 +111,7 @@ ob_start();
                     </p>
                 </div>
                 <div class="w-16 h-16 bg-yellow-500 dark:bg-yellow-600 rounded-full flex items-center justify-center">
-                    <i class="fas fa-hourglass-half text-white dark:text-gray-100 text-2xl"></i>
+                    <i class="fas fa-hourglass-half text-white text-2xl"></i>
                 </div>
             </div>
         </div>
@@ -126,7 +126,7 @@ ob_start();
                     </p>
                 </div>
                 <div class="w-16 h-16 bg-green-500 dark:bg-green-600 rounded-full flex items-center justify-center">
-                    <i class="fas fa-check-circle text-white dark:text-gray-100 text-2xl"></i>
+                    <i class="fas fa-check-circle text-white text-2xl"></i>
                 </div>
             </div>
         </div>
@@ -138,7 +138,7 @@ ob_start();
     <div class="mb-6 flex justify-end">
         <a 
             href="<?php echo asset('api/export_invoices.php'); ?>"
-            class="px-6 py-2 bg-gray-600 dark:bg-gray-700 text-white dark:text-gray-100 rounded-lg font-semibold hover:bg-gray-700 dark:hover:bg-gray-600 transition-all shadow-md"
+            class="px-6 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg font-semibold hover:bg-gray-700 dark:hover:bg-gray-600 transition-all shadow-md"
         >
             <i class="fas fa-download mr-2"></i>
             Alle Belege Exportieren
@@ -271,14 +271,14 @@ ob_start();
                                         <div class="flex gap-2">
                                             <button 
                                                 onclick="updateInvoiceStatus(<?php echo $invoice['id']; ?>, 'approved')"
-                                                class="px-3 py-1 bg-green-600 dark:bg-green-700 text-white dark:text-gray-100 rounded hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
+                                                class="px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
                                                 title="Genehmigen"
                                             >
                                                 <i class="fas fa-check"></i>
                                             </button>
                                             <button 
                                                 onclick="updateInvoiceStatus(<?php echo $invoice['id']; ?>, 'rejected')"
-                                                class="px-3 py-1 bg-red-600 dark:bg-red-700 text-white dark:text-gray-100 rounded hover:bg-red-700 dark:hover:bg-red-600 transition-colors"
+                                                class="px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-600 transition-colors"
                                                 title="Ablehnen"
                                             >
                                                 <i class="fas fa-times"></i>
@@ -287,7 +287,7 @@ ob_start();
                                     <?php elseif ($invoice['status'] === 'approved' && $canMarkAsPaid): ?>
                                         <button 
                                             onclick="markInvoiceAsPaid(<?php echo $invoice['id']; ?>)"
-                                            class="px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white dark:text-gray-100 rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors text-xs"
+                                            class="px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors text-xs"
                                             title="Als Bezahlt markieren"
                                         >
                                             <i class="fas fa-check-double mr-1"></i>
@@ -415,7 +415,7 @@ ob_start();
             <div class="flex gap-4">
                 <button 
                     type="submit"
-                    class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white dark:text-gray-100 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg"
+                    class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg"
                 >
                     <i class="fas fa-paper-plane mr-2"></i>
                     Einreichen
