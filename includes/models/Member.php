@@ -173,6 +173,7 @@ class Member {
     
     /**
      * Update an existing member profile
+     * Note: Uses alumni_profiles table as this is the central profile table for all users
      * 
      * @param int $userId The user ID
      * @param array $data Profile data to update
@@ -210,6 +211,7 @@ class Member {
         }
         
         $values[] = $userId;
+        // Uses alumni_profiles table as this is the central profile table for all users
         $sql = "UPDATE alumni_profiles SET " . implode(', ', $fields) . " WHERE user_id = ?";
         
         $stmt = $db->prepare($sql);

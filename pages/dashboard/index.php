@@ -60,7 +60,7 @@ $userRentals = Inventory::getUserCheckouts($user['id'], false); // false = only 
 $openTasksCount = count($userRentals);
 
 // Get extended statistics for board/head/managers
-$userRole = $_SESSION['user_role'] ?? '';
+$userRole = $user['role'] ?? '';
 $hasExtendedAccess = in_array($userRole, ['admin', 'board', 'head', 'alumni_board']);
 if ($hasExtendedAccess) {
     $inStockStats = Inventory::getInStockStats();
