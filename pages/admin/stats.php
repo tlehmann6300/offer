@@ -131,53 +131,53 @@ ob_start();
 <div class="max-w-7xl mx-auto">
     <!-- Header -->
     <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-800 mb-2">
-            <i class="fas fa-chart-bar mr-3 text-purple-600"></i>
+        <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+            <i class="fas fa-chart-bar mr-3 text-purple-600 dark:text-purple-400"></i>
             Statistiken
         </h1>
-        <p class="text-gray-600">Übersicht über wichtige Kennzahlen und Aktivitäten</p>
+        <p class="text-gray-600 dark:text-gray-300">Übersicht über wichtige Kennzahlen und Aktivitäten</p>
     </div>
 
     <!-- Metrics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <!-- Active Users (7 Days) -->
-        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-blue-50 border-l-4 border-blue-500">
+        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-900/20 border-l-4 border-blue-500 dark:border-blue-600">
             <div class="flex items-center justify-between">
                 <div>
-                    <h3 class="text-sm font-semibold text-gray-600 uppercase mb-1">Aktive Nutzer</h3>
-                    <p class="text-3xl font-bold text-blue-600"><?php echo number_format($activeUsersCount); ?></p>
-                    <p class="text-xs text-gray-500 mt-1">Letzte 7 Tage</p>
+                    <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase mb-1">Aktive Nutzer</h3>
+                    <p class="text-3xl font-bold text-blue-600 dark:text-blue-400"><?php echo number_format($activeUsersCount); ?></p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Letzte 7 Tage</p>
                 </div>
-                <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-users text-blue-600 text-2xl"></i>
+                <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center">
+                    <i class="fas fa-users text-blue-600 dark:text-blue-400 text-2xl"></i>
                 </div>
             </div>
         </div>
 
         <!-- Open Invitations -->
-        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-green-50 border-l-4 border-green-500">
+        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-green-50 dark:from-gray-800 dark:to-green-900/20 border-l-4 border-green-500 dark:border-green-600">
             <div class="flex items-center justify-between">
                 <div>
-                    <h3 class="text-sm font-semibold text-gray-600 uppercase mb-1">Offene Einladungen</h3>
-                    <p class="text-3xl font-bold text-green-600"><?php echo number_format($openInvitationsCount); ?></p>
-                    <p class="text-xs text-gray-500 mt-1">Nicht verwendet</p>
+                    <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase mb-1">Offene Einladungen</h3>
+                    <p class="text-3xl font-bold text-green-600 dark:text-green-400"><?php echo number_format($openInvitationsCount); ?></p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Nicht verwendet</p>
                 </div>
-                <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-envelope-open-text text-green-600 text-2xl"></i>
+                <div class="w-14 h-14 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center">
+                    <i class="fas fa-envelope-open-text text-green-600 dark:text-green-400 text-2xl"></i>
                 </div>
             </div>
         </div>
 
         <!-- Total Users -->
-        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-purple-50 border-l-4 border-purple-500">
+        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-purple-50 dark:from-gray-800 dark:to-purple-900/20 border-l-4 border-purple-500 dark:border-purple-600">
             <div class="flex items-center justify-between">
                 <div>
-                    <h3 class="text-sm font-semibold text-gray-600 uppercase mb-1">Gesamtanzahl User</h3>
-                    <p class="text-3xl font-bold text-purple-600"><?php echo number_format($totalUsersCount); ?></p>
-                    <p class="text-xs text-gray-500 mt-1">Registriert</p>
+                    <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase mb-1">Gesamtanzahl User</h3>
+                    <p class="text-3xl font-bold text-purple-600 dark:text-purple-400"><?php echo number_format($totalUsersCount); ?></p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Registriert</p>
                 </div>
-                <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-user-friends text-purple-600 text-2xl"></i>
+                <div class="w-14 h-14 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center">
+                    <i class="fas fa-user-friends text-purple-600 dark:text-purple-400 text-2xl"></i>
                 </div>
             </div>
         </div>
@@ -185,76 +185,76 @@ ob_start();
 
     <!-- Active Checkouts Section -->
     <div class="card mb-8">
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 class="text-xl font-bold text-gray-800">
-                <i class="fas fa-box-open mr-2 text-orange-600"></i>
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+                <i class="fas fa-box-open mr-2 text-orange-600 dark:text-orange-400"></i>
                 Wer hat was ausgeliehen?
             </h2>
-            <p class="text-sm text-gray-600 mt-1">Aktive Ausleihen mit Benutzernamen</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Aktive Ausleihen mit Benutzernamen</p>
         </div>
         <div class="p-6">
             <?php if (empty($activeCheckouts)): ?>
                 <div class="text-center py-8">
-                    <i class="fas fa-check-circle text-6xl text-gray-300 mb-4"></i>
-                    <p class="text-gray-600 text-lg">Keine aktiven Ausleihen</p>
-                    <p class="text-sm text-gray-500 mt-2">Alle Artikel wurden zurückgegeben</p>
+                    <i class="fas fa-check-circle text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                    <p class="text-gray-600 dark:text-gray-300 text-lg">Keine aktiven Ausleihen</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Alle Artikel wurden zurückgegeben</p>
                 </div>
             <?php else: ?>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-800">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Artikel
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Benutzer
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Ausgeliehen am
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Fällig am
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Status
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                             <?php foreach ($activeCheckouts as $checkout): ?>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                                     <?php echo htmlspecialchars($checkout['item_name']); ?>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900 font-medium">
+                                    <div class="text-sm text-gray-900 dark:text-gray-100 font-medium">
                                         <?php echo htmlspecialchars($checkout['user_name']); ?>
                                     </div>
-                                    <div class="text-xs text-gray-500">
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
                                         <?php echo htmlspecialchars($checkout['user_email']); ?>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                                     <?php echo date('d.m.Y H:i', strtotime($checkout['checked_out_at'])); ?>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                                     <?php 
                                     if (!empty($checkout['due_date'])) {
                                         echo date('d.m.Y', strtotime($checkout['due_date']));
                                     } else {
-                                        echo '<span class="text-gray-400">Kein Datum</span>';
+                                        echo '<span class="text-gray-400 dark:text-gray-500">Kein Datum</span>';
                                     }
                                     ?>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <?php if ($checkout['is_overdue']): ?>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300">
                                             <i class="fas fa-exclamation-triangle mr-1"></i>
                                             Überfällig
                                         </span>
                                     <?php else: ?>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300">
                                             <i class="fas fa-check-circle mr-1"></i>
                                             Aktiv
                                         </span>
@@ -265,7 +265,7 @@ ob_start();
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-4 text-sm text-gray-600">
+                <div class="mt-4 text-sm text-gray-600 dark:text-gray-300">
                     <strong>Gesamt:</strong> <?php echo count($activeCheckouts); ?> aktive Ausleihen
                 </div>
             <?php endif; ?>
@@ -274,65 +274,65 @@ ob_start();
 
     <!-- Project Applications Section -->
     <div class="card">
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 class="text-xl font-bold text-gray-800">
-                <i class="fas fa-briefcase mr-2 text-purple-600"></i>
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+                <i class="fas fa-briefcase mr-2 text-purple-600 dark:text-purple-400"></i>
                 Projekt Bewerbungen
             </h2>
-            <p class="text-sm text-gray-600 mt-1">Anzahl Bewerbungen pro Projekt</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Anzahl Bewerbungen pro Projekt</p>
         </div>
         <div class="p-6">
             <?php if (empty($projectApplications)): ?>
                 <div class="text-center py-8">
-                    <i class="fas fa-briefcase text-6xl text-gray-300 mb-4"></i>
-                    <p class="text-gray-600 text-lg">Keine Projekte vorhanden</p>
+                    <i class="fas fa-briefcase text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                    <p class="text-gray-600 dark:text-gray-300 text-lg">Keine Projekte vorhanden</p>
                 </div>
             <?php else: ?>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-800">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Projekttitel
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Typ
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Status
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Bewerbungen
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                             <?php foreach ($projectApplications as $project): ?>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
                                     <a href="../projects/view.php?id=<?php echo $project['id']; ?>" 
-                                       class="text-purple-600 hover:text-purple-800 hover:underline">
+                                       class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 hover:underline">
                                         <?php echo htmlspecialchars($project['title']); ?>
                                     </a>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                                     <?php 
                                     $typeLabels = [
                                         'internal' => 'Intern',
                                         'external' => 'Extern'
                                     ];
                                     $typeColors = [
-                                        'internal' => 'bg-blue-100 text-blue-800',
-                                        'external' => 'bg-green-100 text-green-800'
+                                        'internal' => 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300',
+                                        'external' => 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300'
                                     ];
                                     $typeLabel = $typeLabels[$project['type']] ?? $project['type'];
-                                    $typeColor = $typeColors[$project['type']] ?? 'bg-gray-100 text-gray-800';
+                                    $typeColor = $typeColors[$project['type']] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
                                     ?>
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo $typeColor; ?>">
                                         <?php echo htmlspecialchars($typeLabel); ?>
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                                     <?php 
                                     $statusLabels = [
                                         'open' => 'Offen',
@@ -342,14 +342,14 @@ ob_start();
                                         'archived' => 'Archiviert'
                                     ];
                                     $statusColors = [
-                                        'open' => 'bg-yellow-100 text-yellow-800',
-                                        'assigned' => 'bg-blue-100 text-blue-800',
-                                        'running' => 'bg-green-100 text-green-800',
-                                        'completed' => 'bg-gray-100 text-gray-800',
-                                        'archived' => 'bg-gray-100 text-gray-600'
+                                        'open' => 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300',
+                                        'assigned' => 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300',
+                                        'running' => 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300',
+                                        'completed' => 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300',
+                                        'archived' => 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
                                     ];
                                     $statusLabel = $statusLabels[$project['status']] ?? $project['status'];
-                                    $statusColor = $statusColors[$project['status']] ?? 'bg-gray-100 text-gray-800';
+                                    $statusColor = $statusColors[$project['status']] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
                                     ?>
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?php echo $statusColor; ?>">
                                         <?php echo htmlspecialchars($statusLabel); ?>
@@ -357,12 +357,12 @@ ob_start();
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <span class="text-lg font-bold text-purple-600 mr-2">
+                                        <span class="text-lg font-bold text-purple-600 dark:text-purple-400 mr-2">
                                             <?php echo $project['application_count']; ?>
                                         </span>
                                         <?php if ($project['application_count'] > 0): ?>
                                         <a href="../projects/applications.php?project_id=<?php echo $project['id']; ?>" 
-                                           class="text-xs text-purple-600 hover:text-purple-800 hover:underline">
+                                           class="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 hover:underline">
                                             Details →
                                         </a>
                                         <?php endif; ?>
@@ -373,7 +373,7 @@ ob_start();
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-4 text-sm text-gray-600">
+                <div class="mt-4 text-sm text-gray-600 dark:text-gray-300">
                     <strong>Gesamt:</strong> <?php echo count($projectApplications); ?> Projekte | 
                     <?php echo array_sum(array_column($projectApplications, 'application_count')); ?> Bewerbungen insgesamt
                 </div>
