@@ -59,7 +59,7 @@ ob_start();
     <!-- Header -->
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">
+            <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                 <i class="fas fa-calendar-alt mr-3 text-purple-600"></i>
                 Events
             </h1>
@@ -78,12 +78,12 @@ ob_start();
     <!-- Filter Tabs -->
     <div class="mb-6 flex gap-2 flex-wrap">
         <a href="?filter=current" 
-           class="px-6 py-3 rounded-lg font-semibold transition-all <?php echo $filter === 'current' ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg' : 'bg-white text-gray-700 hover:bg-gray-50'; ?>">
+           class="px-6 py-3 rounded-lg font-semibold transition-all <?php echo $filter === 'current' ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'; ?>">
             <i class="fas fa-calendar-day mr-2"></i>
             Aktuell
         </a>
         <a href="?filter=my_registrations" 
-           class="px-6 py-3 rounded-lg font-semibold transition-all <?php echo $filter === 'my_registrations' ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg' : 'bg-white text-gray-700 hover:bg-gray-50'; ?>">
+           class="px-6 py-3 rounded-lg font-semibold transition-all <?php echo $filter === 'my_registrations' ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'; ?>">
             <i class="fas fa-user-check mr-2"></i>
             Meine Anmeldungen
         </a>
@@ -92,8 +92,8 @@ ob_start();
     <!-- Events Grid -->
     <?php if (empty($events)): ?>
         <div class="card p-8 text-center">
-            <i class="fas fa-calendar-times text-6xl text-gray-300 mb-4"></i>
-            <p class="text-xl text-gray-600">Keine Events gefunden</p>
+            <i class="fas fa-calendar-times text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+            <p class="text-xl text-gray-600 dark:text-gray-300">Keine Events gefunden</p>
         </div>
     <?php else: ?>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -124,7 +124,7 @@ ob_start();
                     <!-- Status Badge -->
                     <?php if ($isRegistered): ?>
                         <div class="absolute top-4 right-4">
-                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+                            <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs font-semibold rounded-full">
                                 <i class="fas fa-check mr-1"></i>
                                 Angemeldet
                             </span>
@@ -133,14 +133,14 @@ ob_start();
                     
                     <!-- Event Header -->
                     <div class="mb-4">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">
+                        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                             <?php echo htmlspecialchars($event['title']); ?>
                         </h3>
                         
                         <!-- Countdown -->
                         <?php if ($countdown): ?>
                             <div class="mb-2">
-                                <span class="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 text-sm font-semibold rounded-lg">
+                                <span class="inline-flex items-center px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-sm font-semibold rounded-lg">
                                     <i class="fas fa-clock mr-2"></i>
                                     <?php echo $countdown; ?>
                                 </span>
@@ -148,7 +148,7 @@ ob_start();
                         <?php endif; ?>
                         
                         <!-- Event Info -->
-                        <div class="space-y-2 text-sm text-gray-600">
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                             <div class="flex items-start">
                                 <i class="fas fa-calendar w-5 mt-0.5 text-purple-600"></i>
                                 <span>
@@ -169,15 +169,15 @@ ob_start();
                             
                             <?php if ($event['is_external']): ?>
                                 <div class="flex items-start">
-                                    <i class="fas fa-external-link-alt w-5 mt-0.5 text-blue-600"></i>
-                                    <span class="text-blue-600">Externes Event</span>
+                                    <i class="fas fa-external-link-alt w-5 mt-0.5 text-blue-600 dark:text-blue-400"></i>
+                                    <span class="text-blue-600 dark:text-blue-400">Externes Event</span>
                                 </div>
                             <?php endif; ?>
                             
                             <?php if ($event['needs_helpers'] && $userRole !== 'alumni'): ?>
                                 <div class="flex items-start">
-                                    <i class="fas fa-hands-helping w-5 mt-0.5 text-orange-600"></i>
-                                    <span class="text-orange-600">Helfer benötigt</span>
+                                    <i class="fas fa-hands-helping w-5 mt-0.5 text-orange-600 dark:text-orange-400"></i>
+                                    <span class="text-orange-600 dark:text-orange-400">Helfer benötigt</span>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -185,7 +185,7 @@ ob_start();
                     
                     <!-- Description Preview -->
                     <?php if (!empty($event['description'])): ?>
-                        <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                        <p class="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
                             <?php echo htmlspecialchars(substr($event['description'], 0, 150)); ?>
                             <?php echo strlen($event['description']) > 150 ? '...' : ''; ?>
                         </p>
