@@ -432,7 +432,7 @@ endif;
                 </div>
             </a>
             <?php endif; ?>
-            <?php if (in_array($userRole, ['admin', 'board'])): ?>
+            <?php if (in_array($userRole, ['admin', 'board'])): // User management restricted to admin/board only ?>
             <a href="../admin/users.php" class="block p-4 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-800 dark:hover:to-blue-700 transition-all duration-300 group">
                 <div class="flex items-center">
                     <i class="fas fa-users-cog text-blue-600 dark:text-blue-300 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
