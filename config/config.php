@@ -20,6 +20,7 @@ if (file_exists($envFile)) {
         // - Quoted with double quotes: "value with # and spaces"
         // - Quoted with single quotes: 'value with # and spaces'
         // - Unquoted: value (comments after # are removed)
+        // Note: Escaped quotes within quoted strings are not supported (e.g., "value with \"quote\"")
         if (preg_match('/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*)$/i', $line, $matches)) {
             $key = $matches[1];
             $value = $matches[2];
