@@ -20,38 +20,10 @@ if (!Auth::check()) {
 $user = Auth::user();
 $userRole = $user['role'] ?? '';
 
-// Only board members can mark as paid
-if ($userRole !== 'board') {
+// Only vorstand_finanzen_recht members can mark as paid
+if ($userRole !== 'vorstand_finanzen_recht') {
     http_response_code(403);
-    echo json_encode(['success' => false, 'error' => 'Keine Berechtigung - nur Vorstandsmitglieder']);
-    exit;
-}
-
-// Check if user has 'Finanzen und Recht' position in alumni_profiles
-$contentDb = Database::getContentDB();
-$stmt = $contentDb->prepare("
-    SELECT position 
-    FROM alumni_profiles 
-    WHERE user_id = ?
-");
-$stmt->execute([$user['id']]);
-$profile = $stmt->fetch();
-
-$hasFinancePosition = false;
-if ($profile && !empty($profile['position'])) {
-    // Check if position contains 'Finanzen' as a word (not as part of another word)
-    // Use word boundary matching to avoid false positives like 'Nicht-Finanzen'
-    if (preg_match('/\bFinanzen\b/i', $profile['position'])) {
-        $hasFinancePosition = true;
-    }
-}
-
-if (!$hasFinancePosition) {
-    http_response_code(403);
-    echo json_encode([
-        'success' => false, 
-        'error' => 'Keine Berechtigung - Position mit "Finanzen" erforderlich'
-    ]);
+    echo json_encode(['success' => false, 'error' => 'Keine Berechtigung - nur Vorstand Finanzen & Recht']);
     exit;
 }
 

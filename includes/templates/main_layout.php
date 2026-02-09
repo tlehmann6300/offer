@@ -49,17 +49,25 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         
         /* Light mode sidebar styling */
         body:not(.dark-mode) .sidebar {
-            background: linear-gradient(135deg, var(--ibc-blue) 0%, var(--ibc-blue-dark) 100%);
+            background: linear-gradient(135deg, #0066b3 0%, #004f8c 100%);
+            box-shadow: 4px 0 20px rgba(0, 102, 179, 0.15);
         }
         
         /* Light mode sidebar text colors */
         body:not(.dark-mode) .sidebar a {
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(255, 255, 255, 0.95);
+            transition: all 0.2s ease;
         }
         
         body:not(.dark-mode) .sidebar a:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
+            transform: translateX(4px);
+        }
+        
+        body:not(.dark-mode) .sidebar a.active {
+            background: rgba(255, 255, 255, 0.25);
+            border-right: 3px solid #00a651;
         }
         
         body:not(.dark-mode) .sidebar .bg-gray-800 {
@@ -67,11 +75,11 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         }
         
         body:not(.dark-mode) .sidebar .text-gray-300 {
-            color: rgba(255, 255, 255, 0.9) !important;
+            color: rgba(255, 255, 255, 0.95) !important;
         }
         
         body:not(.dark-mode) .sidebar button {
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(255, 255, 255, 0.95);
         }
         
         /* Light mode mobile menu button styling */
@@ -94,23 +102,27 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         
         .card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-            transition: all 0.3s ease;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
         .card:hover {
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 12px 32px rgba(0, 102, 179, 0.15);
+            transform: translateY(-2px);
         }
         .btn-primary {
-            background: linear-gradient(135deg, var(--ibc-green) 0%, var(--ibc-blue) 100%);
+            background: linear-gradient(135deg, #00a651 0%, #0066b3 100%);
             color: white;
-            padding: 0.5rem 1.5rem;
-            border-radius: 0.5rem;
+            padding: 0.625rem 1.75rem;
+            border-radius: 10px;
             transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 166, 81, 0.25);
         }
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-glow-green);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 166, 81, 0.35);
         }
         
         /* Mobile view improvements */
@@ -214,7 +226,14 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </a>
 
                 <!-- Mitglieder (Board, Head, Member, Candidate) -->
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'head', 'member', 'candidate'])): ?>
+                <?php 
+                $isBoardRole = Auth::isBoardMember();
+                $canSeeMitglieder = isset($_SESSION['user_role']) && (
+                    $isBoardRole || 
+                    in_array($_SESSION['user_role'], ['head', 'member', 'candidate'])
+                );
+                ?>
+                <?php if ($canSeeMitglieder): ?>
                 <a href="<?php echo asset('pages/members/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/members/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-users w-5 mr-3"></i>
@@ -264,8 +283,14 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <span>Blog</span>
                 </a>
 
-                <!-- Rechnungen (Board, Alumni, Alumni-Board, Honorary Member) -->
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'alumni', 'alumni_board', 'honorary_member'])): ?>
+                <!-- Rechnungen (Board roles, Alumni, Alumni-Board, Honorary Member) -->
+                <?php 
+                $canSeeInvoices = isset($_SESSION['user_role']) && (
+                    $isBoardRole ||
+                    in_array($_SESSION['user_role'], ['alumni', 'alumni_board', 'honorary_member'])
+                );
+                ?>
+                <?php if ($canSeeInvoices): ?>
                 <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-file-invoice-dollar w-5 mr-3"></i>
@@ -273,35 +298,31 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </a>
                 <?php endif; ?>
 
-                <!-- Verwaltung Dropdown (Board ONLY) -->
-                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'board'): ?>
-                <div>
-                    <button id="verwaltung-dropdown-btn" 
-                            class="flex items-center justify-between w-full px-6 py-2 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200">
-                        <div class="flex items-center">
-                            <i class="fas fa-cogs w-5 mr-3"></i>
-                            <span>Verwaltung</span>
-                        </div>
-                        <i id="verwaltung-chevron" class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
-                    </button>
-                    <div id="verwaltung-dropdown" class="hidden bg-gray-800/50 mt-1 space-y-1">
-                        <a href="<?php echo asset('pages/admin/users.php'); ?>" 
-                           class="flex items-center px-6 py-2 pl-12 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/users.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                            <i class="fas fa-users w-5 mr-3"></i>
-                            <span>Benutzer</span>
-                        </a>
-                        <a href="<?php echo asset('pages/auth/settings.php'); ?>" 
-                           class="flex items-center px-6 py-2 pl-12 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/auth/settings.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                            <i class="fas fa-cog w-5 mr-3"></i>
-                            <span>Einstellungen</span>
-                        </a>
-                        <a href="<?php echo asset('pages/admin/stats.php'); ?>" 
-                           class="flex items-center px-6 py-2 pl-12 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/stats.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                            <i class="fas fa-chart-bar w-5 mr-3"></i>
-                            <span>Statistiken</span>
-                        </a>
-                    </div>
-                </div>
+                <!-- Benutzer (Board roles ONLY) -->
+                <?php if ($isBoardRole): ?>
+                <a href="<?php echo asset('pages/admin/users.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/users.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-users-cog w-5 mr-3"></i>
+                    <span>Benutzer</span>
+                </a>
+                <?php endif; ?>
+
+                <!-- Einstellungen (Board roles ONLY) -->
+                <?php if ($isBoardRole): ?>
+                <a href="<?php echo asset('pages/auth/settings.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/auth/settings.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-cog w-5 mr-3"></i>
+                    <span>Einstellungen</span>
+                </a>
+                <?php endif; ?>
+
+                <!-- Statistiken (Board roles ONLY) -->
+                <?php if ($isBoardRole): ?>
+                <a href="<?php echo asset('pages/admin/stats.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/stats.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-chart-bar w-5 mr-3"></i>
+                    <span>Statistiken</span>
+                </a>
                 <?php endif; ?>
                 
             </nav>
@@ -361,9 +382,11 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <?php echo $initials; ?>
                 </div>
                 <div class='flex-1 min-w-0'>
-                    <p class='text-sm font-semibold text-white dark:text-gray-100 truncate leading-snug mb-0.5' title='<?php echo htmlspecialchars($greeting . ', ' . $greetingName); ?>'>
-                        <?php echo htmlspecialchars($greeting . ', ' . $greetingName); ?>
+                    <?php if (!empty($firstname) || !empty($lastname)): ?>
+                    <p class='text-sm font-semibold text-white dark:text-gray-100 truncate leading-snug mb-0.5' title='<?php echo htmlspecialchars($firstname . ' ' . $lastname); ?>'>
+                        <?php echo htmlspecialchars($firstname . ' ' . $lastname); ?>
                     </p>
+                    <?php endif; ?>
                     <p class='text-[11px] text-gray-200 dark:text-gray-300 truncate leading-snug mb-1' title='<?php echo htmlspecialchars($email); ?>'>
                         <?php echo htmlspecialchars($email); ?>
                     </p>
@@ -375,6 +398,9 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                             'member' => 'Mitglied',
                             'head' => 'Ressortleiter',
                             'board' => 'Vorstand',
+                            'vorstand_intern' => 'Vorstand Intern',
+                            'vorstand_extern' => 'Vorstand Extern',
+                            'vorstand_finanzen_recht' => 'Vorstand Finanzen & Recht',
                             'alumni' => 'Alumni',
                             'alumni_board' => 'Alumni Vorstand',
                             'honorary_member' => 'Ehrenmitglied'
@@ -540,27 +566,6 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         // Update immediately and then every second
         updateLiveClock();
         setInterval(updateLiveClock, 1000);
-        
-        // Verwaltung Dropdown Toggle
-        const verwaltungBtn = document.getElementById('verwaltung-dropdown-btn');
-        const verwaltungDropdown = document.getElementById('verwaltung-dropdown');
-        const verwaltungChevron = document.getElementById('verwaltung-chevron');
-        
-        verwaltungBtn?.addEventListener('click', (e) => {
-            e.preventDefault();
-            verwaltungDropdown.classList.toggle('hidden');
-            verwaltungChevron.classList.toggle('rotate-180');
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (verwaltungBtn && verwaltungDropdown && 
-                !verwaltungBtn.contains(e.target) && 
-                !verwaltungDropdown.contains(e.target)) {
-                verwaltungDropdown.classList.add('hidden');
-                verwaltungChevron?.classList.remove('rotate-180');
-            }
-        });
     </script>
 </body>
 </html>

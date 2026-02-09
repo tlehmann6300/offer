@@ -14,40 +14,22 @@ $user = Auth::user();
 $userRole = $user['role'] ?? '';
 
 // Check if user has one of the allowed roles
-$allowedRoles = ['admin', 'board', 'alumni_board', 'head', 'alumni'];
+$allowedRoles = ['admin', 'board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni_board', 'head', 'alumni', 'honorary_member'];
 if (!in_array($userRole, $allowedRoles)) {
     header('Location: ../dashboard/index.php');
     exit;
 }
 
 // Check if user has permission to mark invoices as paid
-// ONLY board members with 'Finanzen' in position can mark as paid
-$canMarkAsPaid = false;
-if (Auth::hasRole('board')) {
-    $contentDb = Database::getContentDB();
-    $stmt = $contentDb->prepare("
-        SELECT position 
-        FROM alumni_profiles 
-        WHERE user_id = ?
-    ");
-    $stmt->execute([$user['id']]);
-    $profile = $stmt->fetch();
-    
-    if ($profile && !empty($profile['position'])) {
-        $userPos = $profile['position'];
-        // Check if position contains 'Finanzen'
-        if (strpos($userPos, 'Finanzen') !== false) {
-            $canMarkAsPaid = true;
-        }
-    }
-}
+// ONLY vorstand_finanzen_recht can mark as paid
+$canMarkAsPaid = ($userRole === 'vorstand_finanzen_recht');
 
 // Get invoices based on role
 $invoices = Invoice::getAll($userRole, $user['id']);
 
-// Get statistics (only for board/alumni_board)
+// Get statistics (only for board roles and alumni_board)
 $stats = null;
-if (in_array($userRole, ['admin', 'board', 'alumni_board'])) {
+if (in_array($userRole, ['admin', 'board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni_board'])) {
     $stats = Invoice::getStats();
 }
 

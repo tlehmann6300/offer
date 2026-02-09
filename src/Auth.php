@@ -9,6 +9,32 @@ require_once __DIR__ . '/Database.php';
 class Auth {
     
     /**
+     * All valid role types in the system
+     */
+    const VALID_ROLES = [
+        'candidate',
+        'member',
+        'head',
+        'alumni',
+        'alumni_board',
+        'board',
+        'vorstand_intern',
+        'vorstand_extern',
+        'vorstand_finanzen_recht',
+        'honorary_member'
+    ];
+    
+    /**
+     * Board role types (all variants)
+     */
+    const BOARD_ROLES = [
+        'board',
+        'vorstand_intern',
+        'vorstand_extern',
+        'vorstand_finanzen_recht'
+    ];
+    
+    /**
      * Extract domain from BASE_URL for session cookie
      * 
      * @return string Domain from BASE_URL or empty string
@@ -244,6 +270,20 @@ class Auth {
     }
     
     /**
+     * Check if user has any board role
+     * 
+     * @return bool True if user has any board role
+     */
+    public static function isBoardMember() {
+        if (!self::check()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        return in_array($userRole, self::BOARD_ROLES);
+    }
+    
+    /**
      * Check if user has specific permission/role
      * 
      * @param string $role Required role
@@ -256,12 +296,18 @@ class Auth {
         
         // Role hierarchy
         $roleHierarchy = [
+            'candidate' => 0,
             'alumni' => 1,
             'member' => 1,
+            'honorary_member' => 1,
+            'head' => 2,
             'manager' => 2,
             'manage_projects' => 2,  // Permission for manager-level project access
             'alumni_board' => 3,
             'board' => 3,
+            'vorstand_intern' => 3,
+            'vorstand_extern' => 3,
+            'vorstand_finanzen_recht' => 3,
             'admin' => 4
         ];
         
