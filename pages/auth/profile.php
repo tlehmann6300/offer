@@ -4,6 +4,7 @@ require_once __DIR__ . '/../../includes/helpers.php';
 require_once __DIR__ . '/../../includes/handlers/GoogleAuthenticator.php';
 require_once __DIR__ . '/../../includes/models/User.php';
 require_once __DIR__ . '/../../includes/models/Alumni.php';
+require_once __DIR__ . '/../../includes/models/Member.php';
 
 if (!Auth::check()) {
     header('Location: login.php');
@@ -28,8 +29,35 @@ if (isset($_SESSION['error_message'])) {
     unset($_SESSION['error_message']);
 }
 
-// Load user's profile from alumni_profiles table
-$profile = Alumni::getProfileByUserId($user['id']);
+// Load user's profile based on role
+// If User is 'member'/'board'/'head'/'candidate' -> Use Member::getProfileByUserId()
+// If User is 'alumni'/'alumni_board' -> Use Alumni::getProfileByUserId()
+$profile = null;
+if (in_array($userRole, ['member', 'board', 'head', 'candidate'])) {
+    $profile = Member::getProfileByUserId($user['id']);
+} elseif (in_array($userRole, ['alumni', 'alumni_board'])) {
+    $profile = Alumni::getProfileByUserId($user['id']);
+}
+
+// If profile not found, initialize empty profile to show "Profil erstellen" form
+if (!$profile) {
+    $profile = [
+        'first_name' => '',
+        'last_name' => '',
+        'email' => $user['email'],
+        'mobile_phone' => '',
+        'linkedin_url' => '',
+        'xing_url' => '',
+        'about_me' => '',
+        'image_path' => '',
+        'study_program' => '',
+        'semester' => '',
+        'angestrebter_abschluss' => '',
+        'company' => '',
+        'industry' => '',
+        'position' => ''
+    ];
+}
 
 // Handle 2FA setup
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

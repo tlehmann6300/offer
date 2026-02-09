@@ -172,6 +172,28 @@ class Member {
     }
     
     /**
+     * Get profile by user ID
+     * Note: Uses alumni_profiles table as this is the central profile table for all users
+     * 
+     * @param int $userId The user ID
+     * @return array|false Profile data or false if not found
+     */
+    public static function getProfileByUserId(int $userId) {
+        $db = Database::getContentDB();
+        $stmt = $db->prepare("
+            SELECT id, user_id, first_name, last_name, email, mobile_phone, 
+                   linkedin_url, xing_url, industry, company, position, 
+                   study_program, semester, angestrebter_abschluss, 
+                   degree, graduation_year,
+                   image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
+            FROM alumni_profiles 
+            WHERE user_id = ?
+        ");
+        $stmt->execute([$userId]);
+        return $stmt->fetch();
+    }
+    
+    /**
      * Update an existing member profile
      * Note: Uses alumni_profiles table as this is the central profile table for all users
      * 

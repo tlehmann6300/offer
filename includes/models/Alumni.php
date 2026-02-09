@@ -228,14 +228,14 @@ class Alumni extends Database {
     
     /**
      * Search profiles with filters
-     * Returns all profiles from alumni_profiles table matching search criteria
-     * Note: Does not filter by user role - role filtering should be handled by caller if needed
+     * Returns ONLY profiles where the linked User has role 'alumni' OR 'alumni_board'
      * 
      * @param array $filters Array of filters: search (name/position/company/industry), industry
      * @return array Array of matching profiles
      */
     public static function searchProfiles(array $filters = []): array {
         $contentDb = Database::getContentDB();
+        $userDb = Database::getConnection('user');
         
         $whereClauses = [];
         $params = [];
@@ -280,7 +280,25 @@ class Alumni extends Database {
         $stmt->execute($params);
         $profiles = $stmt->fetchAll();
         
-        return $profiles;
+        // Filter profiles by user role (alumni or alumni_board only)
+        $result = [];
+        foreach ($profiles as $profile) {
+            try {
+                $userStmt = $userDb->prepare("SELECT role FROM users WHERE id = ?");
+                $userStmt->execute([$profile['user_id']]);
+                $userRole = $userStmt->fetchColumn();
+                
+                // Only include profiles where user has role 'alumni' or 'alumni_board'
+                if ($userRole === 'alumni' || $userRole === 'alumni_board') {
+                    $result[] = $profile;
+                }
+            } catch (Exception $e) {
+                // Log error but continue processing other profiles
+                error_log("Error checking user role for user_id {$profile['user_id']}: " . $e->getMessage());
+            }
+        }
+        
+        return $result;
     }
     
     /**
