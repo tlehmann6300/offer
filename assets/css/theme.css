@@ -98,6 +98,11 @@ body {
     border: 1px solid #4b5563 !important;
 }
 
+.dark-mode input::placeholder,
+.dark-mode textarea::placeholder {
+    color: var(--text-muted);
+}
+
 /* Fix Tables */
 .dark-mode th {
     background-color: #111827 !important;
@@ -111,11 +116,11 @@ body {
 
 /* Fix Sidebar Text */
 .dark-mode .sidebar a {
-    color: #d1d5db !important;
+    color: var(--text-muted) !important;
 }
 
 .dark-mode .sidebar a:hover {
-    color: #ffffff !important;
+    color: var(--text-main) !important;
     background-color: #374151;
 }
 
@@ -175,20 +180,6 @@ textarea {
 input::placeholder,
 textarea::placeholder {
     color: var(--ibc-gray-400);
-}
-
-/* Input Styles - Dark Mode */
-body.dark-mode input,
-body.dark-mode select,
-body.dark-mode textarea {
-    background-color: #374151 !important;
-    color: #ffffff !important;
-    border: 1px solid #4b5563 !important;
-}
-
-body.dark-mode input::placeholder,
-body.dark-mode textarea::placeholder {
-    color: var(--text-muted);
 }
 
 body.dark-mode .glass-card {
