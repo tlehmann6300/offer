@@ -52,14 +52,14 @@ $categories = [
 // Function to get category color classes
 function getCategoryColor($category) {
     $colors = [
-        'Allgemein' => 'bg-gray-100 text-gray-800',
-        'IT' => 'bg-blue-100 text-blue-800',
-        'Marketing' => 'bg-purple-100 text-purple-800',
-        'Human Resources' => 'bg-green-100 text-green-800',
-        'Qualitätsmanagement' => 'bg-yellow-100 text-yellow-800',
-        'Akquise' => 'bg-red-100 text-red-800'
+        'Allgemein' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+        'IT' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+        'Marketing' => 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+        'Human Resources' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+        'Qualitätsmanagement' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+        'Akquise' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
     ];
-    return $colors[$category] ?? 'bg-gray-100 text-gray-800';
+    return $colors[$category] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
 }
 
 // Function to truncate text
@@ -79,11 +79,11 @@ ob_start();
     <!-- Header -->
     <div class="mb-8 flex justify-between items-center">
         <div>
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">
+            <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                 <i class="fas fa-newspaper mr-3 text-blue-600"></i>
                 News & Updates
             </h1>
-            <p class="text-gray-600">Bleiben Sie über wichtige Neuigkeiten und Updates informiert</p>
+            <p class="text-gray-600 dark:text-gray-300">Bleiben Sie über wichtige Neuigkeiten und Updates informiert</p>
         </div>
         
         <?php if (BlogPost::canAuth($userRole)): ?>
@@ -96,19 +96,19 @@ ob_start();
     </div>
 
     <!-- Filter Bar -->
-    <div class="mb-6 card p-4">
+    <div class="mb-6 card dark:bg-gray-800 p-4">
         <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-gray-700 font-semibold mr-2">
+            <span class="text-gray-700 dark:text-gray-300 font-semibold mr-2">
                 <i class="fas fa-filter mr-2"></i>
                 Kategorie:
             </span>
             <a href="index.php" 
-               class="px-4 py-2 rounded-lg font-medium transition-all <?php echo $filterCategory === null ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'; ?>">
+               class="px-4 py-2 rounded-lg font-medium transition-all <?php echo $filterCategory === null ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'; ?>">
                 Alle
             </a>
             <?php foreach ($categories as $cat => $color): ?>
                 <a href="index.php?category=<?php echo urlencode($cat); ?>" 
-                   class="px-4 py-2 rounded-lg font-medium transition-all <?php echo $filterCategory === $cat ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'; ?>">
+                   class="px-4 py-2 rounded-lg font-medium transition-all <?php echo $filterCategory === $cat ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'; ?>">
                     <?php echo htmlspecialchars($cat); ?>
                 </a>
             <?php endforeach; ?>
@@ -117,28 +117,28 @@ ob_start();
 
     <!-- News Grid -->
     <?php if (empty($posts)): ?>
-        <div class="card p-8 text-center">
-            <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
-            <p class="text-xl text-gray-600">Keine Beiträge gefunden</p>
+        <div class="card dark:bg-gray-800 p-8 text-center">
+            <i class="fas fa-inbox text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+            <p class="text-xl text-gray-600 dark:text-gray-300">Keine Beiträge gefunden</p>
             <?php if ($filterCategory): ?>
-                <p class="text-gray-500 mt-2">Versuchen Sie einen anderen Filter</p>
+                <p class="text-gray-500 dark:text-gray-400 mt-2">Versuchen Sie einen anderen Filter</p>
             <?php endif; ?>
         </div>
     <?php else: ?>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <?php foreach ($posts as $post): ?>
                 <a href="view.php?id=<?php echo (int)$post['id']; ?>" 
-                   class="card overflow-hidden flex flex-col hover:shadow-xl transition-shadow cursor-pointer"
+                   class="card dark:bg-gray-800 overflow-hidden flex flex-col hover:shadow-xl transition-shadow cursor-pointer"
                    aria-label="Beitrag lesen: <?php echo htmlspecialchars($post['title']); ?>">
                     <!-- Image -->
-                    <div class="h-48 bg-gray-200 overflow-hidden">
+                    <div class="h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
                         <?php if (!empty($post['image_path'])): ?>
                             <img src="<?php echo htmlspecialchars($post['image_path']); ?>" 
                                  alt="<?php echo htmlspecialchars($post['title']); ?>"
                                  class="w-full h-full object-cover">
                         <?php else: ?>
-                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
-                                <i class="fas fa-newspaper text-6xl text-gray-400"></i>
+                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900">
+                                <i class="fas fa-newspaper text-6xl text-gray-400 dark:text-gray-600"></i>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -153,12 +153,12 @@ ob_start();
                         </div>
                         
                         <!-- Title -->
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">
+                        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                             <?php echo htmlspecialchars($post['title']); ?>
                         </h3>
                         
                         <!-- Date -->
-                        <div class="text-sm text-gray-500 mb-3">
+                        <div class="text-sm text-gray-500 dark:text-gray-400 mb-3">
                             <i class="fas fa-calendar-alt mr-1"></i>
                             <?php 
                                 $date = new DateTime($post['created_at']);
@@ -167,12 +167,12 @@ ob_start();
                         </div>
                         
                         <!-- Excerpt -->
-                        <p class="text-gray-600 text-sm mb-4 flex-1">
+                        <p class="text-gray-600 dark:text-gray-300 text-sm mb-4 flex-1">
                             <?php echo htmlspecialchars(truncateText($post['content'])); ?>
                         </p>
                         
                         <!-- Footer -->
-                        <div class="pt-4 border-t border-gray-200 flex items-center justify-between text-sm text-gray-600">
+                        <div class="pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
                             <div class="flex items-center">
                                 <i class="fas fa-user-circle mr-2 text-blue-600"></i>
                                 <span><?php echo htmlspecialchars($post['author_email']); ?></span>
@@ -199,19 +199,19 @@ ob_start();
         <div class="mt-8 flex justify-center gap-4">
             <?php if ($page > 1): ?>
                 <a href="?page=<?php echo $page - 1; ?><?php echo $filterCategory ? '&category=' . urlencode($filterCategory) : ''; ?>" 
-                   class="px-6 py-3 bg-white text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all shadow-md">
+                   class="px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-md">
                     <i class="fas fa-chevron-left mr-2"></i>
                     Zurück
                 </a>
             <?php endif; ?>
             
-            <div class="px-6 py-3 bg-blue-100 text-blue-800 rounded-lg font-semibold">
+            <div class="px-6 py-3 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 rounded-lg font-semibold">
                 Seite <?php echo $page; ?>
             </div>
             
             <?php if ($hasNextPage): ?>
                 <a href="?page=<?php echo $page + 1; ?><?php echo $filterCategory ? '&category=' . urlencode($filterCategory) : ''; ?>" 
-                   class="px-6 py-3 bg-white text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all shadow-md">
+                   class="px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-md">
                     Weiter
                     <i class="fas fa-chevron-right ml-2"></i>
                 </a>

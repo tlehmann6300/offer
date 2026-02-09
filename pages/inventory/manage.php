@@ -55,11 +55,11 @@ ob_start();
 <div class="mb-8">
     <div class="flex items-center justify-between mb-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                 <i class="fas fa-cogs text-purple-600 mr-2"></i>
                 Inventar-Verwaltung
             </h1>
-            <p class="text-gray-600"><?php echo count($items); ?> Artikel gefunden</p>
+            <p class="text-gray-600 dark:text-gray-300"><?php echo count($items); ?> Artikel gefunden</p>
         </div>
         <a href="add.php" class="btn-primary">
             <i class="fas fa-plus mr-2"></i>Neuer Artikel
@@ -81,41 +81,41 @@ ob_start();
 
 <!-- Quick Links Section -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <a href="add.php" class="card p-6 hover:shadow-lg transition text-center">
+    <a href="add.php" class="card dark:bg-gray-800 p-6 hover:shadow-lg transition text-center">
         <i class="fas fa-plus-circle text-purple-600 text-4xl mb-3"></i>
-        <h3 class="font-semibold text-gray-800">Artikel hinzufügen</h3>
-        <p class="text-sm text-gray-600 mt-2">Neuen Artikel erstellen</p>
+        <h3 class="font-semibold text-gray-800 dark:text-gray-100">Artikel hinzufügen</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Neuen Artikel erstellen</p>
     </a>
-    <a href="../admin/categories.php" class="card p-6 hover:shadow-lg transition text-center">
+    <a href="../admin/categories.php" class="card dark:bg-gray-800 p-6 hover:shadow-lg transition text-center">
         <i class="fas fa-tags text-blue-600 text-4xl mb-3"></i>
-        <h3 class="font-semibold text-gray-800">Kategorien</h3>
-        <p class="text-sm text-gray-600 mt-2">Kategorien verwalten</p>
+        <h3 class="font-semibold text-gray-800 dark:text-gray-100">Kategorien</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Kategorien verwalten</p>
     </a>
-    <a href="../admin/locations.php" class="card p-6 hover:shadow-lg transition text-center">
+    <a href="../admin/locations.php" class="card dark:bg-gray-800 p-6 hover:shadow-lg transition text-center">
         <i class="fas fa-map-marker-alt text-green-600 text-4xl mb-3"></i>
-        <h3 class="font-semibold text-gray-800">Standorte</h3>
-        <p class="text-sm text-gray-600 mt-2">Standorte verwalten</p>
+        <h3 class="font-semibold text-gray-800 dark:text-gray-100">Standorte</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Standorte verwalten</p>
     </a>
-    <a href="index.php" class="card p-6 hover:shadow-lg transition text-center">
+    <a href="index.php" class="card dark:bg-gray-800 p-6 hover:shadow-lg transition text-center">
         <i class="fas fa-boxes text-orange-600 text-4xl mb-3"></i>
-        <h3 class="font-semibold text-gray-800">Inventar Übersicht</h3>
-        <p class="text-sm text-gray-600 mt-2">Alle Artikel anzeigen</p>
+        <h3 class="font-semibold text-gray-800 dark:text-gray-100">Inventar Übersicht</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Alle Artikel anzeigen</p>
     </a>
 </div>
 
 <!-- Filter Section -->
-<div class="card p-6 mb-6">
-    <h2 class="text-lg font-bold text-gray-800 mb-4">
+<div class="card dark:bg-gray-800 p-6 mb-6">
+    <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">
         <i class="fas fa-filter text-purple-600 mr-2"></i>Filter
     </h2>
     <form method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Suche</label>
-            <input type="text" name="search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" placeholder="Name oder Beschreibung" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Suche</label>
+            <input type="text" name="search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" placeholder="Name oder Beschreibung" class="w-full px-4 py-2 border border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Kategorie</label>
-            <select name="category_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategorie</label>
+            <select name="category_id" class="w-full px-4 py-2 border border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                 <option value="">Alle Kategorien</option>
                 <?php foreach ($categories as $category): ?>
                 <option value="<?php echo $category['id']; ?>" <?php echo (isset($_GET['category_id']) && $_GET['category_id'] == $category['id']) ? 'selected' : ''; ?>>
@@ -125,8 +125,8 @@ ob_start();
             </select>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Standort</label>
-            <select name="location_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Standort</label>
+            <select name="location_id" class="w-full px-4 py-2 border border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                 <option value="">Alle Standorte</option>
                 <?php foreach ($locations as $location): ?>
                 <option value="<?php echo $location['id']; ?>" <?php echo (isset($_GET['location_id']) && $_GET['location_id'] == $location['id']) ? 'selected' : ''; ?>>
@@ -136,14 +136,14 @@ ob_start();
             </select>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Bestand</label>
-            <select name="filter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bestand</label>
+            <select name="filter" class="w-full px-4 py-2 border border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                 <option value="">Alle</option>
                 <option value="low_stock" <?php echo (isset($_GET['filter']) && $_GET['filter'] === 'low_stock') ? 'selected' : ''; ?>>Niedriger Bestand</option>
             </select>
         </div>
         <div class="md:col-span-2 lg:col-span-4 flex justify-end space-x-2">
-            <a href="manage.php" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+            <a href="manage.php" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
                 <i class="fas fa-times mr-2"></i>Zurücksetzen
             </a>
             <button type="submit" class="btn-primary">
@@ -155,10 +155,10 @@ ob_start();
 
 <!-- Items Grid -->
 <?php if (empty($items)): ?>
-<div class="card p-12 text-center">
+<div class="card dark:bg-gray-800 p-12 text-center">
     <i class="fas fa-box-open text-gray-400 text-6xl mb-4"></i>
-    <h3 class="text-xl font-semibold text-gray-600 mb-2">Keine Artikel gefunden</h3>
-    <p class="text-gray-500 mb-6">Es wurden keine Artikel mit den ausgewählten Filtern gefunden.</p>
+    <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">Keine Artikel gefunden</h3>
+    <p class="text-gray-500 dark:text-gray-400 mb-6">Es wurden keine Artikel mit den ausgewählten Filtern gefunden.</p>
     <a href="add.php" class="btn-primary inline-block">
         <i class="fas fa-plus mr-2"></i>Ersten Artikel erstellen
     </a>
@@ -166,7 +166,7 @@ ob_start();
 <?php else: ?>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <?php foreach ($items as $item): ?>
-    <div class="card p-6 hover:shadow-lg transition">
+    <div class="card dark:bg-gray-800 p-6 hover:shadow-lg transition">
         <!-- Image -->
         <?php if (!empty($item['image_path'])): ?>
         <div class="mb-4 rounded-lg overflow-hidden h-48">
@@ -177,12 +177,12 @@ ob_start();
         <?php endif; ?>
         
         <!-- Title -->
-        <h3 class="text-xl font-bold text-gray-800 mb-2">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
             <?php echo htmlspecialchars($item['name']); ?>
         </h3>
 
         <!-- Details -->
-        <div class="space-y-2 mb-4 text-sm text-gray-600">
+        <div class="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
             <?php if (!empty($item['category_name'])): ?>
             <div class="flex items-center">
                 <i class="fas fa-tag w-5 text-purple-600"></i>
@@ -207,8 +207,8 @@ ob_start();
         // FIX: Nutze current_stock für die Warnung
         if ($item['current_stock'] <= $lowStockThreshold): 
         ?>
-        <div class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <div class="flex items-center text-sm text-yellow-800">
+        <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+            <div class="flex items-center text-sm text-yellow-800 dark:text-yellow-200">
                 <i class="fas fa-exclamation-triangle mr-2"></i>
                 <span>Niedriger Bestand!</span>
             </div>
@@ -239,12 +239,12 @@ ob_start();
 
 <!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
-    <div class="bg-white rounded-lg p-6 max-w-md w-full">
-        <h3 id="deleteModalTitle" class="text-xl font-bold text-gray-800 mb-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
+        <h3 id="deleteModalTitle" class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
             <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
             Artikel löschen
         </h3>
-        <p class="text-gray-600 mb-6">
+        <p class="text-gray-600 dark:text-gray-300 mb-6">
             Möchtest Du den Artikel "<span id="deleteItemName" class="font-semibold"></span>" wirklich löschen? 
             Diese Aktion kann nicht rückgängig gemacht werden.
         </p>
@@ -253,7 +253,7 @@ ob_start();
             <input type="hidden" name="item_id" id="deleteItemId" value="">
             <input type="hidden" name="delete_item" value="1">
             <div class="flex space-x-4">
-                <button type="button" id="closeDeleteModalBtn" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                <button type="button" id="closeDeleteModalBtn" class="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
                     Abbrechen
                 </button>
                 <button type="submit" class="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">

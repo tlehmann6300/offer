@@ -113,8 +113,7 @@ function translateRole($role) {
         'candidate' => 'Anwärter',
         'alumni_board' => 'Alumni-Vorstand',
         'honorary_member' => 'Ehrenmitglied',
-        'manager' => 'Ressortleiter',
-        'admin' => 'Administrator'
+        'manager' => 'Ressortleiter'
     ];
     
     return $roleTranslations[$role] ?? ucfirst($role);

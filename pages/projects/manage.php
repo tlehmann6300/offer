@@ -165,11 +165,11 @@ ob_start();
 <div class="mb-8">
     <div class="flex items-center justify-between mb-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                 <i class="fas fa-briefcase text-purple-600 mr-2"></i>
                 Projekt-Verwaltung
             </h1>
-            <p class="text-gray-600"><?php echo count($projects); ?> Projekt(e) gefunden</p>
+            <p class="text-gray-600 dark:text-gray-300"><?php echo count($projects); ?> Projekt(e) gefunden</p>
         </div>
         <a href="manage.php?new=1" class="btn-primary">
             <i class="fas fa-plus mr-2"></i>Neues Projekt
@@ -192,9 +192,9 @@ ob_start();
 <!-- Projects Grid -->
 <?php if (empty($projects)): ?>
 <div class="card p-12 text-center">
-    <i class="fas fa-briefcase text-gray-400 text-6xl mb-4"></i>
-    <h3 class="text-xl font-semibold text-gray-600 mb-2">Keine Projekte gefunden</h3>
-    <p class="text-gray-500 mb-6">Es wurden noch keine Projekte erstellt.</p>
+    <i class="fas fa-briefcase text-gray-400 dark:text-gray-500 text-6xl mb-4"></i>
+    <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">Keine Projekte gefunden</h3>
+    <p class="text-gray-500 dark:text-gray-400 mb-6">Es wurden noch keine Projekte erstellt.</p>
     <a href="manage.php?new=1" class="btn-primary inline-block">
         <i class="fas fa-plus mr-2"></i>Erstes Projekt erstellen
     </a>
@@ -202,7 +202,7 @@ ob_start();
 <?php else: ?>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <?php foreach ($projects as $project): ?>
-    <div class="card p-6 hover:shadow-lg transition">
+    <div class="card p-6 hover:shadow-lg transition dark:hover:shadow-purple-900/20">
         <!-- Image -->
         <?php if (!empty($project['image_path'])): ?>
         <div class="mb-4 rounded-lg overflow-hidden">
@@ -217,13 +217,13 @@ ob_start();
             <span class="px-3 py-1 text-xs font-semibold rounded-full
                 <?php 
                 switch($project['status']) {
-                    case 'draft': echo 'bg-gray-100 text-gray-800'; break;
-                    case 'open': echo 'bg-blue-100 text-blue-800'; break;
-                    case 'applying': echo 'bg-yellow-100 text-yellow-800'; break;
-                    case 'assigned': echo 'bg-green-100 text-green-800'; break;
-                    case 'running': echo 'bg-purple-100 text-purple-800'; break;
-                    case 'completed': echo 'bg-teal-100 text-teal-800'; break;
-                    case 'archived': echo 'bg-red-100 text-red-800'; break;
+                    case 'draft': echo 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'; break;
+                    case 'open': echo 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'; break;
+                    case 'applying': echo 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'; break;
+                    case 'assigned': echo 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'; break;
+                    case 'running': echo 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'; break;
+                    case 'completed': echo 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-300'; break;
+                    case 'archived': echo 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'; break;
                 }
                 ?>">
                 <?php 
@@ -241,9 +241,9 @@ ob_start();
             <span class="px-2 py-1 text-xs font-semibold rounded-full
                 <?php 
                 switch($project['priority']) {
-                    case 'low': echo 'bg-blue-100 text-blue-800'; break;
-                    case 'medium': echo 'bg-yellow-100 text-yellow-800'; break;
-                    case 'high': echo 'bg-red-100 text-red-800'; break;
+                    case 'low': echo 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'; break;
+                    case 'medium': echo 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'; break;
+                    case 'high': echo 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'; break;
                 }
                 ?>">
                 <?php 
@@ -261,7 +261,7 @@ ob_start();
             <span class="px-3 py-1 text-xs font-semibold rounded-full
                 <?php 
                 $projectType = $project['type'] ?? 'internal';
-                echo $projectType === 'internal' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800';
+                echo $projectType === 'internal' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
                 ?>">
                 <i class="fas fa-tag mr-1"></i>
                 <?php echo $projectType === 'internal' ? 'Intern' : 'Extern'; ?>
@@ -269,19 +269,19 @@ ob_start();
         </div>
 
         <!-- Title -->
-        <h3 class="text-xl font-bold text-gray-800 mb-2">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
             <?php echo htmlspecialchars($project['title']); ?>
         </h3>
 
         <!-- Description -->
         <?php if (!empty($project['description'])): ?>
-        <p class="text-sm text-gray-600 mb-4 line-clamp-3">
+        <p class="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
             <?php echo htmlspecialchars(substr($project['description'], 0, 150)) . (strlen($project['description']) > 150 ? '...' : ''); ?>
         </p>
         <?php endif; ?>
 
         <!-- Project Info -->
-        <div class="space-y-2 mb-4 text-sm text-gray-600">
+        <div class="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
             <?php if (!empty($project['client_name'])): ?>
             <div class="flex items-center">
                 <i class="fas fa-user-tie w-5 text-purple-600"></i>
@@ -307,8 +307,8 @@ ob_start();
         </div>
 
         <!-- Application Count -->
-        <div class="mb-4 p-3 bg-purple-50 rounded-lg">
-            <a href="applications.php?project_id=<?php echo $project['id']; ?>" class="text-sm text-gray-700 hover:text-purple-600 transition">
+        <div class="mb-4 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+            <a href="applications.php?project_id=<?php echo $project['id']; ?>" class="text-sm text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition">
                 <i class="fas fa-users mr-1"></i>
                 <strong><?php echo $project['application_count']; ?></strong> Bewerbung(en)
             </a>
@@ -335,12 +335,12 @@ ob_start();
 
 <!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg p-6 max-w-md w-full">
-        <h3 class="text-xl font-bold text-gray-800 mb-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
             <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
             Projekt löschen
         </h3>
-        <p class="text-gray-600 mb-6">
+        <p class="text-gray-600 dark:text-gray-300 mb-6">
             Möchtest Du das Projekt "<span id="deleteProjectName" class="font-semibold"></span>" wirklich löschen? 
             Diese Aktion kann nicht rückgängig gemacht werden.
         </p>
@@ -349,7 +349,7 @@ ob_start();
             <input type="hidden" name="project_id" id="deleteProjectId" value="">
             <input type="hidden" name="delete_project" value="1">
             <div class="flex space-x-4">
-                <button type="button" id="closeDeleteModalBtn" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                <button type="button" id="closeDeleteModalBtn" class="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
                     Abbrechen
                 </button>
                 <button type="submit" class="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
@@ -407,11 +407,11 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
 <!-- Project Form View -->
 <div class="mb-8">
     <div class="flex items-center justify-between mb-4">
-        <h1 class="text-3xl font-bold text-gray-800">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">
             <i class="fas fa-briefcase text-purple-600 mr-2"></i>
             <?php echo $project ? 'Projekt bearbeiten' : 'Neues Projekt'; ?>
         </h1>
-        <a href="manage.php" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+        <a href="manage.php" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
             <i class="fas fa-arrow-left mr-2"></i>Zurück zur Übersicht
         </a>
     </div>
@@ -434,7 +434,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
         
         <!-- Title -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Titel <span class="text-red-500">*</span>
             </label>
             <input 
@@ -442,20 +442,20 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 name="title" 
                 value="<?php echo htmlspecialchars($_POST['title'] ?? $project['title'] ?? ''); ?>"
                 required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Projekt-Titel eingeben"
             >
         </div>
 
         <!-- Description -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Beschreibung
             </label>
             <textarea 
                 name="description" 
                 rows="5"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Projekt-Beschreibung eingeben"
             ><?php echo htmlspecialchars($_POST['description'] ?? $project['description'] ?? ''); ?></textarea>
         </div>
@@ -463,26 +463,26 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
         <!-- Client Information -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Kundenname
                 </label>
                 <input 
                     type="text" 
                     name="client_name" 
                     value="<?php echo htmlspecialchars($_POST['client_name'] ?? $project['client_name'] ?? ''); ?>"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="Name des Kunden"
                 >
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Kontaktdaten
                 </label>
                 <input 
                     type="text" 
                     name="client_contact_details" 
                     value="<?php echo htmlspecialchars($_POST['client_contact_details'] ?? $project['client_contact_details'] ?? ''); ?>"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="E-Mail, Telefon, etc."
                 >
             </div>
@@ -491,12 +491,12 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
         <!-- Priority and Status -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Priorität
                 </label>
                 <select 
                     name="priority" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                     <option value="low" <?php echo (($_POST['priority'] ?? $project['priority'] ?? 'medium') === 'low') ? 'selected' : ''; ?>>Niedrig</option>
                     <option value="medium" <?php echo (($_POST['priority'] ?? $project['priority'] ?? 'medium') === 'medium') ? 'selected' : ''; ?>>Mittel</option>
@@ -504,12 +504,12 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Projekt-Typ
                 </label>
                 <select 
                     name="type" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                     <option value="internal" <?php echo (($_POST['type'] ?? $project['type'] ?? 'internal') === 'internal') ? 'selected' : ''; ?>>Intern</option>
                     <option value="external" <?php echo (($_POST['type'] ?? $project['type'] ?? 'internal') === 'external') ? 'selected' : ''; ?>>Extern</option>
@@ -520,12 +520,12 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
         <!-- Status -->
         <?php if ($project): ?>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Status
             </label>
             <select 
                 name="status" 
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
                 <option value="draft" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'draft') ? 'selected' : ''; ?>>Entwurf</option>
                 <option value="open" <?php echo (($_POST['status'] ?? $project['status'] ?? 'draft') === 'open') ? 'selected' : ''; ?>>Offen</option>
@@ -541,32 +541,32 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
         <!-- Date Range -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Startdatum
                 </label>
                 <input 
                     type="date" 
                     name="start_date" 
                     value="<?php echo htmlspecialchars($_POST['start_date'] ?? $project['start_date'] ?? ''); ?>"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Enddatum
                 </label>
                 <input 
                     type="date" 
                     name="end_date" 
                     value="<?php echo htmlspecialchars($_POST['end_date'] ?? $project['end_date'] ?? ''); ?>"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
             </div>
         </div>
 
         <!-- Required Consultants -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Benötigte Berater <span class="text-red-500">*</span>
             </label>
             <input 
@@ -575,31 +575,31 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 value="<?php echo htmlspecialchars($_POST['max_consultants'] ?? $project['max_consultants'] ?? '1'); ?>"
                 min="1"
                 required
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder="Anzahl benötigter Berater"
             >
         </div>
 
         <!-- Image Upload -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Projekt-Bild
             </label>
             <?php if ($project && !empty($project['image_path'])): ?>
             <div class="mb-4">
                 <img src="/<?php echo htmlspecialchars($project['image_path']); ?>" 
                      alt="Aktuelles Bild"
-                     class="w-64 h-48 object-cover rounded-lg border border-gray-300">
-                <p class="text-sm text-gray-500 mt-2">Aktuelles Bild (wird ersetzt, wenn Sie ein neues hochladen)</p>
+                     class="w-64 h-48 object-cover rounded-lg border border-gray-300 dark:border-gray-600">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Aktuelles Bild (wird ersetzt, wenn Sie ein neues hochladen)</p>
             </div>
             <?php endif; ?>
             <input 
                 type="file" 
                 name="project_image" 
                 accept="image/jpeg,image/png,image/webp,image/gif"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-            <p class="text-sm text-gray-500 mt-2">
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
                 <i class="fas fa-info-circle mr-1"></i>
                 Erlaubte Formate: JPG, PNG, WebP, GIF. Maximale Größe: 5MB
             </p>
@@ -607,12 +607,12 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
 
         <!-- Documentation Upload -->
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Projekt-Dokumentation (PDF)
             </label>
             <?php if ($project && !empty($project['documentation'])): ?>
-            <div class="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-300">
-                <p class="text-sm text-gray-700">
+            <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                <p class="text-sm text-gray-700 dark:text-gray-300">
                     <i class="fas fa-file-pdf text-red-500 mr-2"></i>
                     <a href="/<?php echo htmlspecialchars($project['documentation']); ?>" 
                        target="_blank" 
@@ -626,17 +626,17 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                 type="file" 
                 name="project_file" 
                 accept=".pdf"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-            <p class="text-sm text-gray-500 mt-2">
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
                 <i class="fas fa-info-circle mr-1"></i>
                 Erlaubte Formate: PDF. Maximale Größe: 10MB
             </p>
         </div>
 
         <!-- Form Actions -->
-        <div class="flex space-x-4 pt-6 border-t border-gray-200">
-            <a href="manage.php" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+        <div class="flex space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <a href="manage.php" class="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
                 Abbrechen
             </a>
             <?php if ($project): ?>
@@ -645,7 +645,7 @@ document.getElementById('deleteModal')?.addEventListener('click', (e) => {
                     Änderungen speichern
                 </button>
             <?php else: ?>
-                <button type="submit" name="save_draft" value="1" class="flex-1 px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
+                <button type="submit" name="save_draft" value="1" class="flex-1 px-6 py-3 bg-gray-500 dark:bg-gray-600 text-white rounded-lg hover:bg-gray-600 dark:hover:bg-gray-700 transition">
                     <i class="fas fa-file mr-2"></i>
                     Als Entwurf speichern
                 </button>
