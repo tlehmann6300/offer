@@ -152,33 +152,46 @@ try {
         ['name' => DB_RECH_NAME, 'label' => 'Invoice Database', 'color' => 'green']
     ];
     
-    foreach ($databases as $db) {
-        if (empty($db['name'])) {
-            continue;
-        }
+    // Filter out empty database names
+    $validDatabases = array_filter($databases, function($db) {
+        return !empty($db['name']);
+    });
+    
+    if (!empty($validDatabases)) {
+        // Query all databases in a single query using IN clause
+        $dbNames = array_column($validDatabases, 'name');
+        $placeholders = str_repeat('?,', count($dbNames) - 1) . '?';
         
-        // Query information_schema for this database
         $stmt = $userDb->prepare("
             SELECT 
                 table_schema as database_name,
                 ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) as size_mb
             FROM information_schema.TABLES
-            WHERE table_schema = ?
+            WHERE table_schema IN ($placeholders)
             GROUP BY table_schema
         ");
-        $stmt->execute([$db['name']]);
-        $result = $stmt->fetch();
+        $stmt->execute($dbNames);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        $sizeMb = $result['size_mb'] ?? 0;
-        $percentage = ($sizeMb / $databaseQuota) * 100;
+        // Create a map of database name to size
+        $sizeMap = [];
+        foreach ($results as $result) {
+            $sizeMap[$result['database_name']] = $result['size_mb'];
+        }
         
-        $databaseStats[] = [
-            'name' => $db['name'],
-            'label' => $db['label'],
-            'size_mb' => $sizeMb,
-            'percentage' => min($percentage, 100), // Cap at 100%
-            'color' => $db['color']
-        ];
+        // Build stats array maintaining original order
+        foreach ($validDatabases as $db) {
+            $sizeMb = $sizeMap[$db['name']] ?? 0;
+            $percentage = ($sizeMb / $databaseQuota) * 100;
+            
+            $databaseStats[] = [
+                'name' => $db['name'],
+                'label' => $db['label'],
+                'size_mb' => $sizeMb,
+                'percentage' => min($percentage, 100), // Cap at 100%
+                'color' => $db['color']
+            ];
+        }
     }
 } catch (PDOException $e) {
     error_log("Error fetching database sizes: " . $e->getMessage());
@@ -370,7 +383,7 @@ ob_start();
                     <div class="space-y-2">
                         <div class="flex justify-between text-xs text-gray-600 dark:text-gray-400">
                             <span>Auslastung</span>
-                            <span><?php echo number_format($db['percentage'], 1); ?>% von <?php echo number_format($databaseQuota); ?> MB</span>
+                            <span><?php echo number_format($db['percentage'], 1); ?>% von 1 GB</span>
                         </div>
                         <div class="w-full <?php echo $colors['progress_bg']; ?> rounded-full h-2.5">
                             <div class="<?php echo $colors['progress_bar']; ?> h-2.5 rounded-full transition-all duration-300" style="width: <?php echo min($db['percentage'], 100); ?>%"></div>
