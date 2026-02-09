@@ -17,8 +17,16 @@ class Alumni extends Database {
      * @return array|false Profile data or false if not found
      */
     public static function getProfileById($id) {
-        $db = Database::getConnection('content');
-        $stmt = $db->prepare("SELECT * FROM alumni_profiles WHERE id = ?");
+        $db = Database::getContentDB();
+        $stmt = $db->prepare("
+            SELECT id, user_id, first_name, last_name, email, mobile_phone, 
+                   linkedin_url, xing_url, industry, company, position, 
+                   study_program, semester, angestrebter_abschluss, 
+                   degree, graduation_year,
+                   image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
+            FROM alumni_profiles 
+            WHERE id = ?
+        ");
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }

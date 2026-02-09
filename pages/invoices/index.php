@@ -34,9 +34,9 @@ if (Auth::hasRole('board')) {
     $profile = $stmt->fetch();
     
     if ($profile && !empty($profile['position'])) {
-        $currentUserPosition = $profile['position'];
-        // Check if position contains 'Finanzen' (case-insensitive)
-        if (stripos($currentUserPosition, 'Finanzen') !== false) {
+        $userPos = $profile['position'];
+        // Check if position contains 'Finanzen'
+        if (strpos($userPos, 'Finanzen') !== false) {
             $canMarkAsPaid = true;
         }
     }
