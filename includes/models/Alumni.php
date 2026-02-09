@@ -105,6 +105,12 @@ class Alumni extends Database {
      * @throws Exception On database error
      */
     public static function update(int $userId, array $data): bool {
+        // Check permissions: only alumni or alumni_board can update
+        require_once __DIR__ . '/../../src/Auth.php';
+        if (!Auth::check() || !in_array(Auth::user()['role'] ?? '', ['alumni', 'alumni_board', 'board', 'admin'])) {
+            throw new Exception("Keine Berechtigung zum Aktualisieren des Alumni-Profils");
+        }
+        
         $db = Database::getContentDB();
         
         // Sanitize image_path if provided

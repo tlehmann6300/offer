@@ -170,4 +170,49 @@ class Member {
         
         return $statistics;
     }
+    
+    /**
+     * Update an existing member profile
+     * 
+     * @param int $userId The user ID
+     * @param array $data Profile data to update
+     * @return bool True on success
+     * @throws Exception On database error
+     */
+    public static function update(int $userId, array $data): bool {
+        // Check permissions: only board, head, or candidate can update
+        require_once __DIR__ . '/../../src/Auth.php';
+        if (!Auth::check() || !in_array(Auth::user()['role'] ?? '', ['board', 'head', 'candidate', 'admin'])) {
+            throw new Exception("Keine Berechtigung zum Aktualisieren des Mitgliederprofils");
+        }
+        
+        $db = Database::getContentDB();
+        
+        $fields = [];
+        $values = [];
+        
+        $allowedFields = [
+            'first_name', 'last_name', 'email', 'mobile_phone',
+            'linkedin_url', 'xing_url', 'industry', 'company', 
+            'position', 'study_program', 'semester', 
+            'angestrebter_abschluss', 'degree', 'graduation_year'
+        ];
+        
+        foreach ($allowedFields as $field) {
+            if (array_key_exists($field, $data)) {
+                $fields[] = "$field = ?";
+                $values[] = $data[$field];
+            }
+        }
+        
+        if (empty($fields)) {
+            return true; // No fields to update
+        }
+        
+        $values[] = $userId;
+        $sql = "UPDATE alumni_profiles SET " . implode(', ', $fields) . " WHERE user_id = ?";
+        
+        $stmt = $db->prepare($sql);
+        return $stmt->execute($values);
+    }
 }
