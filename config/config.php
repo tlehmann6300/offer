@@ -1,6 +1,9 @@
 <?php
 ob_start();
 
+// Load security headers early to harden HTTP responses
+require_once __DIR__ . '/../includes/security_headers.php';
+
 // Manually parse .env file
 $envFile = __DIR__ . '/../.env';
 $env = [];
