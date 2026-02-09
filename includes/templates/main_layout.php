@@ -47,6 +47,36 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             background: #111827; /* gray-900 for dark theme */
         }
         
+        /* Custom scrollbar styling for sidebar */
+        .sidebar::-webkit-scrollbar,
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track,
+        .sidebar-scroll::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb,
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb:hover,
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Firefox scrollbar styling */
+        .sidebar,
+        .sidebar-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.2);
+        }
+        
         /* Light mode sidebar styling */
         body:not(.dark-mode) .sidebar {
             background: linear-gradient(135deg, #0066b3 0%, #004f8c 100%);
@@ -79,6 +109,45 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         }
         
         body:not(.dark-mode) .sidebar button {
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        /* Dark mode sidebar styling */
+        body.dark-mode .sidebar {
+            background: #1a1a1a;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Dark mode sidebar - ensure all text is white */
+        body.dark-mode .sidebar a {
+            color: rgba(255, 255, 255, 0.95) !important;
+            transition: all 0.2s ease;
+        }
+        
+        body.dark-mode .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white !important;
+            transform: translateX(4px);
+        }
+        
+        body.dark-mode .sidebar a.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-right: 3px solid #00a651;
+            color: white !important;
+        }
+        
+        body.dark-mode .sidebar .text-gray-300,
+        body.dark-mode .sidebar .text-gray-200 {
+            color: rgba(255, 255, 255, 0.95) !important;
+        }
+        
+        body.dark-mode .sidebar button {
+            color: rgba(255, 255, 255, 0.95) !important;
+        }
+        
+        body.dark-mode .sidebar p,
+        body.dark-mode .sidebar span,
+        body.dark-mode .sidebar div {
             color: rgba(255, 255, 255, 0.95);
         }
         
@@ -164,6 +233,42 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             .flex.space-x-4 > * {
                 width: 100%;
             }
+            
+            /* Improve heading sizes on mobile */
+            main h1 {
+                font-size: 1.75rem;
+            }
+            
+            main h2 {
+                font-size: 1.5rem;
+            }
+            
+            main h3 {
+                font-size: 1.25rem;
+            }
+            
+            /* Better image scaling on mobile */
+            img {
+                max-width: 100%;
+                height: auto;
+            }
+            
+            /* Ensure grids stack on mobile - for auto-responsive grids */
+            .grid:not(.grid-no-stack) {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Tablet view improvements */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            main {
+                padding: 1.5rem !important;
+            }
+            
+            /* 2-column grid on tablets - for auto-responsive grids */
+            .grid:not(.grid-no-stack) {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         
         /* Ensure long text doesn't overflow */
@@ -211,7 +316,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             return strpos($currentUri, $path) !== false;
         }
         ?>
-        <div class="p-6 flex-1 overflow-y-auto">
+        <div class="p-6 flex-1 overflow-y-auto sidebar-scroll">
             <!-- IBC Logo in Navbar -->
             <div class="mb-8">
                 <img src="<?php echo asset('assets/img/ibc_logo_original_navbar.webp'); ?>" alt="IBC Logo" class="w-full h-auto">
