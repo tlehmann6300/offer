@@ -51,7 +51,7 @@ if (!$profile) {
         'about_me' => '',
         'image_path' => '',
         'study_program' => '',
-        'semester' => '',
+        'semester' => null,  // Numeric value, null when not set
         'angestrebter_abschluss' => '',
         'company' => '',
         'industry' => '',

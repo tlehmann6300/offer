@@ -281,20 +281,32 @@ class Alumni extends Database {
         $profiles = $stmt->fetchAll();
         
         // Filter profiles by user role (alumni or alumni_board only)
+        // Fetch all user roles in a single query to avoid N+1 problem
         $result = [];
-        foreach ($profiles as $profile) {
+        
+        if (!empty($profiles)) {
+            $userIds = array_column($profiles, 'user_id');
+            
             try {
-                $userStmt = $userDb->prepare("SELECT role FROM users WHERE id = ?");
-                $userStmt->execute([$profile['user_id']]);
-                $userRole = $userStmt->fetchColumn();
+                // Fetch all user roles in a single query
+                $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+                $userStmt = $userDb->prepare("SELECT id, role FROM users WHERE id IN ($placeholders)");
+                $userStmt->execute($userIds);
+                $userRoles = $userStmt->fetchAll(PDO::FETCH_KEY_PAIR); // id => role mapping
                 
-                // Only include profiles where user has role 'alumni' or 'alumni_board'
-                if ($userRole === 'alumni' || $userRole === 'alumni_board') {
-                    $result[] = $profile;
+                // Filter profiles by role
+                foreach ($profiles as $profile) {
+                    $userId = $profile['user_id'];
+                    $userRole = $userRoles[$userId] ?? null;
+                    
+                    // Only include profiles where user has role 'alumni' or 'alumni_board'
+                    if ($userRole === 'alumni' || $userRole === 'alumni_board') {
+                        $result[] = $profile;
+                    }
                 }
             } catch (Exception $e) {
-                // Log error but continue processing other profiles
-                error_log("Error checking user role for user_id {$profile['user_id']}: " . $e->getMessage());
+                // Log error but continue
+                error_log("Error checking user roles: " . $e->getMessage());
             }
         }
         
