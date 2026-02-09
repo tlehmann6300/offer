@@ -369,7 +369,8 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
 
                 <!-- Helfersystem (All) - Indented -->
                 <a href="<?php echo asset('pages/events/helpers.php'); ?>" 
-                   class="flex items-center pl-12 pr-6 py-2 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/events/helpers.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                   style="padding-left: 2.5rem;"
+                   class="flex items-center pr-6 py-2 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/events/helpers.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-hands-helping w-5 mr-3"></i>
                     <span>Helfersystem</span>
                 </a>

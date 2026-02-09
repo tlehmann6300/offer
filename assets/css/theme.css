@@ -1,6 +1,11 @@
 /* IBC Corporate Identity Design System */
 
 :root {
+    /* High-Contrast Light Mode Variables */
+    --bg-color: #f3f4f6; /* Light Gray */
+    --text-color: #111827; /* Dark Grey/Black */
+    --card-bg: #ffffff; /* White */
+    
     /* Primary IBC Colors */
     --ibc-green: #00a651;
     --ibc-green-light: #33b872;
@@ -46,48 +51,85 @@
     --mobile-header-offset: 5rem;
 }
 
-/* Dark Mode Variables */
+/* High-Contrast Dark Mode Variables */
 body.dark-mode {
-    --bg-primary: #1a1a1a;
-    --bg-secondary: #2d2d2d;
-    --bg-tertiary: #333333;
-    --text-primary: #f0f0f0;
-    --text-secondary: #b0b0b0;
-    --border-color: #444444;
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
+    --bg-color: #111827; /* Very Dark Blue */
+    --text-color: #f9fafb; /* Off-White */
+    --card-bg: #1f2937; /* Dark card background */
+    --bg-primary: #111827;
+    --bg-secondary: #1f2937;
+    --bg-tertiary: #374151;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --border-color: #374151;
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 body.dark-mode main {
-    background-color: var(--bg-primary);
+    background-color: var(--bg-color);
 }
 
 body.dark-mode .card {
-    background-color: var(--bg-tertiary);
-    color: var(--text-primary);
+    background-color: var(--card-bg);
+    color: var(--text-color);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
+/* Table Styles - Light Mode */
+table {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+th {
+    background-color: var(--ibc-gray-100);
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+td {
+    color: var(--text-color);
+    border-color: var(--ibc-gray-200);
+}
+
+/* Table Styles - Dark Mode */
 body.dark-mode table {
     background-color: var(--bg-secondary);
-    color: var(--text-primary);
+    color: var(--text-color);
 }
 
 body.dark-mode th {
     background-color: var(--bg-tertiary);
-    color: var(--text-primary);
+    color: #ffffff; /* White text on dark headers */
+    font-weight: 600;
 }
 
 body.dark-mode td {
     border-color: var(--border-color);
-    color: var(--text-primary);
+    color: var(--text-color);
 }
 
+/* Input Styles - Light Mode */
+input,
+select,
+textarea {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--ibc-gray-300);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--ibc-gray-400);
+}
+
+/* Input Styles - Dark Mode */
 body.dark-mode input,
 body.dark-mode select,
 body.dark-mode textarea {
-    background-color: var(--bg-secondary);
-    color: var(--text-primary);
+    background-color: #374151; /* Dark background for inputs */
+    color: var(--text-color);
     border-color: var(--border-color);
 }
 
@@ -97,7 +139,7 @@ body.dark-mode textarea::placeholder {
 }
 
 body.dark-mode .glass-card {
-    background: rgba(45, 45, 45, 0.9);
+    background: rgba(31, 41, 55, 0.9); /* Using dark-mode card color */
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -142,11 +184,11 @@ body:not(.dark-mode) .text-gray-500 {
 }
 
 body.dark-mode .bg-white {
-    background-color: var(--bg-secondary) !important;
+    background-color: var(--card-bg) !important;
 }
 
 body.dark-mode .bg-gray-50 {
-    background-color: var(--bg-primary) !important;
+    background-color: var(--bg-color) !important;
 }
 
 body.dark-mode .bg-gray-100 {
