@@ -49,17 +49,25 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         
         /* Light mode sidebar styling */
         body:not(.dark-mode) .sidebar {
-            background: linear-gradient(135deg, var(--ibc-blue) 0%, var(--ibc-blue-dark) 100%);
+            background: linear-gradient(135deg, #0066b3 0%, #004f8c 100%);
+            box-shadow: 4px 0 20px rgba(0, 102, 179, 0.15);
         }
         
         /* Light mode sidebar text colors */
         body:not(.dark-mode) .sidebar a {
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(255, 255, 255, 0.95);
+            transition: all 0.2s ease;
         }
         
         body:not(.dark-mode) .sidebar a:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
+            transform: translateX(4px);
+        }
+        
+        body:not(.dark-mode) .sidebar a.active {
+            background: rgba(255, 255, 255, 0.25);
+            border-right: 3px solid #00a651;
         }
         
         body:not(.dark-mode) .sidebar .bg-gray-800 {
@@ -67,11 +75,11 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         }
         
         body:not(.dark-mode) .sidebar .text-gray-300 {
-            color: rgba(255, 255, 255, 0.9) !important;
+            color: rgba(255, 255, 255, 0.95) !important;
         }
         
         body:not(.dark-mode) .sidebar button {
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(255, 255, 255, 0.95);
         }
         
         /* Light mode mobile menu button styling */
@@ -94,23 +102,27 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         
         .card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-            transition: all 0.3s ease;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
         .card:hover {
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 12px 32px rgba(0, 102, 179, 0.15);
+            transform: translateY(-2px);
         }
         .btn-primary {
-            background: linear-gradient(135deg, var(--ibc-green) 0%, var(--ibc-blue) 100%);
+            background: linear-gradient(135deg, #00a651 0%, #0066b3 100%);
             color: white;
-            padding: 0.5rem 1.5rem;
-            border-radius: 0.5rem;
+            padding: 0.625rem 1.75rem;
+            border-radius: 10px;
             transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 166, 81, 0.25);
         }
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-glow-green);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 166, 81, 0.35);
         }
         
         /* Mobile view improvements */
