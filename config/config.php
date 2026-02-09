@@ -126,7 +126,10 @@ function init_session() {
         $domain = '';
         if (defined('BASE_URL') && BASE_URL) {
             $parsed = parse_url(BASE_URL);
-            $domain = $parsed['host'] ?? '';
+            // Validate parse_url result before accessing
+            if ($parsed !== false && isset($parsed['host'])) {
+                $domain = $parsed['host'];
+            }
         }
         
         // Set secure cookie parameters BEFORE starting session

@@ -8,7 +8,7 @@ require_once __DIR__ . '/../src/Auth.php';
 require_once __DIR__ . '/../includes/models/Invoice.php';
 require_once __DIR__ . '/../includes/helpers.php';
 
-// Check authentication
+// Check authentication (Auth::check() calls init_session() which ensures secure session)
 if (!Auth::check()) {
     header('Location: ../pages/auth/login.php');
     exit;
@@ -26,6 +26,7 @@ if (!in_array($userRole, ['admin', 'board', 'alumni_board'])) {
 // Get all invoices
 $invoices = Invoice::getAll($userRole, $user['id']);
 
+// Session is available for error messages (initialized by Auth::check())
 if (empty($invoices)) {
     $_SESSION['error_message'] = 'Keine Rechnungen zum Exportieren vorhanden';
     header('Location: ' . asset('pages/invoices/index.php'));
