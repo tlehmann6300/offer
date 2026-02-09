@@ -13,10 +13,8 @@ class CSRFHandler {
      * @return string The CSRF token
      */
     public static function getToken() {
-        // Ensure session is started
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        // Ensure session is started with secure parameters
+        init_session();
         
         // Generate token if it doesn't exist
         if (!isset($_SESSION['csrf_token'])) {
@@ -35,10 +33,8 @@ class CSRFHandler {
      * @return void
      */
     public static function verifyToken($token) {
-        // Ensure session is started
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        // Ensure session is started with secure parameters
+        init_session();
         
         // Check if session token exists
         if (!isset($_SESSION['csrf_token'])) {

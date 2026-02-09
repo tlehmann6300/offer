@@ -112,9 +112,41 @@ error_reporting($isProduction ? 0 : E_ALL);
 // Set timezone
 date_default_timezone_set('Europe/Berlin');
 
-// Start session only if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+/**
+ * Initialize session with secure parameters
+ * This function MUST be called before any session access to ensure
+ * all sessions are created with Secure, HttpOnly and SameSite=Strict flags
+ */
+function init_session() {
+    if (session_status() === PHP_SESSION_NONE) {
+        // Get session lifetime from config, default to 3600 seconds (1 hour)
+        $lifetime = defined('SESSION_LIFETIME') ? SESSION_LIFETIME : 3600;
+        
+        // Get domain from BASE_URL
+        $domain = '';
+        if (defined('BASE_URL') && BASE_URL) {
+            $parsed = parse_url(BASE_URL);
+            $domain = $parsed['host'] ?? '';
+        }
+        
+        // Set secure cookie parameters BEFORE starting session
+        session_set_cookie_params([
+            'lifetime' => $lifetime,
+            'path' => '/',
+            'domain' => $domain,
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
+        
+        // Set session name if defined
+        if (defined('SESSION_NAME')) {
+            session_name(SESSION_NAME);
+        }
+        
+        // Start the session with secure parameters
+        session_start();
+    }
 }
 
 // Load helper functions globally

@@ -27,7 +27,6 @@ if (!in_array($userRole, ['admin', 'board', 'alumni_board'])) {
 $invoices = Invoice::getAll($userRole, $user['id']);
 
 if (empty($invoices)) {
-    session_start();
     $_SESSION['error_message'] = 'Keine Rechnungen zum Exportieren vorhanden';
     header('Location: ' . asset('pages/invoices/index.php'));
     exit;
@@ -41,7 +40,6 @@ $zipFilePath = $tempDir . '/' . $zipFileName;
 // Create ZIP archive
 $zip = new ZipArchive();
 if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-    session_start();
     $_SESSION['error_message'] = 'Fehler beim Erstellen der ZIP-Datei';
     header('Location: ' . asset('pages/invoices/index.php'));
     exit;
@@ -78,7 +76,6 @@ $zip->close();
 // Check if any files were added
 if ($fileCount === 0) {
     unlink($zipFilePath);
-    session_start();
     $_SESSION['error_message'] = 'Keine Dateien zum Exportieren gefunden';
     header('Location: ' . asset('pages/invoices/index.php'));
     exit;

@@ -34,48 +34,7 @@ class Auth {
         'vorstand_finanzen_recht'
     ];
     
-    /**
-     * Extract domain from BASE_URL for session cookie
-     * 
-     * @return string Domain from BASE_URL or empty string
-     */
-    private static function getDomainFromBaseUrl() {
-        if (!defined('BASE_URL') || !BASE_URL) {
-            return '';
-        }
-        
-        $parsed = parse_url(BASE_URL);
-        return $parsed['host'] ?? '';
-    }
-    
-    /**
-     * Set secure session cookie parameters
-     * Configures session cookies with security flags before session_start().
-     * This ensures cookies are protected against common web vulnerabilities:
-     * - secure: Only transmitted over HTTPS
-     * - httponly: Not accessible via JavaScript (XSS protection)
-     * - samesite: Prevents CSRF attacks
-     */
-    private static function setSecureSessionParams() {
-        if (session_status() === PHP_SESSION_NONE) {
-            // Get session lifetime from config, default to 3600 seconds (1 hour)
-            $lifetime = defined('SESSION_LIFETIME') ? SESSION_LIFETIME : 3600;
-            
-            // Get domain from BASE_URL
-            $domain = self::getDomainFromBaseUrl();
-            
-            // Set secure cookie parameters
-            session_set_cookie_params([
-                'lifetime' => $lifetime,
-                'path' => '/',
-                'domain' => $domain,
-                'secure' => true,
-                'httponly' => true,
-                'samesite' => 'Strict'
-            ]);
-        }
-    }
-    
+
     /**
      * Check if user is authenticated and handle session timeout
      * 
@@ -85,13 +44,8 @@ class Auth {
         // Set timezone
         date_default_timezone_set('Europe/Berlin');
         
-        // Set secure session cookie parameters before starting session
-        self::setSecureSessionParams();
-        
-        // Start session if not started
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        // Initialize session with secure parameters
+        init_session();
         
         // Check if user is authenticated
         if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
@@ -203,13 +157,8 @@ class Auth {
         $stmt = $db->prepare("UPDATE users SET failed_login_attempts = 0, locked_until = NULL, last_login = NOW() WHERE id = ?");
         $stmt->execute([$user['id']]);
         
-        // Set secure session cookie parameters before starting session
-        self::setSecureSessionParams();
-        
-        // Start session if not started
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        // Initialize session with secure parameters
+        init_session();
         
         // Regenerate session ID to prevent session fixation attacks
         session_regenerate_id(true);
@@ -235,12 +184,8 @@ class Auth {
      * Logout current user
      */
     public static function logout() {
-        // Set secure session cookie parameters before starting session
-        self::setSecureSessionParams();
-        
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        // Initialize session with secure parameters if not already started
+        init_session();
         
         // Clear all session data
         session_unset();
