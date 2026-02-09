@@ -45,12 +45,21 @@ CREATE TABLE IF NOT EXISTS invitation_tokens (
         NOT NULL DEFAULT 'member',
     created_by INT UNSIGNED DEFAULT NULL,
     expires_at DATETIME NOT NULL,
+    used_at DATETIME DEFAULT NULL,
+    used_by INT UNSIGNED DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_invitation_created_by
+        FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT fk_invitation_used_by
+        FOREIGN KEY (used_by) REFERENCES users(id) ON DELETE SET NULL,
     
     INDEX idx_email (email),
     INDEX idx_token (token),
     INDEX idx_expires_at (expires_at),
-    INDEX idx_created_by (created_by)
+    INDEX idx_created_by (created_by),
+    INDEX idx_used_at (used_at),
+    INDEX idx_used_by (used_by)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
