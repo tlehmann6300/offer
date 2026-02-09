@@ -22,7 +22,7 @@ if (!in_array($userRole, $allowedRoles)) {
 }
 
 // Check if user has permission to mark invoices as paid
-// Requirements: Auth::hasRole('board') AND position field contains 'Finanzen' (case-insensitive)
+// Requirements: Auth::hasRole('board') is TRUE AND position field contains 'Finanzen' (case-insensitive)
 $canMarkAsPaid = false;
 $debugInfo = ['hasBoard' => false, 'hasFinanzen' => false, 'position' => 'N/A'];
 
