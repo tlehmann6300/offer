@@ -43,7 +43,7 @@ ob_start();
 <div class="max-w-7xl mx-auto">
     <!-- Success/Error Messages -->
     <?php if (isset($_SESSION['success_message'])): ?>
-    <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+    <div class="mb-6 p-4 bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-300 rounded-lg">
         <i class="fas fa-check-circle mr-2"></i><?php echo htmlspecialchars($_SESSION['success_message']); ?>
     </div>
     <?php 
@@ -52,7 +52,7 @@ ob_start();
     ?>
     
     <?php if (isset($_SESSION['error_message'])): ?>
-    <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+    <div class="mb-6 p-4 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg">
         <i class="fas fa-exclamation-circle mr-2"></i><?php echo htmlspecialchars($_SESSION['error_message']); ?>
     </div>
     <?php 
@@ -194,10 +194,10 @@ ob_start();
                             
                             // Status badge colors
                             $statusColors = [
-                                'pending' => 'bg-yellow-100 text-yellow-800 border-yellow-300',
-                                'approved' => 'bg-green-100 text-green-800 border-green-300',
-                                'rejected' => 'bg-red-100 text-red-800 border-red-300',
-                                'paid' => 'bg-blue-100 text-blue-800 border-blue-300'
+                                'pending' => 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700',
+                                'approved' => 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300 border-green-300 dark:border-green-700',
+                                'rejected' => 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300 border-red-300 dark:border-red-700',
+                                'paid' => 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700'
                             ];
                             
                             $statusLabels = [
@@ -207,7 +207,7 @@ ob_start();
                                 'paid' => 'Bezahlt'
                             ];
                             
-                            $statusClass = $statusColors[$invoice['status']] ?? 'bg-gray-100 text-gray-800 border-gray-300';
+                            $statusClass = $statusColors[$invoice['status']] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 border-gray-300 dark:border-gray-600';
                             $statusLabel = $statusLabels[$invoice['status']] ?? ucfirst($invoice['status']);
                             ?>
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
@@ -454,16 +454,16 @@ dropZone.addEventListener('click', () => {
 
 dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropZone.classList.add('border-blue-500', 'bg-blue-50');
+    dropZone.classList.add('border-blue-500', 'dark:border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
 });
 
 dropZone.addEventListener('dragleave', () => {
-    dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+    dropZone.classList.remove('border-blue-500', 'dark:border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
 });
 
 dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
-    dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+    dropZone.classList.remove('border-blue-500', 'dark:border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
     
     if (e.dataTransfer.files.length > 0) {
         fileInput.files = e.dataTransfer.files;
