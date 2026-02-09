@@ -33,9 +33,9 @@ if (isset($_SESSION['error_message'])) {
 // If User is 'member'/'board'/'head'/'candidate' -> Use Member::getProfileByUserId()
 // If User is 'alumni'/'alumni_board'/'honorary_member' -> Use Alumni::getProfileByUserId()
 $profile = null;
-if (in_array($userRole, ['member', 'board', 'head', 'candidate'])) {
+if (isMemberRole($userRole)) {
     $profile = Member::getProfileByUserId($user['id']);
-} elseif (in_array($userRole, ['alumni', 'alumni_board', 'honorary_member'])) {
+} elseif (isAlumniRole($userRole)) {
     $profile = Alumni::getProfileByUserId($user['id']);
 }
 
@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Add role-specific fields based on user role
             // Student View: member, candidate, head, board -> Show study fields
-            if (in_array($userRole, ['candidate', 'member', 'board', 'head'])) {
+            if (isMemberRole($userRole)) {
                 // Fields for students (candidates, members, board, and heads)
                 $profileData['studiengang'] = trim($_POST['studiengang'] ?? '');
                 // study_program: Database column alias for legacy schema compatibility
@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (Alumni::updateOrCreateProfile($user['id'], $profileData)) {
                 $message = 'Profil erfolgreich aktualisiert';
                 // Reload profile based on role
-                if (in_array($userRole, ['member', 'board', 'head', 'candidate'])) {
+                if (isMemberRole($userRole)) {
                     $profile = Member::getProfileByUserId($user['id']);
                 } else {
                     $profile = Alumni::getProfileByUserId($user['id']);
@@ -372,7 +372,7 @@ ob_start();
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">JPG, PNG, GIF oder WEBP (Max. 5MB)</p>
                     </div>
                     
-                    <?php if (in_array($userRole, ['candidate', 'member', 'board', 'head'])): ?>
+                    <?php if (isMemberRole($userRole)): ?>
                     <!-- Fields for Students: Candidates, Members, Board, and Heads -->
                     <!-- Student View: Show Studiengang, Semester, Abschluss -->
                     <div>
@@ -407,7 +407,7 @@ ob_start();
                             placeholder="z.B. Bachelor of Science"
                         >
                     </div>
-                    <?php elseif (in_array($userRole, ['alumni', 'honorary_member'])): ?>
+                    <?php elseif (isAlumniRole($userRole)): ?>
                     <!-- Fields for Alumni and Honorary Members -->
                     <!-- Alumni View: Show Arbeitgeber, Position, Branche -->
                     <div>
