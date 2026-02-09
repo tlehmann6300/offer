@@ -210,13 +210,35 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </a>
                 <?php endif; ?>
 
-                <!-- Statistiken (Board, Head, Alumni, Alumni-Board ONLY) -->
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'head', 'alumni', 'alumni_board'])): ?>
-                <a href="<?php echo asset('pages/admin/stats.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/stats.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
-                    <i class="fas fa-chart-bar w-5 mr-3"></i>
-                    <span>Statistiken</span>
-                </a>
+                <!-- Verwaltung Dropdown (Board ONLY) -->
+                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'board'): ?>
+                <div>
+                    <button id="verwaltung-dropdown-btn" 
+                            class="flex items-center justify-between w-full px-6 py-2 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200">
+                        <div class="flex items-center">
+                            <i class="fas fa-cogs w-5 mr-3"></i>
+                            <span>Verwaltung</span>
+                        </div>
+                        <i id="verwaltung-chevron" class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                    </button>
+                    <div id="verwaltung-dropdown" class="hidden bg-gray-800/50 mt-1 space-y-1">
+                        <a href="<?php echo asset('pages/admin/users.php'); ?>" 
+                           class="flex items-center px-6 py-2 pl-12 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/users.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                            <i class="fas fa-users w-5 mr-3"></i>
+                            <span>Benutzer</span>
+                        </a>
+                        <a href="<?php echo asset('pages/auth/settings.php'); ?>" 
+                           class="flex items-center px-6 py-2 pl-12 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/auth/settings.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                            <i class="fas fa-cog w-5 mr-3"></i>
+                            <span>Einstellungen</span>
+                        </a>
+                        <a href="<?php echo asset('pages/admin/stats.php'); ?>" 
+                           class="flex items-center px-6 py-2 pl-12 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/stats.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                            <i class="fas fa-chart-bar w-5 mr-3"></i>
+                            <span>Statistiken</span>
+                        </a>
+                    </div>
+                </div>
                 <?php endif; ?>
                 
             </nav>

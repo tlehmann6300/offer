@@ -21,9 +21,9 @@ if (!in_array($userRole, $allowedRoles)) {
 }
 
 // Check if user has permission to mark invoices as paid
-// Only board members with 'Finanzen' in position can mark as paid
+// ONLY board members with 'Finanzen' in position can mark as paid
 $canMarkAsPaid = false;
-if ($userRole === 'board') {
+if (Auth::hasRole('board')) {
     $contentDb = Database::getContentDB();
     $stmt = $contentDb->prepare("
         SELECT position 
@@ -35,8 +35,8 @@ if ($userRole === 'board') {
     
     if ($profile && !empty($profile['position'])) {
         $currentUserPosition = $profile['position'];
-        // Check if position contains 'Finanzen'
-        if (strpos($currentUserPosition, 'Finanzen') !== false) {
+        // Check if position contains 'Finanzen' (case-insensitive)
+        if (stripos($currentUserPosition, 'Finanzen') !== false) {
             $canMarkAsPaid = true;
         }
     }
@@ -220,7 +220,7 @@ ob_start();
                             
                             $statusLabels = [
                                 'pending' => 'Ausstehend',
-                                'approved' => 'Genehmigt',
+                                'approved' => 'Bezahlt',
                                 'rejected' => 'Abgelehnt',
                                 'paid' => 'Bezahlt'
                             ];
