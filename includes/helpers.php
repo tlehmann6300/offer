@@ -118,3 +118,30 @@ function translateRole($role) {
     
     return $roleTranslations[$role] ?? ucfirst($role);
 }
+
+/**
+ * Check if role is an active member role
+ * Active member roles: candidate, member, head, board (and board variants)
+ * 
+ * Note: This includes all board variants (vorstand_intern, vorstand_extern, vorstand_finanzen_recht)
+ * to match the Member::ACTIVE_ROLES constant. Previous inline checks that excluded these variants
+ * were inconsistent with the member directory filtering logic.
+ * 
+ * @param string $role Role identifier
+ * @return bool True if role is an active member role
+ */
+function isMemberRole($role) {
+    return in_array($role, ['candidate', 'member', 'head', 'board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht']);
+}
+
+/**
+ * Check if role is an alumni role
+ * Alumni roles: alumni, alumni_board, honorary_member
+ * 
+ * @param string $role Role identifier
+ * @return bool True if role is an alumni role
+ */
+function isAlumniRole($role) {
+    return in_array($role, ['alumni', 'alumni_board', 'honorary_member']);
+}
+

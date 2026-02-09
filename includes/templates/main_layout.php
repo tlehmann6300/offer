@@ -551,14 +551,14 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             <div class='mb-3 space-y-2'>
                 <!-- Profilangaben -->
                 <a href='<?php echo asset('pages/auth/profile.php'); ?>' 
-                   class='flex items-center justify-start w-full px-4 py-2 text-xs font-medium text-white/90 dark:text-gray-100 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm <?php echo isActivePath('/auth/profile.php') ? 'bg-white/10' : ''; ?>'>
+                   class='flex items-center justify-center w-full px-4 py-2 text-xs font-medium text-white/90 dark:text-gray-100 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm <?php echo isActivePath('/auth/profile.php') ? 'bg-white/10' : ''; ?>'>
                     <i class='fas fa-user text-xs mr-2'></i> 
                     <span>Mein Profil</span>
                 </a>
                 
                 <!-- Einstellungen -->
                 <a href='<?php echo asset('pages/auth/settings.php'); ?>' 
-                   class='flex items-center justify-start w-full px-4 py-2 text-xs font-medium text-white/90 dark:text-gray-100 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm <?php echo isActivePath('/auth/settings.php') ? 'bg-white/10' : ''; ?>'>
+                   class='flex items-center justify-center w-full px-4 py-2 text-xs font-medium text-white/90 dark:text-gray-100 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm <?php echo isActivePath('/auth/settings.php') ? 'bg-white/10' : ''; ?>'>
                     <i class='fas fa-cog text-xs mr-2'></i> 
                     <span>Einstellungen</span>
                 </a>
