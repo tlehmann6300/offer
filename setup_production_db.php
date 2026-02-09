@@ -6,6 +6,9 @@
  * IMPORTANT: Run this script once to configure production, then DELETE it for security!
  */
 
+// Load configuration
+require_once __DIR__ . '/config/config.php';
+
 // Load credentials from .env file
 $envFile = __DIR__ . '/.env';
 $env = [];
@@ -60,7 +63,7 @@ $success = false;
 $error = '';
 
 // Simple token-based CSRF protection
-session_start();
+init_session();
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }

@@ -8,8 +8,6 @@ require_once __DIR__ . '/../src/Auth.php';
 require_once __DIR__ . '/../includes/models/Invoice.php';
 require_once __DIR__ . '/../includes/helpers.php';
 
-session_start();
-
 // Check authentication
 if (!Auth::check()) {
     $_SESSION['error_message'] = 'Nicht authentifiziert';

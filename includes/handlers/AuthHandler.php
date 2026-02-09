@@ -6,6 +6,7 @@
 
 require_once __DIR__ . '/../database.php';
 require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../../config/config.php';
 
 class AuthHandler {
     
@@ -16,21 +17,15 @@ class AuthHandler {
         // Set timezone at the very beginning
         date_default_timezone_set('Europe/Berlin');
         
-        if (session_status() === PHP_SESSION_NONE) {
-            ini_set('session.cookie_httponly', 1);
-            ini_set('session.use_only_cookies', 1);
-            ini_set('session.cookie_secure', 1); // Set to 1 if using HTTPS
-            ini_set('session.cookie_samesite', 'Strict');
-            session_name(SESSION_NAME);
-            session_start();
-            
-            // Regenerate session ID periodically to prevent session fixation
-            if (!isset($_SESSION['created'])) {
-                $_SESSION['created'] = time();
-            } else if (time() - $_SESSION['created'] > 1800) {
-                session_regenerate_id(true);
-                $_SESSION['created'] = time();
-            }
+        // Use the centralized init_session() function for secure session initialization
+        init_session();
+        
+        // Regenerate session ID periodically to prevent session fixation
+        if (!isset($_SESSION['created'])) {
+            $_SESSION['created'] = time();
+        } else if (time() - $_SESSION['created'] > 1800) {
+            session_regenerate_id(true);
+            $_SESSION['created'] = time();
         }
         
         // Check for session timeout (30 minutes of inactivity)

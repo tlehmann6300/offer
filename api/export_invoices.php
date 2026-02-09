@@ -8,7 +8,7 @@ require_once __DIR__ . '/../src/Auth.php';
 require_once __DIR__ . '/../includes/models/Invoice.php';
 require_once __DIR__ . '/../includes/helpers.php';
 
-// Check authentication
+// Check authentication (Auth::check() calls init_session() which ensures secure session)
 if (!Auth::check()) {
     header('Location: ../pages/auth/login.php');
     exit;
@@ -26,8 +26,8 @@ if (!in_array($userRole, ['admin', 'board', 'alumni_board'])) {
 // Get all invoices
 $invoices = Invoice::getAll($userRole, $user['id']);
 
+// Session is available for error messages (initialized by Auth::check())
 if (empty($invoices)) {
-    session_start();
     $_SESSION['error_message'] = 'Keine Rechnungen zum Exportieren vorhanden';
     header('Location: ' . asset('pages/invoices/index.php'));
     exit;
@@ -41,7 +41,6 @@ $zipFilePath = $tempDir . '/' . $zipFileName;
 // Create ZIP archive
 $zip = new ZipArchive();
 if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-    session_start();
     $_SESSION['error_message'] = 'Fehler beim Erstellen der ZIP-Datei';
     header('Location: ' . asset('pages/invoices/index.php'));
     exit;
@@ -78,7 +77,6 @@ $zip->close();
 // Check if any files were added
 if ($fileCount === 0) {
     unlink($zipFilePath);
-    session_start();
     $_SESSION['error_message'] = 'Keine Dateien zum Exportieren gefunden';
     header('Location: ' . asset('pages/invoices/index.php'));
     exit;
