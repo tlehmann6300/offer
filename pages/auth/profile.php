@@ -159,7 +159,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Update or create profile (only for the current user)
             if (Alumni::updateOrCreateProfile($user['id'], $profileData)) {
                 $message = 'Profil erfolgreich aktualisiert';
-                $profile = Alumni::getProfileByUserId($user['id']); // Reload profile
+                // Reload profile based on role
+                if (in_array($userRole, ['member', 'board', 'head', 'candidate'])) {
+                    $profile = Member::getProfileByUserId($user['id']);
+                } else {
+                    $profile = Alumni::getProfileByUserId($user['id']);
+                }
             } else {
                 $error = 'Fehler beim Aktualisieren des Profils';
             }
