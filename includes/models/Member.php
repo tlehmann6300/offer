@@ -170,4 +170,71 @@ class Member {
         
         return $statistics;
     }
+    
+    /**
+     * Update an existing member profile
+     * Note: Uses alumni_profiles table as this is the central profile table for all users
+     * 
+     * @param int $userId The user ID
+     * @param array $data Profile data to update
+     * @return bool True on success
+     * @throws Exception On database error
+     */
+    public static function update(int $userId, array $data): bool {
+        // Check permissions
+        require_once __DIR__ . '/../../src/Auth.php';
+        if (!Auth::check()) {
+            throw new Exception("Keine Berechtigung zum Aktualisieren des Mitgliederprofils");
+        }
+        
+        $currentUser = Auth::user();
+        $currentRole = $currentUser['role'] ?? '';
+        
+        // Board, head, and admin can update any profile
+        // Candidates can only update their own profile
+        if ($currentRole === 'candidate') {
+            if ($currentUser['id'] !== $userId) {
+                throw new Exception("Keine Berechtigung zum Aktualisieren anderer Mitgliederprofile");
+            }
+        } elseif (!in_array($currentRole, ['board', 'head', 'admin'])) {
+            throw new Exception("Keine Berechtigung zum Aktualisieren des Mitgliederprofils");
+        }
+        
+        $db = Database::getContentDB();
+        
+        // Check if profile exists
+        $checkStmt = $db->prepare("SELECT id FROM alumni_profiles WHERE user_id = ?");
+        $checkStmt->execute([$userId]);
+        if (!$checkStmt->fetch()) {
+            throw new Exception("Profil nicht gefunden");
+        }
+        
+        $fields = [];
+        $values = [];
+        
+        $allowedFields = [
+            'first_name', 'last_name', 'email', 'mobile_phone',
+            'linkedin_url', 'xing_url', 'industry', 'company', 
+            'position', 'study_program', 'semester', 
+            'angestrebter_abschluss', 'degree', 'graduation_year'
+        ];
+        
+        foreach ($allowedFields as $field) {
+            if (array_key_exists($field, $data)) {
+                $fields[] = "$field = ?";
+                $values[] = $data[$field];
+            }
+        }
+        
+        if (empty($fields)) {
+            return true; // No fields to update
+        }
+        
+        $values[] = $userId;
+        // Uses alumni_profiles table as this is the central profile table for all users
+        $sql = "UPDATE alumni_profiles SET " . implode(', ', $fields) . " WHERE user_id = ?";
+        
+        $stmt = $db->prepare($sql);
+        return $stmt->execute($values);
+    }
 }

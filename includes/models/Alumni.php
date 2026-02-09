@@ -105,7 +105,32 @@ class Alumni extends Database {
      * @throws Exception On database error
      */
     public static function update(int $userId, array $data): bool {
+        // Check permissions
+        require_once __DIR__ . '/../../src/Auth.php';
+        if (!Auth::check()) {
+            throw new Exception("Keine Berechtigung zum Aktualisieren des Alumni-Profils");
+        }
+        
+        $currentUser = Auth::user();
+        $currentRole = $currentUser['role'] ?? '';
+        
+        // Alumni can update their own profile, alumni_board/board/admin can update any
+        if ($currentRole === 'alumni') {
+            if ($currentUser['id'] !== $userId) {
+                throw new Exception("Keine Berechtigung zum Aktualisieren anderer Alumni-Profile");
+            }
+        } elseif (!in_array($currentRole, ['alumni_board', 'board', 'admin'])) {
+            throw new Exception("Keine Berechtigung zum Aktualisieren des Alumni-Profils");
+        }
+        
         $db = Database::getContentDB();
+        
+        // Check if profile exists
+        $checkStmt = $db->prepare("SELECT id FROM alumni_profiles WHERE user_id = ?");
+        $checkStmt->execute([$userId]);
+        if (!$checkStmt->fetch()) {
+            throw new Exception("Profil nicht gefunden");
+        }
         
         // Sanitize image_path if provided
         if (isset($data['image_path'])) {
