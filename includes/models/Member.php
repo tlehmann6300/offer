@@ -11,10 +11,10 @@ require_once __DIR__ . '/../database.php';
 class Member {
     
     /**
-     * Active member roles (excludes 'alumni', 'alumni_board', 'honorary_member', 'admin')
-     * Shows only: board (Vorstand), head (Resortleiter), member (Mitglied), candidate (Anwärter)
+     * Active member roles (excludes 'alumni', 'alumni_board', 'honorary_member')
+     * Shows only: board (all Vorstand types), head (Resortleiter), member (Mitglied), candidate (Anwärter)
      */
-    const ACTIVE_ROLES = ['board', 'head', 'member', 'candidate'];
+    const ACTIVE_ROLES = ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate'];
     
     /**
      * Get all active members with optional search and role filtering

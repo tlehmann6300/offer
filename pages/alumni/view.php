@@ -89,6 +89,9 @@ ob_start();
                 <?php
                 $roleBadgeColors = [
                     'board' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'vorstand_intern' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'vorstand_extern' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'vorstand_finanzen_recht' => 'bg-purple-100 text-purple-800 border-purple-300',
                     'head' => 'bg-blue-100 text-blue-800 border-blue-300',
                     'member' => 'bg-green-100 text-green-800 border-green-300',
                     'candidate' => 'bg-yellow-100 text-yellow-800 border-yellow-300',
@@ -99,6 +102,9 @@ ob_start();
                 
                 $roleNames = [
                     'board' => 'Vorstand',
+                    'vorstand_intern' => 'Vorstand Intern',
+                    'vorstand_extern' => 'Vorstand Extern',
+                    'vorstand_finanzen_recht' => 'Vorstand Finanzen & Recht',
                     'head' => 'Ressortleiter',
                     'member' => 'Mitglied',
                     'candidate' => 'Anwärter',
