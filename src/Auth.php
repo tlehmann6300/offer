@@ -222,6 +222,28 @@ class Auth {
     }
     
     /**
+     * Check if user has specific role(s)
+     * 
+     * @param string|array $role Required role or array of roles
+     * @return bool True if user has the role
+     */
+    public static function hasRole($role) {
+        if (!self::check()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        
+        // If $role is an array, check if user has any of them
+        if (is_array($role)) {
+            return in_array($userRole, $role);
+        }
+        
+        // If $role is a string, check for exact match
+        return $userRole === $role;
+    }
+    
+    /**
      * Check if user has specific permission/role
      * 
      * @param string $role Required role

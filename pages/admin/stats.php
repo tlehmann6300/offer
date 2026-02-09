@@ -47,65 +47,73 @@ $stmt = $userDb->query("SELECT COUNT(*) as total_users FROM users");
 $totalUsersCount = $stmt->fetch()['total_users'] ?? 0;
 
 // List 1: 'Wer hat was ausgeliehen?' (Active Checkouts with User Names)
-$stmt = $contentDb->query("
-    SELECT 
-        ic.id,
-        ic.item_id,
-        ic.user_id,
-        ic.checked_out_at,
-        ic.due_date,
-        i.name as item_name,
-        i.quantity as total_quantity
-    FROM inventory_checkouts ic
-    JOIN inventory_items i ON ic.item_id = i.id
-    WHERE ic.returned_at IS NULL
-    ORDER BY ic.checked_out_at DESC
-");
-$checkouts = $stmt->fetchAll();
-
-// Get all user IDs and fetch user information in bulk
-$userIds = array_unique(array_column($checkouts, 'user_id'));
-$userInfoMap = [];
-
-if (!empty($userIds)) {
-    $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
-    $userStmt = $userDb->prepare("SELECT id, email, firstname, lastname FROM users WHERE id IN ($placeholders)");
-    $userStmt->execute($userIds);
-    $users = $userStmt->fetchAll();
-    
-    foreach ($users as $u) {
-        $userInfoMap[$u['id']] = $u;
-    }
-}
-
-// Build active checkouts array with user information
+$checkouts = [];
 $activeCheckouts = [];
-foreach ($checkouts as $checkout) {
-    $userInfo = $userInfoMap[$checkout['user_id']] ?? null;
+
+try {
+    $stmt = $contentDb->query("
+        SELECT 
+            ic.id,
+            ic.item_id,
+            ic.user_id,
+            ic.checked_out_at,
+            ic.due_date,
+            i.name as item_name,
+            i.quantity as total_quantity
+        FROM inventory_checkouts ic
+        JOIN inventory_items i ON ic.item_id = i.id
+        WHERE ic.returned_at IS NULL
+        ORDER BY ic.checked_out_at DESC
+    ");
+    $checkouts = $stmt->fetchAll();
     
-    $userName = 'Unbekannt';
-    $userEmail = '';
+    // Get all user IDs and fetch user information in bulk
+    $userIds = array_unique(array_column($checkouts, 'user_id'));
+    $userInfoMap = [];
     
-    if ($userInfo) {
-        $userEmail = $userInfo['email'] ?? '';
-        if (!empty($userInfo['firstname']) && !empty($userInfo['lastname'])) {
-            $userName = $userInfo['firstname'] . ' ' . $userInfo['lastname'];
-        } elseif (!empty($userInfo['firstname'])) {
-            $userName = $userInfo['firstname'];
-        } elseif (!empty($userEmail)) {
-            $userName = explode('@', $userEmail)[0];
+    if (!empty($userIds)) {
+        $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
+        $userStmt = $userDb->prepare("SELECT id, email, firstname, lastname FROM users WHERE id IN ($placeholders)");
+        $userStmt->execute($userIds);
+        $users = $userStmt->fetchAll();
+        
+        foreach ($users as $u) {
+            $userInfoMap[$u['id']] = $u;
         }
     }
     
-    $activeCheckouts[] = [
-        'checkout_id' => $checkout['id'],
-        'item_name' => $checkout['item_name'],
-        'user_name' => $userName,
-        'user_email' => $userEmail,
-        'checked_out_at' => $checkout['checked_out_at'],
-        'due_date' => $checkout['due_date'],
-        'is_overdue' => !empty($checkout['due_date']) && strtotime($checkout['due_date']) < time()
-    ];
+    // Build active checkouts array with user information
+    foreach ($checkouts as $checkout) {
+        $userInfo = $userInfoMap[$checkout['user_id']] ?? null;
+        
+        $userName = 'Unbekannt';
+        $userEmail = '';
+        
+        if ($userInfo) {
+            $userEmail = $userInfo['email'] ?? '';
+            if (!empty($userInfo['firstname']) && !empty($userInfo['lastname'])) {
+                $userName = $userInfo['firstname'] . ' ' . $userInfo['lastname'];
+            } elseif (!empty($userInfo['firstname'])) {
+                $userName = $userInfo['firstname'];
+            } elseif (!empty($userEmail)) {
+                $userName = explode('@', $userEmail)[0];
+            }
+        }
+        
+        $activeCheckouts[] = [
+            'checkout_id' => $checkout['id'],
+            'item_name' => $checkout['item_name'],
+            'user_name' => $userName,
+            'user_email' => $userEmail,
+            'checked_out_at' => $checkout['checked_out_at'],
+            'due_date' => $checkout['due_date'],
+            'is_overdue' => !empty($checkout['due_date']) && strtotime($checkout['due_date']) < time()
+        ];
+    }
+} catch (PDOException $e) {
+    // Table doesn't exist or other DB error
+    error_log("Error fetching inventory checkouts: " . $e->getMessage());
+    // activeCheckouts will remain empty array, showing "Keine Daten"
 }
 
 // List 2: 'Projekt Bewerbungen' (Count per Project)
@@ -196,8 +204,8 @@ ob_start();
             <?php if (empty($activeCheckouts)): ?>
                 <div class="text-center py-8">
                     <i class="fas fa-check-circle text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
-                    <p class="text-gray-600 dark:text-gray-300 text-lg">Keine aktiven Ausleihen</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Alle Artikel wurden zurückgegeben</p>
+                    <p class="text-gray-600 dark:text-gray-300 text-lg">Keine Daten verfügbar</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Keine aktiven Ausleihen oder Tabelle nicht initialisiert</p>
                 </div>
             <?php else: ?>
                 <div class="overflow-x-auto">

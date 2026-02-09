@@ -31,7 +31,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                         'ibc-accent-dark': 'var(--ibc-accent-dark)',
                     },
                     fontFamily: {
-                        'sans': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        'sans': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'system-ui', 'sans-serif'],
                     },
                     boxShadow: {
                         'glow': 'var(--shadow-glow-green)',
@@ -115,7 +115,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         }
     </style>
 </head>
-<body class="bg-gray-50" data-user-theme="<?php echo $currentUser['theme_preference'] ?? 'auto'; ?>">
+<body class="<?php echo htmlspecialchars($currentUser['theme_preference'] ?? 'auto'); ?> bg-gray-50" data-user-theme="<?php echo htmlspecialchars($currentUser['theme_preference'] ?? 'auto'); ?>">
     <!-- Mobile Menu Overlay -->
     <div id="sidebar-overlay" class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden transition-opacity duration-300"></div>
 
