@@ -27,6 +27,7 @@ try {
     
     // Query to find users with birthday today
     // Uses DATE_FORMAT to compare only month and day, ignoring the year
+    // Note: DB_CONTENT_NAME is a constant from config.php and is safe to use in the query
     $stmt = $userDb->prepare("
         SELECT 
             u.id,
@@ -66,11 +67,12 @@ try {
         echo "Sending birthday wishes to: {$firstName} ({$email})... ";
         
         // Determine salutation based on gender
-        $salutation = 'Hallo ' . htmlspecialchars($firstName) . ',';
         if ($gender === 'f') {
             $salutation = 'Liebe ' . htmlspecialchars($firstName) . ',';
         } elseif ($gender === 'm') {
             $salutation = 'Lieber ' . htmlspecialchars($firstName) . ',';
+        } else {
+            $salutation = 'Hallo ' . htmlspecialchars($firstName) . ',';
         }
         
         // Build email content
