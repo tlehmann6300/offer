@@ -31,11 +31,11 @@ if (isset($_SESSION['error_message'])) {
 
 // Load user's profile based on role
 // If User is 'member'/'board'/'head'/'candidate' -> Use Member::getProfileByUserId()
-// If User is 'alumni'/'alumni_board' -> Use Alumni::getProfileByUserId()
+// If User is 'alumni'/'alumni_board'/'honorary_member' -> Use Alumni::getProfileByUserId()
 $profile = null;
 if (in_array($userRole, ['member', 'board', 'head', 'candidate'])) {
     $profile = Member::getProfileByUserId($user['id']);
-} elseif (in_array($userRole, ['alumni', 'alumni_board'])) {
+} elseif (in_array($userRole, ['alumni', 'alumni_board', 'honorary_member'])) {
     $profile = Alumni::getProfileByUserId($user['id']);
 }
 
@@ -402,8 +402,8 @@ ob_start();
                             placeholder="z.B. Bachelor of Science"
                         >
                     </div>
-                    <?php elseif ($userRole === 'alumni'): ?>
-                    <!-- Fields for Alumni -->
+                    <?php elseif (in_array($userRole, ['alumni', 'honorary_member'])): ?>
+                    <!-- Fields for Alumni and Honorary Members -->
                     <!-- Alumni View: Show Arbeitgeber, Position, Branche -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Aktueller Arbeitgeber</label>

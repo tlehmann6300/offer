@@ -106,19 +106,35 @@ body.dark-mode a:not(.btn-primary) {
 }
 
 body.dark-mode .text-gray-600 {
-    color: var(--text-secondary) !important;
+    color: #d1d5db !important; /* Lighter gray for better readability */
 }
 
 body.dark-mode .text-gray-700 {
-    color: var(--text-primary) !important;
+    color: #e5e7eb !important; /* Even lighter for better contrast */
 }
 
 body.dark-mode .text-gray-800 {
-    color: #f0f0f0 !important; /* text-gray-100 equivalent */
+    color: #f3f4f6 !important; /* Almost white for headers */
+}
+
+body.dark-mode .text-gray-500 {
+    color: #9ca3af !important; /* Better readability for muted text */
 }
 
 body:not(.dark-mode) .text-gray-800 {
-    color: #1f2937 !important; /* Ensure light mode uses gray-800 */
+    color: #1f2937 !important; /* Dark text for light mode */
+}
+
+body:not(.dark-mode) .text-gray-700 {
+    color: #374151 !important; /* Slightly lighter but still readable */
+}
+
+body:not(.dark-mode) .text-gray-600 {
+    color: #4b5563 !important; /* Good contrast for body text */
+}
+
+body:not(.dark-mode) .text-gray-500 {
+    color: #6b7280 !important; /* Muted but readable */
 }
 
 body.dark-mode .bg-white {
@@ -129,8 +145,34 @@ body.dark-mode .bg-gray-50 {
     background-color: var(--bg-primary) !important;
 }
 
+body.dark-mode .bg-gray-100 {
+    background-color: #374151 !important; /* Lighter background for badges */
+}
+
 body.dark-mode .border-gray-200 {
     border-color: var(--border-color) !important;
+}
+
+body.dark-mode .border-gray-300 {
+    border-color: #4b5563 !important;
+}
+
+/* Dark mode improvements for specific elements */
+body.dark-mode h1, 
+body.dark-mode h2, 
+body.dark-mode h3, 
+body.dark-mode h4, 
+body.dark-mode h5, 
+body.dark-mode h6 {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode p {
+    color: #d1d5db;
+}
+
+body.dark-mode label {
+    color: #e5e7eb !important;
 }
 
 body.dark-mode .shadow {
