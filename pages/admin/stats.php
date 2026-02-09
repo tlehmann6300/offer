@@ -139,6 +139,52 @@ $stmt = $contentDb->query("
 ");
 $projectApplications = $stmt->fetchAll();
 
+// Database Storage Usage
+// Query information_schema to get database sizes
+$databaseStats = [];
+$databaseQuota = 1024; // 1 GB in MB
+
+try {
+    // Get database names from config
+    $databases = [
+        ['name' => DB_USER_NAME, 'label' => 'User Database', 'color' => 'blue'],
+        ['name' => DB_CONTENT_NAME, 'label' => 'Content Database', 'color' => 'purple'],
+        ['name' => DB_RECH_NAME, 'label' => 'Invoice Database', 'color' => 'green']
+    ];
+    
+    foreach ($databases as $db) {
+        if (empty($db['name'])) {
+            continue;
+        }
+        
+        // Query information_schema for this database
+        $stmt = $userDb->prepare("
+            SELECT 
+                table_schema as database_name,
+                ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) as size_mb
+            FROM information_schema.TABLES
+            WHERE table_schema = ?
+            GROUP BY table_schema
+        ");
+        $stmt->execute([$db['name']]);
+        $result = $stmt->fetch();
+        
+        $sizeMb = $result['size_mb'] ?? 0;
+        $percentage = ($sizeMb / $databaseQuota) * 100;
+        
+        $databaseStats[] = [
+            'name' => $db['name'],
+            'label' => $db['label'],
+            'size_mb' => $sizeMb,
+            'percentage' => min($percentage, 100), // Cap at 100%
+            'color' => $db['color']
+        ];
+    }
+} catch (PDOException $e) {
+    error_log("Error fetching database sizes: " . $e->getMessage());
+    // databaseStats will remain empty array
+}
+
 $title = 'Statistiken - IBC Intranet';
 ob_start();
 ?>
@@ -260,6 +306,90 @@ ob_start();
             </div>
         </div>
     </div>
+
+    <!-- Database Storage Usage Section -->
+    <?php if (!empty($databaseStats)): ?>
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+            <i class="fas fa-database mr-2 text-indigo-600 dark:text-indigo-400"></i>
+            Datenbank Speicherverbrauch
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <?php foreach ($databaseStats as $db): ?>
+                <?php 
+                $colorClasses = [
+                    'blue' => [
+                        'border' => 'border-blue-500 dark:border-blue-600',
+                        'gradient' => 'from-white to-blue-50 dark:from-gray-800 dark:to-blue-900/20',
+                        'icon_bg' => 'bg-blue-100 dark:bg-blue-900/50',
+                        'icon_text' => 'text-blue-600 dark:text-blue-400',
+                        'text' => 'text-blue-600 dark:text-blue-400',
+                        'progress_bg' => 'bg-blue-200 dark:bg-blue-800',
+                        'progress_bar' => 'bg-blue-600 dark:bg-blue-400'
+                    ],
+                    'purple' => [
+                        'border' => 'border-purple-500 dark:border-purple-600',
+                        'gradient' => 'from-white to-purple-50 dark:from-gray-800 dark:to-purple-900/20',
+                        'icon_bg' => 'bg-purple-100 dark:bg-purple-900/50',
+                        'icon_text' => 'text-purple-600 dark:text-purple-400',
+                        'text' => 'text-purple-600 dark:text-purple-400',
+                        'progress_bg' => 'bg-purple-200 dark:bg-purple-800',
+                        'progress_bar' => 'bg-purple-600 dark:bg-purple-400'
+                    ],
+                    'green' => [
+                        'border' => 'border-green-500 dark:border-green-600',
+                        'gradient' => 'from-white to-green-50 dark:from-gray-800 dark:to-green-900/20',
+                        'icon_bg' => 'bg-green-100 dark:bg-green-900/50',
+                        'icon_text' => 'text-green-600 dark:text-green-400',
+                        'text' => 'text-green-600 dark:text-green-400',
+                        'progress_bg' => 'bg-green-200 dark:bg-green-800',
+                        'progress_bar' => 'bg-green-600 dark:bg-green-400'
+                    ]
+                ];
+                $colors = $colorClasses[$db['color']] ?? $colorClasses['blue'];
+                ?>
+                <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br <?php echo $colors['gradient']; ?> border-l-4 <?php echo $colors['border']; ?>">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase mb-1"><?php echo htmlspecialchars($db['label']); ?></h3>
+                            <p class="text-2xl font-bold <?php echo $colors['text']; ?>"><?php echo number_format($db['size_mb'], 2); ?> MB</p>
+                        </div>
+                        <div class="w-12 h-12 <?php echo $colors['icon_bg']; ?> rounded-full flex items-center justify-center">
+                            <i class="fas fa-hdd <?php echo $colors['icon_text']; ?> text-xl"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Database Name -->
+                    <div class="mb-3">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-tag mr-1"></i><?php echo htmlspecialchars($db['name']); ?>
+                        </p>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                            <span>Auslastung</span>
+                            <span><?php echo number_format($db['percentage'], 1); ?>% von <?php echo number_format($databaseQuota); ?> MB</span>
+                        </div>
+                        <div class="w-full <?php echo $colors['progress_bg']; ?> rounded-full h-2.5">
+                            <div class="<?php echo $colors['progress_bar']; ?> h-2.5 rounded-full transition-all duration-300" style="width: <?php echo min($db['percentage'], 100); ?>%"></div>
+                        </div>
+                        <?php if ($db['percentage'] >= 90): ?>
+                        <p class="text-xs text-red-600 dark:text-red-400 mt-1">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>Warnung: Hohe Auslastung
+                        </p>
+                        <?php elseif ($db['percentage'] >= 75): ?>
+                        <p class="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
+                            <i class="fas fa-info-circle mr-1"></i>Auslastung über 75%
+                        </p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <!-- In Stock and In Transit Section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
