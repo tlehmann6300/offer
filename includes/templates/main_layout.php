@@ -301,8 +301,8 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
 
     <!-- Mobile Menu Toggle -->
     <div class="lg:hidden fixed top-4 left-4 z-50">
-        <button id="mobile-menu-btn" class="bg-white p-3 rounded-lg shadow-lg">
-            <i class="fas fa-bars text-gray-700"></i>
+        <button id="mobile-menu-btn" class="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg">
+            <i class="fas fa-bars text-gray-700 dark:text-gray-100"></i>
         </button>
     </div>
 
