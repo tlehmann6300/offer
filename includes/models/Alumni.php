@@ -122,12 +122,12 @@ class Alumni extends Database {
         $currentUser = Auth::user();
         $currentRole = $currentUser['role'] ?? '';
         
-        // Alumni and honorary_member can update their own profile, alumni_board/board/admin can update any
+        // Alumni and honorary_member can update their own profile, alumni_board/board (all types)/admin can update any
         if (in_array($currentRole, ['alumni', 'honorary_member'])) {
             if ($currentUser['id'] !== $userId) {
                 throw new Exception("Keine Berechtigung zum Aktualisieren anderer Alumni-Profile");
             }
-        } elseif (!in_array($currentRole, ['alumni_board', 'board', 'admin'])) {
+        } elseif (!in_array($currentRole, ['alumni_board', 'board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'admin'])) {
             throw new Exception("Keine Berechtigung zum Aktualisieren des Alumni-Profils");
         }
         

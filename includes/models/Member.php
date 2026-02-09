@@ -213,13 +213,13 @@ class Member {
         $currentUser = Auth::user();
         $currentRole = $currentUser['role'] ?? '';
         
-        // Board, head, and admin can update any profile
+        // Board (all types), head, and admin can update any profile
         // Candidates can only update their own profile
         if ($currentRole === 'candidate') {
             if ($currentUser['id'] !== $userId) {
                 throw new Exception("Keine Berechtigung zum Aktualisieren anderer Mitgliederprofile");
             }
-        } elseif (!in_array($currentRole, ['board', 'head', 'admin'])) {
+        } elseif (!in_array($currentRole, ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'admin'])) {
             throw new Exception("Keine Berechtigung zum Aktualisieren des Mitgliederprofils");
         }
         
