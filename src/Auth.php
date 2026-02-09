@@ -256,12 +256,18 @@ class Auth {
         
         // Role hierarchy
         $roleHierarchy = [
+            'candidate' => 0,
             'alumni' => 1,
             'member' => 1,
+            'honorary_member' => 1,
+            'head' => 2,
             'manager' => 2,
             'manage_projects' => 2,  // Permission for manager-level project access
             'alumni_board' => 3,
             'board' => 3,
+            'vorstand_intern' => 3,
+            'vorstand_extern' => 3,
+            'vorstand_finanzen_recht' => 3,
             'admin' => 4
         ];
         

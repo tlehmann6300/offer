@@ -135,12 +135,16 @@ ob_start();
                     name="role" 
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
+                    <option value="candidate">Anwärter</option>
                     <option value="member">Mitglied</option>
+                    <option value="head">Ressortleiter</option>
                     <option value="alumni">Alumni</option>
-                    <option value="manager">Ressortleiter</option>
                     <option value="alumni_board">Alumni-Vorstand</option>
                     <option value="board">Vorstand</option>
-                    <option value="admin">Administrator</option>
+                    <option value="vorstand_intern">Vorstand Intern</option>
+                    <option value="vorstand_extern">Vorstand Extern</option>
+                    <option value="vorstand_finanzen_recht">Vorstand Finanzen & Recht</option>
+                    <option value="honorary_member">Ehrenmitglied</option>
                 </select>
             </div>
             <div>
@@ -200,12 +204,16 @@ ob_start();
                             class="role-select px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                             <?php echo ($user['id'] == $_SESSION['user_id']) ? 'disabled' : ''; ?>
                         >
+                            <option value="candidate" <?php echo ($user['role'] == 'candidate') ? 'selected' : ''; ?>>Anwärter</option>
                             <option value="member" <?php echo ($user['role'] == 'member') ? 'selected' : ''; ?>>Mitglied</option>
+                            <option value="head" <?php echo ($user['role'] == 'head') ? 'selected' : ''; ?>>Ressortleiter</option>
                             <option value="alumni" <?php echo ($user['role'] == 'alumni') ? 'selected' : ''; ?>>Alumni</option>
-                            <option value="manager" <?php echo ($user['role'] == 'manager') ? 'selected' : ''; ?>>Ressortleiter</option>
                             <option value="alumni_board" <?php echo ($user['role'] == 'alumni_board') ? 'selected' : ''; ?>>Alumni-Vorstand</option>
                             <option value="board" <?php echo ($user['role'] == 'board') ? 'selected' : ''; ?>>Vorstand</option>
-                            <option value="admin" <?php echo ($user['role'] == 'admin') ? 'selected' : ''; ?>>Administrator</option>
+                            <option value="vorstand_intern" <?php echo ($user['role'] == 'vorstand_intern') ? 'selected' : ''; ?>>Vorstand Intern</option>
+                            <option value="vorstand_extern" <?php echo ($user['role'] == 'vorstand_extern') ? 'selected' : ''; ?>>Vorstand Extern</option>
+                            <option value="vorstand_finanzen_recht" <?php echo ($user['role'] == 'vorstand_finanzen_recht') ? 'selected' : ''; ?>>Vorstand Finanzen & Recht</option>
+                            <option value="honorary_member" <?php echo ($user['role'] == 'honorary_member') ? 'selected' : ''; ?>>Ehrenmitglied</option>
                         </select>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
