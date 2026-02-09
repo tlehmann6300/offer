@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS users (
     tfa_enabled BOOLEAN NOT NULL DEFAULT 0,
     pending_email_update_request BOOLEAN NOT NULL DEFAULT 0,
     prompt_profile_review BOOLEAN NOT NULL DEFAULT 0,
+    theme_preference VARCHAR(10) DEFAULT 'auto',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     

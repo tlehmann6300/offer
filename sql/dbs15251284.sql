@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS invoices (
     file_path VARCHAR(255) DEFAULT NULL,
     status ENUM('pending', 'approved', 'rejected', 'paid') 
         NOT NULL DEFAULT 'pending',
+    paid_by_user_id INT NULL,
+    paid_at DATETIME NULL,
     rejection_reason TEXT DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -24,7 +26,8 @@ CREATE TABLE IF NOT EXISTS invoices (
     INDEX idx_user_id (user_id),
     INDEX idx_status (status),
     INDEX idx_date_of_receipt (date_of_receipt),
-    INDEX idx_created_at (created_at)
+    INDEX idx_created_at (created_at),
+    INDEX idx_paid_at (paid_at)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
