@@ -161,7 +161,24 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         }
     </style>
 </head>
-<body class="<?php echo htmlspecialchars($currentUser['theme_preference'] ?? 'auto'); ?> bg-gray-50" data-user-theme="<?php echo htmlspecialchars($currentUser['theme_preference'] ?? 'auto'); ?>">
+<body class="bg-gray-50" data-user-theme="<?php echo htmlspecialchars($currentUser['theme_preference'] ?? 'auto'); ?>">
+    <script>
+        // Apply theme immediately to prevent flash of unstyled content (FOUC)
+        (function() {
+            const userTheme = document.body.getAttribute('data-user-theme') || 'auto';
+            const savedTheme = localStorage.getItem('theme') || userTheme;
+            
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else if (savedTheme === 'light') {
+                document.body.classList.remove('dark-mode');
+            } else { // auto
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.body.classList.add('dark-mode');
+                }
+            }
+        })();
+    </script>
     <!-- Mobile Menu Overlay -->
     <div id="sidebar-overlay" class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden transition-opacity duration-300"></div>
 
