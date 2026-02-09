@@ -54,11 +54,11 @@ ob_start();
 <div class="mb-8">
     <div class="flex items-center justify-between mb-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                 <i class="fas fa-calendar-alt text-purple-600 mr-2"></i>
                 Event-Verwaltung
             </h1>
-            <p class="text-gray-600"><?php echo count($events); ?> Event(s) gefunden</p>
+            <p class="text-gray-600 dark:text-gray-300"><?php echo count($events); ?> Event(s) gefunden</p>
         </div>
         <a href="edit.php" class="btn-primary">
             <i class="fas fa-plus mr-2"></i>Neues Event
@@ -79,14 +79,14 @@ ob_start();
 <?php endif; ?>
 
 <!-- Filter Section -->
-<div class="card p-6 mb-6">
-    <h2 class="text-lg font-bold text-gray-800 mb-4">
+<div class="card dark:bg-gray-800 p-6 mb-6">
+    <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">
         <i class="fas fa-filter text-purple-600 mr-2"></i>Filter
     </h2>
     <form method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-            <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+            <select name="status" class="w-full px-4 py-2 border border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                 <option value="">Alle</option>
                 <option value="planned" <?php echo (isset($_GET['status']) && $_GET['status'] === 'planned') ? 'selected' : ''; ?>>Geplant</option>
                 <option value="open" <?php echo (isset($_GET['status']) && $_GET['status'] === 'open') ? 'selected' : ''; ?>>Offen</option>
@@ -96,23 +96,23 @@ ob_start();
             </select>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Helfer benötigt</label>
-            <select name="needs_helpers" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Helfer benötigt</label>
+            <select name="needs_helpers" class="w-full px-4 py-2 border border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
                 <option value="">Alle</option>
                 <option value="1" <?php echo (isset($_GET['needs_helpers']) && $_GET['needs_helpers'] === '1') ? 'selected' : ''; ?>>Ja</option>
                 <option value="0" <?php echo (isset($_GET['needs_helpers']) && $_GET['needs_helpers'] === '0') ? 'selected' : ''; ?>>Nein</option>
             </select>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Von Datum</label>
-            <input type="date" name="start_date" value="<?php echo htmlspecialchars($_GET['start_date'] ?? ''); ?>" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Von Datum</label>
+            <input type="date" name="start_date" value="<?php echo htmlspecialchars($_GET['start_date'] ?? ''); ?>" class="w-full px-4 py-2 border border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Bis Datum</label>
-            <input type="date" name="end_date" value="<?php echo htmlspecialchars($_GET['end_date'] ?? ''); ?>" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bis Datum</label>
+            <input type="date" name="end_date" value="<?php echo htmlspecialchars($_GET['end_date'] ?? ''); ?>" class="w-full px-4 py-2 border border-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
         </div>
         <div class="md:col-span-2 lg:col-span-4 flex justify-end space-x-2">
-            <a href="manage.php" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+            <a href="manage.php" class="px-6 py-2 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
                 <i class="fas fa-times mr-2"></i>Zurücksetzen
             </a>
             <button type="submit" class="btn-primary">
@@ -124,10 +124,10 @@ ob_start();
 
 <!-- Events Grid -->
 <?php if (empty($events)): ?>
-<div class="card p-12 text-center">
+<div class="card dark:bg-gray-800 p-12 text-center">
     <i class="fas fa-calendar-times text-gray-400 text-6xl mb-4"></i>
-    <h3 class="text-xl font-semibold text-gray-600 mb-2">Keine Events gefunden</h3>
-    <p class="text-gray-500 mb-6">Es wurden keine Events mit den ausgewählten Filtern gefunden.</p>
+    <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">Keine Events gefunden</h3>
+    <p class="text-gray-500 dark:text-gray-400 mb-6">Es wurden keine Events mit den ausgewählten Filtern gefunden.</p>
     <a href="edit.php" class="btn-primary inline-block">
         <i class="fas fa-plus mr-2"></i>Erstes Event erstellen
     </a>
@@ -135,7 +135,7 @@ ob_start();
 <?php else: ?>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <?php foreach ($events as $event): ?>
-    <div class="card p-6 hover:shadow-lg transition">
+    <div class="card dark:bg-gray-800 p-6 hover:shadow-lg transition">
         <!-- Status Badge -->
         <div class="flex items-start justify-between mb-4">
             <span class="px-3 py-1 text-xs font-semibold rounded-full
@@ -166,12 +166,12 @@ ob_start();
         </div>
 
         <!-- Title -->
-        <h3 class="text-xl font-bold text-gray-800 mb-2">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
             <?php echo htmlspecialchars($event['title']); ?>
         </h3>
 
         <!-- Location and Time -->
-        <div class="space-y-2 mb-4 text-sm text-gray-600">
+        <div class="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
             <?php if ($event['location']): ?>
             <div class="flex items-center">
                 <i class="fas fa-map-marker-alt w-5 text-purple-600"></i>
@@ -192,8 +192,8 @@ ob_start();
 
         <!-- Helper Info -->
         <?php if ($event['needs_helpers'] && !empty($event['helper_types'])): ?>
-        <div class="mb-4 p-3 bg-purple-50 rounded-lg">
-            <div class="text-sm text-gray-700">
+        <div class="mb-4 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+            <div class="text-sm text-gray-700 dark:text-gray-300">
                 <strong><?php echo count($event['helper_types']); ?></strong> Helfer-Typ(en)
             </div>
         </div>
@@ -205,8 +205,8 @@ ob_start();
         if ($lockInfo['is_locked']): 
             $lockedUser = User::getById($lockInfo['locked_by']);
         ?>
-        <div class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <div class="flex items-center text-sm text-yellow-800">
+        <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+            <div class="flex items-center text-sm text-yellow-800 dark:text-yellow-300">
                 <i class="fas fa-lock mr-2"></i>
                 <span>Gesperrt von <?php echo htmlspecialchars($lockedUser['first_name'] ?? 'Benutzer'); ?></span>
             </div>
@@ -234,12 +234,12 @@ ob_start();
 
 <!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg p-6 max-w-md w-full">
-        <h3 class="text-xl font-bold text-gray-800 mb-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
             <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
             Event löschen
         </h3>
-        <p class="text-gray-600 mb-6">
+        <p class="text-gray-600 dark:text-gray-300 mb-6">
             Möchtest Du das Event "<span id="deleteEventName" class="font-semibold"></span>" wirklich löschen? 
             Diese Aktion kann nicht rückgängig gemacht werden.
         </p>
@@ -248,7 +248,7 @@ ob_start();
             <input type="hidden" name="event_id" id="deleteEventId" value="">
             <input type="hidden" name="delete_event" value="1">
             <div class="flex space-x-4">
-                <button type="button" id="closeDeleteModalBtn" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                <button type="button" id="closeDeleteModalBtn" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
                     Abbrechen
                 </button>
                 <button type="submit" class="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
