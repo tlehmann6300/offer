@@ -59,8 +59,9 @@ if (!empty($userUpcomingEvents)) {
 $userRentals = Inventory::getUserCheckouts($user['id'], false); // false = only unreturned items
 $openTasksCount = count($userRentals);
 
-// Get extended statistics for board/managers
-$hasExtendedAccess = Auth::hasPermission('manager');
+// Get extended statistics for board/head/managers
+$userRole = $_SESSION['user_role'] ?? '';
+$hasExtendedAccess = in_array($userRole, ['admin', 'board', 'head', 'alumni_board']);
 if ($hasExtendedAccess) {
     $inStockStats = Inventory::getInStockStats();
     $checkedOutStats = Inventory::getCheckedOutStats();
@@ -232,10 +233,10 @@ endif;
 <!-- Hero Section with Personalized Greeting -->
 <div class="mb-8">
     <div class="max-w-4xl mx-auto text-center">
-        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-3">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 dark:text-gray-100 mb-3">
             <?php echo htmlspecialchars($greeting); ?>, <?php echo htmlspecialchars($firstname); ?>!
         </h1>
-        <p class="text-lg md:text-xl text-gray-600">
+        <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300">
             Willkommen zurück im IBC Intranet
         </p>
     </div>
@@ -243,56 +244,56 @@ endif;
 
 <!-- Quick Stats Widgets -->
 <div class="max-w-6xl mx-auto mb-8">
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
         <i class="fas fa-tachometer-alt text-purple-600 mr-2"></i>
         Schnellübersicht
     </h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- My Open Tasks Widget -->
-        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-orange-50 hover:shadow-2xl transition-all duration-300">
+        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-orange-50 dark:from-gray-800 dark:to-gray-700 hover:shadow-2xl transition-all duration-300">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-bold text-gray-800">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100">
                     <i class="fas fa-tasks text-orange-600 mr-2"></i>
                     Meine offenen Ausleihen
                 </h3>
-                <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <span class="text-2xl font-bold text-orange-600"><?php echo $openTasksCount; ?></span>
+                <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center">
+                    <span class="text-2xl font-bold text-orange-600 dark:text-orange-300"><?php echo $openTasksCount; ?></span>
                 </div>
             </div>
             <?php if ($openTasksCount > 0): ?>
-            <p class="text-gray-600 mb-3">Du hast aktuell <?php echo $openTasksCount; ?> offene Ausleihen</p>
-            <a href="/pages/inventory/my_checkouts.php" class="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold">
+            <p class="text-gray-600 dark:text-gray-300 mb-3">Du hast aktuell <?php echo $openTasksCount; ?> offene Ausleihen</p>
+            <a href="/pages/inventory/my_checkouts.php" class="inline-flex items-center text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 font-semibold">
                 Ausleihen verwalten <i class="fas fa-arrow-right ml-2"></i>
             </a>
             <?php else: ?>
-            <p class="text-gray-600">Keine offenen Ausleihen</p>
-            <p class="text-sm text-gray-500 mt-2">Alle Artikel wurden zurückgegeben</p>
+            <p class="text-gray-600 dark:text-gray-300">Keine offenen Ausleihen</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Alle Artikel wurden zurückgegeben</p>
             <?php endif; ?>
         </div>
 
         <!-- Next Event Widget -->
-        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-blue-50 hover:shadow-2xl transition-all duration-300">
+        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-700 hover:shadow-2xl transition-all duration-300">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-bold text-gray-800">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100">
                     <i class="fas fa-calendar-alt text-blue-600 mr-2"></i>
                     Nächstes Event
                 </h3>
-                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
+                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                    <i class="fas fa-calendar-check text-blue-600 dark:text-blue-300 text-xl"></i>
                 </div>
             </div>
             <?php if ($nextEvent): ?>
-            <h4 class="font-semibold text-gray-800 mb-2"><?php echo htmlspecialchars($nextEvent['title']); ?></h4>
-            <p class="text-gray-600 mb-3">
+            <h4 class="font-semibold text-gray-800 dark:text-gray-100 mb-2"><?php echo htmlspecialchars($nextEvent['title']); ?></h4>
+            <p class="text-gray-600 dark:text-gray-300 mb-3">
                 <i class="fas fa-clock mr-1"></i>
                 <?php echo date('d.m.Y H:i', strtotime($nextEvent['start_time'])); ?> Uhr
             </p>
-            <a href="../events/view.php?id=<?php echo $nextEvent['event_id']; ?>" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold">
+            <a href="../events/view.php?id=<?php echo $nextEvent['event_id']; ?>" class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold">
                 Details ansehen <i class="fas fa-arrow-right ml-2"></i>
             </a>
             <?php else: ?>
-            <p class="text-gray-600 mb-3">Keine anstehenden Events</p>
-            <a href="../events/index.php" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold">
+            <p class="text-gray-600 dark:text-gray-300 mb-3">Keine anstehenden Events</p>
+            <a href="../events/index.php" class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold">
                 Events durchsuchen <i class="fas fa-arrow-right ml-2"></i>
             </a>
             <?php endif; ?>
@@ -302,7 +303,7 @@ endif;
 
 <!-- Dashboard Section - Wir suchen Helfer -->
 <div class="max-w-6xl mx-auto mb-12">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
         <i class="fas fa-hands-helping text-green-600 mr-2"></i>
         Wir suchen Helfer
     </h2>
@@ -310,19 +311,19 @@ endif;
     <?php if (!empty($helperEvents)): ?>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <?php foreach ($helperEvents as $event): ?>
-        <div class="card p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-white to-green-50 border-l-4 border-green-500">
+        <div class="card p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-white to-green-50 dark:from-gray-800 dark:to-gray-700 border-l-4 border-green-500">
             <div class="mb-4">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">
+                <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2">
                     <i class="fas fa-calendar-alt text-green-600 mr-2"></i>
                     <?php echo htmlspecialchars($event['title']); ?>
                 </h3>
                 <?php if (!empty($event['description'])): ?>
-                <p class="text-sm text-gray-600 mb-2">
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
                     <?php echo htmlspecialchars(substr($event['description'], 0, 100)) . (strlen($event['description']) > 100 ? '...' : ''); ?>
                 </p>
                 <?php endif; ?>
             </div>
-            <div class="text-sm text-gray-600 mb-3">
+            <div class="text-sm text-gray-600 dark:text-gray-300 mb-3">
                 <div class="flex items-center mb-1">
                     <i class="fas fa-clock mr-2 text-green-600"></i>
                     <?php echo date('d.m.Y H:i', strtotime($event['start_time'])); ?> Uhr
@@ -342,10 +343,10 @@ endif;
         <?php endforeach; ?>
     </div>
     <?php else: ?>
-    <div class="card p-8 rounded-xl shadow-lg text-center bg-gradient-to-br from-white to-gray-50">
-        <i class="fas fa-hands-helping text-4xl mb-3 text-gray-400"></i>
-        <p class="text-gray-600 text-lg">Aktuell werden keine Helfer gesucht</p>
-        <a href="../events/index.php" class="inline-flex items-center mt-4 text-green-600 hover:text-green-700 font-semibold">
+    <div class="card p-8 rounded-xl shadow-lg text-center bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700">
+        <i class="fas fa-hands-helping text-4xl mb-3 text-gray-400 dark:text-gray-500"></i>
+        <p class="text-gray-600 dark:text-gray-300 text-lg">Aktuell werden keine Helfer gesucht</p>
+        <a href="../events/index.php" class="inline-flex items-center mt-4 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-semibold">
             Alle Events ansehen <i class="fas fa-arrow-right ml-2"></i>
         </a>
     </div>
@@ -423,15 +424,15 @@ endif;
                     <span class="font-semibold text-gray-800">Inventar durchsuchen</span>
                 </div>
             </a>
-            <?php if (Auth::hasPermission('manager')): ?>
+            <?php if ($hasExtendedAccess): ?>
             <a href="../inventory/add.php" class="block p-4 rounded-lg bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 transition-all duration-300 group">
                 <div class="flex items-center">
                     <i class="fas fa-plus-circle text-green-600 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
-                    <span class="font-semibold text-gray-800">Neuen Artikel hinzufügen</span>
+                    <span class="font-semibold text-gray-800 dark:text-gray-100">Neuen Artikel hinzufügen</span>
                 </div>
             </a>
             <?php endif; ?>
-            <?php if (Auth::hasPermission('admin')): ?>
+            <?php if (in_array($userRole, ['admin', 'board'])): ?>
             <a href="../admin/users.php" class="block p-4 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 transition-all duration-300 group">
                 <div class="flex items-center">
                     <i class="fas fa-users-cog text-blue-600 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
