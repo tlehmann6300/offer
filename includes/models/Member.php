@@ -12,7 +12,8 @@ class Member {
     
     /**
      * Active member roles (excludes 'alumni', 'alumni_board', 'honorary_member')
-     * Shows only: board (all Vorstand types), head (Resortleiter), member (Mitglied), candidate (Anwärter)
+     * Includes all board variants: 'board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht'
+     * Plus: 'head' (Resortleiter), 'member' (Mitglied), 'candidate' (Anwärter)
      */
     const ACTIVE_ROLES = ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate'];
     
