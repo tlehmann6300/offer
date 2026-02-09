@@ -87,7 +87,7 @@ ob_start();
 <?php if (!empty($user['prompt_profile_review']) && $user['prompt_profile_review'] == 1): ?>
 <!-- Profile Review Prompt Modal -->
 <div id="profile-review-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden transform transition-all">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden transform transition-all">
         <!-- Modal Header -->
         <div class="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-4">
             <div class="flex items-center">
@@ -100,14 +100,14 @@ ob_start();
         
         <!-- Modal Body -->
         <div class="px-6 py-6">
-            <p class="text-gray-700 text-lg mb-6">
+            <p class="text-gray-700 dark:text-gray-300 text-lg mb-6">
                 Bitte überprüfe deine Daten (besonders E-Mail und Job-Daten), damit wir in Kontakt bleiben können.
             </p>
             
-            <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
+            <div class="bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-700 rounded-lg p-4 mb-6">
                 <div class="flex items-start">
-                    <i class="fas fa-info-circle text-purple-600 mt-1 mr-3"></i>
-                    <p class="text-sm text-gray-700">
+                    <i class="fas fa-info-circle text-purple-600 dark:text-purple-400 mt-1 mr-3"></i>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
                         Es ist wichtig, dass deine Kontaktdaten aktuell sind, damit du alle wichtigen Informationen erhältst.
                     </p>
                 </div>
@@ -115,12 +115,12 @@ ob_start();
         </div>
         
         <!-- Modal Footer -->
-        <div class="px-6 py-4 bg-gray-50 flex flex-col sm:flex-row gap-3">
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 flex flex-col sm:flex-row gap-3">
             <a href="../auth/profile.php" class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
                 <i class="fas fa-user-circle mr-2"></i>
                 Zum Profil
             </a>
-            <button onclick="dismissProfileReviewPrompt()" class="flex-1 px-6 py-3 bg-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-400 transition-all duration-300">
+            <button onclick="dismissProfileReviewPrompt()" class="flex-1 px-6 py-3 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-semibold hover:bg-gray-400 dark:hover:bg-gray-500 transition-all duration-300">
                 Später
             </button>
         </div>
@@ -164,7 +164,7 @@ function dismissProfileReviewPrompt() {
 <?php if (isset($_SESSION['show_2fa_nudge']) && $_SESSION['show_2fa_nudge']): ?>
 <!-- 2FA Nudge Modal -->
 <div id="tfa-nudge-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden transform transition-all">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden transform transition-all">
         <!-- Modal Header -->
         <div class="bg-gradient-to-r from-blue-600 to-green-600 px-6 py-4">
             <div class="flex items-center">
@@ -177,17 +177,17 @@ function dismissProfileReviewPrompt() {
         
         <!-- Modal Body -->
         <div class="px-6 py-6">
-            <p class="text-gray-700 text-lg mb-2 font-semibold">
+            <p class="text-gray-700 dark:text-gray-300 text-lg mb-2 font-semibold">
                 Erhöhe deine Sicherheit!
             </p>
-            <p class="text-gray-600 mb-6">
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
                 Aktiviere jetzt die 2-Faktor-Authentifizierung für zusätzlichen Schutz deines Kontos.
             </p>
             
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-6">
                 <div class="flex items-start">
-                    <i class="fas fa-info-circle text-blue-600 mt-1 mr-3"></i>
-                    <p class="text-sm text-gray-700">
+                    <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-1 mr-3"></i>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
                         Die 2-Faktor-Authentifizierung macht dein Konto deutlich sicherer, indem bei der Anmeldung ein zusätzlicher Code erforderlich ist.
                     </p>
                 </div>
@@ -195,12 +195,12 @@ function dismissProfileReviewPrompt() {
         </div>
         
         <!-- Modal Footer -->
-        <div class="px-6 py-4 bg-gray-50 flex flex-col sm:flex-row gap-3">
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 flex flex-col sm:flex-row gap-3">
             <a href="../auth/profile.php" class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
                 <i class="fas fa-shield-alt mr-2"></i>
                 Jetzt einrichten
             </a>
-            <button onclick="dismissTfaNudge()" class="flex-1 px-6 py-3 bg-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-400 transition-all duration-300">
+            <button onclick="dismissTfaNudge()" class="flex-1 px-6 py-3 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-semibold hover:bg-gray-400 dark:hover:bg-gray-500 transition-all duration-300">
                 Später
             </button>
         </div>
@@ -391,9 +391,9 @@ endif;
         </div>
         <?php else: ?>
         <div class="card p-8 rounded-xl shadow-lg text-center bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700">
-            <i class="fas fa-calendar-times text-4xl mb-3 text-gray-400"></i>
-            <p class="text-gray-600 text-lg">Keine anstehenden Events</p>
-            <a href="../events/index.php" class="inline-flex items-center mt-4 text-blue-600 hover:text-blue-700 font-semibold">
+            <i class="fas fa-calendar-times text-4xl mb-3 text-gray-400 dark:text-gray-500"></i>
+            <p class="text-gray-600 dark:text-gray-300 text-lg">Keine anstehenden Events</p>
+            <a href="../events/index.php" class="inline-flex items-center mt-4 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold">
                 Alle Events ansehen <i class="fas fa-arrow-right ml-2"></i>
             </a>
         </div>

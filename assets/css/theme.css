@@ -1,8 +1,15 @@
 /* IBC Corporate Identity Design System */
 
 :root {
-    /* High-Contrast Light Mode Variables */
-    --bg-color: #f3f4f6; /* Light Gray */
+    /* Light Mode Variables - Source of Truth */
+    --bg-body: #f9fafb; /* Light Gray */
+    --bg-card: #ffffff; /* White */
+    --text-main: #111827; /* Almost Black - Important for readability */
+    --text-muted: #4b5563; /* Dark Gray */
+    --border-color: #e5e7eb;
+    
+    /* Legacy compatibility variables */
+    --bg-color: #f9fafb; /* Light Gray */
     --text-color: #111827; /* Dark Grey/Black */
     --card-bg: #ffffff; /* White */
     
@@ -51,71 +58,122 @@
     --mobile-header-offset: 5rem;
 }
 
-/* High-Contrast Dark Mode Variables */
-body.dark-mode {
-    --bg-color: #111827; /* Very Dark Blue */
-    --text-color: #f9fafb; /* Off-White */
-    --card-bg: #1f2937; /* Dark card background */
+/* Dark Mode Variables - Source of Truth */
+.dark-mode {
+    --bg-body: #111827; /* Very Dark Blue */
+    --bg-card: #1f2937; /* Dark Gray-Blue */
+    --text-main: #f3f4f6; /* Almost White - Critical */
+    --text-muted: #9ca3af; /* Light Gray */
+    --border-color: #374151;
+    
+    /* Legacy compatibility variables */
+    --bg-color: #111827;
+    --text-color: #f3f4f6;
+    --card-bg: #1f2937;
     --bg-primary: #111827;
     --bg-secondary: #1f2937;
     --bg-tertiary: #374151;
-    --text-primary: #f9fafb;
-    --text-secondary: #d1d5db;
-    --border-color: #374151;
-    background-color: var(--bg-color);
-    color: var(--text-color) !important;
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+}
+
+/* Force Overrides - The 'Hammer' to overwrite Tailwind defaults */
+body {
+    background-color: var(--bg-body);
+    color: var(--text-main);
+}
+
+.card,
+.bg-white {
+    background-color: var(--bg-card) !important;
+    color: var(--text-main) !important;
+}
+
+/* Fix Input Fields in Dark Mode */
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+    border: 1px solid #4b5563 !important;
+}
+
+.dark-mode input::placeholder,
+.dark-mode textarea::placeholder {
+    color: var(--text-muted);
+}
+
+/* Fix Tables */
+.dark-mode th {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+}
+
+.dark-mode td {
+    color: #e5e7eb !important;
+    border-bottom-color: #374151 !important;
+}
+
+/* Fix Sidebar Text */
+.dark-mode .sidebar a {
+    color: var(--text-muted) !important;
+}
+
+.dark-mode .sidebar a:hover {
+    color: var(--text-main) !important;
+    background-color: #374151;
 }
 
 body.dark-mode main {
-    background-color: var(--bg-color);
+    background-color: var(--bg-body);
 }
 
 body.dark-mode .card {
-    background-color: var(--card-bg);
-    color: var(--text-color) !important;
+    background-color: var(--bg-card) !important;
+    color: var(--text-main) !important;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* Table Styles - Light Mode */
 table {
-    background-color: var(--card-bg);
-    color: var(--text-color) !important;
+    background-color: var(--bg-card);
+    color: var(--text-main) !important;
 }
 
 th {
     background-color: var(--ibc-gray-100);
-    color: var(--text-color);
+    color: var(--text-main);
     font-weight: 600;
 }
 
 td {
-    color: var(--text-color);
+    color: var(--text-main);
     border-color: var(--ibc-gray-200);
 }
 
 /* Table Styles - Dark Mode */
 body.dark-mode table {
-    background-color: var(--bg-secondary);
-    color: var(--text-color) !important;
+    background-color: var(--bg-card);
+    color: var(--text-main) !important;
 }
 
 body.dark-mode th {
-    background-color: var(--bg-tertiary);
-    color: #f3f4f6 !important; /* White text on dark headers */
+    background-color: #111827 !important;
+    color: #ffffff !important;
     font-weight: 600;
 }
 
 body.dark-mode td {
     border-color: var(--border-color);
-    color: var(--text-color) !important;
+    color: #e5e7eb !important;
 }
 
 /* Input Styles - Light Mode */
 input,
 select,
 textarea {
-    background-color: var(--card-bg);
-    color: var(--text-color);
+    background-color: var(--bg-card);
+    color: var(--text-main);
     border-color: var(--ibc-gray-300);
 }
 
@@ -124,22 +182,8 @@ textarea::placeholder {
     color: var(--ibc-gray-400);
 }
 
-/* Input Styles - Dark Mode */
-body.dark-mode input,
-body.dark-mode select,
-body.dark-mode textarea {
-    background-color: #374151 !important; /* Dark background for inputs */
-    color: white !important;
-    border-color: #4b5563 !important;
-}
-
-body.dark-mode input::placeholder,
-body.dark-mode textarea::placeholder {
-    color: var(--text-secondary);
-}
-
 body.dark-mode .glass-card {
-    background: rgba(31, 41, 55, 0.9); /* Using dark-mode card color */
+    background: rgba(31, 41, 55, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -148,23 +192,23 @@ body.dark-mode a:not(.btn-primary) {
 }
 
 body.dark-mode .text-gray-600 {
-    color: #d1d5db !important; /* Lighter gray for better readability */
+    color: #d1d5db !important;
 }
 
 body.dark-mode .text-gray-700 {
-    color: #e5e7eb !important; /* Even lighter for better contrast */
+    color: #e5e7eb !important;
 }
 
 body.dark-mode .text-gray-800 {
-    color: #f3f4f6 !important; /* Almost white for headers */
+    color: #f3f4f6 !important;
 }
 
 body.dark-mode .text-gray-900 {
-    color: #f9fafb !important; /* White for dark text - fixes black text in dark mode */
+    color: #f9fafb !important;
 }
 
 body.dark-mode .text-gray-500 {
-    color: #9ca3af !important; /* Better readability for muted text */
+    color: #9ca3af !important;
 }
 
 body:not(.dark-mode) .text-gray-800 {
@@ -184,15 +228,15 @@ body:not(.dark-mode) .text-gray-500 {
 }
 
 body.dark-mode .bg-white {
-    background-color: var(--card-bg) !important;
+    background-color: var(--bg-card) !important;
 }
 
 body.dark-mode .bg-gray-50 {
-    background-color: var(--bg-color) !important;
+    background-color: var(--bg-body) !important;
 }
 
 body.dark-mode .bg-gray-100 {
-    background-color: #374151 !important; /* Lighter background for badges */
+    background-color: #374151 !important;
 }
 
 body.dark-mode .border-gray-200 {
