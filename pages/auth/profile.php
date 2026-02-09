@@ -211,11 +211,11 @@ ob_start();
 <div class="mb-8">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                 <i class="fas fa-user text-purple-600 mr-2"></i>
                 Mein Profil
             </h1>
-            <p class="text-gray-600">Verwalte deine Kontoinformationen und Sicherheitseinstellungen</p>
+            <p class="text-gray-600 dark:text-gray-300">Verwalte deine Kontoinformationen und Sicherheitseinstellungen</p>
         </div>
         <div class="mt-4 md:mt-0">
             <a href="../inventory/my_rentals.php" class="btn-primary inline-block">
@@ -241,17 +241,17 @@ ob_start();
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Account Info -->
     <div class="card p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">
+        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
             <i class="fas fa-info-circle text-blue-600 mr-2"></i>
             Kontoinformationen
         </h2>
         <div class="space-y-4">
             <div>
-                <label class="text-sm text-gray-500">E-Mail</label>
-                <p class="text-lg font-semibold text-gray-800"><?php echo htmlspecialchars($user['email']); ?></p>
+                <label class="text-sm text-gray-500 dark:text-gray-400">E-Mail</label>
+                <p class="text-lg font-semibold text-gray-800 dark:text-gray-100"><?php echo htmlspecialchars($user['email']); ?></p>
             </div>
             <div>
-                <label class="text-sm text-gray-500">Rolle</label>
+                <label class="text-sm text-gray-500 dark:text-gray-400">Rolle</label>
                 <p class="text-lg">
                     <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full">
                         <?php echo translateRole($user['role']); ?>
@@ -259,14 +259,14 @@ ob_start();
                 </p>
             </div>
             <div>
-                <label class="text-sm text-gray-500">Letzter Login</label>
-                <p class="text-lg text-gray-800">
+                <label class="text-sm text-gray-500 dark:text-gray-400">Letzter Login</label>
+                <p class="text-lg text-gray-800 dark:text-gray-100">
                     <?php echo $user['last_login'] ? date('d.m.Y H:i', strtotime($user['last_login'])) : 'Nie'; ?>
                 </p>
             </div>
             <div>
-                <label class="text-sm text-gray-500">Mitglied seit</label>
-                <p class="text-lg text-gray-800"><?php echo date('d.m.Y', strtotime($user['created_at'])); ?></p>
+                <label class="text-sm text-gray-500 dark:text-gray-400">Mitglied seit</label>
+                <p class="text-lg text-gray-800 dark:text-gray-100"><?php echo date('d.m.Y', strtotime($user['created_at'])); ?></p>
             </div>
         </div>
     </div>
@@ -274,11 +274,11 @@ ob_start();
     <!-- Profile Information -->
     <div class="lg:col-span-2">
         <div class="card p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
                 <i class="fas fa-user-edit text-purple-600 mr-2"></i>
                 Profilangaben
             </h2>
-            <p class="text-gray-600 mb-6">
+            <p class="text-gray-600 dark:text-gray-300 mb-6">
                 Aktualisiere deine persönlichen Informationen und Kontaktdaten
             </p>
             
@@ -286,119 +286,119 @@ ob_start();
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Common Fields -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Vorname *</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Vorname *</label>
                         <input 
                             type="text" 
                             name="first_name" 
                             required 
                             value="<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                         >
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Nachname *</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nachname *</label>
                         <input 
                             type="text" 
                             name="last_name" 
                             required 
                             value="<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                         >
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">E-Mail (Profil) *</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">E-Mail (Profil) *</label>
                         <input 
                             type="email" 
                             name="profile_email" 
                             required 
                             value="<?php echo htmlspecialchars($profile['email'] ?? $user['email']); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                         >
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Telefon</label>
                         <input 
                             type="text" 
                             name="mobile_phone" 
                             value="<?php echo htmlspecialchars($profile['mobile_phone'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="+49 123 456789"
                         >
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">LinkedIn URL</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">LinkedIn URL</label>
                         <input 
                             type="url" 
                             name="linkedin_url" 
                             value="<?php echo htmlspecialchars($profile['linkedin_url'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="https://linkedin.com/in/..."
                         >
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Xing URL</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Xing URL</label>
                         <input 
                             type="url" 
                             name="xing_url" 
                             value="<?php echo htmlspecialchars($profile['xing_url'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="https://xing.com/profile/..."
                         >
                     </div>
                     
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Profilbild</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Profilbild</label>
                         <?php if (!empty($profile['image_path'])): ?>
                         <div class="mb-2">
-                            <img src="<?php echo asset($profile['image_path']); ?>" alt="Profilbild" class="w-32 h-32 object-cover rounded-lg border-2 border-gray-300">
+                            <img src="<?php echo asset($profile['image_path']); ?>" alt="Profilbild" class="w-32 h-32 object-cover rounded-lg border-2 border-gray-300 dark:border-gray-600">
                         </div>
                         <?php endif; ?>
                         <input 
                             type="file" 
                             name="profile_picture" 
                             accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                         >
-                        <p class="text-xs text-gray-500 mt-1">JPG, PNG, GIF oder WEBP (Max. 5MB)</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">JPG, PNG, GIF oder WEBP (Max. 5MB)</p>
                     </div>
                     
                     <?php if (in_array($userRole, ['candidate', 'member', 'board', 'head'])): ?>
                     <!-- Fields for Students: Candidates, Members, Board, and Heads -->
                     <!-- Student View: Show Studiengang, Semester, Abschluss -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Studiengang</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Studiengang</label>
                         <input 
                             type="text" 
                             name="studiengang" 
                             value="<?php echo htmlspecialchars($profile['studiengang'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="z.B. Wirtschaftsingenieurwesen"
                         >
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Semester</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Semester</label>
                         <input 
                             type="text" 
                             name="semester" 
                             value="<?php echo htmlspecialchars($profile['semester'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="z.B. 5"
                         >
                     </div>
                     
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Angestrebter Abschluss</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Angestrebter Abschluss</label>
                         <input 
                             type="text" 
                             name="angestrebter_abschluss" 
                             value="<?php echo htmlspecialchars($profile['angestrebter_abschluss'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="z.B. Bachelor of Science"
                         >
                     </div>
@@ -406,34 +406,34 @@ ob_start();
                     <!-- Fields for Alumni and Honorary Members -->
                     <!-- Alumni View: Show Arbeitgeber, Position, Branche -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Aktueller Arbeitgeber</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Aktueller Arbeitgeber</label>
                         <input 
                             type="text" 
                             name="company" 
                             value="<?php echo htmlspecialchars($profile['company'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="Firmenname"
                         >
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Position</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Position</label>
                         <input 
                             type="text" 
                             name="position" 
                             value="<?php echo htmlspecialchars($profile['position'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="z.B. Senior Consultant"
                         >
                     </div>
                     
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Branche</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Branche</label>
                         <input 
                             type="text" 
                             name="industry" 
                             value="<?php echo htmlspecialchars($profile['industry'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="z.B. Beratung, IT, Finanzen"
                         >
                     </div>
@@ -442,11 +442,11 @@ ob_start();
                 
                 <!-- About Me - Full Width -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Über mich</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Über mich</label>
                     <textarea 
                         name="about_me" 
                         rows="4"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                         placeholder="Erzähle etwas über dich..."
                     ><?php echo htmlspecialchars($profile['about_me'] ?? ''); ?></textarea>
                 </div>
@@ -461,7 +461,7 @@ ob_start();
     <!-- 2FA Settings -->
     <div class="lg:col-span-2">
         <div class="card p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
                 <i class="fas fa-shield-alt text-green-600 mr-2"></i>
                 Zwei-Faktor-Authentifizierung (2FA)
             </h2>
@@ -469,19 +469,19 @@ ob_start();
             <?php if (!$showQRCode): ?>
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <p class="text-gray-700 mb-2">
+                    <p class="text-gray-700 dark:text-gray-300 mb-2">
                         Status: 
                         <?php if ($user['tfa_enabled']): ?>
                         <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-semibold">
                             <i class="fas fa-check-circle mr-1"></i>Aktiviert
                         </span>
                         <?php else: ?>
-                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full font-semibold">
+                        <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full font-semibold">
                             <i class="fas fa-times-circle mr-1"></i>Deaktiviert
                         </span>
                         <?php endif; ?>
                     </p>
-                    <p class="text-sm text-gray-600">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">
                         Schütze dein Konto mit einer zusätzlichen Sicherheitsebene
                     </p>
                 </div>
@@ -502,8 +502,8 @@ ob_start();
                 </div>
             </div>
 
-            <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
-                <p class="text-sm text-blue-700">
+            <div class="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400 dark:border-blue-500 p-4">
+                <p class="text-sm text-blue-700 dark:text-blue-300">
                     <i class="fas fa-info-circle mr-2"></i>
                     <strong>Empfehlung:</strong> Aktiviere 2FA für zusätzliche Sicherheit. Du benötigst eine Authenticator-App wie Google Authenticator oder Authy.
                 </p>
@@ -512,33 +512,33 @@ ob_start();
             <!-- QR Code Setup -->
             <div class="max-w-md mx-auto">
                 <div class="text-center mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">2FA einrichten</h3>
-                    <p class="text-sm text-gray-600 mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">2FA einrichten</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
                         Scanne den QR-Code mit deiner Authenticator-App und gib den generierten Code ein
                     </p>
-                    <img src="<?php echo $qrCodeUrl; ?>" alt="QR Code" class="mx-auto mb-4 border-4 border-gray-200 rounded-lg">
-                    <p class="text-xs text-gray-500 mb-4">
-                        Geheimer Schlüssel (manuell): <code class="bg-gray-100 px-2 py-1 rounded"><?php echo htmlspecialchars($secret); ?></code>
+                    <img src="<?php echo $qrCodeUrl; ?>" alt="QR Code" class="mx-auto mb-4 border-4 border-gray-200 dark:border-gray-700 rounded-lg">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                        Geheimer Schlüssel (manuell): <code class="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-2 py-1 rounded"><?php echo htmlspecialchars($secret); ?></code>
                     </p>
                 </div>
 
                 <form method="POST" class="space-y-4">
                     <input type="hidden" name="secret" value="<?php echo htmlspecialchars($secret); ?>">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">6-stelliger Code</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">6-stelliger Code</label>
                         <input 
                             type="text" 
                             name="code" 
                             required 
                             maxlength="6"
                             pattern="[0-9]{6}"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-center text-2xl tracking-widest"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-center text-2xl tracking-widest"
                             placeholder="000000"
                             autofocus
                         >
                     </div>
                     <div class="flex space-x-4">
-                        <a href="profile.php" class="flex-1 text-center px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                        <a href="profile.php" class="flex-1 text-center px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
                             Abbrechen
                         </a>
                         <button type="submit" name="confirm_2fa" class="flex-1 btn-primary">
