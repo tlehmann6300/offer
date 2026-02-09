@@ -92,14 +92,12 @@ ob_start();
                     'head' => 'bg-blue-100 text-blue-800 border-blue-300',
                     'member' => 'bg-green-100 text-green-800 border-green-300',
                     'candidate' => 'bg-yellow-100 text-yellow-800 border-yellow-300',
-                    'admin' => 'bg-red-100 text-red-800 border-red-300',
                     'alumni' => 'bg-purple-100 text-purple-800 border-purple-300',
                     'alumni_board' => 'bg-indigo-100 text-indigo-800 border-indigo-300',
                     'honorary_member' => 'bg-amber-100 text-amber-800 border-amber-300'
                 ];
                 
                 $roleNames = [
-                    'admin' => 'Administrator',
                     'board' => 'Vorstand',
                     'head' => 'Ressortleiter',
                     'member' => 'Mitglied',

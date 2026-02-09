@@ -13,7 +13,7 @@ if (!Auth::check()) {
 $user = Auth::user();
 
 // Check if user has one of the allowed active roles
-$allowedRoles = ['admin', 'board', 'head', 'member', 'candidate'];
+$allowedRoles = ['board', 'head', 'member', 'candidate'];
 if (!in_array($user['role'], $allowedRoles)) {
     header('Location: ../dashboard/index.php');
     exit;
@@ -45,12 +45,22 @@ ob_start();
     ?>
 
     <!-- Header -->
-    <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-800 mb-2">
-            <i class="fas fa-users mr-3 text-blue-600"></i>
-            Mitgliederverzeichnis
-        </h1>
-        <p class="text-gray-600">Entdecken und vernetzen Sie sich mit unseren aktiven Mitgliedern</p>
+    <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-users mr-3 text-blue-600"></i>
+                Mitgliederverzeichnis
+            </h1>
+            <p class="text-gray-600">Entdecken und vernetzen Sie sich mit unseren aktiven Mitgliedern</p>
+        </div>
+        
+        <!-- Edit My Profile Button - Only for Vorstand, Resortleiter, Mitglied, Anwärter -->
+        <?php if (in_array($user['role'], ['board', 'head', 'member', 'candidate'])): ?>
+        <a href="../alumni/edit.php" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl">
+            <i class="fas fa-user-edit mr-2"></i>
+            Edit My Profile
+        </a>
+        <?php endif; ?>
     </div>
 
     <!-- Filter/Search Bar -->
@@ -138,12 +148,10 @@ ob_start();
                     'board' => 'bg-purple-100 text-purple-800 border-purple-300',
                     'head' => 'bg-blue-100 text-blue-800 border-blue-300',
                     'member' => 'bg-green-100 text-green-800 border-green-300',
-                    'candidate' => 'bg-yellow-100 text-yellow-800 border-yellow-300',
-                    'admin' => 'bg-red-100 text-red-800 border-red-300'
+                    'candidate' => 'bg-yellow-100 text-yellow-800 border-yellow-300'
                 ];
                 
                 $roleNames = [
-                    'admin' => 'Administrator',
                     'board' => 'Vorstand',
                     'head' => 'Ressortleiter',
                     'member' => 'Mitglied',

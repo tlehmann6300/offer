@@ -22,6 +22,13 @@ class User {
     }
 
     /**
+     * Find user by ID (alias for getById for compatibility)
+     */
+    public static function findById($id) {
+        return self::getById($id);
+    }
+
+    /**
      * Get user by email
      */
     public static function getByEmail($email) {

@@ -21,7 +21,7 @@ $userId = $_SESSION['user_id'];
 $userRole = $user['role'] ?? '';
 
 // Check permission: All authenticated users with these roles can edit their own profile
-$allowedRoles = ['admin', 'alumni', 'alumni_board', 'board', 'head', 'candidate', 'member'];
+$allowedRoles = ['alumni', 'alumni_board', 'board', 'head', 'candidate', 'member', 'honorary_member'];
 if (!in_array($userRole, $allowedRoles)) {
     $_SESSION['error_message'] = 'Du hast keine Berechtigung, Profile zu bearbeiten.';
     header('Location: ../dashboard/index.php');
