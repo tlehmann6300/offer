@@ -63,7 +63,7 @@ body.dark-mode {
     --text-secondary: #d1d5db;
     --border-color: #374151;
     background-color: var(--bg-color);
-    color: var(--text-color);
+    color: var(--text-color) !important;
 }
 
 body.dark-mode main {
@@ -72,14 +72,14 @@ body.dark-mode main {
 
 body.dark-mode .card {
     background-color: var(--card-bg);
-    color: var(--text-color);
+    color: var(--text-color) !important;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* Table Styles - Light Mode */
 table {
     background-color: var(--card-bg);
-    color: var(--text-color);
+    color: var(--text-color) !important;
 }
 
 th {
@@ -96,18 +96,18 @@ td {
 /* Table Styles - Dark Mode */
 body.dark-mode table {
     background-color: var(--bg-secondary);
-    color: var(--text-color);
+    color: var(--text-color) !important;
 }
 
 body.dark-mode th {
     background-color: var(--bg-tertiary);
-    color: #ffffff; /* White text on dark headers */
+    color: #f3f4f6 !important; /* White text on dark headers */
     font-weight: 600;
 }
 
 body.dark-mode td {
     border-color: var(--border-color);
-    color: var(--text-color);
+    color: var(--text-color) !important;
 }
 
 /* Input Styles - Light Mode */
@@ -128,9 +128,9 @@ textarea::placeholder {
 body.dark-mode input,
 body.dark-mode select,
 body.dark-mode textarea {
-    background-color: #374151; /* Dark background for inputs */
-    color: var(--text-color);
-    border-color: var(--border-color);
+    background-color: #374151 !important; /* Dark background for inputs */
+    color: white !important;
+    border-color: #4b5563 !important;
 }
 
 body.dark-mode input::placeholder,

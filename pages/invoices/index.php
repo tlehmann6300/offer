@@ -165,11 +165,16 @@ ob_start();
             <?php
             // Fetch all submitter info in one query to avoid N+1 problem
             $userIds = array_unique(array_column($invoices, 'user_id'));
+            
+            // Also collect paid_by_user_id values
+            $paidByUserIds = array_filter(array_column($invoices, 'paid_by_user_id'));
+            $allUserIds = array_unique(array_merge($userIds, $paidByUserIds));
+            
             $userInfoMap = [];
-            if (!empty($userIds)) {
-                $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
+            if (!empty($allUserIds)) {
+                $placeholders = str_repeat('?,', count($allUserIds) - 1) . '?';
                 $submitterStmt = $userDb->prepare("SELECT id, email FROM users WHERE id IN ($placeholders)");
-                $submitterStmt->execute($userIds);
+                $submitterStmt->execute($allUserIds);
                 $submitters = $submitterStmt->fetchAll();
                 foreach ($submitters as $submitter) {
                     $userInfoMap[$submitter['id']] = $submitter['email'];
@@ -197,6 +202,9 @@ ob_start();
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Status
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                Bezahlt Infos
                             </th>
                             <?php if ($userRole === 'board' || $userRole === 'admin'): ?>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -271,6 +279,30 @@ ob_start();
                                     <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full border <?php echo $statusClass; ?>">
                                         <?php echo htmlspecialchars($statusLabel); ?>
                                     </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                    <?php if ($invoice['status'] === 'paid' || $invoice['status'] === 'approved'): ?>
+                                        <?php if (!empty($invoice['paid_at'])): ?>
+                                            <div class="flex flex-col">
+                                                <span class="font-medium"><?php echo date('d.m.Y', strtotime($invoice['paid_at'])); ?></span>
+                                                <?php if (!empty($invoice['paid_by_user_id']) && isset($userInfoMap[$invoice['paid_by_user_id']])): ?>
+                                                    <?php 
+                                                        $paidByEmail = $userInfoMap[$invoice['paid_by_user_id']];
+                                                        $paidByName = explode('@', $paidByEmail)[0];
+                                                    ?>
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">von <?php echo htmlspecialchars($paidByName); ?></span>
+                                                <?php elseif (!empty($invoice['paid_by_user_id'])): ?>
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">von User ID: <?php echo htmlspecialchars($invoice['paid_by_user_id']); ?></span>
+                                                <?php else: ?>
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">-</span>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php else: ?>
+                                            <span class="text-gray-400 dark:text-gray-500">-</span>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <span class="text-gray-400 dark:text-gray-500">-</span>
+                                    <?php endif; ?>
                                 </td>
                                 <?php if ($userRole === 'board' || $userRole === 'admin'): ?>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">

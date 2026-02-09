@@ -266,6 +266,8 @@ class Invoice {
                     i.status,
                     i.file_path,
                     i.rejection_reason,
+                    i.paid_at,
+                    i.paid_by_user_id,
                     i.created_at,
                     i.updated_at
                 FROM invoices i
@@ -302,6 +304,8 @@ class Invoice {
                     status,
                     file_path,
                     rejection_reason,
+                    paid_at,
+                    paid_by_user_id,
                     created_at,
                     updated_at
                 FROM invoices
@@ -433,6 +437,8 @@ class Invoice {
                     status,
                     file_path,
                     rejection_reason,
+                    paid_at,
+                    paid_by_user_id,
                     created_at,
                     updated_at
                 FROM invoices
