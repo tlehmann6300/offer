@@ -4,11 +4,12 @@
  * Validates token and updates user email address
  */
 
+require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../src/Auth.php';
 require_once __DIR__ . '/../includes/models/User.php';
 
-// Start session
-Auth::startSession();
+// Start session with secure parameters
+init_session();
 
 $error = '';
 $success = '';
