@@ -44,8 +44,54 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .sidebar {
-            background: #111827; /* gray-900 */
+            background: #111827; /* gray-900 for dark theme */
         }
+        
+        /* Light mode sidebar styling */
+        body:not(.dark-mode) .sidebar {
+            background: linear-gradient(135deg, var(--ibc-blue) 0%, var(--ibc-blue-dark) 100%);
+        }
+        
+        /* Light mode sidebar text colors */
+        body:not(.dark-mode) .sidebar a {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        body:not(.dark-mode) .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+        
+        body:not(.dark-mode) .sidebar .bg-gray-800 {
+            background: rgba(255, 255, 255, 0.2) !important;
+        }
+        
+        body:not(.dark-mode) .sidebar .text-gray-300 {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        body:not(.dark-mode) .sidebar button {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        /* Light mode mobile menu button styling */
+        body:not(.dark-mode) #mobile-menu-btn {
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body:not(.dark-mode) #mobile-menu-btn i {
+            color: var(--ibc-blue);
+        }
+        
+        body.dark-mode #mobile-menu-btn {
+            background: var(--bg-secondary);
+        }
+        
+        body.dark-mode #mobile-menu-btn i {
+            color: var(--text-primary);
+        }
+        
         .card {
             background: white;
             border-radius: 12px;
