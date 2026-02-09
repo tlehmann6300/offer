@@ -227,7 +227,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
 
                 <!-- Mitglieder (Board, Head, Member, Candidate) -->
                 <?php 
-                $isBoardRole = isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht']);
+                $isBoardRole = Auth::isBoardMember();
                 $canSeeMitglieder = isset($_SESSION['user_role']) && (
                     $isBoardRole || 
                     in_array($_SESSION['user_role'], ['head', 'member', 'candidate'])
@@ -285,10 +285,10 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
 
                 <!-- Rechnungen (Board roles, Alumni, Alumni-Board, Honorary Member) -->
                 <?php 
-                $canSeeInvoices = isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], [
-                    'board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht',
-                    'alumni', 'alumni_board', 'honorary_member'
-                ]);
+                $canSeeInvoices = isset($_SESSION['user_role']) && (
+                    $isBoardRole ||
+                    in_array($_SESSION['user_role'], ['alumni', 'alumni_board', 'honorary_member'])
+                );
                 ?>
                 <?php if ($canSeeInvoices): ?>
                 <a href="<?php echo asset('pages/invoices/index.php'); ?>" 

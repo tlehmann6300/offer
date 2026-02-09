@@ -9,6 +9,32 @@ require_once __DIR__ . '/Database.php';
 class Auth {
     
     /**
+     * All valid role types in the system
+     */
+    const VALID_ROLES = [
+        'candidate',
+        'member',
+        'head',
+        'alumni',
+        'alumni_board',
+        'board',
+        'vorstand_intern',
+        'vorstand_extern',
+        'vorstand_finanzen_recht',
+        'honorary_member'
+    ];
+    
+    /**
+     * Board role types (all variants)
+     */
+    const BOARD_ROLES = [
+        'board',
+        'vorstand_intern',
+        'vorstand_extern',
+        'vorstand_finanzen_recht'
+    ];
+    
+    /**
      * Extract domain from BASE_URL for session cookie
      * 
      * @return string Domain from BASE_URL or empty string
@@ -241,6 +267,20 @@ class Auth {
         
         // If $role is a string, check for exact match
         return $userRole === $role;
+    }
+    
+    /**
+     * Check if user has any board role
+     * 
+     * @return bool True if user has any board role
+     */
+    public static function isBoardMember() {
+        if (!self::check()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        return in_array($userRole, self::BOARD_ROLES);
     }
     
     /**

@@ -40,7 +40,7 @@ if ($userId <= 0) {
     exit;
 }
 
-if (!in_array($newRole, ['candidate', 'member', 'head', 'alumni', 'alumni_board', 'board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'honorary_member'])) {
+if (!in_array($newRole, Auth::VALID_ROLES)) {
     echo json_encode([
         'success' => false,
         'message' => 'Ungültige Rolle'
