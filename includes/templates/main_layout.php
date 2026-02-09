@@ -180,9 +180,9 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <span>Events</span>
                 </a>
 
-                <!-- Helfersystem (All) -->
+                <!-- Helfersystem (All) - Indented -->
                 <a href="<?php echo asset('pages/events/helpers.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/events/helpers.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                   class="flex items-center pl-12 pr-6 py-2 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/events/helpers.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-hands-helping w-5 mr-3"></i>
                     <span>Helfersystem</span>
                 </a>
@@ -201,8 +201,8 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <span>Blog</span>
                 </a>
 
-                <!-- Rechnungen (Board, Alumni, Alumni-Board) -->
-                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'alumni', 'alumni_board'])): ?>
+                <!-- Rechnungen (Board, Alumni, Alumni-Board, Honorary Member) -->
+                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'alumni', 'alumni_board', 'honorary_member'])): ?>
                 <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-file-invoice-dollar w-5 mr-3"></i>
@@ -313,7 +313,8 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                             'head' => 'Ressortleiter',
                             'board' => 'Vorstand',
                             'alumni' => 'Alumni',
-                            'alumni_board' => 'Alumni Vorstand'
+                            'alumni_board' => 'Alumni Vorstand',
+                            'honorary_member' => 'Ehrenmitglied'
                         ];
                         $roleDisplay = $roleTranslations[$role] ?? ucfirst($role);
                         echo htmlspecialchars($roleDisplay); 
@@ -328,7 +329,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <a href='<?php echo asset('pages/auth/profile.php'); ?>' 
                    class='flex items-center justify-start w-full px-4 py-2 text-xs font-medium text-white/90 dark:text-gray-100 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm <?php echo isActivePath('/auth/profile.php') ? 'bg-white/10' : ''; ?>'>
                     <i class='fas fa-user text-xs mr-2'></i> 
-                    <span>Dein Profil</span>
+                    <span>Mein Profil</span>
                 </a>
                 
                 <!-- Einstellungen -->

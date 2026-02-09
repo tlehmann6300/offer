@@ -122,8 +122,8 @@ class Alumni extends Database {
         $currentUser = Auth::user();
         $currentRole = $currentUser['role'] ?? '';
         
-        // Alumni can update their own profile, alumni_board/board/admin can update any
-        if ($currentRole === 'alumni') {
+        // Alumni and honorary_member can update their own profile, alumni_board/board/admin can update any
+        if (in_array($currentRole, ['alumni', 'honorary_member'])) {
             if ($currentUser['id'] !== $userId) {
                 throw new Exception("Keine Berechtigung zum Aktualisieren anderer Alumni-Profile");
             }
@@ -228,7 +228,7 @@ class Alumni extends Database {
     
     /**
      * Search profiles with filters
-     * Returns ONLY profiles where the linked User has role 'alumni' OR 'alumni_board'
+     * Returns ONLY profiles where the linked User has role 'alumni', 'alumni_board', or 'honorary_member'
      * 
      * @param array $filters Array of filters: search (name/position/company/industry), industry
      * @return array Array of matching profiles
@@ -280,7 +280,7 @@ class Alumni extends Database {
         $stmt->execute($params);
         $profiles = $stmt->fetchAll();
         
-        // Filter profiles by user role (alumni or alumni_board only)
+        // Filter profiles by user role (alumni, alumni_board, or honorary_member only)
         // Fetch all user roles in a single query to avoid N+1 problem
         $result = [];
         
@@ -299,8 +299,8 @@ class Alumni extends Database {
                     $userId = $profile['user_id'];
                     $userRole = $userRoles[$userId] ?? null;
                     
-                    // Only include profiles where user has role 'alumni' or 'alumni_board'
-                    if ($userRole === 'alumni' || $userRole === 'alumni_board') {
+                    // Only include profiles where user has role 'alumni', 'alumni_board', or 'honorary_member'
+                    if (in_array($userRole, ['alumni', 'alumni_board', 'honorary_member'])) {
                         $result[] = $profile;
                     }
                 }
