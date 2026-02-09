@@ -355,7 +355,7 @@ endif;
 
 <!-- Upcoming Events Section - Visible to All Users -->
 <div class="max-w-6xl mx-auto mb-12">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">
         <i class="fas fa-calendar-alt text-purple-600 mr-2"></i>
         Anstehende Events
     </h2>
@@ -373,18 +373,18 @@ endif;
         
         if (!empty($upcomingEventsForAllUsers)): 
         ?>
-        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-blue-50">
+        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-700">
             <div class="space-y-4">
                 <?php foreach ($upcomingEventsForAllUsers as $event): ?>
-                <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+                <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all">
                     <div class="flex-1">
-                        <h3 class="font-bold text-gray-800 mb-1"><?php echo htmlspecialchars($event['title']); ?></h3>
-                        <p class="text-sm text-gray-600">
+                        <h3 class="font-bold text-gray-800 dark:text-gray-100 mb-1"><?php echo htmlspecialchars($event['title']); ?></h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
                             <i class="fas fa-clock mr-1"></i>
                             <?php echo date('d.m.Y H:i', strtotime($event['start_time'])); ?> Uhr
                         </p>
                         <?php if (!empty($event['location'])): ?>
-                        <p class="text-sm text-gray-500 mt-1">
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                             <i class="fas fa-map-marker-alt mr-1"></i>
                             <?php echo htmlspecialchars($event['location']); ?>
                         </p>
@@ -398,7 +398,7 @@ endif;
             </div>
         </div>
         <?php else: ?>
-        <div class="card p-8 rounded-xl shadow-lg text-center bg-gradient-to-br from-white to-gray-50">
+        <div class="card p-8 rounded-xl shadow-lg text-center bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700">
             <i class="fas fa-calendar-times text-4xl mb-3 text-gray-400"></i>
             <p class="text-gray-600 text-lg">Keine anstehenden Events</p>
             <a href="../events/index.php" class="inline-flex items-center mt-4 text-blue-600 hover:text-blue-700 font-semibold">
@@ -412,31 +412,31 @@ endif;
 <!-- Additional Info Cards -->
 <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
     <!-- Quick Actions Card -->
-    <div class="card p-6 rounded-xl shadow-lg">
-        <h3 class="text-xl font-bold text-gray-800 mb-4">
+    <div class="card p-6 rounded-xl shadow-lg dark:bg-gray-800">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
             <i class="fas fa-bolt text-yellow-500 mr-2"></i>
             Schnellaktionen
         </h3>
         <div class="space-y-3">
-            <a href="../inventory/index.php" class="block p-4 rounded-lg bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 transition-all duration-300 group">
+            <a href="../inventory/index.php" class="block p-4 rounded-lg bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 hover:from-purple-100 hover:to-purple-200 dark:hover:from-purple-800 dark:hover:to-purple-700 transition-all duration-300 group">
                 <div class="flex items-center">
-                    <i class="fas fa-boxes text-purple-600 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
-                    <span class="font-semibold text-gray-800">Inventar durchsuchen</span>
+                    <i class="fas fa-boxes text-purple-600 dark:text-purple-300 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
+                    <span class="font-semibold text-gray-800 dark:text-gray-100">Inventar durchsuchen</span>
                 </div>
             </a>
             <?php if ($hasExtendedAccess): ?>
-            <a href="../inventory/add.php" class="block p-4 rounded-lg bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 transition-all duration-300 group">
+            <a href="../inventory/add.php" class="block p-4 rounded-lg bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 hover:from-green-100 hover:to-green-200 dark:hover:from-green-800 dark:hover:to-green-700 transition-all duration-300 group">
                 <div class="flex items-center">
-                    <i class="fas fa-plus-circle text-green-600 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
+                    <i class="fas fa-plus-circle text-green-600 dark:text-green-300 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
                     <span class="font-semibold text-gray-800 dark:text-gray-100">Neuen Artikel hinzufügen</span>
                 </div>
             </a>
             <?php endif; ?>
             <?php if (in_array($userRole, ['admin', 'board'])): ?>
-            <a href="../admin/users.php" class="block p-4 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 transition-all duration-300 group">
+            <a href="../admin/users.php" class="block p-4 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-800 dark:hover:to-blue-700 transition-all duration-300 group">
                 <div class="flex items-center">
-                    <i class="fas fa-users-cog text-blue-600 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
-                    <span class="font-semibold text-gray-800">Benutzerverwaltung</span>
+                    <i class="fas fa-users-cog text-blue-600 dark:text-blue-300 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
+                    <span class="font-semibold text-gray-800 dark:text-gray-100">Benutzerverwaltung</span>
                 </div>
             </a>
             <?php endif; ?>
@@ -444,31 +444,31 @@ endif;
     </div>
     
     <!-- Status Overview Card -->
-    <div class="card p-6 rounded-xl shadow-lg">
-        <h3 class="text-xl font-bold text-gray-800 mb-4">
+    <div class="card p-6 rounded-xl shadow-lg dark:bg-gray-800">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
             <i class="fas fa-info-circle text-blue-500 mr-2"></i>
             Status-Übersicht
         </h3>
         <div class="space-y-4">
-            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
+            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
                 <div class="flex items-center">
                     <i class="fas fa-exclamation-triangle text-yellow-500 mr-3 text-xl"></i>
-                    <span class="text-gray-700 font-medium">Niedriger Bestand</span>
+                    <span class="text-gray-700 dark:text-gray-200 font-medium">Niedriger Bestand</span>
                 </div>
-                <span class="text-2xl font-bold text-yellow-600"><?php echo number_format($stats['low_stock']); ?></span>
+                <span class="text-2xl font-bold text-yellow-600 dark:text-yellow-400"><?php echo number_format($stats['low_stock']); ?></span>
             </div>
             <?php if ($hasExtendedAccess && isset($inStockStats)): ?>
-            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50">
+            <div class="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
                 <div class="flex items-center">
                     <i class="fas fa-warehouse text-green-500 mr-3 text-xl"></i>
-                    <span class="text-gray-700 font-medium">Im Lager</span>
+                    <span class="text-gray-700 dark:text-gray-200 font-medium">Im Lager</span>
                 </div>
-                <span class="text-2xl font-bold text-green-600"><?php echo number_format($inStockStats['total_in_stock']); ?></span>
+                <span class="text-2xl font-bold text-green-600 dark:text-green-400"><?php echo number_format($inStockStats['total_in_stock']); ?></span>
             </div>
             <?php endif; ?>
-            <div class="p-4 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200">
-                <p class="text-sm text-gray-600">
-                    <i class="fas fa-user-circle mr-2 text-purple-600"></i>
+            <div class="p-4 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900 dark:to-blue-900 border border-purple-200 dark:border-purple-700">
+                <p class="text-sm text-gray-600 dark:text-gray-300">
+                    <i class="fas fa-user-circle mr-2 text-purple-600 dark:text-purple-400"></i>
                     Angemeldet als <strong><?php echo htmlspecialchars($user['email']); ?></strong>
                 </p>
             </div>

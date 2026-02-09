@@ -201,8 +201,8 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <span>Blog</span>
                 </a>
 
-                <!-- Rechnungen (Board ONLY) -->
-                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'board'): ?>
+                <!-- Rechnungen (Board, Alumni, Alumni-Board) -->
+                <?php if (isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['board', 'alumni', 'alumni_board'])): ?>
                 <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-file-invoice-dollar w-5 mr-3"></i>
