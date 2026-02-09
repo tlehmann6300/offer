@@ -234,6 +234,42 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             .flex.space-x-4 > * {
                 width: 100%;
             }
+            
+            /* Improve heading sizes on mobile */
+            h1 {
+                font-size: 1.75rem !important;
+            }
+            
+            h2 {
+                font-size: 1.5rem !important;
+            }
+            
+            h3 {
+                font-size: 1.25rem !important;
+            }
+            
+            /* Better image scaling on mobile */
+            img {
+                max-width: 100%;
+                height: auto;
+            }
+            
+            /* Ensure grids stack on mobile */
+            .grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+        
+        /* Tablet view improvements */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            main {
+                padding: 1.5rem !important;
+            }
+            
+            /* 2-column grid on tablets */
+            .grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
         }
         
         /* Ensure long text doesn't overflow */
