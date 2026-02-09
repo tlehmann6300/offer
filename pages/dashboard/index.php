@@ -27,7 +27,6 @@ if (!empty($user['firstname'])) {
 }
 
 // Determine greeting based on time of day (German time)
-// TODO: Move timezone configuration to config file in future refactoring
 $timezone = new DateTimeZone('Europe/Berlin');
 $now = new DateTime('now', $timezone);
 $hour = (int)$now->format('H');
@@ -66,28 +65,6 @@ if ($hasExtendedAccess) {
     $inStockStats = Inventory::getInStockStats();
     $checkedOutStats = Inventory::getCheckedOutStats();
     $writeOffStats = Inventory::getWriteOffStatsThisMonth();
-}
-
-// Restrict board-level statistics to board and head roles only
-// (alumni_board explicitly excluded per requirements)
-$isBoardLevel = in_array($user['role'], ['board', 'head']);
-
-// Get board-specific statistics
-if ($isBoardLevel) {
-    $db = Database::getUserDB();
-    
-    // Active Users (7 days) - users with last_login in the last 7 days
-    $stmt = $db->query("SELECT COUNT(*) as active_users FROM users WHERE last_login IS NOT NULL AND last_login > DATE_SUB(NOW(), INTERVAL 7 DAY)");
-    $activeUsersCount = $stmt->fetch()['active_users'] ?? 0;
-    
-    // Open Invitations - tokens that haven't expired
-    // Note: used_at column may not exist in all deployments, so we only check expiration
-    $stmt = $db->query("SELECT COUNT(*) as open_invitations FROM invitation_tokens WHERE expires_at > NOW()");
-    $openInvitationsCount = $stmt->fetch()['open_invitations'] ?? 0;
-    
-    // Total Users
-    $stmt = $db->query("SELECT COUNT(*) as total_users FROM users");
-    $totalUsersCount = $stmt->fetch()['total_users'] ?? 0;
 }
 
 // Get events that need helpers (for all users)
@@ -238,8 +215,7 @@ function dismissProfileReviewPrompt() {
 </div>
 
 <script>
-// Dismiss modal - Note: Session variable is already unset on page load (line 89)
-// so the modal won't reappear in this session even if user navigates back to dashboard
+// Dismiss modal
 function dismissTfaNudge() {
     document.getElementById('tfa-nudge-modal').style.display = 'none';
 }
@@ -285,7 +261,7 @@ endif;
             </div>
             <?php if ($openTasksCount > 0): ?>
             <p class="text-gray-600 mb-3">Du hast aktuell <?php echo $openTasksCount; ?> offene Ausleihen</p>
-            <a href="../inventory/my_checkouts.php" class="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold">
+            <a href="/pages/inventory/my_checkouts.php" class="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold">
                 Ausleihen verwalten <i class="fas fa-arrow-right ml-2"></i>
             </a>
             <?php else: ?>
@@ -321,87 +297,6 @@ endif;
             </a>
             <?php endif; ?>
         </div>
-    </div>
-</div>
-
-<!-- Hero Section - Legacy (hidden, kept for reference during transition period) -->
-<!-- TODO: Remove after verifying new layout is stable (2 weeks from deployment) -->
-<div class="mb-12 hidden">
-    <div class="text-center max-w-4xl mx-auto">
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-4">
-            Willkommen im IBC Intranet
-        </h1>
-        <p class="text-lg md:text-xl text-gray-600 mb-8">
-            Verwalte dein Inventar effizient und behalte alles im Blick
-        </p>
-        
-        <!-- Primary Action Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <a href="../inventory/index.php" class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl">
-                <i class="fas fa-boxes mr-3 text-xl"></i>
-                Zum Inventar
-            </a>
-            <a href="../auth/profile.php" class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl">
-                <i class="fas fa-user mr-3 text-xl"></i>
-                Mein Profil
-            </a>
-        </div>
-    </div>
-</div>
-
-<!-- Upcoming Events Section - Visible to All Users -->
-<div class="max-w-6xl mx-auto">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
-        <i class="fas fa-calendar-alt text-purple-600 mr-2"></i>
-        Anstehende Events
-    </h2>
-    
-    <div class="grid grid-cols-1 gap-6 mb-12">
-        <?php 
-        // Get upcoming events (upcoming status, ordered by start time)
-        $upcomingEventsForAllUsers = Event::getEvents([
-            'status' => ['upcoming', 'registration_open'],
-            'start_date' => date('Y-m-d H:i:s')
-        ], $user['role']);
-        
-        // Limit to 5 events
-        $upcomingEventsForAllUsers = array_slice($upcomingEventsForAllUsers, 0, 5);
-        
-        if (!empty($upcomingEventsForAllUsers)): 
-        ?>
-        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-blue-50">
-            <div class="space-y-4">
-                <?php foreach ($upcomingEventsForAllUsers as $event): ?>
-                <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
-                    <div class="flex-1">
-                        <h3 class="font-bold text-gray-800 mb-1"><?php echo htmlspecialchars($event['title']); ?></h3>
-                        <p class="text-sm text-gray-600">
-                            <i class="fas fa-clock mr-1"></i>
-                            <?php echo date('d.m.Y H:i', strtotime($event['start_time'])); ?> Uhr
-                        </p>
-                        <?php if (!empty($event['location'])): ?>
-                        <p class="text-sm text-gray-500 mt-1">
-                            <i class="fas fa-map-marker-alt mr-1"></i>
-                            <?php echo htmlspecialchars($event['location']); ?>
-                        </p>
-                        <?php endif; ?>
-                    </div>
-                    <a href="../events/view.php?id=<?php echo $event['id']; ?>" class="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all">
-                        Details
-                    </a>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-        <?php else: ?>
-        <div class="card p-8 rounded-xl shadow-lg text-center bg-gradient-to-br from-white to-gray-50">
-            <i class="fas fa-calendar-times text-4xl mb-3 text-gray-400"></i>
-            <p class="text-gray-600 text-lg">Keine anstehenden Events</p>
-            <a href="../events/index.php" class="inline-flex items-center mt-4 text-blue-600 hover:text-blue-700 font-semibold">
-                Alle Events ansehen <i class="fas fa-arrow-right ml-2"></i>
-            </a>
-        </div>
-        <?php endif; ?>
     </div>
 </div>
 
@@ -457,8 +352,64 @@ endif;
     <?php endif; ?>
 </div>
 
+<!-- Upcoming Events Section - Visible to All Users -->
+<div class="max-w-6xl mx-auto mb-12">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+        <i class="fas fa-calendar-alt text-purple-600 mr-2"></i>
+        Anstehende Events
+    </h2>
+    
+    <div class="grid grid-cols-1 gap-6">
+        <?php 
+        // Get upcoming events (upcoming status, ordered by start time)
+        $upcomingEventsForAllUsers = Event::getEvents([
+            'status' => ['upcoming', 'registration_open'],
+            'start_date' => date('Y-m-d H:i:s')
+        ], $user['role']);
+        
+        // Limit to 5 events
+        $upcomingEventsForAllUsers = array_slice($upcomingEventsForAllUsers, 0, 5);
+        
+        if (!empty($upcomingEventsForAllUsers)): 
+        ?>
+        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-blue-50">
+            <div class="space-y-4">
+                <?php foreach ($upcomingEventsForAllUsers as $event): ?>
+                <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-gray-800 mb-1"><?php echo htmlspecialchars($event['title']); ?></h3>
+                        <p class="text-sm text-gray-600">
+                            <i class="fas fa-clock mr-1"></i>
+                            <?php echo date('d.m.Y H:i', strtotime($event['start_time'])); ?> Uhr
+                        </p>
+                        <?php if (!empty($event['location'])): ?>
+                        <p class="text-sm text-gray-500 mt-1">
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            <?php echo htmlspecialchars($event['location']); ?>
+                        </p>
+                        <?php endif; ?>
+                    </div>
+                    <a href="../events/view.php?id=<?php echo $event['id']; ?>" class="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all">
+                        Details
+                    </a>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php else: ?>
+        <div class="card p-8 rounded-xl shadow-lg text-center bg-gradient-to-br from-white to-gray-50">
+            <i class="fas fa-calendar-times text-4xl mb-3 text-gray-400"></i>
+            <p class="text-gray-600 text-lg">Keine anstehenden Events</p>
+            <a href="../events/index.php" class="inline-flex items-center mt-4 text-blue-600 hover:text-blue-700 font-semibold">
+                Alle Events ansehen <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>
+
 <!-- Additional Info Cards -->
-<div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
     <!-- Quick Actions Card -->
     <div class="card p-6 rounded-xl shadow-lg">
         <h3 class="text-xl font-bold text-gray-800 mb-4">
@@ -536,7 +487,7 @@ endif;
         </div>
         <div>
             <h2 class="text-xl font-bold text-red-800">Verlust/Defekt diesen Monat</h2>
-            <p class="text-red-600"><?php echo $writeOffStats['total_writeoffs']; ?> Meldungen, <?php echo $writeOffStats['total_quantity_lost']; ?> Einheiten betroffen</p>
+            <p class="text-red-600"><?php echo $writeOffStats['total_writeoffs']; ?> Meldungen, <?php echo (float)($writeOffStats['total_quantity_lost'] ?? 0); ?> Einheiten betroffen</p>
         </div>
     </div>
     <div class="bg-white rounded-lg p-4 max-h-80 overflow-y-auto shadow-lg">
