@@ -9,32 +9,33 @@ if (file_exists($envFile)) {
     $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     
     foreach ($lines as $line) {
-        // Skip comments
-        if (strpos(trim($line), '#') === 0) {
+        // Skip comments (lines starting with #)
+        if (preg_match('/^\s*#/', $line)) {
             continue;
         }
         
-        // Parse key=value pairs
-        if (strpos($line, '=') !== false) {
-            list($key, $value) = explode('=', $line, 2);
-            $key = trim($key);
-            $value = trim($value);
+        // Parse key=value pairs with robust regex
+        // Pattern matches: KEY = VALUE or KEY=VALUE
+        // Where VALUE can be:
+        // - Quoted with double quotes: "value with # and spaces"
+        // - Quoted with single quotes: 'value with # and spaces'
+        // - Unquoted: value (comments after # are removed)
+        if (preg_match('/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*)$/i', $line, $matches)) {
+            $key = $matches[1];
+            $value = $matches[2];
             
-            // Remove inline comments (everything after # that's not in quotes)
-            if (strpos($value, '#') !== false) {
-                // Simple handling: if # exists and not quoted, remove it
-                if (!((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
-                      (substr($value, 0, 1) === "'" && substr($value, -1) === "'"))) {
-                    $value = trim(explode('#', $value)[0]);
-                }
-            }
-            
-            // Remove quotes if present (and value is at least 2 chars for quotes)
-            if (strlen($value) >= 2) {
-                if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
-                    (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
-                    $value = substr($value, 1, -1);
-                }
+            // Handle quoted values (both single and double quotes)
+            if (preg_match('/^"(.*)"(\s*#.*)?$/', $value, $valueMatches)) {
+                // Double-quoted value - preserve everything inside quotes
+                $value = $valueMatches[1];
+            } elseif (preg_match("/^'(.*)'(\s*#.*)?$/", $value, $valueMatches)) {
+                // Single-quoted value - preserve everything inside quotes
+                $value = $valueMatches[1];
+            } else {
+                // Unquoted value - remove inline comments
+                // Remove everything after # (and any preceding whitespace)
+                $value = preg_replace('/\s*#.*$/', '', $value);
+                $value = trim($value);
             }
             
             $env[$key] = $value;
