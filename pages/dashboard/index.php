@@ -15,6 +15,7 @@ if (!Auth::check()) {
 }
 
 $user = Auth::user();
+$userRole = Auth::user()['role'] ?? '';
 $stats = Inventory::getDashboardStats();
 
 // Get user's first name for personalized greeting

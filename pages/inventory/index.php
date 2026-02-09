@@ -57,8 +57,8 @@ $filters = [];
 if (!empty($_GET['category_id'])) {
     $filters['category_id'] = $_GET['category_id'];
 }
-if (!empty($_GET['location_id'])) {
-    $filters['location_id'] = $_GET['location_id'];
+if (!empty($_GET['location'])) {
+    $filters['location'] = $_GET['location'];
 }
 if (!empty($_GET['search'])) {
     $filters['search'] = $_GET['search'];
@@ -74,6 +74,16 @@ $filters['sort'] = $sort;
 $items = Inventory::getAll($filters);
 $categories = Inventory::getCategories();
 $locations = Inventory::getLocations();
+
+// Get distinct locations dynamically for the filter dropdown
+$db = Database::getContentDB();
+$locationsQuery = $db->query("
+    SELECT DISTINCT location 
+    FROM inventory_items 
+    WHERE location IS NOT NULL AND location != '' 
+    ORDER BY location ASC
+");
+$distinctLocations = $locationsQuery->fetchAll(PDO::FETCH_COLUMN);
 
 $title = 'Inventar - IBC Intranet';
 ob_start();
@@ -245,9 +255,8 @@ ob_start();
 </div>
 <?php endif; ?>
 
-<!-- Filters -->
 <div class="card p-6 mb-6">
-    <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+    <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Suche</label>
             <input 
@@ -259,29 +268,15 @@ ob_start();
             >
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategorie</label>
-            <select 
-                name="category_id" 
-                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-gray-200"
-            >
-                <option value="">Alle Kategorien</option>
-                <?php foreach ($categories as $category): ?>
-                <option value="<?php echo $category['id']; ?>" <?php echo (isset($_GET['category_id']) && $_GET['category_id'] == $category['id']) ? 'selected' : ''; ?>>
-                    <?php echo htmlspecialchars($category['name']); ?>
-                </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Standort</label>
             <select 
-                name="location_id" 
+                name="location" 
                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-gray-200"
             >
                 <option value="">Alle Standorte</option>
-                <?php foreach ($locations as $location): ?>
-                <option value="<?php echo $location['id']; ?>" <?php echo (isset($_GET['location_id']) && $_GET['location_id'] == $location['id']) ? 'selected' : ''; ?>>
-                    <?php echo htmlspecialchars($location['name']); ?>
+                <?php foreach ($distinctLocations as $location): ?>
+                <option value="<?php echo htmlspecialchars($location); ?>" <?php echo (isset($_GET['location']) && $_GET['location'] == $location) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($location); ?>
                 </option>
                 <?php endforeach; ?>
             </select>

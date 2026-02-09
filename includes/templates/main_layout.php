@@ -404,6 +404,35 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </a>
                 <?php endif; ?>
 
+                <!-- Ideenbox (Members, Candidates, Head, Board) -->
+                <?php 
+                $canSeeIdeas = isset($_SESSION['user_role']) && (
+                    $isBoardRole ||
+                    in_array($_SESSION['user_role'], ['member', 'candidate', 'head'])
+                );
+                ?>
+                <?php if ($canSeeIdeas): ?>
+                <a href="<?php echo asset('pages/ideas/index.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/ideas/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-lightbulb w-5 mr-3"></i>
+                    <span>Ideenbox</span>
+                </a>
+                <?php endif; ?>
+
+                <!-- Schulungsanfrage (Alumni, Alumni-Board) -->
+                <?php 
+                $canSeeTrainingRequests = isset($_SESSION['user_role']) && (
+                    in_array($_SESSION['user_role'], ['alumni', 'alumni_board'])
+                );
+                ?>
+                <?php if ($canSeeTrainingRequests): ?>
+                <a href="<?php echo asset('pages/alumni/requests.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-300 dark:text-gray-200 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/alumni/requests.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
+                    <i class="fas fa-chalkboard-teacher w-5 mr-3"></i>
+                    <span>Schulungsanfrage</span>
+                </a>
+                <?php endif; ?>
+
                 <!-- Benutzer (Board roles ONLY) -->
                 <?php if ($isBoardRole): ?>
                 <a href="<?php echo asset('pages/admin/users.php'); ?>" 
