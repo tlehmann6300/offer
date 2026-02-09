@@ -63,7 +63,6 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         .sidebar-scroll::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.3);
             border-radius: 4px;
-            transition: background 0.2s ease;
         }
         
         .sidebar::-webkit-scrollbar-thumb:hover,
@@ -236,16 +235,16 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             }
             
             /* Improve heading sizes on mobile */
-            h1 {
-                font-size: 1.75rem !important;
+            main h1 {
+                font-size: 1.75rem;
             }
             
-            h2 {
-                font-size: 1.5rem !important;
+            main h2 {
+                font-size: 1.5rem;
             }
             
-            h3 {
-                font-size: 1.25rem !important;
+            main h3 {
+                font-size: 1.25rem;
             }
             
             /* Better image scaling on mobile */
@@ -254,9 +253,9 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 height: auto;
             }
             
-            /* Ensure grids stack on mobile */
-            .grid {
-                grid-template-columns: 1fr !important;
+            /* Ensure grids stack on mobile - for auto-responsive grids */
+            .grid:not(.grid-no-stack) {
+                grid-template-columns: 1fr;
             }
         }
         
@@ -266,9 +265,9 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 padding: 1.5rem !important;
             }
             
-            /* 2-column grid on tablets */
-            .grid {
-                grid-template-columns: repeat(2, 1fr) !important;
+            /* 2-column grid on tablets - for auto-responsive grids */
+            .grid:not(.grid-no-stack) {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
         
