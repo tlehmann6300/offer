@@ -13,7 +13,7 @@ if (!Auth::check()) {
 $user = Auth::user();
 
 // Check if user has one of the allowed active roles
-$allowedRoles = ['board', 'head', 'member', 'candidate'];
+$allowedRoles = ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate'];
 if (!in_array($user['role'], $allowedRoles)) {
     header('Location: ../dashboard/index.php');
     exit;
@@ -54,8 +54,8 @@ ob_start();
             <p class="text-gray-600">Entdecken und vernetzen Sie sich mit unseren aktiven Mitgliedern</p>
         </div>
         
-        <!-- Edit My Profile Button - Only for Vorstand, Resortleiter, Mitglied, Anwärter -->
-        <?php if (in_array($user['role'], ['board', 'head', 'member', 'candidate'])): ?>
+        <!-- Edit My Profile Button - Only for Vorstand (all types), Resortleiter, Mitglied, Anwärter -->
+        <?php if (in_array($user['role'], ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate'])): ?>
         <a href="../alumni/edit.php" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl">
             <i class="fas fa-user-edit mr-2"></i>
             Edit My Profile
@@ -94,7 +94,10 @@ ob_start();
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 >
                     <option value="">Alle</option>
-                    <option value="board" <?php echo $roleFilter === 'board' ? 'selected' : ''; ?>>Vorstand</option>
+                    <option value="board" <?php echo $roleFilter === 'board' ? 'selected' : ''; ?>>Vorstand (allgemein)</option>
+                    <option value="vorstand_intern" <?php echo $roleFilter === 'vorstand_intern' ? 'selected' : ''; ?>>Vorstand Intern</option>
+                    <option value="vorstand_extern" <?php echo $roleFilter === 'vorstand_extern' ? 'selected' : ''; ?>>Vorstand Extern</option>
+                    <option value="vorstand_finanzen_recht" <?php echo $roleFilter === 'vorstand_finanzen_recht' ? 'selected' : ''; ?>>Vorstand Finanzen & Recht</option>
                     <option value="head" <?php echo $roleFilter === 'head' ? 'selected' : ''; ?>>Ressortleiter</option>
                     <option value="member" <?php echo $roleFilter === 'member' ? 'selected' : ''; ?>>Mitglieder</option>
                     <option value="candidate" <?php echo $roleFilter === 'candidate' ? 'selected' : ''; ?>>Anwärter</option>
@@ -146,6 +149,9 @@ ob_start();
                 // Determine role badge color
                 $roleBadgeColors = [
                     'board' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'vorstand_intern' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'vorstand_extern' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'vorstand_finanzen_recht' => 'bg-purple-100 text-purple-800 border-purple-300',
                     'head' => 'bg-blue-100 text-blue-800 border-blue-300',
                     'member' => 'bg-green-100 text-green-800 border-green-300',
                     'candidate' => 'bg-yellow-100 text-yellow-800 border-yellow-300'
@@ -153,6 +159,9 @@ ob_start();
                 
                 $roleNames = [
                     'board' => 'Vorstand',
+                    'vorstand_intern' => 'Vorstand Intern',
+                    'vorstand_extern' => 'Vorstand Extern',
+                    'vorstand_finanzen_recht' => 'Vorstand Finanzen & Recht',
                     'head' => 'Ressortleiter',
                     'member' => 'Mitglied',
                     'candidate' => 'Anwärter'
