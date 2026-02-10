@@ -7,6 +7,7 @@ declare(strict_types=1);
  */
 
 require_once __DIR__ . '/../database.php';
+require_once __DIR__ . '/Alumni.php';
 
 class Member {
     
@@ -279,7 +280,6 @@ class Member {
             return self::update($userId, $data);
         } else {
             // Create new profile - delegate to Alumni::create since it uses the same table
-            require_once __DIR__ . '/Alumni.php';
             $data['user_id'] = $userId;
             return Alumni::create($data);
         }

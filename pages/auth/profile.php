@@ -205,6 +205,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } elseif (isAlumniRole($userRole)) {
                 // For alumni roles (alumni, alumni_board, honorary_member), use Alumni::updateOrCreateProfile
                 $updateSuccess = Alumni::updateOrCreateProfile($user['id'], $profileData);
+            } else {
+                // Log warning for unexpected role
+                error_log("Unexpected user role in profile update: " . $userRole . " for user ID: " . $user['id']);
+                $error = 'Ihre Rolle unterstützt keine Profilaktualisierung';
             }
             
             if ($updateSuccess) {
