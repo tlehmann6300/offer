@@ -568,3 +568,55 @@ body:not(.dark-mode) .sidebar span,
 body:not(.dark-mode) .sidebar i {
     color: #ffffff !important;
 }
+
+/* --- FORCE OVERRIDES FOR READABILITY --- */
+/* DARK MODE: Alles auf Weiß/Hellgrau zwingen */
+body.dark-mode,
+body.dark-mode .card,
+body.dark-mode .bg-white {
+    color: #f3f4f6 !important; /* Fast Weiß */
+}
+
+/* Spezifische Tailwind-Texte im Dark Mode hell machen */
+body.dark-mode .text-gray-500,
+body.dark-mode .text-gray-600,
+body.dark-mode .text-gray-700,
+body.dark-mode .text-gray-800,
+body.dark-mode .text-gray-900,
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode li {
+    color: #e5e7eb !important; /* Hellgrau */
+}
+
+/* Inputs im Dark Mode fixen */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+    background-color: #1f2937 !important; /* Dunkelgrau */
+    color: #ffffff !important;
+    border-color: #4b5563 !important;
+}
+
+/* LIGHT MODE: Alles auf Dunkel zwingen */
+body:not(.dark-mode) {
+    color: #111827 !important; /* Fast Schwarz */
+}
+
+body:not(.dark-mode) h1,
+body:not(.dark-mode) h2,
+body:not(.dark-mode) h3,
+body:not(.dark-mode) p,
+body:not(.dark-mode) li {
+    color: #1f2937 !important;
+}
+
+/* Sidebar Ausnahme (muss im Light Mode hell bleiben wegen blauem Hintergrund) */
+body:not(.dark-mode) .sidebar *,
+body:not(.dark-mode) .sidebar a,
+body:not(.dark-mode) .sidebar i {
+    color: #ffffff !important;
+}
