@@ -105,8 +105,13 @@ function sanitize_http_host($host) {
         return null;
     }
     
-    // Additional validation: Prevent consecutive dots and other edge cases
+    // Additional validation: Prevent consecutive dots
     if (strpos($host, '..') !== false) {
+        return null;
+    }
+    
+    // Prevent dots at start or end (invalid hostname format)
+    if ($host[0] === '.' || $host[strlen($host) - 1] === '.') {
         return null;
     }
     
@@ -114,11 +119,16 @@ function sanitize_http_host($host) {
     if (strpos($host, ':') !== false) {
         $parts = explode(':', $host);
         // Should only have one colon (host:port)
+        // Note: IPv6 addresses in brackets are not supported
         if (count($parts) !== 2) {
             return null;
         }
-        // Port should be numeric
+        // Port should be numeric and in valid range (1-65535)
         if (!ctype_digit($parts[1])) {
+            return null;
+        }
+        $port = (int)$parts[1];
+        if ($port < 1 || $port > 65535) {
             return null;
         }
     }
