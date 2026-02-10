@@ -182,6 +182,32 @@ textarea::placeholder {
     color: var(--ibc-gray-400);
 }
 
+/* Light Mode - Explicit Text Colors */
+body:not(.dark-mode) {
+    color: #1f2937 !important;
+}
+
+body:not(.dark-mode) .card {
+    color: #1f2937 !important;
+}
+
+body:not(.dark-mode) h1,
+body:not(.dark-mode) h2,
+body:not(.dark-mode) h3,
+body:not(.dark-mode) h4,
+body:not(.dark-mode) h5,
+body:not(.dark-mode) h6 {
+    color: #1f2937 !important;
+}
+
+body:not(.dark-mode) p {
+    color: #374151;
+}
+
+body:not(.dark-mode) label {
+    color: #374151 !important;
+}
+
 body.dark-mode .glass-card {
     background: rgba(31, 41, 55, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.1);

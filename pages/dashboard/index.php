@@ -25,13 +25,15 @@ $user = $currentUser;
 $userRole = $user['role'] ?? '';
 $stats = Inventory::getDashboardStats();
 
-// Get user's first name for personalized greeting
-$firstname = 'Benutzer'; // Default fallback
-if (!empty($user['firstname'])) {
-    $firstname = $user['firstname'];
+// Get user's name for personalized greeting
+$displayName = 'Benutzer'; // Default fallback
+if (!empty($user['firstname']) && !empty($user['lastname'])) {
+    $displayName = $user['firstname'] . ' ' . $user['lastname'];
+} elseif (!empty($user['firstname'])) {
+    $displayName = $user['firstname'];
 } elseif (!empty($user['email']) && strpos($user['email'], '@') !== false) {
     $emailParts = explode('@', $user['email']);
-    $firstname = $emailParts[0];
+    $displayName = $emailParts[0];
 }
 
 // Determine greeting based on time of day (German time)
@@ -233,7 +235,7 @@ endif;
 <div class="mb-8">
     <div class="max-w-4xl mx-auto text-center">
         <h1 class="text-4xl md:text-5xl font-bold text-gray-800 dark:text-gray-100 mb-3">
-            <?php echo htmlspecialchars($greeting); ?>, <?php echo htmlspecialchars($firstname); ?>!
+            <?php echo htmlspecialchars($greeting); ?>, <?php echo htmlspecialchars($displayName); ?>!
         </h1>
         <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300">
             Willkommen zurück im IBC Intranet
