@@ -76,6 +76,7 @@ $categories = Inventory::getCategories();
 $locations = Inventory::getLocations();
 
 // Get distinct locations dynamically for the filter dropdown
+// Note: Uses INNER JOIN to only show locations that are currently assigned to inventory items
 $db = Database::getContentDB();
 $locationsQuery = $db->query("
     SELECT DISTINCT l.name 

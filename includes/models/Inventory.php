@@ -84,6 +84,7 @@ class Inventory {
             $params[] = $filters['category_id'];
         }
         
+        // Support filtering by location_id (for programmatic use) OR by location name (for UI filters)
         if (!empty($filters['location_id'])) {
             $whereClauses[] = "i.location_id = ?";
             $params[] = $filters['location_id'];
