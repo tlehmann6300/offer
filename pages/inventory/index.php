@@ -78,10 +78,11 @@ $locations = Inventory::getLocations();
 // Get distinct locations dynamically for the filter dropdown
 $db = Database::getContentDB();
 $locationsQuery = $db->query("
-    SELECT DISTINCT location 
-    FROM inventory_items 
-    WHERE location IS NOT NULL AND location != '' 
-    ORDER BY location ASC
+    SELECT DISTINCT l.name 
+    FROM inventory_items i
+    JOIN locations l ON i.location_id = l.id
+    WHERE l.name IS NOT NULL AND l.name != '' 
+    ORDER BY l.name ASC
 ");
 $distinctLocations = $locationsQuery->fetchAll(PDO::FETCH_COLUMN);
 

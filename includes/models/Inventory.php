@@ -89,6 +89,11 @@ class Inventory {
             $params[] = $filters['location_id'];
         }
         
+        if (!empty($filters['location'])) {
+            $whereClauses[] = "l.name = ?";
+            $params[] = $filters['location'];
+        }
+        
         if (!empty($filters['search'])) {
             $whereClauses[] = "(i.name LIKE ? OR i.description LIKE ?)";
             $searchTerm = '%' . $filters['search'] . '%';
