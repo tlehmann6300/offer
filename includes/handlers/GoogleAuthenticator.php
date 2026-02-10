@@ -83,6 +83,22 @@ class PHPGangsta_GoogleAuthenticator
     }
 
     /**
+     * Get otpauth URL string for generating QR code client-side
+     *
+     * @param string $name
+     * @param string $secret
+     * @param string $title
+     * @return string
+     */
+    public function getQRCodeUrl($name, $secret, $title = null) {
+        $otpauth = 'otpauth://totp/'.$name.'?secret='.$secret;
+        if(isset($title)) {
+            $otpauth .= '&issuer='.urlencode($title);
+        }
+        return $otpauth;
+    }
+
+    /**
      * Check if the code is correct. This will accept codes starting from $discrepancy*30sec ago to $discrepancy*30sec from now
      *
      * @param string $secret
