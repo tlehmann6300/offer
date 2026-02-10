@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => '__root__',
-        'pretty_version' => 'dev-copilot/create-test-mail-attachment-script',
-        'version' => 'dev-copilot/create-test-mail-attachment-script',
-        'reference' => '7c1015acb0faaa089292f7608a4dd97ad83adb7f',
+        'pretty_version' => 'dev-copilot/validate-email-change-token',
+        'version' => 'dev-copilot/validate-email-change-token',
+        'reference' => '690116b8cd3849dcf9105b967db94ecdfc0369f2',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => 'dev-copilot/create-test-mail-attachment-script',
-            'version' => 'dev-copilot/create-test-mail-attachment-script',
-            'reference' => '7c1015acb0faaa089292f7608a4dd97ad83adb7f',
+            'pretty_version' => 'dev-copilot/validate-email-change-token',
+            'version' => 'dev-copilot/validate-email-change-token',
+            'reference' => '690116b8cd3849dcf9105b967db94ecdfc0369f2',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
