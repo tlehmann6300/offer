@@ -159,9 +159,9 @@ ob_start();
                 
                 $roleNames = [
                     'board' => 'Vorstand',
-                    'vorstand_intern' => 'Vorstand Intern',
-                    'vorstand_extern' => 'Vorstand Extern',
-                    'vorstand_finanzen_recht' => 'Vorstand Finanzen & Recht',
+                    'vorstand_intern' => 'Vorstand',
+                    'vorstand_extern' => 'Vorstand',
+                    'vorstand_finanzen_recht' => 'Vorstand',
                     'head' => 'Ressortleiter',
                     'member' => 'Mitglied',
                     'candidate' => 'Anwärter'
