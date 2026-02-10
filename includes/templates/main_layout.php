@@ -90,18 +90,18 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         }
         
         body:not(.dark-mode) .sidebar a:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             color: white;
             transform: translateX(4px);
         }
         
         body:not(.dark-mode) .sidebar a.active {
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.2);
             border-right: 3px solid #00a651;
         }
         
         body:not(.dark-mode) .sidebar .bg-gray-800 {
-            background: rgba(255, 255, 255, 0.2) !important;
+            background: rgba(255, 255, 255, 0.15) !important;
         }
         
         body:not(.dark-mode) .sidebar .text-gray-300 {
@@ -131,7 +131,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         }
         
         body.dark-mode .sidebar a.active {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.2);
             border-right: 3px solid #00a651;
             color: white !important;
         }
@@ -287,14 +287,11 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             
             if (savedTheme === 'dark') {
                 document.body.classList.add('dark-mode');
-                document.body.classList.add('dark');
             } else if (savedTheme === 'light') {
                 document.body.classList.remove('dark-mode');
-                document.body.classList.remove('dark');
             } else { // auto
                 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                     document.body.classList.add('dark-mode');
-                    document.body.classList.add('dark');
                 }
             }
         })();
@@ -703,13 +700,11 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         function applyTheme(theme) {
             if (theme === 'dark') {
                 document.body.classList.add('dark-mode');
-                document.body.classList.add('dark');
                 themeIcon.classList.remove('fa-moon');
                 themeIcon.classList.add('fa-sun');
                 themeText.textContent = 'Hellmodus';
             } else if (theme === 'light') {
                 document.body.classList.remove('dark-mode');
-                document.body.classList.remove('dark');
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
                 themeText.textContent = 'Dunkelmodus';
@@ -717,13 +712,11 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 // Check system preference
                 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                     document.body.classList.add('dark-mode');
-                    document.body.classList.add('dark');
                     themeIcon.classList.remove('fa-moon');
                     themeIcon.classList.add('fa-sun');
                     themeText.textContent = 'Hellmodus';
                 } else {
                     document.body.classList.remove('dark-mode');
-                    document.body.classList.remove('dark');
                     themeIcon.classList.remove('fa-sun');
                     themeIcon.classList.add('fa-moon');
                     themeText.textContent = 'Dunkelmodus';
@@ -737,7 +730,6 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         // Toggle theme on button click
         themeToggle?.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
-            document.body.classList.toggle('dark');
             
             if (document.body.classList.contains('dark-mode')) {
                 localStorage.setItem('theme', 'dark');
