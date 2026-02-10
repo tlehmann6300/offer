@@ -8,11 +8,15 @@ require_once __DIR__ . '/../../config/config.php';
 
 // 3. Weitere Abhängigkeiten laden
 require_once __DIR__ . '/../../src/Auth.php';
+require_once __DIR__ . '/../../src/Database.php';
 require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/helpers.php';
 
 try {
     // 4. Logik in einem try-catch Block schützen
+    // 2FA timeout (5 minutes)
+    define('PENDING_2FA_TIMEOUT', 300);
+    
     // Redirect if already authenticated
     if (Auth::check()) {
         header('Location: ../dashboard/index.php');
@@ -29,33 +33,67 @@ try {
         $password = $_POST['password'] ?? '';
         $tfaCode = $_POST['tfa_code'] ?? null;
         
-        if ($tfaCode !== null && isset($_SESSION['pending_2fa'])) {
-            $email = $_SESSION['pending_2fa']['email'];
-            $password = $_SESSION['pending_2fa']['password'];
-        }
-        
-        $result = Auth::login($email, $password, $tfaCode);
-        
-        if ($result['success']) {
-            unset($_SESSION['pending_2fa']);
-            header('Location: ../dashboard/index.php');
-            exit;
-        } else {
-            if (isset($result['require_2fa']) && $result['require_2fa']) {
-                $_SESSION['pending_2fa'] = [
-                    'email' => $email,
-                    'password' => $password,
-                    'timestamp' => time()
-                ];
-                $require2FA = true;
+        // Step 1: Initial login attempt (email and password)
+        if ($tfaCode === null && !isset($_SESSION['pending_2fa'])) {
+            // Verify credentials
+            $result = Auth::verifyCredentials($email, $password);
+            
+            // Check if verification returned an error
+            if (isset($result['error'])) {
+                $error = $result['error'];
             } else {
-                $error = $result['message'];
+                $user = $result;
+                
+                if ($user['tfa_enabled']) {
+                    // 2FA is enabled, store only user_id in session
+                    $_SESSION['pending_2fa'] = [
+                        'user_id' => $user['id'],
+                        'timestamp' => time()
+                    ];
+                    $require2FA = true;
+                } else {
+                    // No 2FA, create session directly
+                    Auth::createSession($user);
+                    unset($_SESSION['pending_2fa']);
+                    header('Location: ../dashboard/index.php');
+                    exit;
+                }
+            }
+        }
+        // Step 2: 2FA verification
+        elseif ($tfaCode !== null && isset($_SESSION['pending_2fa'])) {
+            $userId = $_SESSION['pending_2fa']['user_id'];
+            
+            // Fetch user by ID from database
+            $db = Database::getUserDB();
+            $stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
+            $stmt->execute([$userId]);
+            $user = $stmt->fetch();
+            
+            if (!$user) {
+                $error = 'Sitzung ungültig. Bitte melden Sie sich erneut an.';
                 unset($_SESSION['pending_2fa']);
+            } else {
+                // Verify 2FA code
+                require_once __DIR__ . '/../../includes/handlers/GoogleAuthenticator.php';
+                $ga = new PHPGangsta_GoogleAuthenticator();
+                
+                if ($ga->verifyCode($user['tfa_secret'], $tfaCode, 2)) {
+                    // 2FA code is valid, create session
+                    Auth::createSession($user);
+                    unset($_SESSION['pending_2fa']);
+                    header('Location: ../dashboard/index.php');
+                    exit;
+                } else {
+                    $error = 'Ungültiger 2FA-Code';
+                    $require2FA = true;
+                }
             }
         }
     } else {
+        // GET request - check if there's a pending 2FA session
         if (isset($_SESSION['pending_2fa'])) {
-            if (time() - $_SESSION['pending_2fa']['timestamp'] > 300) {
+            if (time() - $_SESSION['pending_2fa']['timestamp'] > PENDING_2FA_TIMEOUT) {
                 unset($_SESSION['pending_2fa']);
                 $error = '2FA-Sitzung abgelaufen. Bitte melden Sie sich erneut an.';
             } else {

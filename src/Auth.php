@@ -79,14 +79,13 @@ class Auth {
     }
     
     /**
-     * Login user with email and password
+     * Verify user credentials (email and password)
      * 
      * @param string $email User email
      * @param string $password User password
-     * @param string|null $tfaCode Optional 2FA code
-     * @return array Result with 'success' and 'message' keys
+     * @return array User array on success, or array with 'error' key on failure
      */
-    public static function login($email, $password, $tfaCode = null) {
+    public static function verifyCredentials($email, $password) {
         $db = Database::getUserDB();
         
         // Find user by email
@@ -95,23 +94,23 @@ class Auth {
         $user = $stmt->fetch();
         
         if (!$user) {
-            return ['success' => false, 'message' => 'Ungültige Anmeldedaten'];
+            return ['error' => 'Ungültige Anmeldedaten'];
         }
         
         // Check if account is permanently locked
         if (isset($user['is_locked_permanently']) && $user['is_locked_permanently']) {
-            return ['success' => false, 'message' => 'Account gesperrt. Bitte Admin kontaktieren.'];
+            return ['error' => 'Account gesperrt. Bitte Admin kontaktieren.'];
         }
         
         // Check if account is temporarily locked
         if ($user['locked_until'] && strtotime($user['locked_until']) > time()) {
-            return ['success' => false, 'message' => 'Zu viele Versuche. Wartezeit läuft.'];
+            return ['error' => 'Zu viele Versuche. Wartezeit läuft.'];
         }
         
         // Check if password field exists and is valid
         if (!isset($user['password']) || !is_string($user['password'])) {
             error_log("Database error: password field missing or invalid for user ID: " . $user['id']);
-            return ['success' => false, 'message' => 'Systemfehler. Bitte Admin kontaktieren.'];
+            return ['error' => 'Systemfehler. Bitte Admin kontaktieren.'];
         }
         
         // Verify password
@@ -135,23 +134,20 @@ class Auth {
             $stmt = $db->prepare("UPDATE users SET failed_login_attempts = ?, locked_until = ?, is_locked_permanently = ? WHERE id = ?");
             $stmt->execute([$failedAttempts, $lockedUntil, $isPermanentlyLocked, $user['id']]);
             
-            return ['success' => false, 'message' => 'Ungültige Anmeldedaten'];
+            return ['error' => 'Ungültige Anmeldedaten'];
         }
         
-        // Check 2FA if enabled
-        if ($user['tfa_enabled']) {
-            if ($tfaCode === null) {
-                return ['success' => false, 'require_2fa' => true, 'user_id' => $user['id']];
-            }
-            
-            // Verify 2FA code
-            require_once __DIR__ . '/../includes/handlers/GoogleAuthenticator.php';
-            $ga = new PHPGangsta_GoogleAuthenticator();
-            
-            if (!$ga->verifyCode($user['tfa_secret'], $tfaCode, 2)) {
-                return ['success' => false, 'message' => 'Ungültiger 2FA-Code'];
-            }
-        }
+        return $user;
+    }
+    
+    /**
+     * Create session for authenticated user
+     * 
+     * @param array $user User data array
+     * @return bool True on success
+     */
+    public static function createSession($user) {
+        $db = Database::getUserDB();
         
         // Reset failed attempts and update last login
         $stmt = $db->prepare("UPDATE users SET failed_login_attempts = 0, locked_until = NULL, last_login = NOW() WHERE id = ?");
@@ -171,11 +167,49 @@ class Auth {
         $_SESSION['last_activity'] = time();
         
         // Set 2FA nudge if 2FA is not enabled
-        // Note: This is only reached after full authentication (including 2FA if enabled)
-        // Users with 2FA enabled would have returned earlier if they hadn't provided the code
         if (!$user['tfa_enabled']) {
             $_SESSION['show_2fa_nudge'] = true;
         }
+        
+        return true;
+    }
+    
+    /**
+     * Login user with email and password
+     * 
+     * @param string $email User email
+     * @param string $password User password
+     * @param string|null $tfaCode Optional 2FA code
+     * @return array Result with 'success' and 'message' keys
+     */
+    public static function login($email, $password, $tfaCode = null) {
+        // Verify credentials
+        $result = self::verifyCredentials($email, $password);
+        
+        // Check if verification returned an error
+        if (isset($result['error'])) {
+            return ['success' => false, 'message' => $result['error']];
+        }
+        
+        $user = $result;
+        
+        // Check 2FA if enabled
+        if ($user['tfa_enabled']) {
+            if ($tfaCode === null) {
+                return ['success' => false, 'require_2fa' => true, 'user_id' => $user['id']];
+            }
+            
+            // Verify 2FA code
+            require_once __DIR__ . '/../includes/handlers/GoogleAuthenticator.php';
+            $ga = new PHPGangsta_GoogleAuthenticator();
+            
+            if (!$ga->verifyCode($user['tfa_secret'], $tfaCode, 2)) {
+                return ['success' => false, 'message' => 'Ungültiger 2FA-Code'];
+            }
+        }
+        
+        // Create session
+        self::createSession($user);
         
         return ['success' => true, 'user' => $user];
     }
