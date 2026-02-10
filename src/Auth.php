@@ -83,7 +83,7 @@ class Auth {
      * 
      * @param string $email User email
      * @param string $password User password
-     * @return array|false User array on success, false on failure
+     * @return array User array on success, or array with 'error' key on failure
      */
     public static function verifyCredentials($email, $password) {
         $db = Database::getUserDB();
@@ -94,23 +94,23 @@ class Auth {
         $user = $stmt->fetch();
         
         if (!$user) {
-            return false;
+            return ['error' => 'Ungültige Anmeldedaten'];
         }
         
         // Check if account is permanently locked
         if (isset($user['is_locked_permanently']) && $user['is_locked_permanently']) {
-            return false;
+            return ['error' => 'Account gesperrt. Bitte Admin kontaktieren.'];
         }
         
         // Check if account is temporarily locked
         if ($user['locked_until'] && strtotime($user['locked_until']) > time()) {
-            return false;
+            return ['error' => 'Zu viele Versuche. Wartezeit läuft.'];
         }
         
         // Check if password field exists and is valid
         if (!isset($user['password']) || !is_string($user['password'])) {
             error_log("Database error: password field missing or invalid for user ID: " . $user['id']);
-            return false;
+            return ['error' => 'Systemfehler. Bitte Admin kontaktieren.'];
         }
         
         // Verify password
@@ -134,7 +134,7 @@ class Auth {
             $stmt = $db->prepare("UPDATE users SET failed_login_attempts = ?, locked_until = ?, is_locked_permanently = ? WHERE id = ?");
             $stmt->execute([$failedAttempts, $lockedUntil, $isPermanentlyLocked, $user['id']]);
             
-            return false;
+            return ['error' => 'Ungültige Anmeldedaten'];
         }
         
         return $user;
@@ -184,11 +184,14 @@ class Auth {
      */
     public static function login($email, $password, $tfaCode = null) {
         // Verify credentials
-        $user = self::verifyCredentials($email, $password);
+        $result = self::verifyCredentials($email, $password);
         
-        if (!$user) {
-            return ['success' => false, 'message' => 'Ungültige Anmeldedaten'];
+        // Check if verification returned an error
+        if (isset($result['error'])) {
+            return ['success' => false, 'message' => $result['error']];
         }
+        
+        $user = $result;
         
         // Check 2FA if enabled
         if ($user['tfa_enabled']) {

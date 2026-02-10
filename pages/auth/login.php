@@ -33,17 +33,15 @@ try {
         // Step 1: Initial login attempt (email and password)
         if ($tfaCode === null && !isset($_SESSION['pending_2fa'])) {
             // Verify credentials
-            $user = Auth::verifyCredentials($email, $password);
+            $result = Auth::verifyCredentials($email, $password);
             
-            if (!$user) {
-                $error = 'Ungültige Anmeldedaten';
+            // Check if verification returned an error
+            if (isset($result['error'])) {
+                $error = $result['error'];
             } else {
-                // Check if account is permanently locked
-                if (isset($user['is_locked_permanently']) && $user['is_locked_permanently']) {
-                    $error = 'Account gesperrt. Bitte Admin kontaktieren.';
-                } else if ($user['locked_until'] && strtotime($user['locked_until']) > time()) {
-                    $error = 'Zu viele Versuche. Wartezeit läuft.';
-                } else if ($user['tfa_enabled']) {
+                $user = $result;
+                
+                if ($user['tfa_enabled']) {
                     // 2FA is enabled, store only user_id in session
                     $_SESSION['pending_2fa'] = [
                         'user_id' => $user['id'],
