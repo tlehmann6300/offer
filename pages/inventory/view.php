@@ -499,7 +499,7 @@ ob_start();
 
             <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg mb-4">
                 <p class="font-semibold text-gray-800 dark:text-gray-100"><?php echo htmlspecialchars($item['name']); ?></p>
-                <p class="text-sm text-gray-600 dark:text-gray-300">Verfügbar: <?php echo $item['quantity']; ?> <?php echo htmlspecialchars($item['unit']); ?></p>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Verfügbar: <?php echo htmlspecialchars($item['quantity']); ?> <?php echo htmlspecialchars($item['unit']); ?></p>
             </div>
 
             <div>
@@ -511,7 +511,7 @@ ob_start();
                     name="amount" 
                     required 
                     min="1" 
-                    max="<?php echo $item['quantity']; ?>"
+                    max="<?php echo htmlspecialchars($item['quantity']); ?>"
                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-gray-100"
                     placeholder="Anzahl eingeben"
                 >
