@@ -91,7 +91,7 @@ class PHPGangsta_GoogleAuthenticator
      * @return string
      */
     public function getQRCodeUrl($name, $secret, $title = null) {
-        $otpauth = 'otpauth://totp/'.urlencode($name).'?secret='.$secret;
+        $otpauth = 'otpauth://totp/'.urlencode($name).'?secret='.urlencode($secret);
         if(isset($title)) {
             $otpauth .= '&issuer='.urlencode($title);
         }
