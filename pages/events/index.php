@@ -66,8 +66,8 @@ ob_start();
             <p class="text-gray-600 dark:text-gray-300">Entdecke kommende Events und melde Dich an</p>
         </div>
         
-        <!-- Neues Event Button - Board/Head only -->
-        <?php if (in_array($userRole, ['admin', 'board', 'head', 'alumni_board'])): ?>
+        <!-- Neues Event Button - Board/Head/Manager only -->
+        <?php if (Auth::hasPermission('manage_projects') || in_array($userRole, ['board', 'head', 'alumni_board'])): ?>
         <a href="manage.php" class="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl">
             <i class="fas fa-plus mr-2"></i>
             Neues Event

@@ -142,7 +142,7 @@ $projectApplications = $stmt->fetchAll();
 // Database Storage Usage
 // Query information_schema to get database sizes
 $databaseStats = [];
-$databaseQuota = 1024; // 1 GB in MB
+$databaseQuota = 2048; // 2 GB in MB
 
 try {
     // Get database names from config
@@ -383,7 +383,7 @@ ob_start();
                     <div class="space-y-2">
                         <div class="flex justify-between text-xs text-gray-600 dark:text-gray-400">
                             <span>Auslastung</span>
-                            <span><?php echo number_format($db['percentage'], 1); ?>% von 1 GB</span>
+                            <span><?php echo number_format($db['percentage'], 1); ?>% von 2 GB</span>
                         </div>
                         <div class="w-full <?php echo $colors['progress_bg']; ?> rounded-full h-2.5">
                             <div class="<?php echo $colors['progress_bar']; ?> h-2.5 rounded-full transition-all duration-300" style="width: <?php echo min($db['percentage'], 100); ?>%"></div>
