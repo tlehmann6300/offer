@@ -24,11 +24,14 @@ CREATE TABLE IF NOT EXISTS users (
     pending_email_update_request BOOLEAN NOT NULL DEFAULT 0,
     prompt_profile_review BOOLEAN NOT NULL DEFAULT 0,
     theme_preference VARCHAR(10) DEFAULT 'auto',
+    birthday DATE DEFAULT NULL COMMENT 'User birthday for birthday wishes',
+    gender ENUM('m', 'f', 'd') DEFAULT NULL COMMENT 'User gender: m=male, f=female, d=diverse',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     INDEX idx_email (email),
-    INDEX idx_role (role)
+    INDEX idx_role (role),
+    INDEX idx_birthday (birthday)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
