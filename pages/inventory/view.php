@@ -97,7 +97,7 @@ function formatHistoryComment($data) {
     }
     
     // Check if this looks like a full snapshot (many fields typically used in an item)
-    $snapshotFields = ['name', 'description', 'category_id', 'location_id', 'current_stock', 
+    $snapshotFields = ['name', 'description', 'category_id', 'location_id', 'quantity', 
                        'min_stock', 'unit', 'unit_price', 'serial_number', 'notes', 'status'];
     $matchCount = count(array_intersect(array_keys($filtered), $snapshotFields));
     
@@ -198,7 +198,7 @@ ob_start();
             </div>
 
             <!-- Checkout/Borrow Button for all users -->
-            <?php if ($item['current_stock'] > 0): ?>
+            <?php if ($item['quantity'] > 0): ?>
             <div class="mb-6 flex gap-3">
                 <a href="checkout.php?id=<?php echo $item['id']; ?>" class="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold">
                     <i class="fas fa-hand-holding-box mr-2"></i>Entnehmen / Ausleihen
@@ -228,8 +228,8 @@ ob_start();
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Aktueller Bestand</p>
-                    <p class="text-2xl font-bold <?php echo $item['current_stock'] <= $item['min_stock'] && $item['min_stock'] > 0 ? 'text-red-600' : 'text-gray-800 dark:text-gray-100'; ?>">
-                        <?php echo $item['current_stock']; ?>
+                    <p class="text-2xl font-bold <?php echo $item['quantity'] <= $item['min_stock'] && $item['min_stock'] > 0 ? 'text-red-600' : 'text-gray-800 dark:text-gray-100'; ?>">
+                        <?php echo htmlspecialchars($item['quantity']); ?>
                     </p>
                     <p class="text-xs text-gray-500 dark:text-gray-400"><?php echo htmlspecialchars($item['unit']); ?></p>
                 </div>
@@ -244,7 +244,7 @@ ob_start();
                 </div>
                 <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Gesamtwert</p>
-                    <p class="text-2xl font-bold text-gray-800 dark:text-gray-100"><?php echo number_format($item['current_stock'] * $item['unit_price'], 2); ?> €</p>
+                    <p class="text-2xl font-bold text-gray-800 dark:text-gray-100"><?php echo number_format($item['quantity'] * $item['unit_price'], 2); ?> €</p>
                 </div>
             </div>
 
@@ -499,7 +499,7 @@ ob_start();
 
             <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg mb-4">
                 <p class="font-semibold text-gray-800 dark:text-gray-100"><?php echo htmlspecialchars($item['name']); ?></p>
-                <p class="text-sm text-gray-600 dark:text-gray-300">Verfügbar: <?php echo $item['current_stock']; ?> <?php echo htmlspecialchars($item['unit']); ?></p>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Verfügbar: <?php echo htmlspecialchars($item['quantity']); ?> <?php echo htmlspecialchars($item['unit']); ?></p>
             </div>
 
             <div>
@@ -511,7 +511,7 @@ ob_start();
                     name="amount" 
                     required 
                     min="1" 
-                    max="<?php echo $item['current_stock']; ?>"
+                    max="<?php echo htmlspecialchars($item['quantity']); ?>"
                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-gray-100"
                     placeholder="Anzahl eingeben"
                 >
