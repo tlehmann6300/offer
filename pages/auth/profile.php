@@ -175,7 +175,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $profileData['semester'] = trim($_POST['bachelor_semester'] ?? '');
                 // Use 'angestrebter_abschluss' for master program (repurposed for master program name)
                 $profileData['angestrebter_abschluss'] = trim($_POST['master_studiengang'] ?? '');
-                // Use 'graduation_year' for master semester (optional)
+                // Note: graduation_year is repurposed to store master semester for current students
+                // This is a limitation of the existing database schema
                 $profileData['graduation_year'] = trim($_POST['master_semester'] ?? '') ? intval(trim($_POST['master_semester'] ?? '')) : null;
                 // Note: Arbeitgeber (company) fields are optional/hidden for students
             } elseif (isAlumniRole($userRole)) {
@@ -183,11 +184,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Map study fields
                 $profileData['studiengang'] = trim($_POST['bachelor_studiengang'] ?? '');
                 $profileData['study_program'] = trim($_POST['bachelor_studiengang'] ?? '');
-                // Use 'semester' for bachelor graduation year
+                // Use 'semester' for bachelor graduation year (repurposed for year storage)
                 $profileData['semester'] = trim($_POST['bachelor_year'] ?? '');
                 // Use 'angestrebter_abschluss' for master program name
                 $profileData['angestrebter_abschluss'] = trim($_POST['master_studiengang'] ?? '');
-                // Use 'graduation_year' for master graduation year (optional)
+                // graduation_year stores actual graduation year for alumni (correct usage)
                 $profileData['graduation_year'] = trim($_POST['master_year'] ?? '') ? intval(trim($_POST['master_year'] ?? '')) : null;
                 // Employment fields
                 $profileData['company'] = trim($_POST['company'] ?? '');
@@ -422,6 +423,7 @@ ob_start();
                             type="date" 
                             name="birthday" 
                             value="<?php echo htmlspecialchars($profile['birthday'] ?? ''); ?>"
+                            max="<?php echo date('Y-m-d'); ?>"
                             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                         >
                     </div>
@@ -733,7 +735,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Email change confirmation for non-alumni users
     const profileForm = document.querySelector('form[enctype="multipart/form-data"]');
     const emailInput = document.querySelector('input[name="profile_email"]');
-    const originalEmail = <?php echo json_encode($profile['email'] ?? $user['email'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+    const originalEmail = <?php echo json_encode($profile['email'] ?? $user['email'] ?? '', JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
     const userRole = <?php echo json_encode($userRole, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
     
     if (profileForm && emailInput) {
