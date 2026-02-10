@@ -197,7 +197,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             // Update or create profile (only for the current user)
-            if (Alumni::updateOrCreateProfile($user['id'], $profileData)) {
+            // Use the appropriate method based on role
+            $updateSuccess = false;
+            if (isMemberRole($userRole)) {
+                // For member roles (candidate, member, head, board), use Member::updateProfile
+                $updateSuccess = Member::updateProfile($user['id'], $profileData);
+            } elseif (isAlumniRole($userRole)) {
+                // For alumni roles (alumni, alumni_board, honorary_member), use Alumni::updateOrCreateProfile
+                $updateSuccess = Alumni::updateOrCreateProfile($user['id'], $profileData);
+            }
+            
+            if ($updateSuccess) {
                 $message = 'Profil erfolgreich aktualisiert';
                 // Reload user data to get updated gender and birthday
                 $user = Auth::user();

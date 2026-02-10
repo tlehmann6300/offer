@@ -261,4 +261,27 @@ class Member {
         $stmt = $db->prepare($sql);
         return $stmt->execute($values);
     }
+    
+    /**
+     * Update or create member profile (upsert)
+     * Note: Uses alumni_profiles table as this is the central profile table for all users
+     * 
+     * @param int $userId The user ID
+     * @param array $data Profile data to upsert
+     * @return bool True on success
+     * @throws Exception On database error
+     */
+    public static function updateProfile(int $userId, array $data): bool {
+        // Check if profile exists
+        $existing = self::getProfileByUserId($userId);
+        
+        if ($existing) {
+            return self::update($userId, $data);
+        } else {
+            // Create new profile - delegate to Alumni::create since it uses the same table
+            require_once __DIR__ . '/Alumni.php';
+            $data['user_id'] = $userId;
+            return Alumni::create($data);
+        }
+    }
 }
