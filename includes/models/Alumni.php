@@ -348,7 +348,7 @@ class Alumni extends Database {
         $userDb = Database::getConnection('user');
         
         // Fetch profiles where updated_at is older than specified months
-        // AND last reminder was either never sent OR sent more than specified months ago
+        // AND last reminder was either never sent OR sent more than 12 months ago (spam protection)
         $stmt = $contentDb->prepare("
             SELECT id, user_id, first_name, last_name, email, mobile_phone, 
                    linkedin_url, xing_url, industry, company, position, 
@@ -357,10 +357,10 @@ class Alumni extends Database {
                    image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
             FROM alumni_profiles 
             WHERE updated_at < DATE_SUB(NOW(), INTERVAL ? MONTH)
-              AND (last_reminder_sent_at IS NULL OR last_reminder_sent_at < DATE_SUB(NOW(), INTERVAL ? MONTH))
+              AND (last_reminder_sent_at IS NULL OR last_reminder_sent_at < DATE_SUB(NOW(), INTERVAL 12 MONTH))
             ORDER BY updated_at ASC
         ");
-        $stmt->execute([$months, $months]);
+        $stmt->execute([$months]);
         $profiles = $stmt->fetchAll();
         
         // Filter profiles by user role (alumni or alumni_board only)
