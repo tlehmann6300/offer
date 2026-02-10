@@ -706,19 +706,22 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         
         // Toggle theme on button click
         themeToggle?.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            document.body.classList.toggle('dark');
+            const isDarkMode = document.body.classList.contains('dark-mode');
             
-            if (document.body.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark');
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-                themeText.textContent = 'Hellmodus';
-            } else {
+            if (isDarkMode) {
+                // Switch to light mode
+                document.body.classList.remove('dark-mode', 'dark');
                 localStorage.setItem('theme', 'light');
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
                 themeText.textContent = 'Dunkelmodus';
+            } else {
+                // Switch to dark mode
+                document.body.classList.add('dark-mode', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeText.textContent = 'Hellmodus';
             }
         });
         
