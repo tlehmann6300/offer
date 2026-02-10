@@ -775,7 +775,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- Load Chart.js from CDN (only if documentation is visible) -->
 <?php if ($canViewDocumentation): ?>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" 
+        integrity="sha384-5fqx1ldll1ToJjLlNMfvgLr8aHmgv0yUHlK+TQevjvdX5v6aFJf0jShiTsvjN0hK" 
+        crossorigin="anonymous"></script>
 <?php endif; ?>
 
 <script>
