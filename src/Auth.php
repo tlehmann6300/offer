@@ -279,7 +279,15 @@ class Auth {
         $stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
         $stmt->execute([$_SESSION['user_id']]);
         
-        return $stmt->fetch();
+        $result = $stmt->fetch();
+        
+        // If user not found in database (zombie session), destroy session and return null
+        if ($result === false) {
+            self::logout();
+            return null;
+        }
+        
+        return $result;
     }
     
     /**
