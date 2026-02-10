@@ -916,9 +916,8 @@ class MailService {
         
         // Build body content
         $bodyContent = '<p class="email-text">Hallo ' . htmlspecialchars($firstName) . ',</p>
-        <p class="email-text">bitte prüfe, ob deine Daten im IBC Intranet noch aktuell sind.</p>
-        <p class="email-text">Dein Alumni-Profil wurde seit über einem Jahr nicht mehr aktualisiert. 
-        Wir möchten sicherstellen, dass alle Informationen korrekt und auf dem neuesten Stand sind.</p>
+        <p class="email-text">Dein Profil wurde seit über einem Jahr nicht aktualisiert. 
+        Bitte prüfe, ob deine Job-Daten noch aktuell sind, damit wir in Kontakt bleiben können.</p>
         <p class="email-text">Bitte nimm dir einen Moment Zeit, um dein Profil zu überprüfen und bei Bedarf zu aktualisieren.</p>';
         
         // Create call-to-action button with link to edit page

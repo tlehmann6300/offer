@@ -336,27 +336,62 @@ class Alumni extends Database {
     }
     
     /**
-     * Get profiles where last_verified_at is older than specified months
+     * Get profiles where updated_at is older than specified months
      * Used by email bot to send verification reminders
+     * Only returns profiles for users with role 'alumni' or 'alumni_board'
      * 
      * @param int $months Number of months (default: 12)
      * @return array Array of outdated profiles
      */
     public static function getOutdatedProfiles(int $months = 12): array {
-        $db = Database::getContentDB();
-        $stmt = $db->prepare("
+        $contentDb = Database::getContentDB();
+        $userDb = Database::getConnection('user');
+        
+        // Fetch profiles where updated_at is older than specified months
+        // AND last reminder was either never sent OR sent more than specified months ago
+        $stmt = $contentDb->prepare("
             SELECT id, user_id, first_name, last_name, email, mobile_phone, 
                    linkedin_url, xing_url, industry, company, position, 
                    study_program, semester, angestrebter_abschluss, 
                    degree, graduation_year,
                    image_path, last_verified_at, last_reminder_sent_at, created_at, updated_at
             FROM alumni_profiles 
-            WHERE last_verified_at < DATE_SUB(NOW(), INTERVAL ? MONTH)
+            WHERE updated_at < DATE_SUB(NOW(), INTERVAL ? MONTH)
               AND (last_reminder_sent_at IS NULL OR last_reminder_sent_at < DATE_SUB(NOW(), INTERVAL ? MONTH))
-            ORDER BY last_verified_at ASC
+            ORDER BY updated_at ASC
         ");
         $stmt->execute([$months, $months]);
-        return $stmt->fetchAll();
+        $profiles = $stmt->fetchAll();
+        
+        // Filter profiles by user role (alumni or alumni_board only)
+        $result = [];
+        
+        if (!empty($profiles)) {
+            $userIds = array_column($profiles, 'user_id');
+            
+            try {
+                // Fetch all user roles in a single query
+                $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+                $userStmt = $userDb->prepare("SELECT id, role FROM users WHERE id IN ($placeholders)");
+                $userStmt->execute($userIds);
+                $userRoles = $userStmt->fetchAll(PDO::FETCH_KEY_PAIR); // id => role mapping
+                
+                // Filter profiles by role - only include 'alumni' or 'alumni_board'
+                foreach ($profiles as $profile) {
+                    $userId = $profile['user_id'];
+                    $userRole = $userRoles[$userId] ?? null;
+                    
+                    if (in_array($userRole, ['alumni', 'alumni_board'])) {
+                        $result[] = $profile;
+                    }
+                }
+            } catch (Exception $e) {
+                // Log error but continue
+                error_log("Error checking user roles in getOutdatedProfiles: " . $e->getMessage());
+            }
+        }
+        
+        return $result;
     }
     
     /**
