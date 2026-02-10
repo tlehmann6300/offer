@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/Event.php';
+require_once __DIR__ . '/../../includes/models/EventDocumentation.php';
 require_once __DIR__ . '/../../src/CalendarService.php';
 
 // Check authentication
@@ -86,6 +87,15 @@ if ($event['needs_helpers'] && $userRole !== 'alumni') {
 // Check if event signup has a deadline
 $signupDeadline = $event['start_time']; // Default to event start time
 $canCancel = strtotime($signupDeadline) > time();
+
+// Check if user can view documentation (board and alumni_board only)
+$canViewDocumentation = in_array($userRole, ['board', 'alumni_board']);
+
+// Load event documentation if user has permission
+$documentation = null;
+if ($canViewDocumentation) {
+    $documentation = EventDocumentation::getByEventId($eventId);
+}
 
 $title = htmlspecialchars($event['title']) . ' - Events';
 ob_start();
@@ -383,6 +393,70 @@ ob_start();
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
+    
+    <!-- Event Documentation Section (Board and Alumni Board Only) -->
+    <?php if ($canViewDocumentation): ?>
+        <div class="glass-card shadow-soft rounded-xl p-8 mt-6">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
+                <i class="fas fa-file-alt mr-2 text-purple-600"></i>
+                Dokumentation
+                <span class="text-sm font-normal text-gray-500 dark:text-gray-400 ml-2">(Nur für Vorstand sichtbar)</span>
+            </h2>
+            
+            <!-- Calculations Section -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-3">
+                    <i class="fas fa-calculator mr-2 text-blue-600"></i>
+                    Kalkulationen
+                </h3>
+                <textarea 
+                    id="calculations"
+                    rows="6"
+                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                    placeholder="Notieren Sie hier Kalkulationen, Kosten, Budget-Details..."
+                ><?php echo htmlspecialchars($documentation['calculations'] ?? ''); ?></textarea>
+            </div>
+            
+            <!-- Sales Data Section -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+                        <i class="fas fa-chart-line mr-2 text-green-600"></i>
+                        Verkaufsdaten
+                    </h3>
+                    <button 
+                        id="addSaleBtn"
+                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
+                    >
+                        <i class="fas fa-plus mr-2"></i>
+                        Verkauf hinzufügen
+                    </button>
+                </div>
+                
+                <!-- Sales Entries -->
+                <div id="salesEntries" class="space-y-3 mb-4">
+                    <!-- Sales entries will be rendered here by JavaScript -->
+                </div>
+                
+                <!-- Chart Display -->
+                <div class="bg-white dark:bg-gray-700 p-6 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Verkaufsübersicht</h4>
+                    <canvas id="salesChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+            
+            <!-- Save Button -->
+            <div class="flex justify-end">
+                <button 
+                    id="saveDocumentationBtn"
+                    class="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg hover:shadow-xl"
+                >
+                    <i class="fas fa-save mr-2"></i>
+                    Dokumentation speichern
+                </button>
+            </div>
+        </div>
+    <?php endif; ?>
 </div>
 
 <!-- Success/Error Message Container -->
@@ -502,7 +576,209 @@ function cancelSignup(signupId, message = 'Möchtest Du Deine Anmeldung wirklich
 function cancelHelperSlot(signupId) {
     cancelSignup(signupId, 'Möchtest Du Dich wirklich austragen?', 'Erfolgreich ausgetragen');
 }
+
+<?php if ($canViewDocumentation): ?>
+// ===== Event Documentation Management =====
+
+// Initialize sales data from PHP
+let salesData = <?php echo json_encode($documentation['sales_data'] ?? []); ?>;
+
+// Render sales entries
+function renderSalesEntries() {
+    const container = document.getElementById('salesEntries');
+    if (!container) return;
+    
+    if (salesData.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4">Keine Verkaufsdaten vorhanden. Klicken Sie auf "Verkauf hinzufügen".</p>';
+        return;
+    }
+    
+    container.innerHTML = salesData.map((sale, index) => `
+        <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-600 rounded-lg border border-gray-200 dark:border-gray-500">
+            <div class="flex-1 grid grid-cols-3 gap-4">
+                <div>
+                    <label class="text-xs text-gray-600 dark:text-gray-300 mb-1 block">Bezeichnung</label>
+                    <input 
+                        type="text" 
+                        value="${sale.label || ''}"
+                        onchange="updateSale(${index}, 'label', this.value)"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                        placeholder="z.B. Ticketverkauf"
+                    >
+                </div>
+                <div>
+                    <label class="text-xs text-gray-600 dark:text-gray-300 mb-1 block">Betrag (€)</label>
+                    <input 
+                        type="number" 
+                        step="0.01"
+                        value="${sale.amount || 0}"
+                        onchange="updateSale(${index}, 'amount', parseFloat(this.value))"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                    >
+                </div>
+                <div>
+                    <label class="text-xs text-gray-600 dark:text-gray-300 mb-1 block">Datum</label>
+                    <input 
+                        type="date" 
+                        value="${sale.date || ''}"
+                        onchange="updateSale(${index}, 'date', this.value)"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                    >
+                </div>
+            </div>
+            <button 
+                onclick="removeSale(${index})"
+                class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-all"
+                title="Löschen"
+            >
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+// Update a sale entry
+function updateSale(index, field, value) {
+    if (salesData[index]) {
+        salesData[index][field] = value;
+        updateChart();
+    }
+}
+
+// Add new sale entry
+document.getElementById('addSaleBtn')?.addEventListener('click', function() {
+    salesData.push({
+        label: '',
+        amount: 0,
+        date: new Date().toISOString().split('T')[0]
+    });
+    renderSalesEntries();
+    updateChart();
+});
+
+// Remove sale entry
+function removeSale(index) {
+    if (confirm('Diesen Verkauf wirklich löschen?')) {
+        salesData.splice(index, 1);
+        renderSalesEntries();
+        updateChart();
+    }
+}
+
+// Chart.js instance
+let salesChart = null;
+
+// Update chart with current sales data
+function updateChart() {
+    const canvas = document.getElementById('salesChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Destroy existing chart
+    if (salesChart) {
+        salesChart.destroy();
+    }
+    
+    // Prepare data for chart
+    const labels = salesData.map(s => s.label || 'Unbenannt');
+    const amounts = salesData.map(s => parseFloat(s.amount) || 0);
+    
+    // Create new chart
+    salesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels.length > 0 ? labels : ['Keine Daten'],
+            datasets: [{
+                label: 'Verkaufsbetrag (€)',
+                data: amounts.length > 0 ? amounts : [0],
+                backgroundColor: 'rgba(147, 51, 234, 0.5)',
+                borderColor: 'rgba(147, 51, 234, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toFixed(2) + ' €';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' €';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Save documentation
+document.getElementById('saveDocumentationBtn')?.addEventListener('click', function() {
+    const calculations = document.getElementById('calculations').value;
+    const eventId = <?php echo $eventId; ?>;
+    
+    // Disable button during save
+    this.disabled = true;
+    this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Wird gespeichert...';
+    
+    fetch('../../api/save_event_documentation.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            event_id: eventId,
+            calculations: calculations,
+            sales_data: salesData
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage('Dokumentation erfolgreich gespeichert', 'success');
+        } else {
+            showMessage(data.message || 'Fehler beim Speichern', 'error');
+        }
+    })
+    .catch(error => {
+        showMessage('Netzwerkfehler beim Speichern', 'error');
+    })
+    .finally(() => {
+        // Re-enable button
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-save mr-2"></i>Dokumentation speichern';
+    });
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    renderSalesEntries();
+    updateChart();
+});
+<?php endif; ?>
 </script>
+
+<!-- Load Chart.js from CDN (only if documentation is visible) -->
+<?php if ($canViewDocumentation): ?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<?php endif; ?>
+
+<script>
 
 <?php
 $content = ob_get_clean();
