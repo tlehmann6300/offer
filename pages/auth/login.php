@@ -14,6 +14,9 @@ require_once __DIR__ . '/../../includes/helpers.php';
 
 try {
     // 4. Logik in einem try-catch Block schützen
+    // 2FA timeout (5 minutes)
+    define('PENDING_2FA_TIMEOUT', 300);
+    
     // Redirect if already authenticated
     if (Auth::check()) {
         header('Location: ../dashboard/index.php');
@@ -58,7 +61,7 @@ try {
             }
         }
         // Step 2: 2FA verification
-        else if ($tfaCode !== null && isset($_SESSION['pending_2fa'])) {
+        elseif ($tfaCode !== null && isset($_SESSION['pending_2fa'])) {
             $userId = $_SESSION['pending_2fa']['user_id'];
             
             // Fetch user by ID from database
@@ -90,7 +93,7 @@ try {
     } else {
         // GET request - check if there's a pending 2FA session
         if (isset($_SESSION['pending_2fa'])) {
-            if (time() - $_SESSION['pending_2fa']['timestamp'] > 300) {
+            if (time() - $_SESSION['pending_2fa']['timestamp'] > PENDING_2FA_TIMEOUT) {
                 unset($_SESSION['pending_2fa']);
                 $error = '2FA-Sitzung abgelaufen. Bitte melden Sie sich erneut an.';
             } else {
