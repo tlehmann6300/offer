@@ -40,9 +40,9 @@ if (!isset($_GET['token']) || empty($_GET['token'])) {
     }
 }
 
-// Redirect to profile with message using BASE_URL for security
+// Redirect to settings page with message using BASE_URL for security
 $baseUrl = defined('BASE_URL') ? BASE_URL : '';
-$redirectUrl = $baseUrl . '/pages/auth/profile.php';
+$redirectUrl = $baseUrl . '/pages/auth/settings.php';
 if (!empty($success)) {
     $_SESSION['success_message'] = $success;
 } elseif (!empty($error)) {

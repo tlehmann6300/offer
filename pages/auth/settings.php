@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/helpers.php';
 require_once __DIR__ . '/../../includes/models/User.php';
+require_once __DIR__ . '/../../src/MailService.php';
 
 if (!Auth::check()) {
     header('Location: login.php');
@@ -11,6 +12,16 @@ if (!Auth::check()) {
 $user = Auth::user();
 $message = '';
 $error = '';
+
+// Check for session messages (from email confirmation, etc.)
+if (isset($_SESSION['success_message'])) {
+    $message = $_SESSION['success_message'];
+    unset($_SESSION['success_message']);
+}
+if (isset($_SESSION['error_message'])) {
+    $error = $_SESSION['error_message'];
+    unset($_SESSION['error_message']);
+}
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -23,18 +34,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Generate token and save to email_change_requests
                 $token = User::createEmailChangeRequest($user['id'], $newEmail);
                 
-                // Create confirmation link using BASE_URL for security
-                $baseUrl = defined('BASE_URL') ? BASE_URL : '';
-                $confirmLink = $baseUrl . '/api/confirm_email.php?token=' . urlencode($token);
+                // Send confirmation email to new address
+                $emailSent = MailService::sendEmailChangeConfirmation($newEmail, $token);
                 
-                // TODO: Send email to new address with confirmation link
-                // For now, we'll just show a message
-                // In production, use PHPMailer or similar to send email
-                
-                $message = 'Bestätigungslink an neue E-Mail gesendet. Bitte überprüfe dein Postfach.';
-                
-                // Log the action
-                error_log("Email change confirmation link: $confirmLink");
+                if ($emailSent) {
+                    $message = 'Bestätigungslink an neue E-Mail gesendet. Bitte überprüfe dein Postfach.';
+                } else {
+                    // Email sending failed, but token is created
+                    // Log the link for testing/debugging purposes
+                    $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+                    $confirmLink = $baseUrl . '/api/confirm_email.php?token=' . urlencode($token);
+                    error_log("Email sending failed. Confirmation link: $confirmLink");
+                    
+                    $message = 'E-Mail-Änderung wurde beantragt, aber die Bestätigungsmail konnte nicht versendet werden. Bitte kontaktiere den Administrator.';
+                }
             } catch (Exception $e) {
                 // Catch exceptions like 'E-Mail vergeben' or validation errors
                 $error = $e->getMessage();
