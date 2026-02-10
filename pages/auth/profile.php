@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             
-            // Update user fields (gender, birthday) in users table
+            // Update user fields (about_me, gender, birthday) in users table
             $userUpdateData = [];
             if (isset($profileData['gender'])) {
                 $userUpdateData['gender'] = $profileData['gender'];
@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if (!empty($userUpdateData)) {
                 require_once __DIR__ . '/../../includes/models/User.php';
-                User::update($user['id'], $userUpdateData);
+                User::updateProfile($user['id'], $userUpdateData);
             }
             
             // Add role-specific fields based on user role
