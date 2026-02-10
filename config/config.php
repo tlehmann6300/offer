@@ -111,7 +111,7 @@ function sanitize_http_host($host) {
     }
     
     // Prevent dots at start or end (invalid hostname format)
-    if ($host[0] === '.' || $host[strlen($host) - 1] === '.') {
+    if (strlen($host) > 0 && ($host[0] === '.' || $host[strlen($host) - 1] === '.')) {
         return null;
     }
     
