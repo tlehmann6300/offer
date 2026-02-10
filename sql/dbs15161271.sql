@@ -557,6 +557,7 @@ CREATE TABLE IF NOT EXISTS event_documentation (
     calculations TEXT DEFAULT NULL,
     notes TEXT DEFAULT NULL,
     created_by INT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
     UNIQUE KEY unique_event_doc (event_id)
