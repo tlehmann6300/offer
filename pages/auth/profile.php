@@ -48,7 +48,7 @@ if (!$profile) {
         'mobile_phone' => '',
         'linkedin_url' => '',
         'xing_url' => '',
-        'about_me' => '',
+        'about_me' => $user['about_me'] ?? '',
         'image_path' => '',
         'study_program' => '',
         'semester' => null,  // Numeric value, null when not set
@@ -60,9 +60,10 @@ if (!$profile) {
         'birthday' => $user['birthday'] ?? ''
     ];
 } else {
-    // Ensure gender and birthday from users table are included
+    // Ensure gender, birthday, and about_me from users table are included
     $profile['gender'] = $user['gender'] ?? ($profile['gender'] ?? '');
     $profile['birthday'] = $user['birthday'] ?? ($profile['birthday'] ?? '');
+    $profile['about_me'] = $user['about_me'] ?? ($profile['about_me'] ?? '');
 }
 
 // Handle 2FA setup
@@ -473,7 +474,7 @@ ob_start();
                             type="text" 
                             name="bachelor_studiengang" 
                             required
-                            value="<?php echo htmlspecialchars($profile['studiengang'] ?? ''); ?>"
+                            value="<?php echo htmlspecialchars($profile['study_program'] ?? ''); ?>"
                             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="z.B. Wirtschaftsingenieurwesen"
                         >
@@ -526,7 +527,7 @@ ob_start();
                             type="text" 
                             name="bachelor_studiengang" 
                             required
-                            value="<?php echo htmlspecialchars($profile['studiengang'] ?? ''); ?>"
+                            value="<?php echo htmlspecialchars($profile['study_program'] ?? ''); ?>"
                             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="z.B. Wirtschaftsingenieurwesen"
                         >
