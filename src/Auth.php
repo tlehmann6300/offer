@@ -305,16 +305,15 @@ class Auth {
      * Check if user can access a specific page/menu item
      * Centralizes permission logic for sidebar menu
      * 
-     * @param string $pageKey Page identifier (e.g., 'members', 'invoices', 'ideas', 'training_requests')
+     * @param string $page Page identifier (e.g., 'members', 'invoices', 'ideas', 'training_requests')
      * @return bool True if user has permission to access the page
      */
-    public static function canAccessPage($pageKey) {
+    public static function canAccessPage($page) {
         if (!self::check()) {
             return false;
         }
         
         $userRole = $_SESSION['user_role'] ?? '';
-        $isBoardRole = self::isBoardMember();
         
         // Define page access permissions
         $pagePermissions = [
@@ -325,12 +324,12 @@ class Auth {
         ];
         
         // Check if page exists in permissions map
-        if (!isset($pagePermissions[$pageKey])) {
+        if (!isset($pagePermissions[$page])) {
             return false;
         }
         
         // Check if user's role is in the allowed roles for this page
-        return in_array($userRole, $pagePermissions[$pageKey]);
+        return in_array($userRole, $pagePermissions[$page]);
     }
     
     /**
