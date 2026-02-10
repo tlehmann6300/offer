@@ -77,6 +77,38 @@ class User {
     }
 
     /**
+     * Update user profile fields (about_me, gender, birthday)
+     * @param int $id The user ID
+     * @param array $data Profile data to update (about_me, gender, birthday)
+     * @return bool Returns true on success
+     */
+    public static function updateProfile($id, $data) {
+        $db = Database::getUserDB();
+        $fields = [];
+        $values = [];
+        
+        // Only allow specific profile fields to be updated
+        $allowedFields = ['about_me', 'gender', 'birthday'];
+        
+        foreach ($allowedFields as $field) {
+            if (array_key_exists($field, $data)) {
+                $fields[] = "$field = ?";
+                $values[] = $data[$field];
+            }
+        }
+        
+        if (empty($fields)) {
+            return true; // No fields to update
+        }
+        
+        $values[] = $id;
+        $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ?";
+        
+        $stmt = $db->prepare($sql);
+        return $stmt->execute($values);
+    }
+
+    /**
      * Delete user
      */
     public static function delete($id) {
