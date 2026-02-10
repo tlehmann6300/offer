@@ -933,6 +933,41 @@ class MailService {
     }
     
     /**
+     * Send email change confirmation email
+     * 
+     * @param string $toEmail New email address to send confirmation to
+     * @param string $token Confirmation token
+     * @return bool Success status
+     */
+    public static function sendEmailChangeConfirmation($toEmail, $token) {
+        if (self::isVendorMissing()) {
+            error_log("Cannot send email change confirmation: Composer vendor missing");
+            return false;
+        }
+        
+        $subject = "E-Mail-Adresse bestätigen - IBC Intranet";
+        
+        // Build confirmation link
+        $confirmLink = BASE_URL . '/api/confirm_email.php?token=' . urlencode($token);
+        
+        // Build body content
+        $bodyContent = '<p class="email-text">Hallo,</p>
+        <p class="email-text">du hast eine Änderung deiner E-Mail-Adresse im IBC Intranet beantragt.</p>
+        <p class="email-text">Um die neue E-Mail-Adresse zu bestätigen und die Änderung abzuschließen, klicke bitte auf den folgenden Button:</p>';
+        
+        // Create call-to-action button
+        $callToAction = '<a href="' . htmlspecialchars($confirmLink) . '" class="button">E-Mail-Adresse bestätigen</a>';
+        
+        $bodyContent .= '<p class="email-text" style="margin-top: 20px; font-size: 14px; color: #6b7280;">Dieser Bestätigungslink ist 24 Stunden gültig. Falls du diese Änderung nicht beantragt hast, ignoriere diese E-Mail einfach.</p>';
+        
+        // Get complete HTML template
+        $htmlBody = self::getTemplate('E-Mail-Adresse bestätigen', $bodyContent, $callToAction);
+        
+        // Send email without attachment but with embedded logo (has its own exception handling)
+        return self::sendEmailWithEmbeddedImage($toEmail, $subject, $htmlBody);
+    }
+    
+    /**
      * Send email with file attachment from file path
      * 
      * @param string $toEmail Recipient email address
