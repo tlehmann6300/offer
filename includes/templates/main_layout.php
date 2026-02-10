@@ -331,14 +331,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </a>
 
                 <!-- Mitglieder (Board, Head, Member, Candidate) -->
-                <?php 
-                $isBoardRole = Auth::isBoardMember();
-                $canSeeMitglieder = isset($_SESSION['user_role']) && (
-                    $isBoardRole || 
-                    in_array($_SESSION['user_role'], ['head', 'member', 'candidate'])
-                );
-                ?>
-                <?php if ($canSeeMitglieder): ?>
+                <?php if (Auth::canAccessPage('members')): ?>
                 <a href="<?php echo asset('pages/members/index.php'); ?>" 
                    class="flex items-center px-6 py-2 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/members/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-users w-5 mr-3"></i>
@@ -390,13 +383,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </a>
 
                 <!-- Rechnungen (Board roles, Alumni, Alumni-Board, Honorary Member) -->
-                <?php 
-                $canSeeInvoices = isset($_SESSION['user_role']) && (
-                    $isBoardRole ||
-                    in_array($_SESSION['user_role'], ['alumni', 'alumni_board', 'honorary_member'])
-                );
-                ?>
-                <?php if ($canSeeInvoices): ?>
+                <?php if (Auth::canAccessPage('invoices')): ?>
                 <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
                    class="flex items-center px-6 py-2 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-file-invoice-dollar w-5 mr-3"></i>
@@ -405,13 +392,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <?php endif; ?>
 
                 <!-- Ideenbox (Members, Candidates, Head, Board) -->
-                <?php 
-                $canSeeIdeas = isset($_SESSION['user_role']) && (
-                    $isBoardRole ||
-                    in_array($_SESSION['user_role'], ['member', 'candidate', 'head'])
-                );
-                ?>
-                <?php if ($canSeeIdeas): ?>
+                <?php if (Auth::canAccessPage('ideas')): ?>
                 <a href="<?php echo asset('pages/ideas/index.php'); ?>" 
                    class="flex items-center px-6 py-2 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/ideas/') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-lightbulb w-5 mr-3"></i>
@@ -420,12 +401,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <?php endif; ?>
 
                 <!-- Schulungsanfrage (Alumni, Alumni-Board) -->
-                <?php 
-                $canSeeTrainingRequests = isset($_SESSION['user_role']) && (
-                    in_array($_SESSION['user_role'], ['alumni', 'alumni_board'])
-                );
-                ?>
-                <?php if ($canSeeTrainingRequests): ?>
+                <?php if (Auth::canAccessPage('training_requests')): ?>
                 <a href="<?php echo asset('pages/alumni/requests.php'); ?>" 
                    class="flex items-center px-6 py-2 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/alumni/requests.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-chalkboard-teacher w-5 mr-3"></i>
@@ -434,7 +410,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <?php endif; ?>
 
                 <!-- Benutzer (Board roles ONLY) -->
-                <?php if ($isBoardRole): ?>
+                <?php if (Auth::isBoardMember()): ?>
                 <a href="<?php echo asset('pages/admin/users.php'); ?>" 
                    class="flex items-center px-6 py-2 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/users.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-users-cog w-5 mr-3"></i>
@@ -443,7 +419,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <?php endif; ?>
 
                 <!-- Einstellungen (Board roles ONLY) -->
-                <?php if ($isBoardRole): ?>
+                <?php if (Auth::isBoardMember()): ?>
                 <a href="<?php echo asset('pages/auth/settings.php'); ?>" 
                    class="flex items-center px-6 py-2 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/auth/settings.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-cog w-5 mr-3"></i>
@@ -452,7 +428,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <?php endif; ?>
 
                 <!-- Statistiken (Board roles ONLY) -->
-                <?php if ($isBoardRole): ?>
+                <?php if (Auth::isBoardMember()): ?>
                 <a href="<?php echo asset('pages/admin/stats.php'); ?>" 
                    class="flex items-center px-6 py-2 hover:bg-gray-800 hover:text-white transition-colors duration-200 <?php echo isActivePath('/admin/stats.php') ? 'bg-gray-800 text-white border-r-4 border-purple-500' : ''; ?>">
                     <i class="fas fa-chart-bar w-5 mr-3"></i>

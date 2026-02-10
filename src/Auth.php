@@ -302,6 +302,37 @@ class Auth {
     }
     
     /**
+     * Check if user can access a specific page/menu item
+     * Centralizes permission logic for sidebar menu
+     * 
+     * @param string $page Page identifier (e.g., 'members', 'invoices', 'ideas', 'training_requests')
+     * @return bool True if user has permission to access the page
+     */
+    public static function canAccessPage($page) {
+        if (!self::check()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        
+        // Define page access permissions
+        $pagePermissions = [
+            'members' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate'],
+            'invoices' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni', 'alumni_board', 'honorary_member'],
+            'ideas' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'member', 'candidate', 'head'],
+            'training_requests' => ['alumni', 'alumni_board']
+        ];
+        
+        // Check if page exists in permissions map
+        if (!isset($pagePermissions[$page])) {
+            return false;
+        }
+        
+        // Check if user's role is in the allowed roles for this page
+        return in_array($userRole, $pagePermissions[$page]);
+    }
+    
+    /**
      * Get current user data
      * 
      * @return array|null User data or null if not authenticated
