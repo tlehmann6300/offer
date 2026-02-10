@@ -17,6 +17,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -278,7 +279,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         }
     </style>
 </head>
-<body class="bg-gray-50" data-user-theme="<?php echo htmlspecialchars($currentUser['theme_preference'] ?? 'auto'); ?>">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100" data-user-theme="<?php echo htmlspecialchars($currentUser['theme_preference'] ?? 'auto'); ?>">
     <script>
         // Apply theme immediately to prevent flash of unstyled content (FOUC)
         (function() {
@@ -286,12 +287,12 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             const savedTheme = localStorage.getItem('theme') || userTheme;
             
             if (savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
+                document.body.classList.add('dark-mode', 'dark');
             } else if (savedTheme === 'light') {
-                document.body.classList.remove('dark-mode');
+                document.body.classList.remove('dark-mode', 'dark');
             } else { // auto
                 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.body.classList.add('dark-mode');
+                    document.body.classList.add('dark-mode', 'dark');
                 }
             }
         })();
@@ -675,24 +676,24 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         // Apply theme based on preference
         function applyTheme(theme) {
             if (theme === 'dark') {
-                document.body.classList.add('dark-mode');
+                document.body.classList.add('dark-mode', 'dark');
                 themeIcon.classList.remove('fa-moon');
                 themeIcon.classList.add('fa-sun');
                 themeText.textContent = 'Hellmodus';
             } else if (theme === 'light') {
-                document.body.classList.remove('dark-mode');
+                document.body.classList.remove('dark-mode', 'dark');
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
                 themeText.textContent = 'Dunkelmodus';
             } else { // auto
                 // Check system preference
                 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.body.classList.add('dark-mode');
+                    document.body.classList.add('dark-mode', 'dark');
                     themeIcon.classList.remove('fa-moon');
                     themeIcon.classList.add('fa-sun');
                     themeText.textContent = 'Hellmodus';
                 } else {
-                    document.body.classList.remove('dark-mode');
+                    document.body.classList.remove('dark-mode', 'dark');
                     themeIcon.classList.remove('fa-sun');
                     themeIcon.classList.add('fa-moon');
                     themeText.textContent = 'Dunkelmodus';
@@ -705,18 +706,22 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         
         // Toggle theme on button click
         themeToggle?.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
             
-            if (document.body.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark');
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-                themeText.textContent = 'Hellmodus';
-            } else {
+            if (isDarkMode) {
+                // Switch to light mode
+                document.body.classList.remove('dark-mode', 'dark');
                 localStorage.setItem('theme', 'light');
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
                 themeText.textContent = 'Dunkelmodus';
+            } else {
+                // Switch to dark mode
+                document.body.classList.add('dark-mode', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeText.textContent = 'Hellmodus';
             }
         });
         
