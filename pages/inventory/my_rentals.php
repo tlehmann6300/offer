@@ -13,7 +13,7 @@ function getUserRentals($userId, $includeReturned = false) {
     $sql = "
         SELECT r.*, i.name as item_name, i.unit, i.image_path
         FROM rentals r
-        JOIN inventory i ON r.item_id = i.id
+        JOIN inventory_items i ON r.item_id = i.id
         WHERE r.user_id = ?
     ";
     
