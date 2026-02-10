@@ -214,9 +214,9 @@ class Member {
         $currentUser = Auth::user();
         $currentRole = $currentUser['role'] ?? '';
         
+        // Members and candidates can update their own profile
         // Board (all types), head, and admin can update any profile
-        // Candidates can only update their own profile
-        if ($currentRole === 'candidate') {
+        if (in_array($currentRole, ['member', 'candidate'])) {
             if ($currentUser['id'] !== $userId) {
                 throw new Exception("Keine Berechtigung zum Aktualisieren anderer Mitgliederprofile");
             }
@@ -239,7 +239,7 @@ class Member {
         $allowedFields = [
             'first_name', 'last_name', 'email', 'mobile_phone',
             'linkedin_url', 'xing_url', 'industry', 'company', 
-            'position', 'study_program', 'semester', 
+            'position', 'image_path', 'study_program', 'semester', 
             'angestrebter_abschluss', 'degree', 'graduation_year'
         ];
         
