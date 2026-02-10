@@ -57,6 +57,14 @@ try {
     $emailsSent = 0;
     $emailsFailed = 0;
     
+    // Log cron execution start
+    try {
+        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
+        $stmt->execute([0, 'cron_birthday_wishes', "Started: Found {$totalUsers} user(s) with birthday today"]);
+    } catch (Exception $e) {
+        // Ignore logging errors
+    }
+    
     // Loop through users and send birthday emails
     foreach ($birthdayUsers as $user) {
         $userId = $user['id'];
@@ -110,8 +118,27 @@ try {
     echo "Emails failed: {$emailsFailed}\n";
     echo "Completed at: " . date('Y-m-d H:i:s') . "\n";
     
+    // Log cron execution completion
+    try {
+        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
+        $logDetails = "Completed: Total={$totalUsers}, Sent={$emailsSent}, Failed={$emailsFailed}";
+        $stmt->execute([0, 'cron_birthday_wishes', $logDetails]);
+    } catch (Exception $e) {
+        // Ignore logging errors
+    }
+    
 } catch (Exception $e) {
     echo "FATAL ERROR: " . $e->getMessage() . "\n";
     echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
+    
+    // Log error
+    try {
+        $contentDb = Database::getContentDB();
+        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
+        $stmt->execute([0, 'cron_birthday_wishes', "ERROR: " . $e->getMessage()]);
+    } catch (Exception $logError) {
+        // Ignore logging errors
+    }
+    
     exit(1);
 }

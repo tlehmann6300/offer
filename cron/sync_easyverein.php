@@ -15,12 +15,24 @@
 
 // Load required files
 require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../src/Database.php';
 require_once __DIR__ . '/../includes/database.php';
 require_once __DIR__ . '/../includes/services/EasyVereinSync.php';
 
 // Output start message
 echo "=== EasyVerein Inventory Synchronization ===\n";
 echo "Started at: " . date('Y-m-d H:i:s') . "\n\n";
+
+// Get database connection for logging
+$contentDb = Database::getContentDB();
+
+// Log cron execution start
+try {
+    $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
+    $stmt->execute([0, 'cron_easyverein_sync', "Started synchronization"]);
+} catch (Exception $e) {
+    // Ignore logging errors
+}
 
 try {
     // Create an instance of the sync service
@@ -45,9 +57,31 @@ try {
         echo "\nSynchronization completed successfully!\n";
     }
     
+    // Log cron execution completion
+    try {
+        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
+        $logDetails = "Completed: Created={$result['created']}, Updated={$result['updated']}, Archived={$result['archived']}";
+        if (!empty($result['errors'])) {
+            $logDetails .= ", Errors=" . count($result['errors']);
+        }
+        $stmt->execute([0, 'cron_easyverein_sync', $logDetails]);
+    } catch (Exception $e) {
+        // Ignore logging errors
+    }
+    
 } catch (Exception $e) {
     echo "\nFATAL ERROR: " . $e->getMessage() . "\n";
     echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
+    
+    // Log error
+    try {
+        $contentDb = Database::getContentDB();
+        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
+        $stmt->execute([0, 'cron_easyverein_sync', "ERROR: " . $e->getMessage()]);
+    } catch (Exception $logError) {
+        // Ignore logging errors
+    }
+    
     exit(1);
 }
 
