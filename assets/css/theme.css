@@ -515,3 +515,56 @@ body.dark-mode .shadow {
 body:not(.dark) {
     color: #1f2937 !important;
 }
+
+/* GLOBALER KONTRAST-FIX */
+/* Light Mode: Alles erzwingen dunkel zu sein, außer es ist explizit hell gewollt */
+body:not(.dark-mode) h1,
+body:not(.dark-mode) h2,
+body:not(.dark-mode) h3,
+body:not(.dark-mode) p,
+body:not(.dark-mode) li,
+body:not(.dark-mode) span:not(.badge):not(.btn-primary):not(.text-white),
+body:not(.dark-mode) label,
+body:not(.dark-mode) input,
+body:not(.dark-mode) select,
+body:not(.dark-mode) textarea {
+    color: #111827 !important; /* Fast Schwarz */
+}
+
+/* Light Mode: Kartenhintergrund sicherstellen */
+body:not(.dark-mode) .card {
+    background-color: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* Dark Mode: Alles erzwingen hell zu sein */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode p,
+body.dark-mode li,
+body.dark-mode span:not(.badge):not(.text-black),
+body.dark-mode label {
+    color: #f3f4f6 !important; /* Fast Weiß */
+}
+
+/* Dark Mode Inputs fixen */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+    border-color: #4b5563 !important;
+}
+
+/* Dark Mode Links (außer Buttons) */
+body.dark-mode a:not(.btn):not(.btn-primary):not(.nav-link) {
+    color: #60a5fa !important; /* Helles Blau für Links */
+}
+
+/* Sidebar Ausnahme */
+body:not(.dark-mode) .sidebar a,
+body:not(.dark-mode) .sidebar span,
+body:not(.dark-mode) .sidebar i {
+    color: #ffffff !important;
+}
