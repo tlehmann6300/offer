@@ -87,13 +87,77 @@ define('INVOICE_NOTIFICATION_EMAIL', $env['INVOICE_NOTIFICATION_EMAIL'] ?? 'tleh
 // EasyVerein API Configuration
 define('EASYVEREIN_API_TOKEN', $env['EASYVEREIN_API_TOKEN'] ?? '');
 
-// Define BASE_URL dynamically if not in .env
+/**
+ * Sanitize HTTP_HOST to prevent injection attacks
+ * Only allows alphanumeric characters, dots, colons, and hyphens
+ * 
+ * @param string $host The host string to sanitize
+ * @return string|null Sanitized host or null if invalid
+ */
+function sanitize_http_host($host) {
+    if (empty($host)) {
+        return null;
+    }
+    
+    // Only allow alphanumeric, dots, colons, and hyphens (for valid hostnames and ports)
+    // This prevents XSS and injection via malicious headers
+    if (!preg_match('/^[a-zA-Z0-9.\-:]+$/', $host)) {
+        return null;
+    }
+    
+    // Additional validation: Prevent consecutive dots
+    if (strpos($host, '..') !== false) {
+        return null;
+    }
+    
+    // Prevent dots at start or end (invalid hostname format)
+    if (strlen($host) > 0 && ($host[0] === '.' || $host[strlen($host) - 1] === '.')) {
+        return null;
+    }
+    
+    // If there's a port, validate the port is at the end and numeric
+    if (strpos($host, ':') !== false) {
+        $parts = explode(':', $host);
+        // Should only have one colon (host:port)
+        // Note: IPv6 addresses in brackets are not supported
+        if (count($parts) !== 2) {
+            return null;
+        }
+        // Port should be numeric and in valid range (1-65535)
+        if (!ctype_digit($parts[1])) {
+            return null;
+        }
+        $port = (int)$parts[1];
+        if ($port < 1 || $port > 65535) {
+            return null;
+        }
+    }
+    
+    return $host;
+}
+
+// Define BASE_URL with security considerations
 if (isset($env['BASE_URL'])) {
     define('BASE_URL', $env['BASE_URL']);
 } else {
-    $protocol = (isset($_SERVER['HTTPS']) ? 'https' : 'http');
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    define('BASE_URL', $protocol . '://' . $host . '/intra');
+    $environment = $env['ENVIRONMENT'] ?? 'development';
+    
+    if ($environment === 'production') {
+        // SECURITY: In production, BASE_URL MUST be defined in .env
+        // Never fall back to HTTP_HOST to prevent Host Header Injection attacks
+        throw new RuntimeException('BASE_URL must be defined in .env for production environment');
+    } else {
+        // Development environment: Allow fallback but sanitize HTTP_HOST
+        $protocol = (isset($_SERVER['HTTPS']) ? 'https' : 'http');
+        $host = sanitize_http_host($_SERVER['HTTP_HOST'] ?? '');
+        
+        if ($host === null) {
+            // If HTTP_HOST is invalid or missing, use localhost as safe fallback
+            $host = 'localhost';
+        }
+        
+        define('BASE_URL', $protocol . '://' . $host . '/intra');
+    }
 }
 
 // Application Settings
