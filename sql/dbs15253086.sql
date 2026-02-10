@@ -26,6 +26,10 @@ CREATE TABLE IF NOT EXISTS users (
     theme_preference VARCHAR(10) DEFAULT 'auto',
     birthday DATE DEFAULT NULL COMMENT 'User birthday for birthday wishes',
     gender ENUM('m', 'f', 'd') DEFAULT NULL COMMENT 'User gender: m=male, f=female, d=diverse',
+    about_me VARCHAR(400) DEFAULT NULL,
+    study_level ENUM('bachelor', 'master') DEFAULT NULL,
+    study_program VARCHAR(255) DEFAULT NULL,
+    study_status ENUM('current', 'completed') DEFAULT 'current',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
