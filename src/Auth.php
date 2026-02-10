@@ -283,6 +283,10 @@ class Auth {
         
         // If user not found in database (zombie session), destroy session and return null
         if ($result === false) {
+            // Log zombie session detection for security monitoring
+            error_log("Zombie session detected: User ID " . ($_SESSION['user_id'] ?? 'unknown') . 
+                      " not found in database. IP: " . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+            
             self::logout();
             return null;
         }
