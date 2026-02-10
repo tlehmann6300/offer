@@ -4,8 +4,6 @@
 
 -- Note: gender and birthday fields already exist in the users table
 
-USE dbs15253086;
-
 -- Add about_me field if it doesn't exist
 SET @dbname = DATABASE();
 SET @tablename = 'users';
