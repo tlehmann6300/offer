@@ -547,3 +547,18 @@ CREATE TABLE IF NOT EXISTS system_logs (
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
   COMMENT='System-wide audit log for security and tracking';
+
+-- ============================================
+-- EVENT DOCUMENTATION TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS event_documentation (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id INT UNSIGNED NOT NULL,
+    calculations TEXT DEFAULT NULL,
+    notes TEXT DEFAULT NULL,
+    created_by INT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_event_doc (event_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
