@@ -363,7 +363,7 @@ $currentTime = date('Y-m-d H:i:s');
         </div>
         
         <div class="footer">
-            <p>📄 Weitere Informationen zur Einrichtung finden Sie in der <a href="CRON_SETUP.md" target="_blank">CRON_SETUP.md</a></p>
+            <p>📄 Weitere Informationen zur Einrichtung finden Sie in der <a href="CRON_SETUP.md" target="_blank" rel="noopener noreferrer">CRON_SETUP.md</a></p>
         </div>
     </div>
 </body>

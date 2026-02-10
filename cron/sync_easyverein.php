@@ -73,9 +73,11 @@ try {
     echo "\nFATAL ERROR: " . $e->getMessage() . "\n";
     echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
     
-    // Log error
+    // Log error (reuse existing contentDb or create new connection if not available)
     try {
-        $contentDb = Database::getContentDB();
+        if (!isset($contentDb)) {
+            $contentDb = Database::getContentDB();
+        }
         $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
         $stmt->execute([0, 'cron_easyverein_sync', "ERROR: " . $e->getMessage()]);
     } catch (Exception $logError) {

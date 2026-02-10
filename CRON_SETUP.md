@@ -137,7 +137,7 @@ which php
 Nutzen Sie das `check_cron_status.php` Skript im Browser, um zu überprüfen, wann die Cron Jobs zuletzt ausgeführt wurden:
 
 ```
-https://ihr-domain.de/check_cron_status.php
+https://ihre-domain.de/check_cron_status.php
 ```
 
 Das Skript zeigt die letzte Ausführungszeit jedes Cron Jobs und etwaige Fehler an.
