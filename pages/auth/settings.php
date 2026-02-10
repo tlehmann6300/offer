@@ -408,7 +408,7 @@ document.querySelectorAll('input[name="theme"]').forEach(radio => {
 // Role change and succession logic
 <?php if (Auth::isBoardMember()): ?>
 const currentRole = '<?php echo $user['role']; ?>';
-const boardRoles = ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht'];
+const boardRoles = <?php echo json_encode(Auth::BOARD_ROLES); ?>;
 const modal = document.getElementById('successionModal');
 const newRoleSelect = document.getElementById('newRoleSelect');
 const changeRoleBtn = document.getElementById('changeRoleBtn');

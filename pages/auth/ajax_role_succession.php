@@ -13,6 +13,9 @@ require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../src/Database.php';
 require_once __DIR__ . '/../../includes/models/User.php';
 
+// Redirect path after successful role change
+define('REDIRECT_AFTER_ROLE_CHANGE', '/pages/dashboard/index.php');
+
 try {
     // Check authentication
     if (!Auth::check()) {
@@ -123,7 +126,7 @@ try {
             echo json_encode([
                 'success' => true,
                 'message' => 'Rollenwechsel erfolgreich durchgeführt',
-                'redirect' => '/pages/dashboard/index.php'
+                'redirect' => REDIRECT_AFTER_ROLE_CHANGE
             ]);
             
         } catch (Exception $e) {
@@ -143,7 +146,7 @@ try {
             echo json_encode([
                 'success' => true,
                 'message' => 'Rolle erfolgreich geändert',
-                'redirect' => '/pages/dashboard/index.php'
+                'redirect' => REDIRECT_AFTER_ROLE_CHANGE
             ]);
         } else {
             echo json_encode([
