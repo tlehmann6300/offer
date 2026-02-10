@@ -103,25 +103,35 @@ body {
     color: var(--text-muted);
 }
 
-/* Fix Tables */
+.dark-mode input:disabled,
+.dark-mode select:disabled,
+.dark-mode textarea:disabled {
+    background-color: #1f2937 !important;
+    color: #6b7280 !important;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Fix Tables - Improved contrast */
 .dark-mode th {
-    background-color: #111827 !important;
+    background-color: #1f2937 !important;
     color: #ffffff !important;
+    border-color: #374151 !important;
 }
 
 .dark-mode td {
-    color: #e5e7eb !important;
+    color: #f3f4f6 !important;
     border-bottom-color: #374151 !important;
 }
 
 /* Fix Sidebar Text */
 .dark-mode .sidebar a {
-    color: var(--text-muted) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
 }
 
 .dark-mode .sidebar a:hover {
-    color: var(--text-main) !important;
-    background-color: #374151;
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 body.dark-mode main {
@@ -158,14 +168,14 @@ body.dark-mode table {
 }
 
 body.dark-mode th {
-    background-color: #111827 !important;
+    background-color: #1f2937 !important;
     color: #ffffff !important;
     font-weight: 600;
 }
 
 body.dark-mode td {
     border-color: var(--border-color);
-    color: #e5e7eb !important;
+    color: #f3f4f6 !important;
 }
 
 /* Input Styles - Light Mode */
@@ -175,11 +185,21 @@ textarea {
     background-color: var(--bg-card);
     color: var(--text-main);
     border-color: var(--ibc-gray-300);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 input::placeholder,
 textarea::placeholder {
     color: var(--ibc-gray-400);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background-color: var(--ibc-gray-100);
+    color: var(--ibc-gray-500);
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* Light Mode - Explicit Text Colors */
@@ -498,26 +518,59 @@ body.dark-mode .shadow {
     box-shadow: -5px 0 0 rgba(0, 166, 81, 0.1), 5px 0 0 rgba(0, 166, 81, 0.1);
 }
 
-/* Fix für Inputs im Dark Mode */
-.dark input, .dark textarea, .dark select {
-    background-color: #1f2937 !important; /* dunkelgrau */
-    color: #f3f4f6 !important; /* fast weiß */
-    border-color: #374151 !important;
+/* Flatpickr Dark Mode Support */
+body.dark-mode .flatpickr-calendar {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* Fix für Karten-Hintergründe, falls sie weiß bleiben */
-.dark .card, .dark .bg-white {
-    background-color: #111827 !important; /* sehr dunkel */
-    color: #e5e7eb !important;
+body.dark-mode .flatpickr-months {
+    background: var(--ibc-blue-dark);
 }
 
-/* Erzwinge dunklen Text auf hellem Grund im Light Mode */
-body:not(.dark) {
-    color: #1f2937 !important;
+body.dark-mode .flatpickr-weekdays {
+    background: var(--ibc-blue-dark);
 }
 
-/* GLOBALER KONTRAST-FIX */
-/* Light Mode: Alles erzwingen dunkel zu sein, außer es ist explizit hell gewollt */
+body.dark-mode .flatpickr-days,
+body.dark-mode .flatpickr-day {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .flatpickr-day:hover:not(.selected):not(.startRange):not(.endRange) {
+    background: var(--ibc-green-dark);
+    border-color: var(--ibc-green-dark);
+    color: white;
+}
+
+body.dark-mode .flatpickr-day.today {
+    border-color: var(--ibc-blue-light);
+}
+
+body.dark-mode .flatpickr-day.disabled,
+body.dark-mode .flatpickr-day.disabled:hover {
+    color: var(--ibc-gray-600);
+}
+
+body.dark-mode .flatpickr-time {
+    border-top-color: var(--border-color);
+}
+
+body.dark-mode .flatpickr-time input {
+    background: var(--bg-body);
+    color: var(--text-main);
+}
+
+body.dark-mode .flatpickr-time input:hover,
+body.dark-mode .flatpickr-time input:focus {
+    background: var(--bg-card);
+    border-color: var(--ibc-green);
+}
+
+/* LIGHT MODE: Force dark text for better readability */
 body:not(.dark-mode) h1,
 body:not(.dark-mode) h2,
 body:not(.dark-mode) h3,
@@ -565,58 +618,6 @@ body.dark-mode a:not(.btn):not(.btn-primary):not(.nav-link) {
 /* Sidebar Ausnahme */
 body:not(.dark-mode) .sidebar a,
 body:not(.dark-mode) .sidebar span,
-body:not(.dark-mode) .sidebar i {
-    color: #ffffff !important;
-}
-
-/* --- FORCE OVERRIDES FOR READABILITY --- */
-/* DARK MODE: Alles auf Weiß/Hellgrau zwingen */
-body.dark-mode,
-body.dark-mode .card,
-body.dark-mode .bg-white {
-    color: #f3f4f6 !important; /* Fast Weiß */
-}
-
-/* Spezifische Tailwind-Texte im Dark Mode hell machen */
-body.dark-mode .text-gray-500,
-body.dark-mode .text-gray-600,
-body.dark-mode .text-gray-700,
-body.dark-mode .text-gray-800,
-body.dark-mode .text-gray-900,
-body.dark-mode h1,
-body.dark-mode h2,
-body.dark-mode h3,
-body.dark-mode p,
-body.dark-mode span,
-body.dark-mode li {
-    color: #e5e7eb !important; /* Hellgrau */
-}
-
-/* Inputs im Dark Mode fixen */
-body.dark-mode input,
-body.dark-mode select,
-body.dark-mode textarea {
-    background-color: #1f2937 !important; /* Dunkelgrau */
-    color: #ffffff !important;
-    border-color: #4b5563 !important;
-}
-
-/* LIGHT MODE: Alles auf Dunkel zwingen */
-body:not(.dark-mode) {
-    color: #111827 !important; /* Fast Schwarz */
-}
-
-body:not(.dark-mode) h1,
-body:not(.dark-mode) h2,
-body:not(.dark-mode) h3,
-body:not(.dark-mode) p,
-body:not(.dark-mode) li {
-    color: #1f2937 !important;
-}
-
-/* Sidebar Ausnahme (muss im Light Mode hell bleiben wegen blauem Hintergrund) */
-body:not(.dark-mode) .sidebar *,
-body:not(.dark-mode) .sidebar a,
 body:not(.dark-mode) .sidebar i {
     color: #ffffff !important;
 }
