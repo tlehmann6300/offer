@@ -226,7 +226,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else if (isset($_POST['enable_2fa'])) {
         $ga = new PHPGangsta_GoogleAuthenticator();
         $secret = $ga->createSecret();
-        $qrCodeUrl = $ga->getQRCodeGoogleUrl($user['email'], $secret, 'IBC Intranet');
+        $qrCodeUrl = $ga->getQRCodeUrl($user['email'], $secret, 'IBC Intranet');
         $showQRCode = true;
     } else if (isset($_POST['confirm_2fa'])) {
         $secret = $_POST['secret'] ?? '';
@@ -244,7 +244,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Ungültiger Code. Bitte versuche es erneut.';
             $secret = $_POST['secret'];
             $ga = new PHPGangsta_GoogleAuthenticator();
-            $qrCodeUrl = $ga->getQRCodeGoogleUrl($user['email'], $secret, 'IBC Intranet');
+            $qrCodeUrl = $ga->getQRCodeUrl($user['email'], $secret, 'IBC Intranet');
             $showQRCode = true;
         }
     } else if (isset($_POST['disable_2fa'])) {
@@ -675,7 +675,7 @@ ob_start();
                     <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
                         Scanne den QR-Code mit deiner Authenticator-App und gib den generierten Code ein
                     </p>
-                    <img src="<?php echo $qrCodeUrl; ?>" alt="QR Code" class="mx-auto mb-4 border-4 border-gray-200 dark:border-gray-700 rounded-lg">
+                    <div id="qrcode" class="mx-auto mb-4 inline-block"></div>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
                         Geheimer Schlüssel (manuell): <code class="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-2 py-1 rounded"><?php echo htmlspecialchars($secret); ?></code>
                     </p>
@@ -716,7 +716,31 @@ ob_start();
 $content = ob_get_clean();
 ?>
 
+<!-- QRCode.js Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <script>
+// Generate QR Code if the element exists
+<?php if ($showQRCode && !empty($qrCodeUrl)): ?>
+document.addEventListener('DOMContentLoaded', function() {
+    const qrcodeElement = document.getElementById('qrcode');
+    if (qrcodeElement) {
+        // Clear any existing QR code
+        qrcodeElement.innerHTML = '';
+        
+        // Generate QR Code
+        new QRCode(qrcodeElement, {
+            text: <?php echo json_encode($qrCodeUrl, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
+            width: 200,
+            height: 200,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    }
+});
+<?php endif; ?>
+
 // Character counter for "Über mich" field
 document.addEventListener('DOMContentLoaded', function() {
     const aboutMeTextarea = document.getElementById('about_me');
