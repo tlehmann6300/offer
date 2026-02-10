@@ -10,6 +10,7 @@ header('Content-Type: application/json');
 ini_set('display_errors', 0);
 
 require_once __DIR__ . '/../../src/Auth.php';
+require_once __DIR__ . '/../../src/Database.php';
 require_once __DIR__ . '/../../includes/models/User.php';
 
 try {

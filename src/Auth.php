@@ -240,6 +240,8 @@ class Auth {
         }
         
         // Role hierarchy
+        // Note: 'admin' kept at level 3 for backward compatibility only
+        // New users cannot be assigned 'admin' role (not in VALID_ROLES)
         $roleHierarchy = [
             'candidate' => 0,
             'alumni' => 1,
