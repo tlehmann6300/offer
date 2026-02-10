@@ -41,6 +41,25 @@ function sanitize_http_host($host) {
     if (!preg_match('/^[a-zA-Z0-9.\-:]+$/', $host)) {
         return null;
     }
+    
+    // Additional validation: Prevent consecutive dots and other edge cases
+    if (strpos($host, '..') !== false) {
+        return null;
+    }
+    
+    // If there's a port, validate the port is at the end and numeric
+    if (strpos($host, ':') !== false) {
+        $parts = explode(':', $host);
+        // Should only have one colon (host:port)
+        if (count($parts) !== 2) {
+            return null;
+        }
+        // Port should be numeric
+        if (!ctype_digit($parts[1])) {
+            return null;
+        }
+    }
+    
     return $host;
 }
 

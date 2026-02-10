@@ -15,6 +15,24 @@ function sanitize_http_host($host) {
         return null;
     }
     
+    // Additional validation: Prevent consecutive dots and other edge cases
+    if (strpos($host, '..') !== false) {
+        return null;
+    }
+    
+    // If there's a port, validate the port is at the end and numeric
+    if (strpos($host, ':') !== false) {
+        $parts = explode(':', $host);
+        // Should only have one colon (host:port)
+        if (count($parts) !== 2) {
+            return null;
+        }
+        // Port should be numeric
+        if (!ctype_digit($parts[1])) {
+            return null;
+        }
+    }
+    
     return $host;
 }
 
@@ -47,7 +65,13 @@ $invalidHosts = [
     'host.com\\malicious',
     'test@evil.com',
     'host.com;rm -rf /',
-    'test.com|whoami'
+    'test.com|whoami',
+    '..example.com',           // consecutive dots at start
+    'example..com',            // consecutive dots in middle
+    'example.com..',           // consecutive dots at end
+    'example.com:abc',         // non-numeric port
+    'example.com:80:443',      // multiple colons
+    'example.com::',           // double colon
 ];
 
 foreach ($invalidHosts as $host) {
