@@ -468,23 +468,29 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             <?php 
             $currentUser = Auth::user();
             
-            // Try to get name from alumni_profiles table first
-            require_once __DIR__ . '/../models/Alumni.php';
-            $profile = Alumni::getProfileByUserId($currentUser['id']);
-            
+            // Initialize default values
             $firstname = '';
             $lastname = '';
+            $email = '';
+            $role = 'User';
             
-            if ($profile && !empty($profile['first_name'])) {
-                $firstname = $profile['first_name'];
-                $lastname = $profile['last_name'] ?? '';
-            } elseif (!empty($currentUser['firstname'])) {
-                $firstname = $currentUser['firstname'];
-                $lastname = $currentUser['lastname'] ?? '';
+            // Only try to get profile if user is logged in
+            if ($currentUser && isset($currentUser['id'])) {
+                // Try to get name from alumni_profiles table first
+                require_once __DIR__ . '/../models/Alumni.php';
+                $profile = Alumni::getProfileByUserId($currentUser['id']);
+                
+                if ($profile && !empty($profile['first_name'])) {
+                    $firstname = $profile['first_name'];
+                    $lastname = $profile['last_name'] ?? '';
+                } elseif (!empty($currentUser['firstname'])) {
+                    $firstname = $currentUser['firstname'];
+                    $lastname = $currentUser['lastname'] ?? '';
+                }
+                
+                $email = $currentUser['email'] ?? '';
+                $role = $currentUser['role'] ?? 'User';
             }
-            
-            $email = $currentUser['email'] ?? '';
-            $role = $currentUser['role'] ?? 'User';
             
             // Generate greeting
             $greeting = 'Guten Tag';
