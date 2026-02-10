@@ -28,26 +28,8 @@ if (!in_array($userRole, $allowedRoles)) {
 }
 
 // Check if user has permission to mark invoices as paid
-// Requirements: Auth::hasRole('board') is TRUE AND position field contains 'Finanzen' (case-insensitive)
-$canMarkAsPaid = false;
-$debugInfo = ['hasBoard' => false, 'hasFinanzen' => false, 'position' => 'N/A'];
-
-if (Auth::hasRole('board')) {
-    $debugInfo['hasBoard'] = true;
-    
-    // Get user profile to check position field
-    $userProfile = Member::getProfileByUserId($user['id']);
-    if ($userProfile && isset($userProfile['position'])) {
-        $position = $userProfile['position'];
-        $debugInfo['position'] = $position;
-        
-        // Case-insensitive check for 'Finanzen' in position
-        if (stripos($position, 'Finanzen') !== false) {
-            $debugInfo['hasFinanzen'] = true;
-            $canMarkAsPaid = true;
-        }
-    }
-}
+// Only users with role 'vorstand_finanzen_recht' can mark invoices as paid
+$canMarkAsPaid = Auth::hasRole('vorstand_finanzen_recht');
 
 // Get invoices based on role
 $invoices = Invoice::getAll($userRole, $user['id']);

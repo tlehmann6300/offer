@@ -240,6 +240,8 @@ class Auth {
         }
         
         // Role hierarchy
+        // Note: 'admin' kept at level 3 for backward compatibility only
+        // New users cannot be assigned 'admin' role (not in VALID_ROLES)
         $roleHierarchy = [
             'candidate' => 0,
             'alumni' => 1,
@@ -253,7 +255,7 @@ class Auth {
             'vorstand_intern' => 3,
             'vorstand_extern' => 3,
             'vorstand_finanzen_recht' => 3,
-            'admin' => 4
+            'admin' => 3  // Keep for backward compatibility, treat as board level
         ];
         
         $userRole = $_SESSION['user_role'] ?? '';
