@@ -55,8 +55,14 @@ if (!$profile) {
         'angestrebter_abschluss' => '',
         'company' => '',
         'industry' => '',
-        'position' => ''
+        'position' => '',
+        'gender' => $user['gender'] ?? '',
+        'birthday' => $user['birthday'] ?? ''
     ];
+} else {
+    // Ensure gender and birthday from users table are included
+    $profile['gender'] = $user['gender'] ?? ($profile['gender'] ?? '');
+    $profile['birthday'] = $user['birthday'] ?? ($profile['birthday'] ?? '');
 }
 
 // Handle 2FA setup
@@ -71,8 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'mobile_phone' => trim($_POST['mobile_phone'] ?? ''),
                 'linkedin_url' => trim($_POST['linkedin_url'] ?? ''),
                 'xing_url' => trim($_POST['xing_url'] ?? ''),
-                'about_me' => trim($_POST['about_me'] ?? ''),
-                'image_path' => $profile['image_path'] ?? '' // Keep existing image by default
+                'about_me' => mb_substr(trim($_POST['about_me'] ?? ''), 0, 400), // Limit to 400 chars
+                'image_path' => $profile['image_path'] ?? '', // Keep existing image by default
+                'gender' => trim($_POST['gender'] ?? ''),
+                'birthday' => trim($_POST['birthday'] ?? '')
             ];
             
             // Handle profile picture upload
@@ -139,18 +147,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             
+            // Update user fields (gender, birthday) in users table
+            $userUpdateData = [];
+            if (isset($profileData['gender'])) {
+                $userUpdateData['gender'] = $profileData['gender'];
+            }
+            if (isset($profileData['birthday'])) {
+                $userUpdateData['birthday'] = $profileData['birthday'];
+            }
+            if (isset($profileData['about_me'])) {
+                $userUpdateData['about_me'] = $profileData['about_me'];
+            }
+            
+            if (!empty($userUpdateData)) {
+                require_once __DIR__ . '/../../includes/models/User.php';
+                User::update($user['id'], $userUpdateData);
+            }
+            
             // Add role-specific fields based on user role
             // Student View: member, candidate, head, board -> Show study fields
             if (isMemberRole($userRole)) {
                 // Fields for students (candidates, members, board, and heads)
-                $profileData['studiengang'] = trim($_POST['studiengang'] ?? '');
+                // Map new field names to legacy database columns
+                $profileData['studiengang'] = trim($_POST['bachelor_studiengang'] ?? '');
                 // study_program: Database column alias for legacy schema compatibility
-                $profileData['study_program'] = trim($_POST['studiengang'] ?? '');
-                $profileData['semester'] = trim($_POST['semester'] ?? '');
-                $profileData['angestrebter_abschluss'] = trim($_POST['angestrebter_abschluss'] ?? '');
+                $profileData['study_program'] = trim($_POST['bachelor_studiengang'] ?? '');
+                $profileData['semester'] = trim($_POST['bachelor_semester'] ?? '');
+                // Use 'angestrebter_abschluss' for master program (repurposed for master program name)
+                $profileData['angestrebter_abschluss'] = trim($_POST['master_studiengang'] ?? '');
+                // Note: graduation_year is repurposed to store master semester for current students
+                // This is a limitation of the existing database schema
+                $profileData['graduation_year'] = trim($_POST['master_semester'] ?? '') ? intval(trim($_POST['master_semester'] ?? '')) : null;
                 // Note: Arbeitgeber (company) fields are optional/hidden for students
-            } elseif ($userRole === 'alumni') {
-                // Alumni View: Show employment fields
+            } elseif (isAlumniRole($userRole)) {
+                // Alumni View: Show employment fields and completed studies
+                // Map study fields
+                $profileData['studiengang'] = trim($_POST['bachelor_studiengang'] ?? '');
+                $profileData['study_program'] = trim($_POST['bachelor_studiengang'] ?? '');
+                // Use 'semester' for bachelor graduation year (repurposed for year storage)
+                $profileData['semester'] = trim($_POST['bachelor_year'] ?? '');
+                // Use 'angestrebter_abschluss' for master program name
+                $profileData['angestrebter_abschluss'] = trim($_POST['master_studiengang'] ?? '');
+                // graduation_year stores actual graduation year for alumni (correct usage)
+                $profileData['graduation_year'] = trim($_POST['master_year'] ?? '') ? intval(trim($_POST['master_year'] ?? '')) : null;
+                // Employment fields
                 $profileData['company'] = trim($_POST['company'] ?? '');
                 $profileData['industry'] = trim($_POST['industry'] ?? '');
                 $profileData['position'] = trim($_POST['position'] ?? '');
@@ -159,11 +199,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Update or create profile (only for the current user)
             if (Alumni::updateOrCreateProfile($user['id'], $profileData)) {
                 $message = 'Profil erfolgreich aktualisiert';
+                // Reload user data to get updated gender and birthday
+                $user = Auth::user();
                 // Reload profile based on role
                 if (isMemberRole($userRole)) {
                     $profile = Member::getProfileByUserId($user['id']);
                 } elseif (isAlumniRole($userRole)) {
                     $profile = Alumni::getProfileByUserId($user['id']);
+                }
+                // Ensure gender and birthday from users table are included in profile
+                if ($profile) {
+                    $profile['gender'] = $user['gender'] ?? ($profile['gender'] ?? '');
+                    $profile['birthday'] = $user['birthday'] ?? ($profile['birthday'] ?? '');
                 }
                 // If neither member nor alumni role, profile will remain as-is
             } else {
@@ -357,6 +404,30 @@ ob_start();
                         >
                     </div>
                     
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Geschlecht</label>
+                        <select 
+                            name="gender"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                            <option value="">Bitte wählen</option>
+                            <option value="m" <?php echo ($profile['gender'] ?? '') === 'm' ? 'selected' : ''; ?>>Männlich</option>
+                            <option value="f" <?php echo ($profile['gender'] ?? '') === 'f' ? 'selected' : ''; ?>>Weiblich</option>
+                            <option value="d" <?php echo ($profile['gender'] ?? '') === 'd' ? 'selected' : ''; ?>>Divers</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Geburtstag</label>
+                        <input 
+                            type="date" 
+                            name="birthday" 
+                            value="<?php echo htmlspecialchars($profile['birthday'] ?? ''); ?>"
+                            max="<?php echo date('Y-m-d'); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                    </div>
+                    
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Profilbild</label>
                         <?php if (!empty($profile['image_path'])): ?>
@@ -375,12 +446,19 @@ ob_start();
                     
                     <?php if (isMemberRole($userRole)): ?>
                     <!-- Fields for Students: Candidates, Members, Board, and Heads -->
-                    <!-- Student View: Show Studiengang, Semester, Abschluss -->
+                    <!-- Student View: Show Aktuelles Studium -->
+                    <div class="md:col-span-2">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3 border-b border-gray-300 dark:border-gray-600 pb-2">
+                            Aktuelles Studium
+                        </h3>
+                    </div>
+                    
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Studiengang</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bachelor-Studiengang *</label>
                         <input 
                             type="text" 
-                            name="studiengang" 
+                            name="bachelor_studiengang" 
+                            required
                             value="<?php echo htmlspecialchars($profile['studiengang'] ?? ''); ?>"
                             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="z.B. Wirtschaftsingenieurwesen"
@@ -388,29 +466,97 @@ ob_start();
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Semester</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bachelor-Semester</label>
                         <input 
                             type="text" 
-                            name="semester" 
+                            name="bachelor_semester" 
                             value="<?php echo htmlspecialchars($profile['semester'] ?? ''); ?>"
                             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             placeholder="z.B. 5"
                         >
                     </div>
                     
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Angestrebter Abschluss</label>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Master-Studiengang (optional)</label>
                         <input 
                             type="text" 
-                            name="angestrebter_abschluss" 
+                            name="master_studiengang" 
                             value="<?php echo htmlspecialchars($profile['angestrebter_abschluss'] ?? ''); ?>"
                             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            placeholder="z.B. Bachelor of Science"
+                            placeholder="z.B. Management & Engineering"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Master-Semester (optional)</label>
+                        <input 
+                            type="text" 
+                            name="master_semester" 
+                            value="<?php echo htmlspecialchars($profile['graduation_year'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="z.B. 2"
                         >
                     </div>
                     <?php elseif (isAlumniRole($userRole)): ?>
                     <!-- Fields for Alumni and Honorary Members -->
-                    <!-- Alumni View: Show Arbeitgeber, Position, Branche -->
+                    <!-- Alumni View: Show Absolviertes Studium -->
+                    <div class="md:col-span-2">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3 border-b border-gray-300 dark:border-gray-600 pb-2">
+                            Absolviertes Studium
+                        </h3>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bachelor-Studiengang *</label>
+                        <input 
+                            type="text" 
+                            name="bachelor_studiengang" 
+                            required
+                            value="<?php echo htmlspecialchars($profile['studiengang'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="z.B. Wirtschaftsingenieurwesen"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bachelor-Abschlussjahr</label>
+                        <input 
+                            type="text" 
+                            name="bachelor_year" 
+                            value="<?php echo htmlspecialchars($profile['semester'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="z.B. 2020"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Master-Studiengang (optional)</label>
+                        <input 
+                            type="text" 
+                            name="master_studiengang" 
+                            value="<?php echo htmlspecialchars($profile['angestrebter_abschluss'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="z.B. Management & Engineering"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Master-Abschlussjahr (optional)</label>
+                        <input 
+                            type="text" 
+                            name="master_year" 
+                            value="<?php echo htmlspecialchars($profile['graduation_year'] ?? ''); ?>"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="z.B. 2022"
+                        >
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3 border-b border-gray-300 dark:border-gray-600 pb-2 mt-4">
+                            Berufliche Informationen
+                        </h3>
+                    </div>
+                    
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Aktueller Arbeitgeber</label>
                         <input 
@@ -448,10 +594,17 @@ ob_start();
                 
                 <!-- About Me - Full Width -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Über mich</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Über mich
+                        <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                            (<span id="char-count">0</span>/400 Zeichen)
+                        </span>
+                    </label>
                     <textarea 
+                        id="about_me"
                         name="about_me" 
                         rows="4"
+                        maxlength="400"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                         placeholder="Erzähle etwas über dich..."
                     ><?php echo htmlspecialchars($profile['about_me'] ?? ''); ?></textarea>
@@ -561,3 +714,52 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
+?>
+
+<script>
+// Character counter for "Über mich" field
+document.addEventListener('DOMContentLoaded', function() {
+    const aboutMeTextarea = document.getElementById('about_me');
+    const charCount = document.getElementById('char-count');
+    
+    if (aboutMeTextarea && charCount) {
+        // Update counter on page load
+        charCount.textContent = aboutMeTextarea.value.length;
+        
+        // Update counter on input
+        aboutMeTextarea.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+    }
+    
+    // Email change confirmation for non-alumni users
+    const profileForm = document.querySelector('form[enctype="multipart/form-data"]');
+    const emailInput = document.querySelector('input[name="profile_email"]');
+    const originalEmail = <?php echo json_encode($profile['email'] ?? $user['email'] ?? '', JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+    const userRole = <?php echo json_encode($userRole, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+    
+    if (profileForm && emailInput) {
+        profileForm.addEventListener('submit', function(e) {
+            // Only check for profile update submissions
+            if (!e.submitter || e.submitter.name !== 'update_profile') {
+                return true;
+            }
+            
+            // Check if email has changed and user is not alumni
+            const isAlumniRole = ['alumni', 'alumni_board'].includes(userRole);
+            const emailChanged = emailInput.value.trim() !== originalEmail;
+            
+            if (emailChanged && !isAlumniRole) {
+                const confirmed = confirm('Willst du deine E-Mail wirklich ändern? Dies ändert deinen Login-Namen.');
+                if (!confirmed) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+    }
+});
+</script>
+
+<?php
+include __DIR__ . '/../../includes/templates/main_layout.php';
