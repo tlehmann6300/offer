@@ -14,8 +14,15 @@ if (!Auth::check()) {
     exit;
 }
 
-$user = Auth::user();
-$userRole = Auth::user()['role'] ?? '';
+$currentUser = Auth::user();
+if (!$currentUser) {
+    Auth::logout();
+    header('Location: ../auth/login.php');
+    exit;
+}
+
+$user = $currentUser;
+$userRole = $user['role'] ?? '';
 $stats = Inventory::getDashboardStats();
 
 // Get user's first name for personalized greeting
