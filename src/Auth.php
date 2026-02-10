@@ -253,7 +253,7 @@ class Auth {
             'vorstand_intern' => 3,
             'vorstand_extern' => 3,
             'vorstand_finanzen_recht' => 3,
-            'admin' => 4
+            'admin' => 3  // Keep for backward compatibility, treat as board level
         ];
         
         $userRole = $_SESSION['user_role'] ?? '';

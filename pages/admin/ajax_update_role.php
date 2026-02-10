@@ -10,7 +10,7 @@ require_once __DIR__ . '/../../includes/models/User.php';
 
 try {
     // Check authentication and permission
-    if (!Auth::check() || !Auth::hasPermission('admin')) {
+    if (!Auth::check() || !Auth::hasPermission('board')) {
         echo json_encode([
             'success' => false,
             'message' => 'Nicht autorisiert'

@@ -100,6 +100,7 @@ function asset($path) {
 
 /**
  * Translate role from English to German
+ * All board sub-roles (vorstand_*) are displayed as 'Vorstand'
  * 
  * @param string $role Role identifier
  * @return string German translation of the role
@@ -107,6 +108,9 @@ function asset($path) {
 function translateRole($role) {
     $roleTranslations = [
         'board' => 'Vorstand',
+        'vorstand_intern' => 'Vorstand',
+        'vorstand_extern' => 'Vorstand',
+        'vorstand_finanzen_recht' => 'Vorstand',
         'head' => 'Ressortleiter',
         'member' => 'Mitglied',
         'alumni' => 'Alumni',
