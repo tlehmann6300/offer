@@ -7,6 +7,7 @@ declare(strict_types=1);
  */
 
 require_once __DIR__ . '/../database.php';
+require_once __DIR__ . '/Alumni.php';
 
 class Member {
     
@@ -214,9 +215,9 @@ class Member {
         $currentUser = Auth::user();
         $currentRole = $currentUser['role'] ?? '';
         
+        // Members and candidates can update their own profile
         // Board (all types), head, and admin can update any profile
-        // Candidates can only update their own profile
-        if ($currentRole === 'candidate') {
+        if (in_array($currentRole, ['member', 'candidate'])) {
             if ($currentUser['id'] !== $userId) {
                 throw new Exception("Keine Berechtigung zum Aktualisieren anderer Mitgliederprofile");
             }
@@ -239,7 +240,7 @@ class Member {
         $allowedFields = [
             'first_name', 'last_name', 'email', 'mobile_phone',
             'linkedin_url', 'xing_url', 'industry', 'company', 
-            'position', 'study_program', 'semester', 
+            'position', 'image_path', 'study_program', 'semester', 
             'angestrebter_abschluss', 'degree', 'graduation_year'
         ];
         
@@ -260,5 +261,27 @@ class Member {
         
         $stmt = $db->prepare($sql);
         return $stmt->execute($values);
+    }
+    
+    /**
+     * Update or create member profile (upsert)
+     * Note: Uses alumni_profiles table as this is the central profile table for all users
+     * 
+     * @param int $userId The user ID
+     * @param array $data Profile data to upsert
+     * @return bool True on success
+     * @throws Exception On database error
+     */
+    public static function updateProfile(int $userId, array $data): bool {
+        // Check if profile exists
+        $existing = self::getProfileByUserId($userId);
+        
+        if ($existing) {
+            return self::update($userId, $data);
+        } else {
+            // Create new profile - delegate to Alumni::create since it uses the same table
+            $data['user_id'] = $userId;
+            return Alumni::create($data);
+        }
     }
 }
