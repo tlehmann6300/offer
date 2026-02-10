@@ -191,11 +191,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Update or create profile (only for the current user)
             if (Alumni::updateOrCreateProfile($user['id'], $profileData)) {
                 $message = 'Profil erfolgreich aktualisiert';
+                // Reload user data to get updated gender and birthday
+                $user = Auth::user();
                 // Reload profile based on role
                 if (isMemberRole($userRole)) {
                     $profile = Member::getProfileByUserId($user['id']);
                 } elseif (isAlumniRole($userRole)) {
                     $profile = Alumni::getProfileByUserId($user['id']);
+                }
+                // Ensure gender and birthday from users table are included in profile
+                if ($profile) {
+                    $profile['gender'] = $user['gender'] ?? ($profile['gender'] ?? '');
+                    $profile['birthday'] = $user['birthday'] ?? ($profile['birthday'] ?? '');
                 }
                 // If neither member nor alumni role, profile will remain as-is
             } else {
@@ -717,13 +724,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Email change confirmation for non-alumni users
-    const profileForm = document.querySelector('form[method="POST"]');
+    const profileForm = document.querySelector('form[enctype="multipart/form-data"]');
     const emailInput = document.querySelector('input[name="profile_email"]');
     const originalEmail = '<?php echo addslashes($profile['email'] ?? $user['email']); ?>';
     const userRole = '<?php echo addslashes($userRole); ?>';
     
     if (profileForm && emailInput) {
         profileForm.addEventListener('submit', function(e) {
+            // Only check for profile update submissions
+            if (!e.submitter || e.submitter.name !== 'update_profile') {
+                return true;
+            }
+            
             // Check if email has changed and user is not alumni
             const isAlumniRole = ['alumni', 'alumni_board'].includes(userRole);
             const emailChanged = emailInput.value.trim() !== originalEmail;
