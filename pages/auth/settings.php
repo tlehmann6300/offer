@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $confirmLink = $baseUrl . '/api/confirm_email.php?token=' . urlencode($token);
                     error_log("Email sending failed. Confirmation link: $confirmLink");
                     
-                    $message = 'E-Mail-Änderung wurde beantragt, aber die Bestätigungsmail konnte nicht versendet werden. Bitte kontaktiere den Administrator.';
+                    $message = 'Die E-Mail-Änderung konnte nicht abgeschlossen werden. Bitte versuche es später erneut oder kontaktiere den Administrator.';
                 }
             } catch (Exception $e) {
                 // Catch exceptions like 'E-Mail vergeben' or validation errors
