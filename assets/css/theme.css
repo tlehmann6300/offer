@@ -497,3 +497,21 @@ body.dark-mode .shadow {
     border-color: transparent;
     box-shadow: -5px 0 0 rgba(0, 166, 81, 0.1), 5px 0 0 rgba(0, 166, 81, 0.1);
 }
+
+/* Fix für Inputs im Dark Mode */
+.dark input, .dark textarea, .dark select {
+    background-color: #1f2937 !important; /* dunkelgrau */
+    color: #f3f4f6 !important; /* fast weiß */
+    border-color: #374151 !important;
+}
+
+/* Fix für Karten-Hintergründe, falls sie weiß bleiben */
+.dark .card, .dark .bg-white {
+    background-color: #111827 !important; /* sehr dunkel */
+    color: #e5e7eb !important;
+}
+
+/* Erzwinge dunklen Text auf hellem Grund im Light Mode */
+body:not(.dark) {
+    color: #1f2937 !important;
+}
