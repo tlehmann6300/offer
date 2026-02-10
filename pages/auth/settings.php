@@ -361,7 +361,8 @@ ob_start();
                 >
                     <option value="">-- Bitte wählen --</option>
                     <?php 
-                    // Get all members for successor selection
+                    // Get users with 'member' role for successor selection
+                    // Only 'member' role users are eligible to become board members
                     $members = User::getAll('member');
                     foreach ($members as $member):
                         if ($member['id'] != $user['id']): // Exclude current user
@@ -476,9 +477,7 @@ confirmSuccessionBtn.addEventListener('click', function() {
 function performRoleChange(newRole, successorId) {
     // Disable buttons during processing
     changeRoleBtn.disabled = true;
-    if (confirmSuccessionBtn) {
-        confirmSuccessionBtn.disabled = true;
-    }
+    confirmSuccessionBtn.disabled = true;
     
     const formData = new FormData();
     formData.append('new_role', newRole);
@@ -508,9 +507,7 @@ function performRoleChange(newRole, successorId) {
             
             // Re-enable buttons
             changeRoleBtn.disabled = false;
-            if (confirmSuccessionBtn) {
-                confirmSuccessionBtn.disabled = false;
-            }
+            confirmSuccessionBtn.disabled = false;
         }
     })
     .catch(error => {
@@ -519,9 +516,7 @@ function performRoleChange(newRole, successorId) {
         
         // Re-enable buttons
         changeRoleBtn.disabled = false;
-        if (confirmSuccessionBtn) {
-            confirmSuccessionBtn.disabled = false;
-        }
+        confirmSuccessionBtn.disabled = false;
     });
 }
 <?php endif; ?>

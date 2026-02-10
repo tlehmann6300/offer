@@ -110,12 +110,13 @@ try {
         try {
             $db->beginTransaction();
             
-            // Update current user to new role (demotion)
+            // Prepare statement for role updates
             $stmt = $db->prepare("UPDATE users SET role = ?, prompt_profile_review = 1 WHERE id = ?");
+            
+            // Update current user to new role (demotion)
             $stmt->execute([$newRole, $currentUserId]);
             
             // Update successor to inherit the exact board role
-            $stmt = $db->prepare("UPDATE users SET role = ?, prompt_profile_review = 1 WHERE id = ?");
             $stmt->execute([$currentRole, $successorId]);
             
             $db->commit();
