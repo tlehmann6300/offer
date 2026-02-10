@@ -89,7 +89,9 @@ $signupDeadline = $event['start_time']; // Default to event start time
 $canCancel = strtotime($signupDeadline) > time();
 
 // Check if user can view documentation (board and alumni_board only)
-$canViewDocumentation = in_array($userRole, ['board', 'alumni_board']);
+// This includes all board role variants: board, vorstand_intern, vorstand_extern, vorstand_finanzen_recht
+$allowedDocRoles = array_merge(Auth::BOARD_ROLES, ['alumni_board']);
+$canViewDocumentation = in_array($userRole, $allowedDocRoles);
 
 // Load event documentation if user has permission
 $documentation = null;
