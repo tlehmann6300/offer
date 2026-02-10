@@ -916,7 +916,7 @@ class MailService {
         
         // Build body content
         $bodyContent = '<p class="email-text">Hallo ' . htmlspecialchars($firstName) . ',</p>
-        <p class="email-text">dein Profil wurde seit über einem Jahr nicht aktualisiert. 
+        <p class="email-text">Dein Profil wurde seit über einem Jahr nicht aktualisiert. 
         Bitte prüfe, ob deine Job-Daten noch aktuell sind, damit wir in Kontakt bleiben können.</p>
         <p class="email-text">Bitte nimm dir einen Moment Zeit, um dein Profil zu überprüfen und bei Bedarf zu aktualisieren.</p>';
         
