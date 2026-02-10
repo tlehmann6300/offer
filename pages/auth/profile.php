@@ -208,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 // Log warning for unexpected role
                 error_log("Unexpected user role in profile update: " . $userRole . " for user ID: " . $user['id']);
-                $error = 'Ihre Rolle unterstützt keine Profilaktualisierung';
+                $error = 'Ihre Rolle unterstützt keine Profilaktualisierung. Bitte kontaktieren Sie den Administrator.';
             }
             
             if ($updateSuccess) {
