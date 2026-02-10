@@ -10,6 +10,7 @@
 
 // Load required files
 require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../src/Database.php';
 require_once __DIR__ . '/../includes/database.php';
 require_once __DIR__ . '/../includes/models/Alumni.php';
 require_once __DIR__ . '/../src/MailService.php';
@@ -18,11 +19,22 @@ require_once __DIR__ . '/../src/MailService.php';
 echo "=== Alumni Reminder Email Cron Job ===\n";
 echo "Started at: " . date('Y-m-d H:i:s') . "\n\n";
 
+// Get database connection for logging
+$contentDb = Database::getContentDB();
+
 // Fetch profiles where last_verified_at is older than 1 year (12 months)
 $outdatedProfiles = Alumni::getOutdatedProfiles(12);
 
 $totalOutdated = count($outdatedProfiles);
 echo "Found {$totalOutdated} alumni profiles that need verification.\n";
+
+// Log cron execution start
+try {
+    $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
+    $stmt->execute([0, 'cron_alumni_reminders', "Started: Found {$totalOutdated} outdated profiles"]);
+} catch (Exception $e) {
+    // Ignore logging errors
+}
 
 // Limit to max 20 emails per execution
 $maxEmails = 20;
@@ -70,3 +82,12 @@ echo "Emails sent successfully: {$emailsSent}\n";
 echo "Emails failed: {$emailsFailed}\n";
 echo "Remaining profiles: " . max(0, $totalOutdated - $maxEmails) . "\n";
 echo "Completed at: " . date('Y-m-d H:i:s') . "\n";
+
+// Log cron execution completion
+try {
+    $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
+    $logDetails = "Completed: Total={$totalOutdated}, Sent={$emailsSent}, Failed={$emailsFailed}, Remaining=" . max(0, $totalOutdated - $maxEmails);
+    $stmt->execute([0, 'cron_alumni_reminders', $logDetails]);
+} catch (Exception $e) {
+    // Ignore logging errors
+}
