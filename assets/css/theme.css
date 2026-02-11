@@ -112,18 +112,6 @@ body {
     opacity: 0.5;
 }
 
-/* Fix Tables - Improved contrast */
-.dark-mode th {
-    background-color: #374151 !important; /* Slightly gray to differentiate from table content */
-    color: #ffffff !important;
-    border-color: #4b5563 !important;
-}
-
-.dark-mode td {
-    color: #f3f4f6 !important;
-    border-bottom-color: #374151 !important;
-}
-
 /* Fix Sidebar Text */
 .dark-mode .sidebar a {
     color: rgba(255, 255, 255, 0.9) !important;
@@ -135,14 +123,20 @@ body {
 }
 
 /* Sidebar Links - Consistent Hover and Active States */
+.sidebar a {
+    transition: all 0.2s ease;
+}
+
 .sidebar a:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
 .sidebar a.active,
+.sidebar a.bg-blue-50,
 .sidebar a[class*="bg-blue-50"],
 .sidebar a[class*="bg-blue-900"] {
     border-right: 4px solid var(--ibc-green);
+    padding-right: calc(1.5rem - 4px); /* Adjust padding to account for border */
 }
 
 body.dark-mode main {
@@ -181,12 +175,14 @@ body.dark-mode table {
 body.dark-mode th {
     background-color: #374151 !important; /* Slightly gray to differentiate from table content */
     color: #ffffff !important;
+    border-color: #4b5563 !important;
     font-weight: 600;
 }
 
 body.dark-mode td {
     border-color: var(--border-color);
     color: #f3f4f6 !important;
+    border-bottom-color: #374151 !important;
 }
 
 /* Input Styles - Light Mode */
