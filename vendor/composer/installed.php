@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => '__root__',
-        'pretty_version' => 'dev-main',
-        'version' => 'dev-main',
-        'reference' => '59e4ee1e4da1b3852309fff7e7b09d8a31db896d',
+        'pretty_version' => 'dev-copilot/add-microsoft-entra-id-login',
+        'version' => 'dev-copilot/add-microsoft-entra-id-login',
+        'reference' => 'f8e7604001c721467ff289df48cd65bcb7d7f9d0',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => '59e4ee1e4da1b3852309fff7e7b09d8a31db896d',
+            'pretty_version' => 'dev-copilot/add-microsoft-entra-id-login',
+            'version' => 'dev-copilot/add-microsoft-entra-id-login',
+            'reference' => 'f8e7604001c721467ff289df48cd65bcb7d7f9d0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

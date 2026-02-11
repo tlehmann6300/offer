@@ -361,4 +361,199 @@ class AuthHandler {
             error_log("Failed to log system action: " . $e->getMessage());
         }
     }
+
+    /**
+     * Initiate Microsoft Entra ID OAuth login
+     */
+    public static function initiateMicrosoftLogin() {
+        require_once __DIR__ . '/../../vendor/autoload.php';
+        
+        self::startSession();
+        
+        // Load credentials from configuration constants
+        $clientId = defined('AZURE_CLIENT_ID') ? AZURE_CLIENT_ID : '';
+        $clientSecret = defined('AZURE_CLIENT_SECRET') ? AZURE_CLIENT_SECRET : '';
+        $redirectUri = defined('AZURE_REDIRECT_URI') ? AZURE_REDIRECT_URI : '';
+        $tenantId = defined('AZURE_TENANT_ID') ? AZURE_TENANT_ID : '';
+        
+        // Validate required environment variables
+        if (empty($clientId) || empty($clientSecret) || empty($redirectUri) || empty($tenantId)) {
+            throw new Exception('Missing Azure OAuth configuration');
+        }
+        
+        // Initialize Azure OAuth provider
+        $provider = new \TheNetworg\OAuth2\Client\Provider\Azure([
+            'clientId'     => $clientId,
+            'clientSecret' => $clientSecret,
+            'redirectUri'  => $redirectUri,
+            'tenant'       => $tenantId
+        ]);
+        
+        // Set scope
+        $provider->scope = 'openid profile email offline_access User.Read';
+        
+        // Generate authorization URL
+        $authorizationUrl = $provider->getAuthorizationUrl();
+        
+        // Store state in session for CSRF protection
+        $_SESSION['oauth2state'] = $provider->getState();
+        
+        // Redirect to authorization URL
+        header('Location: ' . $authorizationUrl);
+        exit;
+    }
+
+    /**
+     * Handle Microsoft Entra ID OAuth callback
+     */
+    public static function handleMicrosoftCallback() {
+        require_once __DIR__ . '/../../vendor/autoload.php';
+        
+        self::startSession();
+        
+        // Validate state for CSRF protection
+        if (!isset($_GET['state']) || !isset($_SESSION['oauth2state']) || $_GET['state'] !== $_SESSION['oauth2state']) {
+            unset($_SESSION['oauth2state']);
+            throw new Exception('Invalid state parameter');
+        }
+        
+        // Clear state
+        unset($_SESSION['oauth2state']);
+        
+        // Check for error
+        if (isset($_GET['error'])) {
+            throw new Exception('OAuth error: ' . ($_GET['error_description'] ?? $_GET['error']));
+        }
+        
+        // Check for authorization code
+        if (!isset($_GET['code'])) {
+            throw new Exception('No authorization code received');
+        }
+        
+        // Load credentials from configuration constants
+        $clientId = defined('AZURE_CLIENT_ID') ? AZURE_CLIENT_ID : '';
+        $clientSecret = defined('AZURE_CLIENT_SECRET') ? AZURE_CLIENT_SECRET : '';
+        $redirectUri = defined('AZURE_REDIRECT_URI') ? AZURE_REDIRECT_URI : '';
+        $tenantId = defined('AZURE_TENANT_ID') ? AZURE_TENANT_ID : '';
+        
+        // Validate required environment variables
+        if (empty($clientId) || empty($clientSecret) || empty($redirectUri) || empty($tenantId)) {
+            throw new Exception('Missing Azure OAuth configuration');
+        }
+        
+        // Initialize Azure OAuth provider
+        $provider = new \TheNetworg\OAuth2\Client\Provider\Azure([
+            'clientId'     => $clientId,
+            'clientSecret' => $clientSecret,
+            'redirectUri'  => $redirectUri,
+            'tenant'       => $tenantId
+        ]);
+        
+        try {
+            // Get access token using authorization code
+            $token = $provider->getAccessToken('authorization_code', [
+                'code' => $_GET['code']
+            ]);
+            
+            // Get user details
+            $user = $provider->get('me', $token);
+            
+            // Get user claims (including roles)
+            $claims = $user->getClaims();
+            $azureRoles = $claims['roles'] ?? [];
+            
+            // Define role mapping from Azure roles (string) to internal role names (string)
+            // Azure roles should not contain umlauts for technical compatibility
+            $roleMapping = [
+                'anwaerter' => 'candidate',
+                'mitglied' => 'member',
+                'ressortleiter' => 'head',
+                'vorstand_finanzen' => 'board_finance',
+                'vorstand_intern' => 'board_internal',
+                'vorstand_extern' => 'board_external',
+                'alumni' => 'alumni',
+                'alumni_vorstand' => 'alumni_board',
+                'alumni_finanz' => 'alumni_auditor',
+                'ehrenmitglied' => 'honorary_member'
+            ];
+            
+            // Define role hierarchy for priority selection (higher value = higher priority)
+            $roleHierarchy = [
+                'candidate' => 1,
+                'member' => 2,
+                'head' => 3,
+                'alumni' => 4,
+                'honorary_member' => 5,
+                'board_finance' => 6,
+                'board_internal' => 7,
+                'board_external' => 8,
+                'alumni_board' => 9,
+                'alumni_auditor' => 10
+            ];
+            
+            // Find the role with the highest priority
+            $highestPriority = 0;
+            $selectedRole = 'member'; // Default to member if no valid role found
+            
+            foreach ($azureRoles as $azureRole) {
+                if (isset($roleMapping[$azureRole])) {
+                    $internalRole = $roleMapping[$azureRole];
+                    $priority = $roleHierarchy[$internalRole] ?? 0;
+                    
+                    if ($priority > $highestPriority) {
+                        $highestPriority = $priority;
+                        $selectedRole = $internalRole;
+                    }
+                }
+            }
+            
+            $roleName = $selectedRole;
+            
+            // Get user email
+            $email = $user->getEmail();
+            
+            // Check if user exists in database
+            $db = Database::getUserDB();
+            $stmt = $db->prepare("SELECT * FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            $existingUser = $stmt->fetch();
+            
+            if ($existingUser) {
+                // Update existing user
+                $userId = $existingUser['id'];
+                
+                // Update last login
+                $stmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+                $stmt->execute([$userId]);
+            } else {
+                // Create new user without password (OAuth login only)
+                $stmt = $db->prepare("INSERT INTO users (email, password, role, is_alumni_validated, profile_complete) VALUES (?, ?, ?, ?, ?)");
+                $isAlumniValidated = ($roleName === 'alumni') ? 0 : 1;
+                $profileComplete = 0;
+                // Use a random password hash since user will login via OAuth
+                $randomPassword = password_hash(bin2hex(random_bytes(32)), HASH_ALGO);
+                $stmt->execute([$email, $randomPassword, $roleName, $isAlumniValidated, $profileComplete]);
+                $userId = $db->lastInsertId();
+            }
+            
+            // Set session variables
+            $_SESSION['user_id'] = $userId;
+            $_SESSION['user_email'] = $email;
+            $_SESSION['user_role'] = $roleName;
+            $_SESSION['authenticated'] = true;
+            $_SESSION['last_activity'] = time();
+            
+            // Log successful login
+            self::logSystemAction($userId, 'login_success_microsoft', 'user', $userId, 'Successful Microsoft Entra ID login');
+            
+            // Redirect to dashboard
+            $dashboardUrl = (defined('BASE_URL') && BASE_URL) ? BASE_URL . '/pages/dashboard/index.php' : '/pages/dashboard/index.php';
+            header('Location: ' . $dashboardUrl);
+            exit;
+            
+        } catch (Exception $e) {
+            self::logSystemAction(null, 'login_failed_microsoft', 'user', null, 'Microsoft login error: ' . $e->getMessage());
+            throw new Exception('Failed to authenticate with Microsoft: ' . $e->getMessage());
+        }
+    }
 }

@@ -87,6 +87,12 @@ define('INVOICE_NOTIFICATION_EMAIL', $env['INVOICE_NOTIFICATION_EMAIL'] ?? 'tleh
 // EasyVerein API Configuration
 define('EASYVEREIN_API_TOKEN', $env['EASYVEREIN_API_TOKEN'] ?? '');
 
+// Azure/Microsoft Entra ID OAuth Configuration
+define('AZURE_CLIENT_ID', $env['AZURE_CLIENT_ID'] ?? '');
+define('AZURE_CLIENT_SECRET', $env['AZURE_CLIENT_SECRET'] ?? '');
+define('AZURE_REDIRECT_URI', $env['AZURE_REDIRECT_URI'] ?? '');
+define('AZURE_TENANT_ID', $env['AZURE_TENANT_ID'] ?? '');
+
 /**
  * Sanitize HTTP_HOST to prevent injection attacks
  * Only allows alphanumeric characters, dots, colons, and hyphens
