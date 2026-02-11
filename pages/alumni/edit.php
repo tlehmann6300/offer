@@ -31,6 +31,9 @@ if (!in_array($userRole, $allowedRoles)) {
 // Fetch profile for current user only ($userId from session) - this prevents cross-user edits
 $profile = Alumni::getProfileByUserId($userId);
 
+// Check if this is a first-time profile completion (profile_complete = 0)
+$isFirstTimeSetup = isset($user['profile_complete']) && $user['profile_complete'] == 0;
+
 $message = '';
 $errors = [];
 
@@ -50,8 +53,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $position = trim($_POST['position'] ?? '');
     
     // Validate required fields
-    if (empty($firstName) || empty($lastName) || empty($email) || empty($company) || empty($position)) {
-        $errors[] = 'Bitte füllen Sie alle Pflichtfelder aus (Name, E-Mail, Firma, Position)';
+    // For first-time setup, only require first_name and last_name
+    if ($isFirstTimeSetup) {
+        if (empty($firstName) || empty($lastName)) {
+            $errors[] = 'Bitte geben Sie Ihren Vornamen und Nachnamen ein, um fortzufahren.';
+        }
+    } else {
+        // For normal edits, require all fields
+        if (empty($firstName) || empty($lastName) || empty($email) || empty($company) || empty($position)) {
+            $errors[] = 'Bitte füllen Sie alle Pflichtfelder aus (Name, E-Mail, Firma, Position)';
+        }
     }
     
     if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -117,9 +128,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Update last_verified_at timestamp
                     Alumni::verifyProfile($userId);
                     
-                    // Redirect to index with success message
+                    // If this was first-time setup and first_name and last_name are now provided,
+                    // mark profile as complete
+                    if ($isFirstTimeSetup && !empty($firstName) && !empty($lastName)) {
+                        require_once __DIR__ . '/../../includes/models/User.php';
+                        User::update($userId, ['profile_complete' => 1]);
+                    }
+                    
+                    // Redirect to dashboard with success message
                     $_SESSION['success_message'] = 'Profil erfolgreich gespeichert!';
-                    header('Location: index.php');
+                    header('Location: ../dashboard/index.php');
                     exit;
                 } else {
                     $errors[] = 'Fehler beim Speichern des Profils. Bitte versuchen Sie es erneut.';
@@ -148,11 +166,32 @@ ob_start();
 ?>
 
 <div class="max-w-4xl mx-auto">
+    <?php if (!$isFirstTimeSetup): ?>
     <div class="mb-6">
         <a href="index.php" class="text-purple-600 hover:text-purple-700 inline-flex items-center mb-4">
             <i class="fas fa-arrow-left mr-2"></i>Zurück zum Alumni Directory
         </a>
     </div>
+    <?php endif; ?>
+    
+    <?php if ($isFirstTimeSetup): ?>
+    <div class="mb-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800">
+        <div class="flex items-start">
+            <i class="fas fa-exclamation-triangle mt-0.5 mr-3 text-xl"></i>
+            <div>
+                <h3 class="font-bold mb-2">Profil vervollständigen erforderlich</h3>
+                <p>Bitte geben Sie Ihren Vornamen und Nachnamen ein, um fortzufahren. Diese Informationen sind erforderlich.</p>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+    
+    <?php if (isset($_SESSION['profile_incomplete_message'])): ?>
+    <div class="mb-6 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded-lg">
+        <i class="fas fa-info-circle mr-2"></i><?php echo htmlspecialchars($_SESSION['profile_incomplete_message']); ?>
+    </div>
+    <?php unset($_SESSION['profile_incomplete_message']); ?>
+    <?php endif; ?>
 
     <?php if (!empty($errors)): ?>
     <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
@@ -328,9 +367,11 @@ ob_start();
 
             <!-- Submit Buttons -->
             <div class="flex justify-end space-x-4 pt-6 border-t">
+                <?php if (!$isFirstTimeSetup): ?>
                 <a href="index.php" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
                     Abbrechen
                 </a>
+                <?php endif; ?>
                 <button type="submit" class="px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg hover:shadow-xl">
                     <i class="fas fa-save mr-2"></i>Profil speichern
                 </button>
@@ -338,6 +379,34 @@ ob_start();
         </form>
     </div>
 </div>
+
+<?php if ($isFirstTimeSetup): ?>
+<script>
+// Prevent navigation away from page during first-time profile setup
+(function() {
+    // Disable back button functionality
+    history.pushState(null, null, location.href);
+    window.onpopstate = function() {
+        history.go(1);
+    };
+    
+    // Warn user if they try to leave the page
+    window.addEventListener('beforeunload', function (e) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+    });
+    
+    // Allow navigation when form is submitted
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            window.onbeforeunload = null;
+        });
+    }
+})();
+</script>
+<?php endif; ?>
 
 <?php
 $content = ob_get_clean();

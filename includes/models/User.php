@@ -50,8 +50,11 @@ class User {
         // This allows the isAlumniValidated() check to work correctly for all users
         $isAlumniValidated = ($role === 'alumni') ? 0 : 1;
         
-        $stmt = $db->prepare("INSERT INTO users (email, password, role, is_alumni_validated) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$email, $passwordHash, $role, $isAlumniValidated]);
+        // New users need to complete their profile (first_name + last_name)
+        $profileComplete = 0;
+        
+        $stmt = $db->prepare("INSERT INTO users (email, password, role, is_alumni_validated, profile_complete) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$email, $passwordHash, $role, $isAlumniValidated, $profileComplete]);
         
         return $db->lastInsertId();
     }
