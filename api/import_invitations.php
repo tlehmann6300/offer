@@ -9,6 +9,7 @@ require_once __DIR__ . '/../includes/handlers/AuthHandler.php';
 require_once __DIR__ . '/../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../includes/database.php';
 require_once __DIR__ . '/../src/MailService.php';
+require_once __DIR__ . '/../src/Auth.php';
 
 AuthHandler::startSession();
 
@@ -115,10 +116,8 @@ foreach ($invitations as $index => $invitation) {
         continue;
     }
     
-    // Validate role - only allow specific roles for invitations
-    // Note: Use new role names (board_finance, board_internal, board_external, alumni_auditor)
-    $validInvitationRoles = ['member', 'alumni', 'manager', 'alumni_board', 'alumni_auditor', 'board_finance', 'board_internal', 'board_external'];
-    if (!in_array($role, $validInvitationRoles)) {
+    // Validate role - use Auth::VALID_ROLES as single source of truth
+    if (!in_array($role, Auth::VALID_ROLES)) {
         $failedCount++;
         $errors[] = "Zeile " . ($index + 1) . ": Ungültige Rolle: " . htmlspecialchars($role);
         continue;
