@@ -43,23 +43,23 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">E-Mail-Adresse</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">E-Mail-Adresse</label>
                 <input 
                     type="email" 
                     id="invitationEmail" 
                     name="email" 
                     required 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="benutzer@beispiel.de"
                 >
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Rolle</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rolle</label>
                 <select 
                     id="invitationRole" 
                     name="role" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
                     <option value="member">Mitglied</option>
                     <option value="alumni">Alumni</option>
@@ -71,11 +71,11 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Token Validity</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Token Validity</label>
                 <select 
                     id="validityHours" 
                     name="validity_hours" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
                     <option value="24">24 hours</option>
                     <option value="168" selected>7 days</option>
@@ -243,7 +243,7 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
                 <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         JSON-Datei auswählen
                     </label>
                     <input 
@@ -252,7 +252,7 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
                         name="json_file" 
                         accept=".json"
                         required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                 </div>
                 

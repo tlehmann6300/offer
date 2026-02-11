@@ -97,7 +97,7 @@ ob_start();
             <input type="hidden" name="checkout" value="1">
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Menge <span class="text-red-500">*</span>
                 </label>
                 <input 
@@ -106,7 +106,7 @@ ob_start();
                     min="1" 
                     max="<?php echo $item['current_stock']; ?>"
                     required 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Anzahl der auszuleihenden Artikel"
                 >
                 <p class="text-xs text-gray-500 mt-1">
@@ -115,26 +115,26 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Verwendungszweck <span class="text-red-500">*</span>
                 </label>
                 <input 
                     type="text" 
                     name="purpose" 
                     required 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="z.B. Veranstaltung, Projekt, Workshop"
                 >
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Zielort / Verwendungsort
                 </label>
                 <input 
                     type="text" 
                     name="destination" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="z.B. Konferenzraum A, Offsite-Event"
                 >
                 <p class="text-xs text-gray-500 mt-1">Optional: Wo wird der Artikel verwendet?</p>

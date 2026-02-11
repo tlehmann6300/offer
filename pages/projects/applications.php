@@ -455,7 +455,7 @@ ob_start();
             <input type="hidden" name="accept_application" value="1">
             
             <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Rolle auswählen <span class="text-red-500">*</span>
                 </label>
                 <select name="role" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">

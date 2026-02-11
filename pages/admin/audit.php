@@ -67,23 +67,23 @@ ob_start();
 <div class="card p-6 mb-6">
     <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Aktion</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Aktion</label>
             <input 
                 type="text" 
                 name="action" 
                 placeholder="z.B. login, create, update..."
                 value="<?php echo htmlspecialchars($_GET['action'] ?? ''); ?>"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Benutzer-ID</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Benutzer-ID</label>
             <input 
                 type="number" 
                 name="user_id" 
                 placeholder="Benutzer-ID"
                 value="<?php echo htmlspecialchars($_GET['user_id'] ?? ''); ?>"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
         </div>
         <div class="flex items-end space-x-2">

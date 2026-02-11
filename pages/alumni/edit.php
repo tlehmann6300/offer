@@ -181,46 +181,46 @@ ob_start();
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Persönliche Informationen</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Vorname *</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Vorname *</label>
                         <input 
                             type="text" 
                             name="first_name" 
                             required 
                             value="<?php echo htmlspecialchars($firstName); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         >
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Nachname *</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nachname *</label>
                         <input 
                             type="text" 
                             name="last_name" 
                             required 
                             value="<?php echo htmlspecialchars($lastName); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         >
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">E-Mail *</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">E-Mail *</label>
                         <input 
                             type="email" 
                             name="email" 
                             required 
                             value="<?php echo htmlspecialchars($email); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         >
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Mobiltelefon</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mobiltelefon</label>
                         <input 
                             type="text" 
                             name="mobile_phone" 
                             value="<?php echo htmlspecialchars($mobilePhone); ?>"
                             placeholder="+49 123 4567890"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         >
                     </div>
                 </div>
@@ -231,37 +231,37 @@ ob_start();
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Berufliche Informationen</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Firma *</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Firma *</label>
                         <input 
                             type="text" 
                             name="company" 
                             required 
                             value="<?php echo htmlspecialchars($company); ?>"
                             placeholder="z.B. ABC GmbH"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         >
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Position *</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Position *</label>
                         <input 
                             type="text" 
                             name="position" 
                             required 
                             value="<?php echo htmlspecialchars($position); ?>"
                             placeholder="z.B. Senior Consultant"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         >
                     </div>
 
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Branche</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Branche</label>
                         <input 
                             type="text" 
                             name="industry" 
                             value="<?php echo htmlspecialchars($industry); ?>"
                             placeholder="z.B. IT, Consulting, Finance"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         >
                     </div>
                 </div>
@@ -272,7 +272,7 @@ ob_start();
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Social Media</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             <i class="fab fa-linkedin text-blue-600 mr-1"></i>
                             LinkedIn URL
                         </label>
@@ -281,12 +281,12 @@ ob_start();
                             name="linkedin_url" 
                             value="<?php echo htmlspecialchars($linkedinUrl); ?>"
                             placeholder="https://www.linkedin.com/in/ihr-profil"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         >
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             <i class="fab fa-xing text-green-700 mr-1"></i>
                             Xing URL
                         </label>
@@ -295,7 +295,7 @@ ob_start();
                             name="xing_url" 
                             value="<?php echo htmlspecialchars($xingUrl); ?>"
                             placeholder="https://www.xing.com/profile/ihr-profil"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         >
                     </div>
                 </div>
@@ -311,14 +311,14 @@ ob_start();
                 </div>
                 <?php endif; ?>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         <?php echo $imagePath ? 'Neues Bild hochladen (optional)' : 'Bild hochladen (optional)'; ?>
                     </label>
                     <input 
                         type="file" 
                         name="image" 
                         accept="image/jpeg,image/png,image/gif,image/webp"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                     <p class="text-sm text-gray-500 mt-2">
                         Erlaubt: JPG, PNG, GIF, WebP. Maximum: 5MB. Wird sicher verarbeitet und validiert.
