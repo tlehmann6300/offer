@@ -370,14 +370,14 @@ class AuthHandler {
         
         self::startSession();
         
-        // Load credentials from environment
-        $clientId = $_ENV['AZURE_CLIENT_ID'] ?? null;
-        $clientSecret = $_ENV['AZURE_CLIENT_SECRET'] ?? null;
-        $redirectUri = $_ENV['AZURE_REDIRECT_URI'] ?? null;
-        $tenantId = $_ENV['AZURE_TENANT_ID'] ?? null;
+        // Load credentials from configuration constants
+        $clientId = defined('AZURE_CLIENT_ID') ? AZURE_CLIENT_ID : '';
+        $clientSecret = defined('AZURE_CLIENT_SECRET') ? AZURE_CLIENT_SECRET : '';
+        $redirectUri = defined('AZURE_REDIRECT_URI') ? AZURE_REDIRECT_URI : '';
+        $tenantId = defined('AZURE_TENANT_ID') ? AZURE_TENANT_ID : '';
         
         // Validate required environment variables
-        if (!$clientId || !$clientSecret || !$redirectUri || !$tenantId) {
+        if (empty($clientId) || empty($clientSecret) || empty($redirectUri) || empty($tenantId)) {
             throw new Exception('Missing Azure OAuth configuration');
         }
         
@@ -430,14 +430,14 @@ class AuthHandler {
             throw new Exception('No authorization code received');
         }
         
-        // Load credentials from environment
-        $clientId = $_ENV['AZURE_CLIENT_ID'] ?? null;
-        $clientSecret = $_ENV['AZURE_CLIENT_SECRET'] ?? null;
-        $redirectUri = $_ENV['AZURE_REDIRECT_URI'] ?? null;
-        $tenantId = $_ENV['AZURE_TENANT_ID'] ?? null;
+        // Load credentials from configuration constants
+        $clientId = defined('AZURE_CLIENT_ID') ? AZURE_CLIENT_ID : '';
+        $clientSecret = defined('AZURE_CLIENT_SECRET') ? AZURE_CLIENT_SECRET : '';
+        $redirectUri = defined('AZURE_REDIRECT_URI') ? AZURE_REDIRECT_URI : '';
+        $tenantId = defined('AZURE_TENANT_ID') ? AZURE_TENANT_ID : '';
         
         // Validate required environment variables
-        if (!$clientId || !$clientSecret || !$redirectUri || !$tenantId) {
+        if (empty($clientId) || empty($clientSecret) || empty($redirectUri) || empty($tenantId)) {
             throw new Exception('Missing Azure OAuth configuration');
         }
         
