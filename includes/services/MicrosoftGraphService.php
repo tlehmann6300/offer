@@ -19,20 +19,20 @@ class MicrosoftGraphService {
     
     /**
      * Role mapping: role values to their respective Azure App Role IDs
-     * TODO: Replace placeholder IDs with actual Azure App Role IDs from your Azure Portal
+     * Configured with actual Azure App Role IDs from Azure Portal
      * Each role must have a unique GUID from Azure AD App Roles
      */
     private const ROLE_MAPPING = [
-        'anwaerter' => 'PLACEHOLDER_ANWAERTER_ID',
-        'mitglied' => 'PLACEHOLDER_MITGLIED_ID',
-        'vorstand_intern' => 'PLACEHOLDER_VORSTAND_INTERN_ID',
-        'vorstand_extern' => 'PLACEHOLDER_VORSTAND_EXTERN_ID',
-        'berater' => 'PLACEHOLDER_BERATER_ID',
-        'alumni' => 'PLACEHOLDER_ALUMNI_ID',
-        'ehrenmitglied' => 'PLACEHOLDER_EHRENMITGLIED_ID',
-        'senior' => 'PLACEHOLDER_SENIOR_ID',
-        'partner' => 'PLACEHOLDER_PARTNER_ID',
-        'gast' => 'PLACEHOLDER_GAST_ID'
+        'ehrenmitglied' => '09686b92-dbc8-4e66-a851-2dafea64df89',
+        'alumni_finanz' => '39597941-0a22-4922-9587-e3d62ab986d6',
+        'alumni_vorstand' => '8a45c6aa-e791-422e-b964-986d8bdd2ed8',
+        'alumni' => '7ffd9c73-a828-4e34-a9f4-10f4ed00f796',
+        'vorstand_extern' => 'bf17e26b-e5f1-4a63-ae56-91ab69ae33ca',
+        'vorstand_intern' => 'f61e99e2-2717-4aff-b3f5-ef2ec489b598',
+        'vorstand_finanzen' => '3ad43a76-75af-48a7-9974-7a2cf350f349',
+        'ressortleiter' => '9456552d-0f49-42ff-bbde-495a60e61e61',
+        'mitglied' => '70f07477-ea4e-4edc-b0e6-7e25968f16c0',
+        'anwaerter' => '75edcb0a-c610-4ceb-82f2-457a9dde4fc0'
     ];
     
     /**
