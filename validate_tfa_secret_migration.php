@@ -46,8 +46,7 @@ if ($userPhpContent !== null) {
         echo "   ✗ disable2FA method does not reference tfa_secret column\n";
     }
 } else {
-    $errors[] = "User.php not found";
-    echo "   ✗ User.php not found\n";
+    echo "   ⚠ Skipping - User.php already reported as not found\n";
 }
 
 // Check 3: Verify schema file contains tfa_secret
