@@ -130,7 +130,7 @@ if ($isOwnRole && $isBoardMember && in_array($newRole, ['member', 'alumni'])) {
         $db->commit();
         
         // Build success message
-        $message = 'Rollenwechsel erfolgreich durchgeführt. Deine Rolle wurde an ' . 
+        $message = 'Rollenwechsel erfolgreich durchgeführt. deine Rolle wurde an ' . 
                    htmlspecialchars($successor['email'], ENT_QUOTES, 'UTF-8') . ' übertragen.';
         
         echo json_encode([
