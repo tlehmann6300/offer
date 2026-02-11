@@ -2,14 +2,14 @@
 /**
  * Database Maintenance Tool
  * Admin page for database cleanup and maintenance
- * Only accessible by admin and board members
+ * Only accessible by board members
  */
 
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../src/Database.php';
 
-// Check if user has admin or board permission
-if (!Auth::check() || !Auth::hasPermission('board')) {
+// Check if user is a board member (board_finance, board_internal, or board_external)
+if (!Auth::check() || !Auth::isBoard()) {
     header('Location: ../auth/login.php');
     exit;
 }

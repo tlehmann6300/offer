@@ -9,19 +9,33 @@ require_once __DIR__ . '/Database.php';
 class Auth {
     
     /**
+     * Role constants - exactly 10 allowed roles
+     */
+    const ROLE_ALUMNI = 'alumni';
+    const ROLE_ALUMNI_AUDITOR = 'alumni_auditor';
+    const ROLE_ALUMNI_BOARD = 'alumni_board';
+    const ROLE_CANDIDATE = 'candidate';
+    const ROLE_MEMBER = 'member';
+    const ROLE_HEAD = 'head';
+    const ROLE_HONORARY_MEMBER = 'honorary_member';
+    const ROLE_BOARD_FINANCE = 'board_finance';
+    const ROLE_BOARD_EXTERNAL = 'board_external';
+    const ROLE_BOARD_INTERNAL = 'board_internal';
+    
+    /**
      * All valid role types in the system
      */
     const VALID_ROLES = [
+        'alumni',
+        'alumni_auditor',
+        'alumni_board',
         'candidate',
         'member',
         'head',
-        'alumni',
-        'alumni_board',
-        'alumni_auditor',
+        'honorary_member',
         'board_finance',
         'board_internal',
-        'board_external',
-        'honorary_member'
+        'board_external'
     ];
     
     /**
@@ -327,24 +341,18 @@ class Auth {
             return false;
         }
         
-        // Role hierarchy
-        // Note: 'admin' kept at level 3 for backward compatibility with legacy code paths.
-        // This role is NOT in VALID_ROLES and cannot be assigned to new users.
-        // Existing code checking for 'admin' will be handled through hasRole() mapping to board_finance.
+        // Role hierarchy - only the 10 allowed roles
         $roleHierarchy = [
             'candidate' => 0,
             'alumni' => 1,
             'member' => 1,
             'honorary_member' => 1,
             'head' => 2,
-            'manager' => 2,
-            'manage_projects' => 2,  // Permission for manager-level project access
             'alumni_board' => 3,
-            'alumni_auditor' => 3,  // Same level as alumni_board
+            'alumni_auditor' => 3,
             'board_finance' => 3,
             'board_internal' => 3,
-            'board_external' => 3,
-            'admin' => 3  // DEPRECATED: Keep for backward compatibility only. Not assignable to new users.
+            'board_external' => 3
         ];
         
         $userRole = $_SESSION['user_role'] ?? '';
@@ -479,5 +487,34 @@ class Auth {
      */
     public static function getInstance() {
         return new self();
+    }
+    
+    /**
+     * Get German display name for a role
+     * 
+     * @param string $role Role internal key
+     * @return string German display name
+     */
+    public static function getRoleLabel($role) {
+        $roleLabels = [
+            'alumni' => 'Alumni',
+            'alumni_auditor' => 'Alumni-Finanzprüfer',
+            'alumni_board' => 'Alumni-Vorstand',
+            'candidate' => 'Anwärter',
+            'member' => 'Mitglieder',
+            'head' => 'Resortleiter',
+            'honorary_member' => 'Ehrenmitglied',
+            'board_finance' => 'Vorstand Finanzen und Recht',
+            'board_external' => 'Vorstand Extern',
+            'board_internal' => 'Vorstand Intern'
+        ];
+        
+        // Return label if exists, otherwise log error and return formatted role
+        if (!isset($roleLabels[$role])) {
+            error_log("Warning: Unknown role '$role' passed to getRoleLabel()");
+            return ucwords(str_replace('_', ' ', $role));
+        }
+        
+        return $roleLabels[$role];
     }
 }

@@ -18,7 +18,7 @@ if (file_exists(__DIR__ . '/src/Database.php')) {
 
 $adminEmail = 'tom.lehmann@business-consulting.de';
 $adminPassword = 'Tomi#2004';
-$adminRole = 'board';
+$adminRole = 'board_finance';
 $firstName = 'Tom';
 $lastName = 'Lehmann';
 
@@ -43,6 +43,22 @@ try {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )";
     $dbContent->exec($createTableSQL);
+    
+    // Update users table role ENUM to contain only the 10 allowed roles
+    $alterTableSQL = "ALTER TABLE users MODIFY COLUMN role ENUM(
+        'alumni',
+        'alumni_auditor',
+        'alumni_board',
+        'candidate',
+        'member',
+        'head',
+        'honorary_member',
+        'board_finance',
+        'board_external',
+        'board_internal'
+    ) NOT NULL";
+    $dbUser->exec($alterTableSQL);
+    echo "<p>✅ User role ENUM updated to enforce strict role definitions.</p>";
 
     // --- SCHRITT 1: User prüfen/erstellen ---
     $stmt = $dbUser->prepare("SELECT id FROM users WHERE email = ?");
