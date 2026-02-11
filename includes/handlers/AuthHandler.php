@@ -179,16 +179,18 @@ class AuthHandler {
         }
         
         // Role hierarchy: alumni and member have read-only access (level 1)
-        // manager can edit inventory (level 2)
+        // head can edit inventory (level 2)
         // board roles and alumni_board have full board access (level 3)
-        // Note: 'admin' and 'board' kept for backward compatibility with legacy code paths.
+        // Note: 'admin', 'board', and 'manager' kept for backward compatibility with legacy code paths.
+        // 'manager' is DEPRECATED in favor of 'head' but kept for existing users
         // 'board' is a placeholder level 3 role used for permission checks
+        // 'admin' is DEPRECATED and not assignable to new users
         $roleHierarchy = [
             'candidate' => 1,
             'alumni' => 1, 
             'member' => 1,
             'honorary_member' => 1,
-            'manager' => 2,  // DEPRECATED: Use 'head' instead
+            'manager' => 2,  // DEPRECATED: Use 'head' instead. Kept for existing users.
             'head' => 2,
             'alumni_board' => 3,
             'alumni_auditor' => 3,  // Same level as alumni_board

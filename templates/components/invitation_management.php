@@ -237,6 +237,7 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
     "role": "alumni"
   }
 ]</code></pre>
+                    <!-- Note: This role list matches Auth::VALID_ROLES. Keep in sync when roles change. -->
                     <p class="text-xs text-blue-700 mt-2">
                         <strong>Verfügbare Rollen:</strong> candidate, member, head, alumni, honorary_member, alumni_board, alumni_auditor, board_finance, board_internal, board_external
                     </p>
