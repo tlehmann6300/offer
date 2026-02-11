@@ -45,7 +45,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .sidebar {
-            background: #ffffff; /* white for light mode */
+            background: linear-gradient(180deg, #0066b3, #004f8c); /* blue gradient for light mode */
         }
         
         /* Custom scrollbar styling for sidebar */
@@ -80,7 +80,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         
         /* Dark mode sidebar styling */
         body.dark-mode .sidebar {
-            background: #020617; /* slate-950 for subtle contrast */
+            background: #1a1a1a; /* dark gray for dark mode */
             border-right: 1px solid rgba(255, 255, 255, 0.1);
         }
         
