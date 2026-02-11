@@ -52,8 +52,16 @@ if (!in_array($newRole, Auth::VALID_ROLES)) {
 // Check if user is trying to change their own role
 $isOwnRole = ($userId === (int)$_SESSION['user_id']);
 
-// Get current user's role for checks
-$currentUserRole = $_SESSION['user_role'] ?? '';
+// Get current user's actual role from the database for consistency
+$currentUserData = Auth::user();
+if (!$currentUserData) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Fehler beim Abrufen der Benutzerdaten'
+    ]);
+    exit;
+}
+$currentUserRole = $currentUserData['role'];
 $isBoardMember = in_array($currentUserRole, Auth::BOARD_ROLES);
 
 // If board member is demoting themselves to member or alumni, require a successor
@@ -102,8 +110,10 @@ if ($isOwnRole && $isBoardMember && in_array($newRole, ['member', 'alumni'])) {
         // Add succession message if applicable
         if ($isOwnRole && $successorId) {
             $successorUser = User::getById($successorId);
-            $message = 'Rollenwechsel erfolgreich durchgeführt. Deine Rolle wurde an ' . 
-                       $successorUser['email'] . ' übertragen.';
+            if ($successorUser) {
+                $message = 'Rollenwechsel erfolgreich durchgeführt. Deine Rolle wurde an ' . 
+                           $successorUser['email'] . ' übertragen.';
+            }
         }
         
         echo json_encode([
