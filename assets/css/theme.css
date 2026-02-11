@@ -75,6 +75,10 @@
     --bg-tertiary: #374151;
     --text-primary: #f3f4f6;
     --text-secondary: #9ca3af;
+    
+    /* Enhanced Dark Mode Shadows for depth */
+    --shadow-premium: 0 20px 40px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.3);
+    --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Force Overrides - The 'Hammer' to overwrite Tailwind defaults */
@@ -112,31 +116,30 @@ body {
     opacity: 0.5;
 }
 
-/* Fix Sidebar Text */
-.dark-mode .sidebar a {
-    color: rgba(255, 255, 255, 0.9) !important;
+/* Sidebar - Permanent Corporate Blue (IBC-Blau) for Light and Dark Mode */
+.sidebar {
+    background-color: var(--ibc-blue) !important;
 }
 
-.dark-mode .sidebar a:hover {
-    color: #ffffff !important;
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* Sidebar Links - Consistent Hover and Active States */
-.sidebar a {
-    transition: all 0.2s ease;
+/* Sidebar Text - Always White on Blue Background */
+.sidebar a,
+.sidebar span,
+.sidebar i,
+.sidebar label {
+    color: rgba(255, 255, 255, 0.95) !important;
 }
 
 .sidebar a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    transition: all 0.2s ease;
 }
 
+/* Sidebar Active State - White Background with IBC Green Border */
 .sidebar a.active,
-.sidebar a.bg-blue-50,
-.sidebar a[class*="bg-blue-50"],
-.sidebar a[class*="bg-blue-900"] {
-    border-right: 4px solid var(--ibc-green);
-    padding-right: calc(1.5rem - 4px); /* Adjust padding to account for border */
+.sidebar a[class*="bg-white/20"] {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    border-right: 4px solid var(--ibc-green) !important;
 }
 
 body.dark-mode main {
@@ -593,13 +596,6 @@ body:not(.dark-mode) td {
 }
 
 /* Sidebar Exception: Keep text light in the blue sidebar */
-body:not(.dark-mode) .sidebar span,
-body:not(.dark-mode) .sidebar a,
-body:not(.dark-mode) .sidebar i,
-body:not(.dark-mode) .sidebar label {
-    color: rgba(255, 255, 255, 0.95) !important;
-}
-
 /* Sidebar Icons - Inherit text color */
 .sidebar i,
 .sidebar i.fas {
@@ -633,14 +629,12 @@ body.dark-mode textarea {
     border-color: #334155 !important; /* slate-700 */
 }
 
-/* Dark Mode Links (außer Buttons) */
+/* Dark Mode Links (außer Buttons und Sidebar) */
 body.dark-mode a:not(.btn):not(.btn-primary):not(.nav-link) {
     color: #60a5fa !important; /* Helles Blau für Links */
 }
 
-/* Sidebar Ausnahme */
-body:not(.dark-mode) .sidebar a,
-body:not(.dark-mode) .sidebar span,
-body:not(.dark-mode) .sidebar i {
-    color: #ffffff !important;
+/* Sidebar links override - keep white */
+body.dark-mode .sidebar a {
+    color: rgba(255, 255, 255, 0.95) !important;
 }
