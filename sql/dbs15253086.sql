@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'alumni', 'candidate', 'alumni_board', 'honorary_member') 
+    role ENUM('board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor', 'alumni', 'member') 
         NOT NULL DEFAULT 'member',
     -- 'BOOLEAN' ersetzt 'TINYINT(1)' um Warnings zu vermeiden
     is_alumni_validated BOOLEAN NOT NULL DEFAULT 0, 
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS invitation_tokens (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     token VARCHAR(64) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL,
-    role ENUM('board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'alumni', 'candidate', 'alumni_board', 'honorary_member') 
+    role ENUM('board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor', 'alumni', 'member') 
         NOT NULL DEFAULT 'member',
     created_by INT UNSIGNED DEFAULT NULL,
     expires_at DATETIME NOT NULL,

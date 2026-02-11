@@ -549,6 +549,66 @@ CREATE TABLE IF NOT EXISTS system_logs (
   COMMENT='System-wide audit log for security and tracking';
 
 -- ============================================
+-- POLLS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS polls (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT DEFAULT NULL,
+    created_by INT UNSIGNED NOT NULL,
+    start_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    end_date DATETIME NOT NULL,
+    target_groups JSON NOT NULL COMMENT 'Array of roles allowed to vote e.g. ["member", "candidate", "board"]',
+    is_active TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    INDEX idx_created_by (created_by),
+    INDEX idx_end_date (end_date),
+    INDEX idx_is_active (is_active)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Polls for member voting';
+
+-- ============================================
+-- POLL OPTIONS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS poll_options (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    poll_id INT UNSIGNED NOT NULL,
+    option_text VARCHAR(255) NOT NULL,
+    
+    FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE,
+    
+    INDEX idx_poll_id (poll_id)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Options for polls';
+
+-- ============================================
+-- POLL VOTES TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS poll_votes (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    poll_id INT UNSIGNED NOT NULL,
+    option_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    voted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE,
+    FOREIGN KEY (option_id) REFERENCES poll_options(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_vote (poll_id, user_id),
+    
+    INDEX idx_poll_id (poll_id),
+    INDEX idx_option_id (option_id),
+    INDEX idx_user_id (user_id)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='User votes on poll options';
+
+-- ============================================
 -- EVENT DOCUMENTATION TABLE
 -- ============================================
 CREATE TABLE IF NOT EXISTS event_documentation (
@@ -556,9 +616,19 @@ CREATE TABLE IF NOT EXISTS event_documentation (
     event_id INT UNSIGNED NOT NULL,
     calculations TEXT DEFAULT NULL,
     notes TEXT DEFAULT NULL,
+    sales_data JSON DEFAULT NULL COMMENT 'JSON array of sales entries with label, amount, and date',
     created_by INT UNSIGNED NOT NULL,
+    updated_by INT UNSIGNED DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
     FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_event_doc (event_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    UNIQUE KEY unique_event_doc (event_id),
+    
+    INDEX idx_event_id (event_id),
+    INDEX idx_created_by (created_by),
+    INDEX idx_updated_by (updated_by)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Event documentation for calculations, notes, and sales tracking';
