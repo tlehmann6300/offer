@@ -323,8 +323,7 @@ class Auth {
         }
         
         $userRole = $_SESSION['user_role'] ?? '';
-        $allowedRoles = ['board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor'];
-        return in_array($userRole, $allowedRoles);
+        return in_array($userRole, array_merge(self::BOARD_ROLES, ['alumni_board', 'alumni_auditor']));
     }
     
     /**
@@ -347,8 +346,7 @@ class Auth {
         }
         
         $userRole = $_SESSION['user_role'] ?? '';
-        $allowedRoles = ['board_finance', 'board_internal', 'board_external'];
-        return in_array($userRole, $allowedRoles);
+        return in_array($userRole, self::BOARD_ROLES);
     }
     
     /**
@@ -362,8 +360,7 @@ class Auth {
         }
         
         $userRole = $_SESSION['user_role'] ?? '';
-        $allowedRoles = ['board_finance', 'board_internal', 'board_external', 'head'];
-        return in_array($userRole, $allowedRoles);
+        return in_array($userRole, array_merge(self::BOARD_ROLES, ['head']));
     }
     
     /**
@@ -377,8 +374,7 @@ class Auth {
         }
         
         $userRole = $_SESSION['user_role'] ?? '';
-        $allowedRoles = ['board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor'];
-        return in_array($userRole, $allowedRoles);
+        return in_array($userRole, array_merge(self::BOARD_ROLES, ['alumni_board', 'alumni_auditor']));
     }
     
     /**
@@ -392,8 +388,7 @@ class Auth {
         }
         
         $userRole = $_SESSION['user_role'] ?? '';
-        $allowedRoles = ['board_finance', 'board_internal', 'board_external'];
-        return in_array($userRole, $allowedRoles);
+        return in_array($userRole, self::BOARD_ROLES);
     }
     
     /**
