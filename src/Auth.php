@@ -512,7 +512,7 @@ class Auth {
         // Return label if exists, otherwise log error and return formatted role
         if (!isset($roleLabels[$role])) {
             error_log("Warning: Unknown role '$role' passed to getRoleLabel()");
-            return str_replace('_', ' ', ucwords(str_replace('_', ' ', $role)));
+            return ucwords(str_replace('_', ' ', $role));
         }
         
         return $roleLabels[$role];
