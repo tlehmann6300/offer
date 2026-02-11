@@ -33,7 +33,7 @@ $stmt = $userDb->query("
     SELECT COUNT(*) as active_users_prev 
     FROM users 
     WHERE last_login IS NOT NULL 
-    AND last_login BETWEEN DATE_SUB(NOW(), INTERVAL 14 DAY) AND DATE_SUB(NOW(), INTERVAL 7 DAY)
+    AND DATE(last_login) BETWEEN DATE(DATE_SUB(NOW(), INTERVAL 14 DAY)) AND DATE(DATE_SUB(NOW(), INTERVAL 7 DAY))
 ");
 $activeUsersPrev = $stmt->fetch()['active_users_prev'] ?? 0;
 $activeUsersTrend = $activeUsersPrev > 0 ? (($activeUsersCount - $activeUsersPrev) / $activeUsersPrev) * 100 : 0;
@@ -50,7 +50,7 @@ $openInvitationsCount = $stmt->fetch()['open_invitations'] ?? 0;
 $stmt = $userDb->query("
     SELECT COUNT(*) as open_invitations_prev 
     FROM invitation_tokens 
-    WHERE created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)
+    WHERE DATE(created_at) < DATE(DATE_SUB(NOW(), INTERVAL 7 DAY))
     AND expires_at > DATE_SUB(NOW(), INTERVAL 7 DAY)
 ");
 $openInvitationsPrev = $stmt->fetch()['open_invitations_prev'] ?? 0;
@@ -917,9 +917,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
+            const dateStr = new Date().toLocaleDateString('de-DE').replace(/\./g, '-');
             
             link.setAttribute('href', url);
-            link.setAttribute('download', 'statistik_report_' + new Date().toISOString().split('T')[0] + '.csv');
+            link.setAttribute('download', 'statistik_report_' + dateStr + '.csv');
             link.style.visibility = 'hidden';
             
             document.body.appendChild(link);
