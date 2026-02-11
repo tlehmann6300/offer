@@ -138,11 +138,11 @@ ob_start();
 
 <div class="w-full max-w-md p-8 bg-white rounded-2xl shadow-2xl transition-all duration-300">
     <div class="text-center mb-8">
-        <div class="inline-block p-4 bg-gradient-to-br from-blue-500 to-green-500 rounded-full mb-4 hover:shadow-lg transition-all duration-300">
-            <i class="fas fa-building text-4xl text-white"></i>
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 via-blue-600 to-emerald-500 rounded-2xl mb-5 shadow-lg shadow-blue-200/50 hover:shadow-xl hover:scale-105 transition-all duration-300">
+            <i class="fas fa-building text-3xl text-white"></i>
         </div>
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">IBC Intranet</h1>
-        <p class="text-gray-600">Melden Sie sich an, um fortzufahren</p>
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-2 tracking-tight">Willkommen zurück</h1>
+        <p class="text-gray-500 font-medium">Melde dich bei deinem Konto an</p>
     </div>
 
     <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 1): ?>
@@ -183,13 +183,13 @@ ob_start();
         </div>
         <?php endif; ?>
 
-        <button type="submit" class="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-green-600 dark:hover:from-blue-600 dark:hover:to-green-600 transition-all duration-300 transform hover:scale-105 shadow-lg">
+        <button type="submit" class="w-full py-4 px-6 bg-gradient-to-r from-blue-600 via-blue-500 to-emerald-500 text-white rounded-xl font-bold hover:from-blue-700 hover:via-blue-600 hover:to-emerald-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg shadow-blue-300/30 hover:shadow-xl hover:shadow-blue-400/30 tracking-wide">
             <i class="fas fa-sign-in-alt mr-2"></i><?php echo $require2FA ? 'Code bestätigen' : 'Anmelden'; ?>
         </button>
     </form>
     
     <div class="mt-6 text-center">
-        <p class="text-gray-600 text-sm">Passwort vergessen? Wenden Sie sich an einen Administrator.</p>
+        <p class="text-gray-400 text-sm font-medium">Passwort vergessen? Wende dich an einen Administrator.</p>
     </div>
 </div>
 
