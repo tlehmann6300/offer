@@ -170,7 +170,18 @@ ob_start();
         <!-- Image -->
         <?php if (!empty($item['image_path'])): ?>
         <div class="mb-4 rounded-lg overflow-hidden h-48">
-            <img src="<?php echo htmlspecialchars($item['image_path']); ?>" 
+            <?php
+            // Check if image is from EasyVerein and needs proxy
+            $imageSrc = $item['image_path'];
+            if (strpos($imageSrc, 'easyverein.com') !== false) {
+                // Use proxy for EasyVerein images
+                $imageSrc = '/api/easyverein_image.php?url=' . urlencode($imageSrc);
+            } else {
+                // Local image - ensure leading slash
+                $imageSrc = '/' . ltrim($imageSrc, '/');
+            }
+            ?>
+            <img src="<?php echo htmlspecialchars($imageSrc); ?>" 
                  alt="<?php echo htmlspecialchars($item['name']); ?>" 
                  class="w-full h-full object-cover">
         </div>

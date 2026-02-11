@@ -340,7 +340,18 @@ ob_start();
                     <td class="px-4 py-4 whitespace-nowrap">
                         <div class="h-16 w-16 flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-100 rounded <?php echo $item['is_archived_in_easyverein'] ? 'grayscale' : ''; ?>" <?php if (empty($item['image_path'])): ?>aria-label="Kein Bild verfügbar"<?php endif; ?>>
                             <?php if (!empty($item['image_path'])): ?>
-                            <img src="/<?php echo htmlspecialchars($item['image_path']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="h-full w-full object-cover rounded">
+                                <?php
+                                // Check if image is from EasyVerein and needs proxy
+                                $imageSrc = $item['image_path'];
+                                if (strpos($imageSrc, 'easyverein.com') !== false) {
+                                    // Use proxy for EasyVerein images
+                                    $imageSrc = '/api/easyverein_image.php?url=' . urlencode($imageSrc);
+                                } else {
+                                    // Local image - ensure leading slash
+                                    $imageSrc = '/' . ltrim($imageSrc, '/');
+                                }
+                                ?>
+                            <img src="<?php echo htmlspecialchars($imageSrc); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="h-full w-full object-cover rounded">
                             <?php else: ?>
                             <i class="fas fa-image text-gray-400 dark:text-gray-500 text-2xl" aria-hidden="true"></i>
                             <?php endif; ?>

@@ -212,7 +212,18 @@ ob_start();
             <!-- Image -->
             <?php if ($item['image_path']): ?>
             <div class="mb-6">
-                <img src="/<?php echo htmlspecialchars($item['image_path']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="w-full max-w-lg rounded-lg shadow-md">
+                <?php
+                // Check if image is from EasyVerein and needs proxy
+                $imageSrc = $item['image_path'];
+                if (strpos($imageSrc, 'easyverein.com') !== false) {
+                    // Use proxy for EasyVerein images
+                    $imageSrc = '/api/easyverein_image.php?url=' . urlencode($imageSrc);
+                } else {
+                    // Local image - ensure leading slash
+                    $imageSrc = '/' . ltrim($imageSrc, '/');
+                }
+                ?>
+                <img src="<?php echo htmlspecialchars($imageSrc); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="w-full max-w-lg rounded-lg shadow-md">
             </div>
             <?php endif; ?>
 
