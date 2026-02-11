@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS polls (
     created_by INT NOT NULL,
     start_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     end_date DATETIME NOT NULL,
-    target_groups JSON NOT NULL COMMENT 'Array of roles allowed to vote e.g. ["member", "alumni_candidate"]',
+    target_groups JSON NOT NULL COMMENT 'Array of roles allowed to vote e.g. ["member", "candidate", "board"]',
     is_active TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

@@ -38,6 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_poll'])) {
         $errorMessage = 'Bitte geben Sie einen Titel ein.';
     } elseif (empty($endDate)) {
         $errorMessage = 'Bitte geben Sie ein Enddatum an.';
+    } elseif (strtotime($endDate) <= time()) {
+        $errorMessage = 'Das Enddatum muss in der Zukunft liegen.';
     } elseif (count($options) < 2) {
         $errorMessage = 'Bitte geben Sie mindestens 2 Antwortmöglichkeiten an.';
     } elseif (empty($targetGroups)) {
@@ -172,7 +174,7 @@ ob_start();
                             <?php echo (isset($_POST['target_groups']) && in_array('candidate', $_POST['target_groups'])) ? 'checked' : ''; ?>
                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                         >
-                        <span class="ml-3 text-gray-700 dark:text-gray-300">Alumni Candidate</span>
+                        <span class="ml-3 text-gray-700 dark:text-gray-300">Candidate</span>
                     </label>
                     <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
                         <input 
@@ -289,6 +291,14 @@ ob_start();
 </div>
 
 <script>
+// Set minimum datetime to current time
+document.addEventListener('DOMContentLoaded', function() {
+    const endDateInput = document.getElementById('end_date');
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    endDateInput.min = now.toISOString().slice(0, 16);
+});
+
 // Dynamic option adding
 document.getElementById('addOptionBtn').addEventListener('click', function() {
     const container = document.getElementById('optionsContainer');
