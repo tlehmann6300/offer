@@ -24,8 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_invite'])) {
     if (!in_array($role, Auth::VALID_ROLES)) {
         $error = 'Ungültige Rolle ausgewählt';
     } else {
-        // Split emails by line breaks
-        $emails = array_filter(array_map('trim', explode("\n", $emailsText)));
+        // Split emails by line breaks (handle Unix, Windows, and Mac line breaks)
+        $emails = array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $emailsText)));
         
         if (empty($emails)) {
             $error = 'Bitte geben Sie mindestens eine E-Mail-Adresse ein';
@@ -34,8 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_invite'])) {
                 // Initialize Microsoft Graph Service
                 $graphService = new MicrosoftGraphService();
                 
-                // Get redirect URL for invitations
-                $redirectUrl = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . BASE_URL;
+                // Get redirect URL for invitations using BASE_URL constant (secure)
+                $redirectUrl = BASE_URL;
                 
                 // Process each email
                 foreach ($emails as $email) {
@@ -51,11 +51,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_invite'])) {
                     }
                     
                     try {
-                        // Extract name from email (everything before @)
-                        $name = explode('@', $email)[0];
+                        // Extract display name from email (everything before @)
+                        $displayName = explode('@', $email)[0];
                         
                         // Invite user
-                        $userId = $graphService->inviteUser($email, $name, $redirectUrl);
+                        $userId = $graphService->inviteUser($email, $displayName, $redirectUrl);
                         
                         // Assign role
                         $roleAssigned = $graphService->assignRole($userId, $role);
