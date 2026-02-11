@@ -71,19 +71,38 @@ ob_start();
 ?>
 
 <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-2">
-        <i class="fas fa-users text-purple-600 mr-2"></i>
-        Benutzerverwaltung
-    </h1>
-    <p class="text-gray-600"><?php echo count($users); ?> Benutzer gesamt</p>
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                <i class="fas fa-users text-purple-600 dark:text-purple-400 mr-2"></i>
+                Benutzerverwaltung
+            </h1>
+            <p class="text-gray-600 dark:text-gray-300"><?php echo count($users); ?> Benutzer gesamt</p>
+        </div>
+        <div class="flex items-center space-x-2 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+            <i class="fas fa-chart-line text-green-600 dark:text-green-400 text-xl"></i>
+            <div class="text-sm">
+                <div class="font-semibold text-gray-900 dark:text-gray-100"><?php 
+                    $activeToday = 0;
+                    foreach ($users as $u) {
+                        if ($u['last_login'] && strtotime($u['last_login']) > strtotime('-24 hours')) {
+                            $activeToday++;
+                        }
+                    }
+                    echo $activeToday;
+                ?></div>
+                <div class="text-gray-500 dark:text-gray-400">Aktiv heute</div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Tab Navigation -->
 <div class="mb-6">
-    <div class="border-b border-gray-200">
+    <div class="border-b border-gray-200 dark:border-gray-700">
         <nav class="-mb-px flex space-x-8" aria-label="Tabs">
             <button 
-                class="tab-button active border-purple-500 text-purple-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                class="tab-button active border-purple-500 text-purple-600 dark:text-purple-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                 data-tab="users"
             >
                 <i class="fas fa-users mr-2"></i>
@@ -91,7 +110,7 @@ ob_start();
             </button>
             <?php if ($canManageInvitations): ?>
             <button 
-                class="tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                 data-tab="invitations"
             >
                 <i class="fas fa-envelope mr-2"></i>
@@ -103,13 +122,13 @@ ob_start();
 </div>
 
 <?php if ($message): ?>
-<div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+<div class="mb-6 p-4 bg-green-100 dark:bg-green-900/50 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-300 rounded-lg">
     <i class="fas fa-check-circle mr-2"></i><?php echo htmlspecialchars($message); ?>
 </div>
 <?php endif; ?>
 
 <?php if ($error): ?>
-<div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+<div class="mb-6 p-4 bg-red-100 dark:bg-red-900/50 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg">
     <i class="fas fa-exclamation-circle mr-2"></i><?php echo htmlspecialchars($error); ?>
 </div>
 <?php endif; ?>
@@ -117,9 +136,9 @@ ob_start();
 <!-- Tab Content: Users -->
 <div id="tab-users" class="tab-content">
     <!-- Invite User -->
-    <div class="card p-6 mb-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">
-            <i class="fas fa-user-plus text-green-600 mr-2"></i>
+    <div class="card p-6 mb-6 bg-gradient-to-r from-white to-green-50 dark:from-gray-800 dark:to-green-900/20">
+        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+            <i class="fas fa-user-plus text-green-600 dark:text-green-400 mr-2"></i>
             Neuen Benutzer einladen
         </h2>
         <form method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -165,40 +184,103 @@ ob_start();
 
     <!-- Users List -->
     <div class="card overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="w-full">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Benutzer</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rolle</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">2FA / Validierung</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Letzter Login</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aktionen</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                <?php foreach ($users as $user): ?>
-                <tr class="hover:bg-gray-50">
+        <!-- Search and Filter Bar -->
+        <div class="p-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-b border-gray-200 dark:border-gray-600">
+            <div class="flex flex-col md:flex-row gap-4 mb-4">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-search mr-1"></i>Suche
+                    </label>
+                    <input 
+                        type="text" 
+                        id="userSearch" 
+                        placeholder="Nach E-Mail oder ID suchen..." 
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    >
+                </div>
+                <div class="md:w-48">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-filter mr-1"></i>Filter nach Rolle
+                    </label>
+                    <select 
+                        id="roleFilter" 
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    >
+                        <option value="">Alle Rollen</option>
+                        <?php foreach (Auth::VALID_ROLES as $role): ?>
+                        <option value="<?php echo htmlspecialchars($role); ?>"><?php echo htmlspecialchars(translateRole($role)); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="md:w-48">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-sort mr-1"></i>Sortierung
+                    </label>
+                    <select 
+                        id="sortBy" 
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    >
+                        <option value="email">E-Mail (A-Z)</option>
+                        <option value="email-desc">E-Mail (Z-A)</option>
+                        <option value="login">Letzter Login (neu)</option>
+                        <option value="login-old">Letzter Login (alt)</option>
+                        <option value="id">ID (aufsteigend)</option>
+                        <option value="id-desc">ID (absteigend)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-600 dark:text-gray-300">
+                    <span id="visibleCount"><?php echo count($users); ?></span> von 
+                    <span id="totalCount"><?php echo count($users); ?></span> Benutzern
+                </div>
+                <button 
+                    id="exportUsers" 
+                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                >
+                    <i class="fas fa-download mr-2"></i>Export CSV
+                </button>
+            </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full" id="usersTable">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Benutzer</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Rolle</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">2FA / Validierung</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Letzter Login</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aktionen</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <?php foreach ($users as $user): ?>
+                <tr class="user-row hover:bg-gray-50 dark:hover:bg-gray-700" 
+                    data-email="<?php echo htmlspecialchars(strtolower($user['email'])); ?>"
+                    data-role="<?php echo htmlspecialchars($user['role']); ?>"
+                    data-id="<?php echo $user['id']; ?>"
+                    data-login="<?php echo $user['last_login'] ? strtotime($user['last_login']) : 0; ?>">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center">
-                                <i class="fas fa-user text-purple-600"></i>
+                            <div class="flex-shrink-0 h-10 w-10 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-purple-600 dark:text-purple-400"></i>
                             </div>
                             <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900">
+                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                                     <?php echo htmlspecialchars($user['email']); ?>
                                     <?php if ($user['id'] == $_SESSION['user_id']): ?>
-                                    <span class="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">Du</span>
+                                    <span class="ml-2 px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full">Du</span>
                                     <?php endif; ?>
                                 </div>
-                                <div class="text-xs text-gray-500">ID: <?php echo $user['id']; ?></div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">ID: <?php echo $user['id']; ?></div>
                             </div>
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <select 
                             data-user-id="<?php echo $user['id']; ?>"
-                            class="role-select px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="role-select px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                         >
                             <?php foreach (Auth::VALID_ROLES as $role): ?>
                             <option value="<?php echo htmlspecialchars($role); ?>" <?php echo ($user['role'] == $role) ? 'selected' : ''; ?>><?php echo htmlspecialchars(translateRole($role)); ?></option>
@@ -208,7 +290,7 @@ ob_start();
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex flex-col space-y-1">
                             <?php if ($user['tfa_enabled']): ?>
-                            <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full inline-flex items-center">
+                            <span class="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 rounded-full inline-flex items-center">
                                 <i class="fas fa-shield-alt mr-1"></i>2FA
                             </span>
                             <?php endif; ?>
@@ -217,7 +299,7 @@ ob_start();
                                 <form method="POST" class="inline">
                                     <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
                                     <input type="hidden" name="is_validated" value="0">
-                                    <button type="submit" name="toggle_alumni_validation" class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full inline-flex items-center hover:bg-green-200">
+                                    <button type="submit" name="toggle_alumni_validation" class="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 rounded-full inline-flex items-center hover:bg-green-200 dark:hover:bg-green-900">
                                         <i class="fas fa-check-circle mr-1"></i>Verifiziert
                                     </button>
                                 </form>
@@ -225,7 +307,7 @@ ob_start();
                                 <form method="POST" class="inline">
                                     <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
                                     <input type="hidden" name="is_validated" value="1">
-                                    <button type="submit" name="toggle_alumni_validation" class="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-full inline-flex items-center hover:bg-yellow-200">
+                                    <button type="submit" name="toggle_alumni_validation" class="px-2 py-1 text-xs bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 rounded-full inline-flex items-center hover:bg-yellow-200 dark:hover:bg-yellow-900">
                                         <i class="fas fa-clock mr-1"></i>Ausstehend
                                     </button>
                                 </form>
@@ -233,14 +315,14 @@ ob_start();
                             <?php endif; ?>
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                         <?php echo $user['last_login'] ? date('d.m.Y H:i', strtotime($user['last_login'])) : 'Nie'; ?>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                         <?php if ($user['id'] != $_SESSION['user_id']): ?>
                         <form method="POST" class="inline" onsubmit="return confirm('Bist Du sicher, dass Du diesen Benutzer löschen möchtest?');">
                             <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                            <button type="submit" name="delete_user" class="text-red-600 hover:text-red-800">
+                            <button type="submit" name="delete_user" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </form>
@@ -340,6 +422,119 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             document.getElementById('tab-' + targetTab).classList.remove('hidden');
         });
+    });
+});
+</script>
+
+<script>
+// Search, Filter, and Sort functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const userSearch = document.getElementById('userSearch');
+    const roleFilter = document.getElementById('roleFilter');
+    const sortBy = document.getElementById('sortBy');
+    const exportBtn = document.getElementById('exportUsers');
+    const userRows = document.querySelectorAll('.user-row');
+    const visibleCount = document.getElementById('visibleCount');
+    const totalCount = document.getElementById('totalCount');
+    
+    function filterAndSortUsers() {
+        const searchTerm = userSearch.value.toLowerCase();
+        const selectedRole = roleFilter.value;
+        const sortOption = sortBy.value;
+        
+        // Convert NodeList to Array for sorting
+        let rowsArray = Array.from(userRows);
+        
+        // Apply search and role filter
+        let visibleRows = rowsArray.filter(row => {
+            const email = row.getAttribute('data-email');
+            const id = row.getAttribute('data-id');
+            const role = row.getAttribute('data-role');
+            
+            const matchesSearch = email.includes(searchTerm) || id.toString().includes(searchTerm);
+            const matchesRole = !selectedRole || role === selectedRole;
+            
+            return matchesSearch && matchesRole;
+        });
+        
+        // Apply sorting
+        visibleRows.sort((a, b) => {
+            switch(sortOption) {
+                case 'email':
+                    return a.getAttribute('data-email').localeCompare(b.getAttribute('data-email'));
+                case 'email-desc':
+                    return b.getAttribute('data-email').localeCompare(a.getAttribute('data-email'));
+                case 'login':
+                    return parseInt(b.getAttribute('data-login')) - parseInt(a.getAttribute('data-login'));
+                case 'login-old':
+                    return parseInt(a.getAttribute('data-login')) - parseInt(b.getAttribute('data-login'));
+                case 'id':
+                    return parseInt(a.getAttribute('data-id')) - parseInt(b.getAttribute('data-id'));
+                case 'id-desc':
+                    return parseInt(b.getAttribute('data-id')) - parseInt(a.getAttribute('data-id'));
+                default:
+                    return 0;
+            }
+        });
+        
+        // Hide all rows
+        userRows.forEach(row => {
+            row.style.display = 'none';
+        });
+        
+        // Show and reorder visible rows
+        const tbody = document.querySelector('#usersTable tbody');
+        visibleRows.forEach(row => {
+            row.style.display = '';
+            tbody.appendChild(row); // Reorder by appending
+        });
+        
+        // Update counter
+        visibleCount.textContent = visibleRows.length;
+    }
+    
+    // Event listeners
+    userSearch.addEventListener('input', filterAndSortUsers);
+    roleFilter.addEventListener('change', filterAndSortUsers);
+    sortBy.addEventListener('change', filterAndSortUsers);
+    
+    // Export to CSV functionality
+    exportBtn.addEventListener('click', function() {
+        const visibleRows = Array.from(userRows).filter(row => row.style.display !== 'none');
+        
+        let csv = 'ID,E-Mail,Rolle,2FA Aktiviert,Alumni Verifiziert,Letzter Login\n';
+        
+        visibleRows.forEach(row => {
+            const id = row.getAttribute('data-id');
+            const email = row.getAttribute('data-email');
+            const role = row.getAttribute('data-role');
+            
+            // Get additional info from row cells
+            const cells = row.querySelectorAll('td');
+            const tfaBadge = cells[2].querySelector('.fa-shield-alt');
+            const tfa = tfaBadge ? 'Ja' : 'Nein';
+            
+            const verifBadge = cells[2].querySelector('.fa-check-circle');
+            const verif = verifBadge ? 'Ja' : (cells[2].querySelector('.fa-clock') ? 'Nein' : 'N/A');
+            
+            const login = cells[3].textContent.trim();
+            
+            csv += `${id},"${email}","${role}","${tfa}","${verif}","${login}"\n`;
+        });
+        
+        // Create download link
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        const dateStr = new Date().toLocaleDateString('de-DE').replace(/\./g, '-');
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'benutzer_export_' + dateStr + '.csv');
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     });
 });
 </script>
