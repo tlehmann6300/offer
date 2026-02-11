@@ -10,6 +10,10 @@ assets/uploads/*
 uploads/events/*
 !uploads/events/.gitkeep
 
+# Inventory uploads directory - keep structure, ignore uploaded files
+uploads/inventory/*
+!uploads/inventory/.gitkeep
+
 # Composer
 composer.lock
 
