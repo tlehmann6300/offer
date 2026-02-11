@@ -207,7 +207,7 @@ function dismissProfileReviewPrompt() {
                 </div>
                 <?php if ($openTasksCount > 0): ?>
                 <p class="text-gray-600 mb-3">Du hast aktuell <?php echo $openTasksCount; ?> offene Ausleihen</p>
-                <span class="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold">
+                <span class="inline-flex items-center text-orange-600 font-semibold">
                     Ausleihen verwalten <i class="fas fa-arrow-right ml-2"></i>
                 </span>
                 <?php else: ?>
