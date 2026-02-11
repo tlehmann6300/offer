@@ -139,16 +139,9 @@ ob_start();
                     name="role" 
                     class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
-                    <option value="candidate">Anwärter</option>
-                    <option value="member">Mitglied</option>
-                    <option value="head">Ressortleiter</option>
-                    <option value="alumni">Alumni</option>
-                    <option value="alumni_board">Alumni-Vorstand</option>
-                    <option value="alumni_auditor">Alumni-Finanzprüfer</option>
-                    <option value="board_finance">Vorstand Finanzen & Recht</option>
-                    <option value="board_internal">Vorstand Intern</option>
-                    <option value="board_external">Vorstand Extern</option>
-                    <option value="honorary_member">Ehrenmitglied</option>
+                    <?php foreach (Auth::VALID_ROLES as $role): ?>
+                    <option value="<?php echo htmlspecialchars($role); ?>"><?php echo htmlspecialchars(translateRole($role)); ?></option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <div>
@@ -207,16 +200,9 @@ ob_start();
                             data-user-id="<?php echo $user['id']; ?>"
                             class="role-select px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                         >
-                            <option value="candidate" <?php echo ($user['role'] == 'candidate') ? 'selected' : ''; ?>>Anwärter</option>
-                            <option value="member" <?php echo ($user['role'] == 'member') ? 'selected' : ''; ?>>Mitglied</option>
-                            <option value="head" <?php echo ($user['role'] == 'head') ? 'selected' : ''; ?>>Ressortleiter</option>
-                            <option value="alumni" <?php echo ($user['role'] == 'alumni') ? 'selected' : ''; ?>>Alumni</option>
-                            <option value="alumni_board" <?php echo ($user['role'] == 'alumni_board') ? 'selected' : ''; ?>>Alumni-Vorstand</option>
-                            <option value="alumni_auditor" <?php echo ($user['role'] == 'alumni_auditor') ? 'selected' : ''; ?>>Alumni-Finanzprüfer</option>
-                            <option value="board_finance" <?php echo ($user['role'] == 'board_finance') ? 'selected' : ''; ?>>Vorstand Finanzen & Recht</option>
-                            <option value="board_internal" <?php echo ($user['role'] == 'board_internal') ? 'selected' : ''; ?>>Vorstand Intern</option>
-                            <option value="board_external" <?php echo ($user['role'] == 'board_external') ? 'selected' : ''; ?>>Vorstand Extern</option>
-                            <option value="honorary_member" <?php echo ($user['role'] == 'honorary_member') ? 'selected' : ''; ?>>Ehrenmitglied</option>
+                            <?php foreach (Auth::VALID_ROLES as $role): ?>
+                            <option value="<?php echo htmlspecialchars($role); ?>" <?php echo ($user['role'] == $role) ? 'selected' : ''; ?>><?php echo htmlspecialchars(translateRole($role)); ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
