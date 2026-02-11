@@ -184,71 +184,90 @@ function dismissProfileReviewPrompt() {
 <?php endif; ?>
 
 <!-- Hero Section with Personalized Greeting -->
-<div class="mb-8">
-    <div class="max-w-4xl mx-auto text-center">
-        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-3">
-            <?php echo htmlspecialchars($greeting); ?>, <?php echo htmlspecialchars($displayName); ?>!
-        </h1>
-        <p class="text-lg md:text-xl text-gray-600">
-            Willkommen zurück im IBC Intranet
-        </p>
+<div class="mb-10">
+    <div class="max-w-4xl mx-auto">
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-blue-700 to-emerald-600 p-8 md:p-12 text-white shadow-xl">
+            <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptMCAwdi02aC02djZoNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-50"></div>
+            <div class="relative z-10">
+                <p class="text-blue-100 text-sm font-medium uppercase tracking-wider mb-2">
+                    <i class="fas fa-sun mr-1"></i> <?php
+                        $germanMonths = [1=>'Januar',2=>'Februar',3=>'März',4=>'April',5=>'Mai',6=>'Juni',7=>'Juli',8=>'August',9=>'September',10=>'Oktober',11=>'November',12=>'Dezember'];
+                        $monthNum = (int)date('n');
+                        echo date('d') . '. ' . ($germanMonths[$monthNum] ?? '') . ' ' . date('Y');
+                    ?>
+                </p>
+                <h1 class="text-3xl md:text-5xl font-extrabold mb-3 tracking-tight" style="color: white !important;">
+                    <?php echo htmlspecialchars($greeting); ?>, <?php echo htmlspecialchars($displayName); ?>! 👋
+                </h1>
+                <p class="text-lg text-blue-100 font-medium" style="color: rgba(219, 234, 254, 0.9) !important;">
+                    Willkommen zurück im IBC Intranet
+                </p>
+            </div>
+            <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+            <div class="absolute -top-6 -left-6 w-24 h-24 bg-emerald-400/20 rounded-full blur-xl"></div>
+        </div>
     </div>
 </div>
 
 <!-- Quick Stats Widgets -->
-<div class="max-w-6xl mx-auto mb-8">
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">
-        <i class="fas fa-tachometer-alt text-purple-600 mr-2"></i>
-        Schnellübersicht
-    </h2>
+<div class="max-w-6xl mx-auto mb-10">
+    <div class="flex items-center mb-6">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mr-3 shadow-md">
+            <i class="fas fa-tachometer-alt text-white text-sm"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800">Schnellübersicht</h2>
+    </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- My Open Tasks Widget -->
-        <a href="/pages/inventory/my_rentals.php" class="block">
-            <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-orange-50 hover:shadow-2xl transition-all duration-300 cursor-pointer">
+        <a href="/pages/inventory/my_rentals.php" class="block group">
+            <div class="card p-6 rounded-2xl bg-gradient-to-br from-white to-orange-50/50 hover:shadow-2xl transition-all duration-300 cursor-pointer border border-orange-100/50">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold text-gray-800">
-                        <i class="fas fa-tasks text-orange-600 mr-2"></i>
-                        Meine offenen Ausleihen
-                    </h3>
-                    <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                        <span class="text-2xl font-bold text-orange-600"><?php echo $openTasksCount; ?></span>
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 mb-1">Ausleihen</p>
+                        <h3 class="text-lg font-bold text-gray-800">Meine offenen Ausleihen</h3>
+                    </div>
+                    <div class="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-200 group-hover:scale-110 group-hover:rotate-[-5deg] transition-transform duration-300">
+                        <span class="text-2xl font-bold text-white"><?php echo $openTasksCount; ?></span>
                     </div>
                 </div>
                 <?php if ($openTasksCount > 0): ?>
                 <p class="text-gray-600 mb-3">Du hast aktuell <?php echo $openTasksCount; ?> offene Ausleihen</p>
-                <span class="inline-flex items-center text-orange-600 font-semibold">
+                <span class="inline-flex items-center text-orange-600 font-semibold text-sm group-hover:translate-x-1 transition-transform">
                     Ausleihen verwalten <i class="fas fa-arrow-right ml-2"></i>
                 </span>
                 <?php else: ?>
                 <p class="text-gray-600">Keine offenen Ausleihen</p>
-                <p class="text-sm text-gray-500 mt-2">Alle Artikel wurden zurückgegeben</p>
+                <p class="text-sm text-gray-500 mt-2">
+                    <i class="fas fa-check-circle text-green-500 mr-1"></i>
+                    Alle Artikel wurden zurückgegeben
+                </p>
                 <?php endif; ?>
             </div>
         </a>
 
         <!-- Next Event Widget -->
-        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-blue-50 hover:shadow-2xl transition-all duration-300">
+        <div class="card p-6 rounded-2xl bg-gradient-to-br from-white to-blue-50/50 hover:shadow-2xl transition-all duration-300 border border-blue-100/50">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-bold text-gray-800">
-                    <i class="fas fa-calendar-alt text-blue-600 mr-2"></i>
-                    Nächstes Event
-                </h3>
-                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 mb-1">Events</p>
+                    <h3 class="text-lg font-bold text-gray-800">Nächstes Event</h3>
+                </div>
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
+                    <i class="fas fa-calendar-check text-white text-xl"></i>
                 </div>
             </div>
             <?php if ($nextEvent): ?>
             <h4 class="font-semibold text-gray-800 mb-2"><?php echo htmlspecialchars($nextEvent['title']); ?></h4>
             <p class="text-gray-600 mb-3">
-                <i class="fas fa-clock mr-1"></i>
+                <i class="fas fa-clock mr-1 text-blue-400"></i>
                 <?php echo date('d.m.Y H:i', strtotime($nextEvent['start_time'])); ?> Uhr
             </p>
-            <a href="../events/view.php?id=<?php echo $nextEvent['event_id']; ?>" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold">
+            <a href="../events/view.php?id=<?php echo $nextEvent['event_id']; ?>" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold text-sm hover:translate-x-1 transition-transform">
                 Details ansehen <i class="fas fa-arrow-right ml-2"></i>
             </a>
             <?php else: ?>
             <p class="text-gray-600 mb-3">Keine anstehenden Events</p>
-            <a href="../events/index.php" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold">
+            <a href="../events/index.php" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold text-sm hover:translate-x-1 transition-transform">
                 Events durchsuchen <i class="fas fa-arrow-right ml-2"></i>
             </a>
             <?php endif; ?>
@@ -258,15 +277,17 @@ function dismissProfileReviewPrompt() {
 
 <!-- Dashboard Section - Wir suchen Helfer -->
 <div class="max-w-6xl mx-auto mb-12">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">
-        <i class="fas fa-hands-helping text-green-600 mr-2"></i>
-        Wir suchen Helfer
-    </h2>
+    <div class="flex items-center mb-6">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mr-3 shadow-md">
+            <i class="fas fa-hands-helping text-white text-sm"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800">Wir suchen Helfer</h2>
+    </div>
     
     <?php if (!empty($helperEvents)): ?>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <?php foreach ($helperEvents as $event): ?>
-        <div class="card p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-white to-green-50 border-l-4 border-green-500">
+        <div class="card p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-white to-green-50/60 border-l-4 border-green-500">
             <div class="mb-4">
                 <h3 class="text-lg font-bold text-gray-800 mb-2">
                     <i class="fas fa-calendar-alt text-green-600 mr-2"></i>
@@ -310,10 +331,12 @@ function dismissProfileReviewPrompt() {
 
 <!-- Upcoming Events Section - Visible to All Users -->
 <div class="max-w-6xl mx-auto mb-12">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
-        <i class="fas fa-calendar-alt text-purple-600 mr-2"></i>
-        Anstehende Events
-    </h2>
+    <div class="flex items-center justify-center mb-6">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center mr-3 shadow-md">
+            <i class="fas fa-calendar-alt text-white text-sm"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800">Anstehende Events</h2>
+    </div>
     
     <div class="grid grid-cols-1 gap-6">
         <?php 

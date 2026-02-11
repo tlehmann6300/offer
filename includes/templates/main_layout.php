@@ -125,28 +125,45 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         }
         
         .card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: var(--bg-card);
+            border-radius: var(--radius-lg, 16px);
+            box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06));
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--ibc-green), var(--ibc-blue));
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
         .card:hover {
-            box-shadow: 0 12px 32px rgba(0, 102, 179, 0.15);
-            transform: translateY(-2px);
+            box-shadow: var(--shadow-card-hover, 0 4px 12px rgba(0,0,0,0.08), 0 20px 40px rgba(0,0,0,0.12));
+            transform: translateY(-4px);
+            border-color: rgba(0, 102, 179, 0.12);
+        }
+        .card:hover::before {
+            opacity: 1;
         }
         .btn-primary {
-            background: linear-gradient(135deg, #00a651 0%, #0066b3 100%);
+            background: linear-gradient(135deg, var(--ibc-green) 0%, var(--ibc-green-mid) 50%, var(--ibc-blue) 100%);
+            background-size: 200% 200%;
             color: white;
-            padding: 0.625rem 1.75rem;
-            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            border-radius: var(--radius-md, 12px);
             transition: all 0.3s ease;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0, 166, 81, 0.25);
+            letter-spacing: 0.02em;
+            box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3);
         }
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 166, 81, 0.35);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 166, 81, 0.4);
         }
         
         /* Mobile view improvements */
@@ -262,7 +279,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
     </div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar fixed left-0 top-0 h-screen w-64 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-40 text-white shadow-2xl flex flex-col">
+    <aside id="sidebar" class="sidebar fixed left-0 top-0 h-screen w-72 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 z-40 text-white shadow-2xl flex flex-col">
         <?php $currentUser = Auth::user(); ?>
         <?php 
         // Helper function to determine if a path is active
@@ -271,10 +288,15 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             return strpos($currentUri, $path) !== false;
         }
         ?>
-        <div class="p-6 flex-1 overflow-y-auto sidebar-scroll">
+        <div class="p-5 flex-1 overflow-y-auto sidebar-scroll">
             <!-- IBC Logo in Navbar -->
-            <div class="mb-8">
-                <img src="<?php echo asset('assets/img/ibc_logo_original_navbar.webp'); ?>" alt="IBC Logo" class="w-full h-auto">
+            <div class="mb-6 px-3 pt-2">
+                <img src="<?php echo asset('assets/img/ibc_logo_original_navbar.webp'); ?>" alt="IBC Logo" class="w-full h-auto drop-shadow-lg">
+            </div>
+            
+            <!-- Navigation Label -->
+            <div class="px-5 mb-3">
+                <p class="text-[11px] font-semibold uppercase tracking-widest text-white/50">Navigation</p>
             </div>
             
             <nav>
@@ -379,6 +401,14 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </a>
                 <?php endif; ?>
 
+                <!-- Admin Section Divider -->
+                <?php if (Auth::canManageUsers() || Auth::isAdmin()): ?>
+                <div class="my-3 mx-4">
+                    <div class="border-t border-white/10"></div>
+                    <p class="text-[11px] font-semibold uppercase tracking-widest text-white/40 mt-3 px-2">Administration</p>
+                </div>
+                <?php endif; ?>
+                
                 <!-- Benutzer (All board members who can manage users) -->
                 <?php if (Auth::canManageUsers()): ?>
                 <a href="<?php echo asset('pages/admin/users.php'); ?>" 
@@ -428,7 +458,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         </div>
 
         <!-- User Profile Section -->
-        <div class='mt-auto border-t border-white/20 pt-8 pb-6 px-5 bg-gradient-to-b from-black/30 to-black/40'>
+        <div class='mt-auto border-t border-white/10 pt-6 pb-5 px-5 bg-gradient-to-b from-black/20 to-black/35 backdrop-blur-sm'>
             <?php 
             $currentUser = Auth::user();
             
@@ -483,7 +513,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             ?>
             <!-- User Info -->
             <div class='flex items-center gap-3 mb-5'>
-                <div class='w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-base shadow-lg border-2 border-white/20 shrink-0'>
+                <div class='w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-white font-bold text-sm shadow-lg border-2 border-white/20 shrink-0'>
                     <?php echo $initials; ?>
                 </div>
                 <div class='flex-1 min-w-0'>
@@ -557,7 +587,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
     </aside>
 
     <!-- Main Content -->
-    <main class="lg:ml-64 min-h-screen p-6 lg:p-8">
+    <main class="lg:ml-72 min-h-screen p-6 lg:p-10">
         <?php if (isset($_SESSION['show_2fa_nudge']) && $_SESSION['show_2fa_nudge']): ?>
         <!-- 2FA Nudge Modal -->
         <div id="tfa-nudge-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
