@@ -673,7 +673,9 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             });
         });
         
-        // Auto-expand submenu if current page is a child item (execute immediately)
+        // Auto-expand submenu if current page is a child item
+        // Note: This executes immediately (IIFE) since the script runs after DOM is loaded,
+        // and DOMContentLoaded would never fire at this point
         (function() {
             const activeSubmenuItem = document.querySelector('.submenu a.bg-white\\/20, .submenu a[class*="border-ibc-green"]');
             if (activeSubmenuItem) {
