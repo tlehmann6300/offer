@@ -455,11 +455,11 @@ class AuthHandler {
                 'code' => $_GET['code']
             ]);
             
-            // Get user details
-            $user = $provider->get('me', $token);
+            // Get resource owner (user) details from the ID token
+            $resourceOwner = $provider->getResourceOwner($token);
             
             // Get user claims (including roles)
-            $claims = $user->getClaims();
+            $claims = $resourceOwner->toArray();
             $azureRoles = $claims['roles'] ?? [];
             
             // Define role mapping from Azure roles (string) to internal role names (string)
@@ -509,8 +509,13 @@ class AuthHandler {
             
             $roleName = $selectedRole;
             
-            // Get user email
-            $email = $user->getEmail();
+            // Get user email from claims
+            // Priority: email -> preferred_username -> upn
+            $email = $claims['email'] ?? $claims['preferred_username'] ?? $claims['upn'] ?? null;
+            
+            if (!$email) {
+                throw new Exception('Unable to retrieve user email from Azure AD claims');
+            }
             
             // Check if user exists in database
             $db = Database::getUserDB();
