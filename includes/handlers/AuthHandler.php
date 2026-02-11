@@ -7,6 +7,7 @@
 require_once __DIR__ . '/../database.php';
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../src/Auth.php';
 
 class AuthHandler {
     
@@ -179,15 +180,19 @@ class AuthHandler {
         
         // Role hierarchy: alumni and member have read-only access (level 1)
         // manager can edit inventory (level 2)
-        // board and alumni_board have full board access (level 3)
-        // admin has full system access (level 4)
+        // board roles and alumni_board have full board access (level 3)
+        // Note: 'admin' kept for backward compatibility with legacy code paths.
+        // This role is NOT in VALID_ROLES and cannot be assigned to new users.
         $roleHierarchy = [
             'alumni' => 1, 
             'member' => 1, 
             'manager' => 2, 
             'alumni_board' => 3,
-            'board' => 3, 
-            'admin' => 4
+            'alumni_auditor' => 3,  // Same level as alumni_board
+            'board_finance' => 3,
+            'board_internal' => 3,
+            'board_external' => 3,
+            'admin' => 3  // DEPRECATED: Keep for backward compatibility only. Not assignable to new users.
         ];
         $userRole = $_SESSION['user_role'];
         
@@ -201,7 +206,7 @@ class AuthHandler {
 
     /**
      * Check if user has specific role (exact match, not hierarchical)
-     * Special case: 'admin' role check also returns true for 'board' users
+     * Special case: 'admin' and 'board' role checks return true for board_finance users
      * 
      * @param string $role Required role
      * @return bool True if user has exact role
@@ -212,18 +217,25 @@ class AuthHandler {
             return false;
         }
         
-        // Special case: board has equal privileges to admin
-        if ($role === 'admin' && isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'board') {
+        $userRole = $_SESSION['user_role'] ?? '';
+        
+        // Special case: board_finance has equal privileges to admin and board for backward compatibility
+        if (($role === 'admin' || $role === 'board') && $userRole === 'board_finance') {
             return true;
         }
         
-        return isset($_SESSION['user_role']) && $_SESSION['user_role'] === $role;
+        // Also check other board roles for 'board' check
+        if ($role === 'board' && in_array($userRole, ['board_internal', 'board_external'])) {
+            return true;
+        }
+        
+        return $userRole === $role;
     }
 
     /**
-     * Check if user is admin or board (equal privileges)
+     * Check if user is admin (board_finance has full system access)
      * 
-     * @return bool True if user is admin or board
+     * @return bool True if user is board_finance
      */
     public static function isAdmin() {
         self::startSession();
@@ -231,12 +243,11 @@ class AuthHandler {
             return false;
         }
         
-        return isset($_SESSION['user_role']) && 
-               ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'board');
+        return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'board_finance';
     }
 
     /**
-     * Require admin privileges (admin or board)
+     * Require admin privileges (board_finance only)
      * Redirects to login if not authorized
      */
     public static function requireAdmin() {
@@ -245,6 +256,51 @@ class AuthHandler {
             header('Location: ' . $loginUrl);
             exit;
         }
+    }
+    
+    /**
+     * Check if user is a board member (any board role)
+     * 
+     * @return bool True if user has any board role
+     */
+    public static function isBoard() {
+        self::startSession();
+        if (!self::isAuthenticated()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        return in_array($userRole, Auth::BOARD_ROLES);
+    }
+    
+    /**
+     * Check if user can manage invoices
+     * 
+     * @return bool True if user is board_finance
+     */
+    public static function canManageInvoices() {
+        self::startSession();
+        if (!self::isAuthenticated()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        return $userRole === 'board_finance';
+    }
+    
+    /**
+     * Check if user can manage users
+     * 
+     * @return bool True if user has any board role
+     */
+    public static function canManageUsers() {
+        self::startSession();
+        if (!self::isAuthenticated()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        return in_array($userRole, Auth::BOARD_ROLES);
     }
 
     /**
