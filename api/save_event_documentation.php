@@ -19,8 +19,8 @@ if (!Auth::check()) {
 $user = Auth::user();
 $userRole = $user['role'] ?? '';
 
-// Check if user has permission (board or alumni_board only)
-// This includes all board role variants: board, vorstand_intern, vorstand_extern, vorstand_finanzen_recht
+// Check if user has permission (board roles or alumni_board only)
+// This includes all board role variants: board_finance, board_internal, board_external
 $allowedRoles = array_merge(Auth::BOARD_ROLES, ['alumni_board']);
 if (!in_array($userRole, $allowedRoles)) {
     http_response_code(403);

@@ -13,10 +13,10 @@ class Member {
     
     /**
      * Active member roles (excludes 'alumni', 'alumni_board', 'honorary_member')
-     * Includes all board variants: 'board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht'
+     * Includes all board role variants: 'board_finance', 'board_internal', 'board_external'
      * Plus: 'head' (Resortleiter), 'member' (Mitglied), 'candidate' (Anwärter)
      */
-    const ACTIVE_ROLES = ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate'];
+    const ACTIVE_ROLES = ['board_finance', 'board_internal', 'board_external', 'head', 'member', 'candidate'];
     
     /**
      * Get all active members with optional search and role filtering

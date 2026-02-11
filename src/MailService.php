@@ -522,13 +522,16 @@ class MailService {
         
         // Build body content
         $roleNames = [
-            'board' => 'Vorstand',
+            'board_finance' => 'Vorstand Finanzen & Recht',
+            'board_internal' => 'Vorstand Intern',
+            'board_external' => 'Vorstand Extern',
             'alumni_board' => 'Alumni-Vorstand',
-            'alumni_finanzprufer' => 'Alumni-Finanzprüfer',
+            'alumni_auditor' => 'Alumni-Finanzprüfer',
             'manager' => 'Ressortleiter',
             'member' => 'Mitglied',
             'alumni' => 'Alumni',
-            'candidate' => 'Anwärter'
+            'candidate' => 'Anwärter',
+            'head' => 'Ressortleiter'
         ];
         $roleDisplay = $roleNames[$role] ?? ucfirst($role);
         

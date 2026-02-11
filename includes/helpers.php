@@ -107,15 +107,15 @@ function asset($path) {
  */
 function translateRole($role) {
     $roleTranslations = [
-        'board' => 'Vorstand',
-        'vorstand_intern' => 'Vorstand',
-        'vorstand_extern' => 'Vorstand',
-        'vorstand_finanzen_recht' => 'Vorstand',
+        'board_finance' => 'Vorstand Finanzen & Recht',
+        'board_internal' => 'Vorstand Intern',
+        'board_external' => 'Vorstand Extern',
         'head' => 'Ressortleiter',
         'member' => 'Mitglied',
         'alumni' => 'Alumni',
         'candidate' => 'Anwärter',
         'alumni_board' => 'Alumni-Vorstand',
+        'alumni_auditor' => 'Alumni-Finanzprüfer',
         'honorary_member' => 'Ehrenmitglied',
         'manager' => 'Ressortleiter'
     ];
