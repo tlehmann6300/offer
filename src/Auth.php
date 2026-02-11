@@ -17,6 +17,7 @@ class Auth {
         'head',
         'alumni',
         'alumni_board',
+        'alumni_finanzprufer',
         'board',
         'vorstand_intern',
         'vorstand_extern',
@@ -285,6 +286,7 @@ class Auth {
             'manager' => 2,
             'manage_projects' => 2,  // Permission for manager-level project access
             'alumni_board' => 3,
+            'alumni_finanzprufer' => 3,
             'board' => 3,
             'vorstand_intern' => 3,
             'vorstand_extern' => 3,
@@ -318,10 +320,10 @@ class Auth {
         // Define page access permissions
         $pagePermissions = [
             'members' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate'],
-            'invoices' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni', 'alumni_board', 'honorary_member'],
+            'invoices' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni', 'alumni_board', 'alumni_finanzprufer', 'honorary_member'],
             'ideas' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'member', 'candidate', 'head'],
-            'training_requests' => ['alumni', 'alumni_board'],
-            'polls' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate', 'alumni', 'alumni_board', 'honorary_member']
+            'training_requests' => ['alumni', 'alumni_board', 'alumni_finanzprufer'],
+            'polls' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate', 'alumni', 'alumni_board', 'alumni_finanzprufer', 'honorary_member']
         ];
         
         // Check if page exists in permissions map

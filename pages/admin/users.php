@@ -140,6 +140,7 @@ ob_start();
                     <option value="head">Ressortleiter</option>
                     <option value="alumni">Alumni</option>
                     <option value="alumni_board">Alumni-Vorstand</option>
+                    <option value="alumni_finanzprufer">Alumni-Finanzprüfer</option>
                     <option value="board">Vorstand</option>
                     <option value="vorstand_intern">Vorstand Intern</option>
                     <option value="vorstand_extern">Vorstand Extern</option>
@@ -209,6 +210,7 @@ ob_start();
                             <option value="head" <?php echo ($user['role'] == 'head') ? 'selected' : ''; ?>>Ressortleiter</option>
                             <option value="alumni" <?php echo ($user['role'] == 'alumni') ? 'selected' : ''; ?>>Alumni</option>
                             <option value="alumni_board" <?php echo ($user['role'] == 'alumni_board') ? 'selected' : ''; ?>>Alumni-Vorstand</option>
+                            <option value="alumni_finanzprufer" <?php echo ($user['role'] == 'alumni_finanzprufer') ? 'selected' : ''; ?>>Alumni-Finanzprüfer</option>
                             <option value="board" <?php echo ($user['role'] == 'board') ? 'selected' : ''; ?>>Vorstand</option>
                             <option value="vorstand_intern" <?php echo ($user['role'] == 'vorstand_intern') ? 'selected' : ''; ?>>Vorstand Intern</option>
                             <option value="vorstand_extern" <?php echo ($user['role'] == 'vorstand_extern') ? 'selected' : ''; ?>>Vorstand Extern</option>

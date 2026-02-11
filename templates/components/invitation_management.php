@@ -2,7 +2,7 @@
 /**
  * Invitation Management Component
  * Modern UI for creating and managing user invitations
- * Required permissions: admin, board, or alumni_board
+ * Required permissions: board or alumni_board
  */
 
 // This component expects to be included in a page that has already done auth checks
@@ -65,8 +65,8 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
                     <option value="alumni">Alumni</option>
                     <option value="manager">Ressortleiter</option>
                     <option value="alumni_board">Alumni-Vorstand</option>
+                    <option value="alumni_finanzprufer">Alumni-Finanzprüfer</option>
                     <option value="board">Vorstand</option>
-                    <option value="admin">Administrator</option>
                 </select>
             </div>
             
@@ -234,7 +234,7 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
   }
 ]</code></pre>
                     <p class="text-xs text-blue-700 mt-2">
-                        <strong>Verfügbare Rollen:</strong> member, alumni, manager, alumni_board, board, admin
+                        <strong>Verfügbare Rollen:</strong> member, alumni, manager, alumni_board, alumni_finanzprufer, board
                     </p>
                 </div>
             </div>
@@ -317,8 +317,8 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
         'alumni': 'Alumni',
         'manager': 'Ressortleiter',
         'alumni_board': 'Alumni-Vorstand',
-        'board': 'Vorstand',
-        'admin': 'Administrator'
+        'alumni_finanzprufer': 'Alumni-Finanzprüfer',
+        'board': 'Vorstand'
     };
     
     // Load invitations on page load

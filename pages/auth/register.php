@@ -96,9 +96,9 @@ ob_start();
             <p class="text-gray-500 text-xs mt-1">
                 Rolle: <?php 
                 $roleNames = [
-                    'admin' => 'Administrator',
                     'board' => 'Vorstand',
                     'alumni_board' => 'Alumni-Vorstand',
+                    'alumni_finanzprufer' => 'Alumni-Finanzprüfer',
                     'manager' => 'Ressortleiter',
                     'member' => 'Mitglied',
                     'alumni' => 'Alumni',
