@@ -284,7 +284,7 @@ ob_start();
                         value="<?php echo htmlspecialchars($_POST['title'] ?? $event['title'] ?? ''); ?>"
                         required 
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Event-Titel"
                     >
                 </div>
@@ -296,7 +296,7 @@ ob_start();
                         name="description" 
                         rows="4"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Event-Beschreibung..."
                     ><?php echo htmlspecialchars($_POST['description'] ?? $event['description'] ?? ''); ?></textarea>
                 </div>
@@ -309,7 +309,7 @@ ob_start();
                         name="contact_person"
                         value="<?php echo htmlspecialchars($_POST['contact_person'] ?? $event['contact_person'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Name des Ansprechpartners"
                     >
                 </div>
@@ -322,7 +322,7 @@ ob_start();
                         name="location"
                         value="<?php echo htmlspecialchars($_POST['location'] ?? $event['location'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="z.B. H-1.88 Aula"
                     >
                 </div>
@@ -382,7 +382,7 @@ ob_start();
                         name="event_image"
                         accept="image/*"
                         <?php echo $readOnly ? 'disabled' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                     >
                     <p class="text-xs text-gray-500 mt-1">Unterstützte Formate: JPG, PNG, GIF. Max. 5MB.</p>
                 </div>
@@ -514,7 +514,7 @@ ob_start();
                         name="external_link"
                         value="<?php echo htmlspecialchars($_POST['external_link'] ?? $event['external_link'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="https://..."
                     >
                 </div>
@@ -533,7 +533,7 @@ ob_start();
                             }
                             ?>
                             <?php echo $readOnly ? 'disabled' : ''; ?>
-                            class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                            class="w-5 h-5 text-purple-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-blue-500"
                         >
                         <span class="text-sm font-medium text-gray-700">Externes Event</span>
                     </label>
@@ -551,7 +551,7 @@ ob_start();
                             }
                             ?>
                             <?php echo $readOnly ? 'disabled' : ''; ?>
-                            class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                            class="w-5 h-5 text-purple-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-blue-500"
                         >
                         <span class="text-sm font-medium text-gray-700">Helfer benötigt</span>
                     </label>
@@ -576,7 +576,7 @@ ob_start();
                                 value="<?php echo $roleValue; ?>"
                                 <?php echo in_array($roleValue, $allowedRoles) ? 'checked' : ''; ?>
                                 <?php echo $readOnly ? 'disabled' : ''; ?>
-                                class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                                class="w-4 h-4 text-purple-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-blue-500"
                             >
                             <span class="text-sm text-gray-700"><?php echo $roleLabel; ?></span>
                         </label>

@@ -269,7 +269,7 @@ ob_start();
                     name="is_defective" 
                     value="yes"
                     onchange="toggleDefectiveSection()"
-                    class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    class="w-4 h-4 text-purple-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-blue-500"
                 >
                 <label for="is_defective" class="ml-2 text-sm font-medium text-gray-700">
                     Artikel ist beschädigt/defekt
