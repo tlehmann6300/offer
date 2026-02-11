@@ -45,7 +45,7 @@ if ($userRole !== 'alumni') {
 
 // Check if user is project lead or admin/board
 $isLead = Project::isLead($projectId, $user['id']);
-$canComplete = $isLead || $userRole === 'board' || $userRole === 'manager';
+$canComplete = $isLead || Auth::isBoard() || $userRole === 'manager';
 
 // Get team size info
 $teamSize = Project::getTeamSize($projectId);
