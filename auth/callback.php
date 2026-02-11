@@ -20,12 +20,13 @@ AuthHandler::startSession();
 try {
     AuthHandler::handleMicrosoftCallback();
 } catch (Exception $e) {
-    // Log the error
+    // Log the full error details server-side
     error_log("Microsoft callback error: " . $e->getMessage());
+    error_log("Stack trace: " . $e->getTraceAsString());
     
-    // Redirect to login page with error message
+    // Redirect to login page with a generic error message
     $loginUrl = (defined('BASE_URL') && BASE_URL) ? BASE_URL . '/pages/auth/login.php' : '/pages/auth/login.php';
-    $errorMessage = urlencode('Authentifizierung fehlgeschlagen: ' . $e->getMessage());
+    $errorMessage = urlencode('Authentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.');
     header('Location: ' . $loginUrl . '?error=' . $errorMessage);
     exit;
 }
