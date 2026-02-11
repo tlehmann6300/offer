@@ -20,7 +20,7 @@ class EasyVereinSync {
     public function fetchDataFromEasyVerein() {
         $apiUrl = 'https://easyverein.com/api/v2.0/inventory-object?limit=100';
         // Hardcoded token as per requirements
-        $apiToken = '0277d541c6bb7044e901a8a985ea74a9894df724';
+        $apiToken = '5e7c6d41440d7560d518cd15070d0a8d476139e1';
         
         try {
             // Initialize cURL
@@ -431,7 +431,7 @@ class EasyVereinSync {
     public static function updateItem($easyvereinId, $data) {
         $apiUrl = "https://easyverein.com/api/v2.0/inventory-object/{$easyvereinId}";
         // Hardcoded token as per requirements
-        $apiToken = '0277d541c6bb7044e901a8a985ea74a9894df724';
+        $apiToken = '5e7c6d41440d7560d518cd15070d0a8d476139e1';
         
         try {
             // Map our fields to EasyVerein API fields
