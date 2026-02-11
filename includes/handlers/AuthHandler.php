@@ -389,8 +389,8 @@ class AuthHandler {
             'tenant'       => $tenantId
         ]);
         
-        // Set scope
-        $provider->scope = 'openid profile email offline_access User.Read';
+        // Set scope (must be an array)
+        $provider->scope = ['openid', 'profile', 'email', 'offline_access', 'User.Read'];
         
         // Generate authorization URL
         $authorizationUrl = $provider->getAuthorizationUrl();
