@@ -15,14 +15,16 @@ if (!Auth::check()) {
 }
 
 $user = Auth::user();
-$userRole = $user['role'] ?? '';
 
-// Check if user has one of the allowed roles
-$allowedRoles = ['member', 'candidate', 'head', 'board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht'];
-if (!in_array($userRole, $allowedRoles)) {
+// Check if user has permission to access ideas page
+// According to Auth::canAccessPage, allowed roles are: board roles, member, candidate, head
+$hasIdeasAccess = Auth::canAccessPage('ideas');
+if (!$hasIdeasAccess) {
     header('Location: ../dashboard/index.php');
     exit;
 }
+
+$userRole = $user['role'] ?? '';
 
 $successMessage = '';
 $errorMessage = '';

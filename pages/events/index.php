@@ -39,8 +39,10 @@ if ($filter === 'my_registrations') {
         return in_array($event['id'], $myEventIds);
     });
 } else {
-    // Hide past events for normal users (non-board)
-    if (!in_array($userRole, ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni_board', 'alumni_finanzprufer', 'manager'])) {
+    // Hide past events for normal users (non-board, non-manager)
+    // Board members, alumni_board, alumni_auditor, and managers can see past events
+    $canViewPastEvents = Auth::isBoard() || Auth::hasRole(['alumni_board', 'alumni_auditor', 'manager']);
+    if (!$canViewPastEvents) {
         $events = array_filter($events, function($event) use ($now) {
             return $event['end_time'] >= $now;
         });

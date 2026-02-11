@@ -206,7 +206,7 @@ class AuthHandler {
 
     /**
      * Check if user has specific role (exact match, not hierarchical)
-     * Special case: 'admin' and 'board' role checks return true for board_finance users
+     * Special case: 'admin' and 'board' role checks return true for board users
      * 
      * @param string $role Required role
      * @return bool True if user has exact role
@@ -219,14 +219,14 @@ class AuthHandler {
         
         $userRole = $_SESSION['user_role'] ?? '';
         
-        // Special case: board_finance has equal privileges to admin and board for backward compatibility
-        if (($role === 'admin' || $role === 'board') && $userRole === 'board_finance') {
-            return true;
+        // Special case: 'admin' maps to board_finance for backward compatibility
+        if ($role === 'admin') {
+            return Auth::isAdmin();
         }
         
-        // Also check other board roles for 'board' check
-        if ($role === 'board' && in_array($userRole, ['board_internal', 'board_external'])) {
-            return true;
+        // Special case: 'board' maps to any board role for backward compatibility
+        if ($role === 'board') {
+            return Auth::isBoard();
         }
         
         return $userRole === $role;

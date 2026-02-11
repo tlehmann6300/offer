@@ -12,9 +12,10 @@ if (!Auth::check()) {
 
 $user = Auth::user();
 
-// Check if user has one of the allowed active roles
-$allowedRoles = ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate'];
-if (!in_array($user['role'], $allowedRoles)) {
+// Check if user has permission to access members page
+// Allowed: board members, head, member, candidate
+$hasMembersAccess = Auth::canAccessPage('members');
+if (!$hasMembersAccess) {
     header('Location: ../dashboard/index.php');
     exit;
 }
@@ -55,7 +56,7 @@ ob_start();
         </div>
         
         <!-- Edit My Profile Button - Only for Vorstand (all types), Resortleiter, Mitglied, Anwärter -->
-        <?php if (in_array($user['role'], ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate'])): ?>
+        <?php if (Auth::isBoard() || Auth::hasRole(['head', 'member', 'candidate'])): ?>
         <a href="../alumni/edit.php" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl">
             <i class="fas fa-user-edit mr-2"></i>
             Edit My Profile
