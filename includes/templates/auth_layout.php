@@ -95,6 +95,35 @@ require_once __DIR__ . '/../helpers.php';
             33% { transform: translateY(-20px) rotate(120deg); }
             66% { transform: translateY(10px) rotate(240deg); }
         }
+        
+        /* Perfect Responsive Auth Layout */
+        @media (max-width: 640px) {
+            body::before,
+            body::after {
+                opacity: 0.5; /* Reduce decorative elements on mobile */
+            }
+            
+            .floating-dot {
+                width: 80px !important;
+                height: 80px !important;
+            }
+            
+            .auth-card {
+                border-radius: 16px;
+                padding: 0.75rem !important;
+            }
+            
+            .auth-card .bg-white {
+                padding: 1.5rem !important;
+                border-radius: 14px !important;
+            }
+        }
+        
+        @media (min-width: 641px) and (max-width: 768px) {
+            .auth-card .bg-white {
+                padding: 2rem !important;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen">

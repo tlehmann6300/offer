@@ -168,66 +168,163 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         
         /* Mobile view improvements */
         @media (max-width: 768px) {
+            /* Enhanced mobile menu button - always visible and accessible */
+            #mobile-menu-btn {
+                position: fixed !important;
+                top: 1rem !important;
+                left: 1rem !important;
+                z-index: 60 !important;
+                width: 48px;
+                height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 12px !important;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+                transition: all 0.3s ease;
+            }
+            
+            #mobile-menu-btn:active {
+                transform: scale(0.95);
+            }
+            
+            /* Sidebar improvements for mobile */
+            .sidebar {
+                width: 85% !important;
+                max-width: 320px !important;
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3) !important;
+            }
+            
+            .sidebar .sidebar-scroll {
+                padding-bottom: 2rem !important;
+            }
+            
+            /* Better logo sizing on mobile */
+            .sidebar img[alt="IBC Logo"] {
+                max-width: 90% !important;
+                margin: 0 auto !important;
+            }
+            
             .card {
                 padding: 1rem !important;
+                border-radius: 12px !important;
             }
             
             /* Fix text overflow in cards */
-            .card p, .card div {
+            .card p, .card div, .card span {
                 word-wrap: break-word;
                 overflow-wrap: break-word;
+                hyphens: auto;
             }
             
             /* Better spacing on mobile - add top padding for better visibility */
             main {
                 padding: 1rem !important;
-                padding-top: var(--mobile-header-offset) !important; /* Ensure content doesn't hide under toggle button */
+                padding-top: 5rem !important; /* Ensure content doesn't hide under toggle button */
+                margin-left: 0 !important;
             }
             
             /* Prevent horizontal overflow */
             table {
                 display: block;
                 overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
                 white-space: nowrap;
+                border-radius: 8px;
+            }
+            
+            table thead {
+                display: table-header-group;
+            }
+            
+            table tbody {
+                display: table-row-group;
             }
             
             /* Better form spacing on mobile */
             form input, form select, form textarea {
                 font-size: 16px; /* Prevents zoom on iOS */
+                padding: 0.875rem !important;
+                border-radius: 10px !important;
             }
             
             /* Stack buttons vertically on mobile */
-            .flex.space-x-4 {
-                flex-direction: column;
-                gap: 0.75rem;
+            .flex.space-x-2,
+            .flex.space-x-3,
+            .flex.space-x-4,
+            .flex.gap-2,
+            .flex.gap-3,
+            .flex.gap-4 {
+                flex-direction: column !important;
+                gap: 0.75rem !important;
             }
             
-            .flex.space-x-4 > * {
-                width: 100%;
+            .flex.space-x-2 > *,
+            .flex.space-x-3 > *,
+            .flex.space-x-4 > *,
+            .flex.gap-2 > *,
+            .flex.gap-3 > *,
+            .flex.gap-4 > * {
+                width: 100% !important;
+                margin: 0 !important;
             }
             
             /* Improve heading sizes on mobile */
             main h1 {
-                font-size: 1.75rem;
+                font-size: 1.75rem !important;
+                line-height: 1.2;
+                margin-bottom: 1rem;
             }
             
             main h2 {
-                font-size: 1.5rem;
+                font-size: 1.5rem !important;
+                line-height: 1.3;
+                margin-bottom: 0.875rem;
             }
             
             main h3 {
-                font-size: 1.25rem;
+                font-size: 1.25rem !important;
+                line-height: 1.4;
+                margin-bottom: 0.75rem;
             }
             
             /* Better image scaling on mobile */
-            img {
+            img:not([class*="w-"]) {
                 max-width: 100%;
                 height: auto;
             }
             
             /* Ensure grids stack on mobile - for auto-responsive grids */
-            .grid:not(.grid-no-stack) {
-                grid-template-columns: 1fr;
+            .grid:not(.grid-no-stack):not(.grid-cols-1) {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+            
+            /* Improved stat cards on mobile */
+            .stat-icon {
+                width: 48px !important;
+                height: 48px !important;
+                font-size: 1.25rem !important;
+            }
+            
+            /* Better badge sizing */
+            .badge, [class*="badge"] {
+                padding: 0.375rem 0.75rem !important;
+                font-size: 0.8125rem !important;
+            }
+            
+            /* Improve sidebar navigation on mobile */
+            .sidebar nav a {
+                padding: 0.875rem 1rem !important;
+                margin: 2px 8px !important;
+                font-size: 0.9375rem !important;
+                border-radius: 8px !important;
+            }
+            
+            /* Better submenu styling on mobile */
+            .submenu a {
+                padding-left: 2.25rem !important;
+                font-size: 0.875rem !important;
             }
         }
         
@@ -237,9 +334,115 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 padding: 1.5rem !important;
             }
             
+            .card {
+                padding: 1.5rem !important;
+            }
+            
             /* 2-column grid on tablets - for auto-responsive grids */
-            .grid:not(.grid-no-stack) {
-                grid-template-columns: repeat(2, 1fr);
+            .grid:not(.grid-no-stack):not(.grid-cols-1) {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            
+            /* Adjust sidebar width on tablets */
+            .sidebar {
+                width: 16rem !important;
+            }
+            
+            main h1 {
+                font-size: 2rem !important;
+            }
+            
+            main h2 {
+                font-size: 1.625rem !important;
+            }
+        }
+        
+        /* Desktop improvements */
+        @media (min-width: 1025px) {
+            main {
+                padding: 2rem !important;
+            }
+            
+            .card {
+                padding: 2rem !important;
+            }
+            
+            /* Better spacing for large screens */
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+        }
+        
+        /* Extra large screens */
+        @media (min-width: 1536px) {
+            main {
+                padding: 2.5rem !important;
+            }
+            
+            .card {
+                padding: 2.5rem !important;
+            }
+            
+            .container {
+                max-width: 1600px;
+            }
+        }
+        
+        /* Landscape mobile optimization */
+        @media (max-height: 500px) and (orientation: landscape) and (max-width: 1024px) {
+            /* Compact everything for landscape mobile */
+            .sidebar {
+                width: 14rem !important;
+            }
+            
+            .sidebar nav a {
+                padding: 0.5rem 1rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            main {
+                padding-top: 1rem !important;
+            }
+            
+            #mobile-menu-btn {
+                top: 0.5rem !important;
+                left: 0.5rem !important;
+                width: 40px !important;
+                height: 40px !important;
+            }
+        }
+        
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            body {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+            
+            .card {
+                border-width: 0.5px;
+            }
+        }
+        
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            /* Larger touch targets */
+            a, button, input[type="submit"], input[type="button"] {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            /* Better tap feedback */
+            a:active, button:active {
+                opacity: 0.7;
+                transform: scale(0.98);
+                transition: all 0.1s ease;
+            }
+            
+            /* Remove hover effects on touch devices */
+            .card:hover {
+                transform: translateY(-2px); /* Reduce hover effect */
             }
         }
         
@@ -271,10 +474,14 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
     <!-- Mobile Menu Overlay -->
     <div id="sidebar-overlay" class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden transition-opacity duration-300"></div>
 
-    <!-- Mobile Menu Toggle -->
+    <!-- Mobile Menu Toggle - Enhanced Design -->
     <div class="lg:hidden fixed top-4 left-4 z-50">
-        <button id="mobile-menu-btn" class="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-lg">
-            <i class="fas fa-bars text-gray-600 dark:text-white"></i>
+        <button id="mobile-menu-btn" class="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 active:scale-95">
+            <svg class="w-6 h-6 text-gray-600 dark:text-white transition-transform duration-300" id="menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path id="menu-icon-top" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16" class="transition-all duration-300"></path>
+                <path id="menu-icon-middle" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12h16" class="transition-all duration-300"></path>
+                <path id="menu-icon-bottom" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 18h16" class="transition-all duration-300"></path>
+            </svg>
         </button>
     </div>
 
@@ -649,14 +856,35 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
     </main>
 
     <script>
-        // Mobile menu toggle
+        // Mobile menu toggle with animated icon
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const menuIcon = document.getElementById('menu-icon');
+        const menuIconTop = document.getElementById('menu-icon-top');
+        const menuIconMiddle = document.getElementById('menu-icon-middle');
+        const menuIconBottom = document.getElementById('menu-icon-bottom');
         
         function toggleSidebar() {
+            const isOpen = sidebar.classList.contains('-translate-x-full');
+            
             sidebar.classList.toggle('-translate-x-full');
             sidebarOverlay.classList.toggle('hidden');
+            
+            // Animate hamburger to X and back
+            if (isOpen) {
+                // Transform to X (opening sidebar)
+                menuIconTop?.setAttribute('d', 'M6 18L18 6');
+                menuIconMiddle?.setAttribute('d', 'M12 12h0');
+                menuIconMiddle?.setAttribute('opacity', '0');
+                menuIconBottom?.setAttribute('d', 'M6 6L18 18');
+            } else {
+                // Transform back to hamburger
+                menuIconTop?.setAttribute('d', 'M4 6h16');
+                menuIconMiddle?.setAttribute('d', 'M4 12h16');
+                menuIconMiddle?.setAttribute('opacity', '1');
+                menuIconBottom?.setAttribute('d', 'M4 18h16');
+            }
         }
         
         mobileMenuBtn?.addEventListener('click', () => {

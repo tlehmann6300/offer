@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Design Demo - IBC Intranet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .demo-section {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+        }
+        
+        .breakpoint-indicator {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--ibc-blue);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: var(--shadow-premium);
+        }
+        
+        .device-preview {
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-800 p-4">
+    <div class="container-fluid max-w-7xl mx-auto">
+        <h1 class="text-4xl font-bold mb-2 gradient-text">🎨 Perfect Responsive Design Demo</h1>
+        <p class="text-gray-600 mb-8">IBC Intranet - Mobile-First Responsive System</p>
+        
+        <!-- Breakpoint Indicator -->
+        <div class="breakpoint-indicator">
+            <span id="current-breakpoint">Desktop</span>
+            <span id="screen-width" class="ml-2 opacity-75"></span>
+        </div>
+        
+        <!-- Demo Section: Cards -->
+        <div class="demo-section animate-slide-in-bottom">
+            <h2 class="text-2xl font-bold mb-4">📱 Responsive Cards</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="card p-6 animate-scale-in">
+                    <div class="stat-icon bg-blue-100 text-blue-600 mb-4">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Mobile First</h3>
+                    <p class="text-gray-600">Optimized for all screen sizes starting from 320px</p>
+                </div>
+                <div class="card p-6 animate-scale-in" style="animation-delay: 0.1s;">
+                    <div class="stat-icon bg-green-100 text-green-600 mb-4">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Touch Optimized</h3>
+                    <p class="text-gray-600">44px minimum touch targets throughout</p>
+                </div>
+                <div class="card p-6 animate-scale-in" style="animation-delay: 0.2s;">
+                    <div class="stat-icon bg-purple-100 text-purple-600 mb-4">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Fast Performance</h3>
+                    <p class="text-gray-600">GPU-accelerated animations</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Demo Section: Buttons -->
+        <div class="demo-section">
+            <h2 class="text-2xl font-bold mb-4">🎯 Responsive Buttons</h2>
+            <div class="flex space-x-4 mb-4">
+                <button class="btn-primary">
+                    <i class="fas fa-check mr-2"></i>Primary Action
+                </button>
+                <button class="px-6 py-3 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all">
+                    Secondary
+                </button>
+            </div>
+            <p class="text-sm text-gray-600">
+                <i class="fas fa-info-circle mr-1"></i>
+                Buttons stack vertically on mobile for better touch accessibility
+            </p>
+        </div>
+        
+        <!-- Demo Section: Forms -->
+        <div class="demo-section">
+            <h2 class="text-2xl font-bold mb-4">📝 Responsive Forms</h2>
+            <div class="max-w-md">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2">Email Address</label>
+                    <input type="email" placeholder="name@example.com" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2">Message</label>
+                    <textarea rows="4" placeholder="Your message..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <p class="text-sm text-gray-600">
+                    <i class="fas fa-check-circle text-green-600 mr-1"></i>
+                    Forms use 16px font size on mobile to prevent iOS zoom
+                </p>
+            </div>
+        </div>
+        
+        <!-- Demo Section: Animations -->
+        <div class="demo-section">
+            <h2 class="text-2xl font-bold mb-4">✨ Animation System</h2>
+            <div class="space-y-3">
+                <div class="stagger-item p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg">
+                    <i class="fas fa-arrow-right text-blue-600 mr-2"></i>
+                    Stagger Item 1 - Smooth entrance
+                </div>
+                <div class="stagger-item p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg">
+                    <i class="fas fa-arrow-right text-blue-600 mr-2"></i>
+                    Stagger Item 2 - Progressive reveal
+                </div>
+                <div class="stagger-item p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg">
+                    <i class="fas fa-arrow-right text-blue-600 mr-2"></i>
+                    Stagger Item 3 - Perfect timing
+                </div>
+            </div>
+        </div>
+        
+        <!-- Demo Section: Utilities -->
+        <div class="demo-section">
+            <h2 class="text-2xl font-bold mb-4">🧰 Utility Classes</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="glass p-4 rounded-lg">
+                    <h3 class="font-semibold mb-2">Glass Morphism</h3>
+                    <p class="text-sm">Backdrop blur effect with transparency</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg">
+                    <h3 class="font-semibold mb-2 gradient-text">Gradient Text</h3>
+                    <p class="text-sm">IBC brand colors gradient</p>
+                </div>
+            </div>
+            <div class="mt-4 space-y-2">
+                <div class="mobile-only p-3 bg-blue-50 rounded-lg text-blue-800">
+                    📱 Visible on mobile only
+                </div>
+                <div class="tablet-up p-3 bg-green-50 rounded-lg text-green-800">
+                    💻 Visible on tablet and up
+                </div>
+                <div class="desktop-only p-3 bg-purple-50 rounded-lg text-purple-800">
+                    🖥️ Visible on desktop only
+                </div>
+            </div>
+        </div>
+        
+        <!-- Demo Section: Breakpoints -->
+        <div class="demo-section">
+            <h2 class="text-2xl font-bold mb-4">📏 Breakpoint System</h2>
+            <div class="space-y-2 text-sm">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="font-semibold">Mobile</span>
+                    <span class="text-gray-600">0-640px</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="font-semibold">Small Tablet</span>
+                    <span class="text-gray-600">641-768px</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="font-semibold">Tablet</span>
+                    <span class="text-gray-600">769-1024px</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="font-semibold">Desktop</span>
+                    <span class="text-gray-600">1025-1280px</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="font-semibold">Large Desktop</span>
+                    <span class="text-gray-600">1281px+</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Features List -->
+        <div class="demo-section">
+            <h2 class="text-2xl font-bold mb-4">🎯 Complete Feature List</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
+                    <span>Mobile-first approach</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
+                    <span>5 responsive breakpoints</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
+                    <span>Touch-optimized (44px)</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
+                    <span>Animated mobile menu</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
+                    <span>GPU-accelerated animations</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
+                    <span>WCAG 2.1 AA accessible</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
+                    <span>Dark mode optimized</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
+                    <span>Print-friendly layouts</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
+                    <span>45+ utility classes</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
+                    <span>High-DPI support</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
+                    <span>Reduced motion support</span>
+                </div>
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
+                    <span>Landscape optimization</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center mt-12 mb-8">
+            <p class="text-gray-600">
+                <i class="fas fa-heart text-red-500"></i>
+                Built with love for perfect user experience
+            </p>
+            <p class="text-sm text-gray-500 mt-2">
+                IBC Intranet • February 2026 • Production Ready
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Update breakpoint indicator
+        function updateBreakpoint() {
+            const width = window.innerWidth;
+            const indicator = document.getElementById('current-breakpoint');
+            const screenWidth = document.getElementById('screen-width');
+            
+            let breakpoint = '';
+            if (width < 641) {
+                breakpoint = '📱 Mobile';
+            } else if (width < 769) {
+                breakpoint = '📱 Small Tablet';
+            } else if (width < 1025) {
+                breakpoint = '💻 Tablet';
+            } else if (width < 1281) {
+                breakpoint = '🖥️ Desktop';
+            } else {
+                breakpoint = '🖥️ Large Desktop';
+            }
+            
+            indicator.textContent = breakpoint;
+            screenWidth.textContent = `${width}px`;
+        }
+        
+        updateBreakpoint();
+        window.addEventListener('resize', updateBreakpoint);
+        
+        // Animate elements on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
