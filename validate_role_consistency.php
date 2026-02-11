@@ -149,3 +149,4 @@ echo "- All " . count($microsoftMappingRoles) . " Microsoft mapped roles are val
 echo "- All SQL role ENUMs are consistent\n";
 echo "- profile_complete column exists in users table\n";
 echo "- Role hierarchy includes backward compatibility for deprecated roles\n";
+

@@ -97,7 +97,7 @@ ob_start();
                     <option value="">Alle</option>
                     <option value="candidate" <?php echo $roleFilter === 'candidate' ? 'selected' : ''; ?>>Anwärter</option>
                     <option value="member" <?php echo $roleFilter === 'member' ? 'selected' : ''; ?>>Mitglieder</option>
-                    <option value="honorary_member" <?php echo $roleFilter === 'honorary_member' ? 'selected' : ''; ?>>Ehrenmitglied</option>
+                    <option value="honorary_member" <?php echo $roleFilter === 'honorary_member' ? 'selected' : ''; ?>>Ehrenmitglieder</option>
                     <option value="head" <?php echo $roleFilter === 'head' ? 'selected' : ''; ?>>Ressortleiter</option>
                     <option value="alumni" <?php echo $roleFilter === 'alumni' ? 'selected' : ''; ?>>Alumni</option>
                     <option value="alumni_board" <?php echo $roleFilter === 'alumni_board' ? 'selected' : ''; ?>>Alumni-Vorstand</option>

@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS users (
     study_level ENUM('bachelor', 'master') DEFAULT NULL,
     study_program VARCHAR(255) DEFAULT NULL,
     study_status ENUM('current', 'completed') DEFAULT 'current',
-    profile_complete BOOLEAN NOT NULL DEFAULT 1 COMMENT 'Flag to track if user has completed initial profile setup (first_name + last_name)',
+    profile_complete BOOLEAN NOT NULL DEFAULT 1 COMMENT 'Flag to track if user has completed initial profile setup (first_name + last_name). Default 1 for existing users to avoid disruption; new OAuth users should be set to 0.',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
