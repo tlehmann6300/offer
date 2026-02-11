@@ -308,20 +308,26 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <span>Projekte</span>
                 </a>
 
-                <!-- Events (All) -->
-                <a href="<?php echo asset('pages/events/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/events/') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
-                    <i class="fas fa-calendar w-5 mr-3"></i>
-                    <span>Events</span>
-                </a>
+                <!-- Events (All) - Parent with submenu -->
+                <div class="menu-item-with-submenu">
+                    <a href="<?php echo asset('pages/events/index.php'); ?>" 
+                       class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/events/') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
+                        <i class="fas fa-calendar w-5 mr-3"></i>
+                        <span class="flex-1">Events</span>
+                        <i class="fas fa-chevron-down text-xs transition-transform duration-200 submenu-chevron"></i>
+                    </a>
 
-                <!-- Helfersystem (All) - Indented -->
-                <a href="<?php echo asset('pages/events/helpers.php'); ?>" 
-                   style="padding-left: 2.5rem;"
-                   class="flex items-center pr-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/events/helpers.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
-                    <i class="fas fa-hands-helping w-5 mr-3"></i>
-                    <span>Helfersystem</span>
-                </a>
+                    <!-- Submenu -->
+                    <div class="submenu">
+                        <!-- Helfersystem (All) - Indented -->
+                        <a href="<?php echo asset('pages/events/helpers.php'); ?>" 
+                           style="padding-left: 2.5rem;"
+                           class="flex items-center pr-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/events/helpers.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
+                            <i class="fas fa-hands-helping w-5 mr-3"></i>
+                            <span>Helfersystem</span>
+                        </a>
+                    </div>
+                </div>
 
                 <!-- Inventar (All) -->
                 <a href="<?php echo asset('pages/inventory/index.php'); ?>" 
@@ -640,6 +646,41 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 !sidebar.classList.contains('-translate-x-full')) {
                 sidebar.classList.add('-translate-x-full');
                 sidebarOverlay.classList.add('hidden');
+            }
+        });
+        
+        // Submenu toggle functionality
+        document.querySelectorAll('.menu-item-with-submenu > a').forEach(menuItem => {
+            menuItem.addEventListener('click', (e) => {
+                const parent = menuItem.closest('.menu-item-with-submenu');
+                const isExpanded = parent.classList.contains('expanded');
+                
+                // Close all other submenus
+                document.querySelectorAll('.menu-item-with-submenu').forEach(item => {
+                    if (item !== parent) {
+                        item.classList.remove('expanded');
+                    }
+                });
+                
+                // Toggle current submenu
+                parent.classList.toggle('expanded');
+                
+                // If clicking the parent link, prevent navigation to allow toggle
+                // Only navigate if clicking while already expanded
+                if (!isExpanded) {
+                    e.preventDefault();
+                }
+            });
+        });
+        
+        // Auto-expand submenu if current page is a child item
+        document.addEventListener('DOMContentLoaded', () => {
+            const activeSubmenuItem = document.querySelector('.submenu a.bg-white\\/20, .submenu a[class*="border-ibc-green"]');
+            if (activeSubmenuItem) {
+                const parent = activeSubmenuItem.closest('.menu-item-with-submenu');
+                if (parent) {
+                    parent.classList.add('expanded');
+                }
             }
         });
         

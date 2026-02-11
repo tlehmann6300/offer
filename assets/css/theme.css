@@ -184,6 +184,22 @@ body.dark-mode .sidebar::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5);
 }
 
+/* Sidebar Submenu Styles */
+.menu-item-with-submenu .submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.menu-item-with-submenu.expanded .submenu {
+    max-height: 500px;
+    transition: max-height 0.3s ease-in;
+}
+
+.menu-item-with-submenu.expanded .submenu-chevron {
+    transform: rotate(180deg);
+}
+
 body.dark-mode main {
     background-color: var(--bg-body);
 }
@@ -287,6 +303,11 @@ body.dark-mode .glass-card {
 
 body.dark-mode a:not(.btn-primary) {
     color: var(--ibc-blue-light);
+}
+
+/* Light Mode Links - Use IBC Blue for interactive elements */
+body:not(.dark-mode) a:not(.btn-primary) {
+    color: var(--ibc-blue);
 }
 
 body.dark-mode .text-gray-600 {
