@@ -504,7 +504,7 @@ body.dark-mode .text-purple-800 {
 body.dark-mode .text-blue-600,
 body.dark-mode .text-blue-700,
 body.dark-mode .text-blue-800 {
-    color: #bfdbfe !important; /* blue-200 - light blue for dark backgrounds */
+    color: #f3f4f6 !important; /* Almost white for better readability in dark mode */
 }
 
 body.dark-mode .text-green-600,
@@ -545,7 +545,7 @@ body.dark-mode .text-purple-500 {
 
 body.dark-mode .text-blue-400,
 body.dark-mode .text-blue-500 {
-    color: #bfdbfe !important; /* blue-200 - light blue for dark backgrounds */
+    color: #f3f4f6 !important; /* Almost white for better readability in dark mode */
 }
 
 body.dark-mode .text-green-400,
@@ -1013,7 +1013,7 @@ body.dark-mode .hover\:border-green-500:hover {
 
 /* Dark Mode: Hover Text Colors */
 body.dark-mode .hover\:text-blue-700:hover {
-    color: #93c5fd !important; /* lighter blue for hover in dark mode */
+    color: #ffffff !important; /* white for hover in dark mode */
 }
 
 body.dark-mode .hover\:text-green-700:hover {
