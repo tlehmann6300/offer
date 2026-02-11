@@ -69,6 +69,21 @@ $stmt = $userDb->query("
 $newUsersCount = $stmt->fetch()['new_users'] ?? 0;
 $totalUsersTrend = $newUsersCount;
 
+// Get recent user activity
+$recentActivity = [];
+try {
+    $stmt = $userDb->query("
+        SELECT id, email, firstname, lastname, last_login, created_at
+        FROM users 
+        WHERE last_login IS NOT NULL
+        ORDER BY last_login DESC
+        LIMIT 10
+    ");
+    $recentActivity = $stmt->fetchAll();
+} catch (PDOException $e) {
+    error_log("Error fetching recent activity: " . $e->getMessage());
+}
+
 // Get inventory stats (for dashboard content that will be moved here)
 $stats = Inventory::getDashboardStats();
 $inStockStats = Inventory::getInStockStats();
@@ -382,6 +397,87 @@ ob_start();
             </div>
         </div>
     </div>
+
+    <!-- Recent User Activity Section -->
+    <?php if (!empty($recentActivity)): ?>
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+            <i class="fas fa-history mr-2 text-orange-600 dark:text-orange-400"></i>
+            Letzte Benutzeraktivitäten
+        </h2>
+        <div class="card overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Benutzer</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">E-Mail</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Letzter Login</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Mitglied seit</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        <?php foreach ($recentActivity as $activity): ?>
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-purple-600 dark:text-purple-400"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                            <?php 
+                                            if (!empty($activity['firstname']) && !empty($activity['lastname'])) {
+                                                echo htmlspecialchars($activity['firstname'] . ' ' . $activity['lastname']);
+                                            } elseif (!empty($activity['firstname'])) {
+                                                echo htmlspecialchars($activity['firstname']);
+                                            } else {
+                                                echo 'Unbekannt';
+                                            }
+                                            ?>
+                                        </div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">ID: <?php echo $activity['id']; ?></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                <?php echo htmlspecialchars($activity['email']); ?>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <?php 
+                                $loginTime = strtotime($activity['last_login']);
+                                $now = time();
+                                $diff = $now - $loginTime;
+                                
+                                if ($diff < 3600) {
+                                    $timeAgo = floor($diff / 60) . ' Min';
+                                    $colorClass = 'text-green-600 dark:text-green-400';
+                                } elseif ($diff < 86400) {
+                                    $timeAgo = floor($diff / 3600) . ' Std';
+                                    $colorClass = 'text-blue-600 dark:text-blue-400';
+                                } else {
+                                    $timeAgo = floor($diff / 86400) . ' Tage';
+                                    $colorClass = 'text-gray-600 dark:text-gray-400';
+                                }
+                                ?>
+                                <div class="text-sm <?php echo $colorClass; ?> font-medium">
+                                    <i class="fas fa-clock mr-1"></i>vor <?php echo $timeAgo; ?>
+                                </div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                    <?php echo date('d.m.Y H:i', $loginTime); ?>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                <?php echo date('d.m.Y', strtotime($activity['created_at'])); ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <!-- Database Storage Usage Section -->
     <?php if (!empty($databaseStats)): ?>
