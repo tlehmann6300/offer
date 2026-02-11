@@ -115,8 +115,10 @@ foreach ($invitations as $index => $invitation) {
         continue;
     }
     
-    // Validate role
-    if (!in_array($role, ['member', 'alumni', 'manager', 'alumni_board', 'alumni_finanzprufer', 'board'])) {
+    // Validate role - only allow specific roles for invitations
+    // Note: Use new role names (board_finance, board_internal, board_external, alumni_auditor)
+    $validInvitationRoles = ['member', 'alumni', 'manager', 'alumni_board', 'alumni_auditor', 'board_finance', 'board_internal', 'board_external'];
+    if (!in_array($role, $validInvitationRoles)) {
         $failedCount++;
         $errors[] = "Zeile " . ($index + 1) . ": Ungültige Rolle: " . htmlspecialchars($role);
         continue;

@@ -216,12 +216,12 @@ class Member {
         $currentRole = $currentUser['role'] ?? '';
         
         // Members and candidates can update their own profile
-        // Board (all types), head, and admin can update any profile
+        // Board roles (all types) and head can update any profile
         if (in_array($currentRole, ['member', 'candidate'])) {
             if ($currentUser['id'] !== $userId) {
                 throw new Exception("Keine Berechtigung zum Aktualisieren anderer Mitgliederprofile");
             }
-        } elseif (!in_array($currentRole, ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'admin'])) {
+        } elseif (!in_array($currentRole, ['board_finance', 'board_internal', 'board_external', 'head'])) {
             throw new Exception("Keine Berechtigung zum Aktualisieren des Mitgliederprofils");
         }
         
