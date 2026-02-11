@@ -320,7 +320,8 @@ class Auth {
             'members' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate'],
             'invoices' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni', 'alumni_board', 'honorary_member'],
             'ideas' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'member', 'candidate', 'head'],
-            'training_requests' => ['alumni', 'alumni_board']
+            'training_requests' => ['alumni', 'alumni_board'],
+            'polls' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate', 'alumni', 'alumni_board', 'honorary_member']
         ];
         
         // Check if page exists in permissions map

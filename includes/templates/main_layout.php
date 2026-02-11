@@ -354,6 +354,15 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </a>
                 <?php endif; ?>
 
+                <!-- Umfragen (Polls - All authenticated users) -->
+                <?php if (Auth::canAccessPage('polls')): ?>
+                <a href="<?php echo asset('pages/polls/index.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/polls/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                    <i class="fas fa-poll w-5 mr-3"></i>
+                    <span>Umfragen</span>
+                </a>
+                <?php endif; ?>
+
                 <!-- Schulungsanfrage (Alumni, Alumni-Board) -->
                 <?php if (Auth::canAccessPage('training_requests')): ?>
                 <a href="<?php echo asset('pages/alumni/requests.php'); ?>" 
