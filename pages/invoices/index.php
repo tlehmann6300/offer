@@ -88,7 +88,7 @@ ob_start();
         <div class="card p-6 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-l-4 border-yellow-500 dark:border-yellow-600">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-1">Offene Beträge</p>
+                    <p class="text-sm text-gray-800 dark:text-gray-300 mb-1">Offene Beträge</p>
                     <p class="text-3xl font-bold text-gray-800 dark:text-gray-100">
                         <?php echo number_format($stats['total_pending'], 2, ',', '.'); ?> €
                     </p>
@@ -103,7 +103,7 @@ ob_start();
         <div class="card p-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-l-4 border-green-500 dark:border-green-600">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-1">Diesen Monat ausgezahlt</p>
+                    <p class="text-sm text-gray-800 dark:text-gray-300 mb-1">Diesen Monat ausgezahlt</p>
                     <p class="text-3xl font-bold text-gray-800 dark:text-gray-100">
                         <?php echo number_format($stats['monthly_paid'], 2, ',', '.'); ?> €
                     </p>

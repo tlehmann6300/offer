@@ -139,10 +139,10 @@ ob_start();
                             <div class="text-3xl font-bold text-green-600 dark:text-green-400">
                                 <?php echo $slotsAvailable; ?>
                             </div>
-                            <div class="text-sm text-gray-600 dark:text-gray-300">
+                            <div class="text-sm text-gray-800 dark:text-gray-300">
                                 <?php echo $slotsAvailable === 1 ? 'Platz frei' : 'Plätze frei'; ?>
                             </div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <div class="text-xs text-gray-700 dark:text-gray-400 mt-1">
                                 von <?php echo $totalSlotsNeeded; ?> gesamt
                             </div>
                         </div>

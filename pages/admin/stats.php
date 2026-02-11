@@ -311,7 +311,7 @@ ob_start();
                     <span class="text-2xl font-bold text-green-600 dark:text-green-400"><?php echo number_format($inStockStats['total_in_stock']); ?></span>
                 </div>
                 <div class="p-4 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900 dark:to-blue-900 border border-purple-200 dark:border-purple-700">
-                    <p class="text-sm text-gray-600 dark:text-gray-300">
+                    <p class="text-sm text-gray-800 dark:text-gray-300">
                         <i class="fas fa-user-circle mr-2 text-purple-600 dark:text-purple-400"></i>
                         Angemeldet als <strong><?php echo htmlspecialchars($user['email']); ?></strong>
                     </p>
