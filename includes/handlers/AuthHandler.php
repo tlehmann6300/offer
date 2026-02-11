@@ -289,13 +289,7 @@ class AuthHandler {
      * @return bool True if user has any board role
      */
     public static function canManageUsers() {
-        self::startSession();
-        if (!self::isAuthenticated()) {
-            return false;
-        }
-        
-        $userRole = $_SESSION['user_role'] ?? '';
-        return in_array($userRole, Auth::BOARD_ROLES);
+        return self::isBoard();
     }
     
     /**

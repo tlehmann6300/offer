@@ -304,12 +304,7 @@ class Auth {
      * @return bool True if user has any board role
      */
     public static function canManageUsers() {
-        if (!self::check()) {
-            return false;
-        }
-        
-        $userRole = $_SESSION['user_role'] ?? '';
-        return in_array($userRole, self::BOARD_ROLES);
+        return self::isBoard();
     }
     
     /**
