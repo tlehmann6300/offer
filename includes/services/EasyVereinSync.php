@@ -193,15 +193,15 @@ class EasyVereinSync {
                 try {
                     // Map API fields to our expected format
                     // Map: name -> name, note -> description, pieces -> quantity (DB: quantity), 
-                    // acquisitionPrice -> unit_price, locationName -> location, picture -> image_path
+                    // acquisitionPrice -> unit_price, locationName -> location (for future mapping), picture -> image_path
                     $easyvereinId = $evItem['id'] ?? $evItem['EasyVereinID'] ?? null;
                     $name = $evItem['name'] ?? $evItem['Name'] ?? 'Unnamed Item';
                     $description = $evItem['note'] ?? $evItem['description'] ?? $evItem['Description'] ?? '';
                     $totalQuantity = $evItem['pieces'] ?? $evItem['quantity'] ?? $evItem['total_stock'] ?? $evItem['TotalQuantity'] ?? 0;
-                    // Use acquisitionPrice as primary, fall back to price
+                    // Use acquisitionPrice as primary (original purchase price per requirements), fall back to price
                     $unitPrice = $evItem['acquisitionPrice'] ?? $evItem['price'] ?? $evItem['unit_price'] ?? 0;
                     $serialNumber = $evItem['serial_number'] ?? $evItem['SerialNumber'] ?? null;
-                    // Extract location name
+                    // Extract location name (stored for future use - requires mapping to location_id)
                     $locationName = $evItem['locationName'] ?? $evItem['location'] ?? null;
                     
                     // Extract image URL (do NOT download - save URL directly)
