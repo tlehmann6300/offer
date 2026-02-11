@@ -133,11 +133,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($isFirstTimeSetup && !empty($firstName) && !empty($lastName)) {
                         require_once __DIR__ . '/../../includes/models/User.php';
                         User::update($userId, ['profile_complete' => 1]);
+                        // First-time setup complete - redirect to dashboard
+                        $_SESSION['success_message'] = 'Profil erfolgreich erstellt!';
+                        header('Location: ../dashboard/index.php');
+                        exit;
                     }
                     
-                    // Redirect to dashboard with success message
+                    // Regular profile update - redirect back to alumni directory
                     $_SESSION['success_message'] = 'Profil erfolgreich gespeichert!';
-                    header('Location: ../dashboard/index.php');
+                    header('Location: index.php');
                     exit;
                 } else {
                     $errors[] = 'Fehler beim Speichern des Profils. Bitte versuchen Sie es erneut.';
@@ -391,17 +395,18 @@ ob_start();
     };
     
     // Warn user if they try to leave the page
-    window.addEventListener('beforeunload', function (e) {
+    const beforeUnloadHandler = function(e) {
         e.preventDefault();
         e.returnValue = '';
         return '';
-    });
+    };
+    window.addEventListener('beforeunload', beforeUnloadHandler);
     
     // Allow navigation when form is submitted
     const form = document.querySelector('form');
     if (form) {
         form.addEventListener('submit', function() {
-            window.onbeforeunload = null;
+            window.removeEventListener('beforeunload', beforeUnloadHandler);
         });
     }
 })();

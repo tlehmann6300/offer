@@ -541,6 +541,9 @@ document.body.setAttribute('data-user-theme', newTheme);
 localStorage.setItem('theme', newTheme);
 
 // Apply theme immediately
+// Note: Both 'dark-mode' and 'dark' classes are required:
+// - 'dark-mode' is used by custom CSS rules for sidebar and specific components
+// - 'dark' is used by Tailwind's dark mode (darkMode: 'class' in config)
 if (newTheme === 'dark') {
     document.body.classList.add('dark-mode', 'dark');
 } else if (newTheme === 'light') {
