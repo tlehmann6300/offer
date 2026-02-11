@@ -52,3 +52,4 @@ layout_preview.html
 *.backup
 verify_repair.php
 test-css-display.html
+test_auth_permissions.php
