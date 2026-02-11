@@ -44,8 +44,9 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Sidebar - Permanent Corporate Blue (IBC-Blau) for both light and dark modes */
         .sidebar {
-            background: linear-gradient(180deg, #0066b3, #004f8c); /* Corporate Blue gradient for both light and dark modes */
+            background: var(--ibc-blue) !important; /* Solid IBC Corporate Blue */
         }
         
         /* Custom scrollbar styling for sidebar */
@@ -78,9 +79,9 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.05);
         }
         
-        /* Dark mode sidebar styling */
+        /* Sidebar styling for dark mode - adds border and maintains Corporate Blue */
         body.dark-mode .sidebar {
-            /* Corporate Blue gradient maintained in both light and dark modes */
+            /* Corporate Blue maintained in both light and dark modes */
             border-right: 1px solid rgba(255, 255, 255, 0.1);
         }
         
@@ -279,7 +280,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             <nav>
                 <!-- Dashboard (All) -->
                 <a href="<?php echo asset('pages/dashboard/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/dashboard/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/dashboard/') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-home w-5 mr-3"></i>
                     <span>Dashboard</span>
                 </a>
@@ -287,7 +288,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Mitglieder (Board, Head, Member, Candidate) -->
                 <?php if (Auth::canAccessPage('members')): ?>
                 <a href="<?php echo asset('pages/members/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/members/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/members/') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-users w-5 mr-3"></i>
                     <span>Mitglieder</span>
                 </a>
@@ -295,21 +296,21 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
 
                 <!-- Alumni (All) -->
                 <a href="<?php echo asset('pages/alumni/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/alumni/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/alumni/') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-user-graduate w-5 mr-3"></i>
                     <span>Alumni</span>
                 </a>
 
                 <!-- Projekte (All) -->
                 <a href="<?php echo asset('pages/projects/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/projects/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/projects/') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-folder w-5 mr-3"></i>
                     <span>Projekte</span>
                 </a>
 
                 <!-- Events (All) -->
                 <a href="<?php echo asset('pages/events/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/events/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/events/') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-calendar w-5 mr-3"></i>
                     <span>Events</span>
                 </a>
@@ -317,21 +318,21 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Helfersystem (All) - Indented -->
                 <a href="<?php echo asset('pages/events/helpers.php'); ?>" 
                    style="padding-left: 2.5rem;"
-                   class="flex items-center pr-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/events/helpers.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center pr-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/events/helpers.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-hands-helping w-5 mr-3"></i>
                     <span>Helfersystem</span>
                 </a>
 
                 <!-- Inventar (All) -->
                 <a href="<?php echo asset('pages/inventory/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo (isActivePath('/inventory/') && !isActivePath('/my_rentals.php')) ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo (isActivePath('/inventory/') && !isActivePath('/my_rentals.php')) ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-box w-5 mr-3"></i>
                     <span>Inventar</span>
                 </a>
 
                 <!-- Blog (All) -->
                 <a href="<?php echo asset('pages/blog/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/blog/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/blog/') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-newspaper w-5 mr-3"></i>
                     <span>Blog</span>
                 </a>
@@ -339,7 +340,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Rechnungen (Only board_finance) -->
                 <?php if (Auth::canManageInvoices()): ?>
                 <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-file-invoice-dollar w-5 mr-3"></i>
                     <span>Rechnungen</span>
                 </a>
@@ -348,7 +349,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Ideenbox (Members, Candidates, Head, Board) -->
                 <?php if (Auth::canAccessPage('ideas')): ?>
                 <a href="<?php echo asset('pages/ideas/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/ideas/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/ideas/') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-lightbulb w-5 mr-3"></i>
                     <span>Ideenbox</span>
                 </a>
@@ -357,7 +358,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Umfragen (Polls - All authenticated users) -->
                 <?php if (Auth::canAccessPage('polls')): ?>
                 <a href="<?php echo asset('pages/polls/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/polls/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/polls/') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-poll w-5 mr-3"></i>
                     <span>Umfragen</span>
                 </a>
@@ -366,7 +367,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Schulungsanfrage (Alumni, Alumni-Board) -->
                 <?php if (Auth::canAccessPage('training_requests')): ?>
                 <a href="<?php echo asset('pages/alumni/requests.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/alumni/requests.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/alumni/requests.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-chalkboard-teacher w-5 mr-3"></i>
                     <span>Schulungsanfrage</span>
                 </a>
@@ -375,7 +376,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Benutzer (All board members who can manage users) -->
                 <?php if (Auth::canManageUsers()): ?>
                 <a href="<?php echo asset('pages/admin/users.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/admin/users.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/admin/users.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-users-cog w-5 mr-3"></i>
                     <span>Benutzer</span>
                 </a>
@@ -384,7 +385,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Statistiken (All board members) -->
                 <?php if (Auth::isAdmin()): ?>
                 <a href="<?php echo asset('pages/admin/stats.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/admin/stats.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/admin/stats.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-chart-bar w-5 mr-3"></i>
                     <span>Statistiken</span>
                 </a>
@@ -393,7 +394,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Audit Logs (All board members) -->
                 <?php if (Auth::isAdmin()): ?>
                 <a href="<?php echo asset('pages/admin/audit.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/admin/audit.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/admin/audit.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-clipboard-list w-5 mr-3"></i>
                     <span>Audit Logs</span>
                 </a>
@@ -402,7 +403,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- System Health (All board members) -->
                 <?php if (Auth::isAdmin()): ?>
                 <a href="<?php echo asset('pages/admin/db_maintenance.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/admin/db_maintenance.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/admin/db_maintenance.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-database w-5 mr-3"></i>
                     <span>System Health</span>
                 </a>
@@ -411,7 +412,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Einstellungen (All board members) -->
                 <?php if (Auth::isAdmin()): ?>
                 <a href="<?php echo asset('pages/auth/settings.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/auth/settings.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/auth/settings.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-cog w-5 mr-3"></i>
                     <span>Einstellungen</span>
                 </a>
