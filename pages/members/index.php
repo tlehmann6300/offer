@@ -95,13 +95,16 @@ ob_start();
                     class="w-full px-4 py-3 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all"
                 >
                     <option value="">Alle</option>
-                    <option value="board" <?php echo $roleFilter === 'board' ? 'selected' : ''; ?>>Vorstand (allgemein)</option>
-                    <option value="vorstand_intern" <?php echo $roleFilter === 'vorstand_intern' ? 'selected' : ''; ?>>Vorstand Intern</option>
-                    <option value="vorstand_extern" <?php echo $roleFilter === 'vorstand_extern' ? 'selected' : ''; ?>>Vorstand Extern</option>
-                    <option value="vorstand_finanzen_recht" <?php echo $roleFilter === 'vorstand_finanzen_recht' ? 'selected' : ''; ?>>Vorstand Finanzen & Recht</option>
-                    <option value="head" <?php echo $roleFilter === 'head' ? 'selected' : ''; ?>>Ressortleiter</option>
-                    <option value="member" <?php echo $roleFilter === 'member' ? 'selected' : ''; ?>>Mitglieder</option>
                     <option value="candidate" <?php echo $roleFilter === 'candidate' ? 'selected' : ''; ?>>Anwärter</option>
+                    <option value="member" <?php echo $roleFilter === 'member' ? 'selected' : ''; ?>>Mitglieder</option>
+                    <option value="honorary_member" <?php echo $roleFilter === 'honorary_member' ? 'selected' : ''; ?>>Ehrenmitglied</option>
+                    <option value="head" <?php echo $roleFilter === 'head' ? 'selected' : ''; ?>>Ressortleiter</option>
+                    <option value="alumni" <?php echo $roleFilter === 'alumni' ? 'selected' : ''; ?>>Alumni</option>
+                    <option value="alumni_board" <?php echo $roleFilter === 'alumni_board' ? 'selected' : ''; ?>>Alumni-Vorstand</option>
+                    <option value="alumni_auditor" <?php echo $roleFilter === 'alumni_auditor' ? 'selected' : ''; ?>>Alumni-Finanzprüfer</option>
+                    <option value="board_finance" <?php echo $roleFilter === 'board_finance' ? 'selected' : ''; ?>>Vorstand Finanzen</option>
+                    <option value="board_internal" <?php echo $roleFilter === 'board_internal' ? 'selected' : ''; ?>>Vorstand Intern</option>
+                    <option value="board_external" <?php echo $roleFilter === 'board_external' ? 'selected' : ''; ?>>Vorstand Extern</option>
                 </select>
             </div>
             
