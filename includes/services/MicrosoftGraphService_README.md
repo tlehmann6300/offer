@@ -110,7 +110,7 @@ public function assignRole(string $userId, string $roleValue): bool
 - `partner`
 - `gast`
 
-**Important**: Replace the placeholder IDs (`DEINE_ECHTE_ID_HIER_EINFUEGEN`) with actual Azure App Role IDs from your Azure AD application.
+**Important**: Replace the placeholder IDs (e.g., `PLACEHOLDER_ANWAERTER_ID`, `PLACEHOLDER_MITGLIED_ID`) with actual Azure App Role IDs from your Azure AD application.
 
 **Request Body**:
 ```json
