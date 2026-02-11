@@ -151,6 +151,8 @@ body.dark-mode .sidebar {
     background-color: var(--ibc-blue) !important;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.05);
 }
 
 body.dark-mode .sidebar a:hover {
@@ -180,11 +182,6 @@ body.dark-mode .sidebar::-webkit-scrollbar-thumb {
 
 body.dark-mode .sidebar::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5);
-}
-
-body.dark-mode .sidebar {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.05);
 }
 
 body.dark-mode main {
@@ -1385,7 +1382,11 @@ body.dark-mode tbody tr {
 }
 
 /* Dark Mode: Improved focus states for accessibility */
-body.dark-mode *:focus {
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus,
+body.dark-mode button:focus,
+body.dark-mode a:focus {
     outline-color: rgba(59, 130, 246, 0.5);
 }
 
