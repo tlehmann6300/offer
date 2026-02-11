@@ -10,7 +10,7 @@ require_once __DIR__ . '/../../includes/models/User.php';
 
 try {
     // Check authentication and permission
-    if (!Auth::check() || !Auth::hasPermission('board')) {
+    if (!Auth::check() || !Auth::canManageUsers()) {
         echo json_encode([
             'success' => false,
             'message' => 'Nicht autorisiert'
@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Get POST data
 $userId = intval($_POST['user_id'] ?? 0);
 $newRole = $_POST['new_role'] ?? '';
+$successorId = isset($_POST['successor_id']) ? intval($_POST['successor_id']) : null;
 
 // Validate input
 if ($userId <= 0) {
@@ -49,10 +50,50 @@ if (!in_array($newRole, Auth::VALID_ROLES)) {
 }
 
 // Check if user is trying to change their own role
-if ($userId === $_SESSION['user_id']) {
+$isOwnRole = ($userId === $_SESSION['user_id']);
+
+// Get current user's role for checks
+$currentUserRole = $_SESSION['user_role'] ?? '';
+$isBoardMember = in_array($currentUserRole, Auth::BOARD_ROLES);
+
+// If board member is demoting themselves to member or alumni, require a successor
+if ($isOwnRole && $isBoardMember && in_array($newRole, ['member', 'alumni'])) {
+    if (!$successorId || $successorId <= 0) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Ein Nachfolger muss bestimmt werden'
+        ]);
+        exit;
+    }
+    
+    // Validate successor exists and has appropriate role
+    $successor = User::getById($successorId);
+    if (!$successor) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Ungültiger Nachfolger'
+        ]);
+        exit;
+    }
+    
+    // Update successor's role to the current user's board role
+    if (!User::update($successorId, [
+        'role' => $currentUserRole,
+        'prompt_profile_review' => 1
+    ])) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Fehler beim Zuweisen der Rolle an den Nachfolger'
+        ]);
+        exit;
+    }
+}
+
+// For non-succession cases, prevent self role changes
+if ($isOwnRole && !$successorId) {
     echo json_encode([
         'success' => false,
-        'message' => 'Du kannst Deine eigene Rolle nicht ändern'
+        'message' => 'Du kannst Deine eigene Rolle nicht direkt ändern'
     ]);
     exit;
 }
@@ -65,9 +106,18 @@ if ($userId === $_SESSION['user_id']) {
     ];
     
     if (User::update($userId, $updateData)) {
+        $message = 'Rolle erfolgreich geändert';
+        
+        // Add succession message if applicable
+        if ($isOwnRole && $successorId) {
+            $successorUser = User::getById($successorId);
+            $message = 'Rollenwechsel erfolgreich durchgeführt. Deine Rolle wurde an ' . 
+                       htmlspecialchars($successorUser['email']) . ' übertragen.';
+        }
+        
         echo json_encode([
             'success' => true,
-            'message' => 'Rolle erfolgreich geändert'
+            'message' => $message
         ]);
     } else {
         echo json_encode([
