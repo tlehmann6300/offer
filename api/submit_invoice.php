@@ -69,15 +69,15 @@ $result = Invoice::create($user['id'], [
 ], $_FILES['file']);
 
 if ($result['success']) {
-    // Send email notification to board_finance user
+    // Send email notification to board_finance users
     try {
         $userDb = Database::getUserDB();
-        $stmt = $userDb->prepare("SELECT email FROM users WHERE role = ? LIMIT 1");
+        $stmt = $userDb->prepare("SELECT email FROM users WHERE role = ?");
         $stmt->execute(['board_finance']);
-        $financeUser = $stmt->fetch();
+        $financeUsers = $stmt->fetchAll();
         
-        if ($financeUser && !empty($financeUser['email'])) {
-            $uploaderName = $user['firstname'] && $user['lastname'] 
+        if (!empty($financeUsers)) {
+            $uploaderName = !empty($user['firstname']) && !empty($user['lastname'])
                 ? $user['firstname'] . ' ' . $user['lastname'] 
                 : $user['email'];
             
@@ -92,7 +92,11 @@ if ($result['success']) {
                 '<p>Bitte prüfen Sie die Rechnung im System.</p>'
             );
             
-            MailService::sendEmail($financeUser['email'], $subject, $body);
+            foreach ($financeUsers as $financeUser) {
+                if (!empty($financeUser['email'])) {
+                    MailService::sendEmail($financeUser['email'], $subject, $body);
+                }
+            }
         }
     } catch (Exception $e) {
         error_log("Error sending invoice notification email: " . $e->getMessage());
