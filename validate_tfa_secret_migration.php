@@ -13,12 +13,19 @@ echo "=================================================================\n\n";
 $errors = [];
 $warnings = [];
 
+// Read all file contents once
+$userPhpPath = __DIR__ . '/includes/models/User.php';
+$schemaPath = __DIR__ . '/sql/dbs15253086.sql';
+$migrationPath = __DIR__ . '/sql/add_tfa_secret_column.sql';
+
+$userPhpContent = file_exists($userPhpPath) ? file_get_contents($userPhpPath) : null;
+$schemaContent = file_exists($schemaPath) ? file_get_contents($schemaPath) : null;
+$migrationContent = file_exists($migrationPath) ? file_get_contents($migrationPath) : null;
+
 // Check 1: Verify User.php enable2FA method
 echo "1. Checking User.php enable2FA method...\n";
-$userPhpPath = __DIR__ . '/includes/models/User.php';
-if (file_exists($userPhpPath)) {
-    $content = file_get_contents($userPhpPath);
-    if (strpos($content, 'tfa_secret = ?') !== false) {
+if ($userPhpContent !== null) {
+    if (strpos($userPhpContent, 'tfa_secret = ?') !== false) {
         echo "   ✓ enable2FA method references tfa_secret column\n";
     } else {
         $errors[] = "enable2FA method does not reference tfa_secret column";
@@ -31,22 +38,22 @@ if (file_exists($userPhpPath)) {
 
 // Check 2: Verify User.php disable2FA method
 echo "\n2. Checking User.php disable2FA method...\n";
-if (file_exists($userPhpPath)) {
-    $content = file_get_contents($userPhpPath);
-    if (strpos($content, 'tfa_secret = NULL') !== false) {
+if ($userPhpContent !== null) {
+    if (strpos($userPhpContent, 'tfa_secret = NULL') !== false) {
         echo "   ✓ disable2FA method references tfa_secret column\n";
     } else {
         $errors[] = "disable2FA method does not reference tfa_secret column";
         echo "   ✗ disable2FA method does not reference tfa_secret column\n";
     }
+} else {
+    $errors[] = "User.php not found";
+    echo "   ✗ User.php not found\n";
 }
 
 // Check 3: Verify schema file contains tfa_secret
 echo "\n3. Checking schema file (dbs15253086.sql)...\n";
-$schemaPath = __DIR__ . '/sql/dbs15253086.sql';
-if (file_exists($schemaPath)) {
-    $content = file_get_contents($schemaPath);
-    if (strpos($content, 'tfa_secret VARCHAR(255)') !== false) {
+if ($schemaContent !== null) {
+    if (strpos($schemaContent, 'tfa_secret VARCHAR(255)') !== false) {
         echo "   ✓ Schema file includes tfa_secret column definition\n";
     } else {
         $errors[] = "Schema file does not include tfa_secret column";
@@ -54,7 +61,7 @@ if (file_exists($schemaPath)) {
     }
     
     // Check if it's in the right position (after tfa_enabled)
-    if (preg_match('/tfa_enabled.*\n.*tfa_secret/s', $content)) {
+    if (preg_match('/tfa_enabled.*\n.*tfa_secret/s', $schemaContent)) {
         echo "   ✓ tfa_secret column is positioned after tfa_enabled\n";
     } else {
         $warnings[] = "tfa_secret column may not be in the expected position";
@@ -67,11 +74,9 @@ if (file_exists($schemaPath)) {
 
 // Check 4: Verify migration file exists
 echo "\n4. Checking migration file...\n";
-$migrationPath = __DIR__ . '/sql/add_tfa_secret_column.sql';
-if (file_exists($migrationPath)) {
+if ($migrationContent !== null) {
     echo "   ✓ Migration file exists\n";
-    $content = file_get_contents($migrationPath);
-    if (strpos($content, 'ALTER TABLE users') !== false) {
+    if (strpos($migrationContent, 'ALTER TABLE users') !== false) {
         echo "   ✓ Migration file contains ALTER TABLE statement\n";
     } else {
         $errors[] = "Migration file does not contain ALTER TABLE statement";
