@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor', 'alumni', 'member') 
+    role ENUM('board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor', 'alumni', 'honorary_member', 'head', 'member', 'candidate') 
         NOT NULL DEFAULT 'member',
     -- 'BOOLEAN' ersetzt 'TINYINT(1)' um Warnings zu vermeiden
     is_alumni_validated BOOLEAN NOT NULL DEFAULT 0, 
@@ -31,12 +31,14 @@ CREATE TABLE IF NOT EXISTS users (
     study_level ENUM('bachelor', 'master') DEFAULT NULL,
     study_program VARCHAR(255) DEFAULT NULL,
     study_status ENUM('current', 'completed') DEFAULT 'current',
+    profile_complete BOOLEAN NOT NULL DEFAULT 1 COMMENT 'Flag to track if user has completed initial profile setup (first_name + last_name). Default 1 for existing users to avoid disruption; new OAuth users should be set to 0.',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     INDEX idx_email (email),
     INDEX idx_role (role),
-    INDEX idx_birthday (birthday)
+    INDEX idx_birthday (birthday),
+    INDEX idx_profile_complete (profile_complete)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
@@ -49,7 +51,7 @@ CREATE TABLE IF NOT EXISTS invitation_tokens (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     token VARCHAR(64) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL,
-    role ENUM('board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor', 'alumni', 'member') 
+    role ENUM('board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor', 'alumni', 'honorary_member', 'head', 'member', 'candidate') 
         NOT NULL DEFAULT 'member',
     created_by INT UNSIGNED DEFAULT NULL,
     expires_at DATETIME NOT NULL,

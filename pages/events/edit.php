@@ -565,7 +565,18 @@ ob_start();
                     </label>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                         <?php 
-                        $roles = ['member' => 'Mitglied', 'alumni' => 'Alumni', 'manager' => 'Ressortleiter', 'alumni_board' => 'Alumni-Vorstand', 'alumni_finanzprufer' => 'Alumni-Finanzprüfer', 'board' => 'Vorstand'];
+                        $roles = [
+                            'candidate' => 'Anwärter',
+                            'member' => 'Mitglied',
+                            'honorary_member' => 'Ehrenmitglied',
+                            'head' => 'Ressortleiter',
+                            'alumni' => 'Alumni',
+                            'alumni_board' => 'Alumni-Vorstand',
+                            'alumni_auditor' => 'Alumni-Finanzprüfer',
+                            'board_finance' => 'Vorstand Finanzen',
+                            'board_internal' => 'Vorstand Intern',
+                            'board_external' => 'Vorstand Extern'
+                        ];
                         $allowedRoles = $_POST['allowed_roles'] ?? $event['allowed_roles'] ?? [];
                         foreach ($roles as $roleValue => $roleLabel): 
                         ?>

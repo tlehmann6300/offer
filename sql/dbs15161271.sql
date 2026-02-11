@@ -490,7 +490,7 @@ CREATE TABLE IF NOT EXISTS event_signups (
 CREATE TABLE IF NOT EXISTS event_roles (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     event_id INT UNSIGNED NOT NULL,
-    role ENUM('board', 'head', 'member', 'alumni', 'candidate', 'alumni_board') 
+    role ENUM('board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor', 'alumni', 'honorary_member', 'head', 'member', 'candidate') 
         NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
