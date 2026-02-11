@@ -149,6 +149,11 @@ class MicrosoftGraphService {
         
         $roleId = self::ROLE_MAPPING[$roleValue];
         
+        // Validate that role ID has been configured (not using placeholder)
+        if (strpos($roleId, 'DEINE_ECHTE_ID_HIER_EINFUEGEN') !== false) {
+            throw new Exception("Role ID for '{$roleValue}' is not configured. Please update ROLE_MAPPING with actual Azure App Role IDs.");
+        }
+        
         // Get Service Principal ID (cached)
         $resourceId = $this->getServicePrincipalId();
         
