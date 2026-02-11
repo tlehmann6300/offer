@@ -1,0 +1,216 @@
+<?php
+/**
+ * Microsoft Graph Service
+ * Handles user invitation and role assignment via Microsoft Graph API
+ * Requires Azure App Permissions: User.Invite.All and AppRoleAssignment.ReadWrite.All
+ */
+
+require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../config/config.php';
+
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+
+class MicrosoftGraphService {
+    
+    private $accessToken;
+    private $httpClient;
+    private $servicePrincipalId;
+    
+    /**
+     * Role mapping: role values to their respective Azure App Role IDs
+     * TODO: Replace placeholder IDs with actual Azure App Role IDs
+     */
+    private const ROLE_MAPPING = [
+        'anwaerter' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
+        'mitglied' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
+        'vorstand_intern' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
+        'vorstand_extern' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
+        'berater' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
+        'alumni' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
+        'ehrenmitglied' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
+        'senior' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
+        'partner' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
+        'gast' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN'
+    ];
+    
+    /**
+     * Constructor: Obtain access token via Client Credentials Flow
+     * 
+     * @throws Exception If authentication fails or environment variables are missing
+     */
+    public function __construct() {
+        // Verify required environment variables are set
+        $tenantId = defined('AZURE_TENANT_ID') ? AZURE_TENANT_ID : '';
+        $clientId = defined('AZURE_CLIENT_ID') ? AZURE_CLIENT_ID : '';
+        $clientSecret = defined('AZURE_CLIENT_SECRET') ? AZURE_CLIENT_SECRET : '';
+        
+        if (empty($tenantId) || empty($clientId) || empty($clientSecret)) {
+            throw new Exception('Azure credentials not configured. Check AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET in .env file.');
+        }
+        
+        // Initialize Guzzle HTTP client
+        $this->httpClient = new Client([
+            'timeout' => 30,
+            'connect_timeout' => 10,
+        ]);
+        
+        // Obtain access token using Client Credentials Flow
+        $this->accessToken = $this->getAccessToken($tenantId, $clientId, $clientSecret);
+    }
+    
+    /**
+     * Get access token using Client Credentials Flow
+     * 
+     * @param string $tenantId Azure Tenant ID
+     * @param string $clientId Azure Client ID
+     * @param string $clientSecret Azure Client Secret
+     * @return string Access token
+     * @throws Exception If token request fails
+     */
+    private function getAccessToken($tenantId, $clientId, $clientSecret) {
+        $tokenUrl = "https://login.microsoftonline.com/{$tenantId}/oauth2/v2.0/token";
+        
+        try {
+            $response = $this->httpClient->post($tokenUrl, [
+                'form_params' => [
+                    'client_id' => $clientId,
+                    'client_secret' => $clientSecret,
+                    'scope' => 'https://graph.microsoft.com/.default',
+                    'grant_type' => 'client_credentials'
+                ]
+            ]);
+            
+            $body = json_decode($response->getBody()->getContents(), true);
+            
+            if (!isset($body['access_token'])) {
+                throw new Exception('Access token not found in response');
+            }
+            
+            return $body['access_token'];
+            
+        } catch (GuzzleException $e) {
+            throw new Exception('Failed to obtain access token: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Invite a user via Microsoft Graph API
+     * 
+     * @param string $email User's email address
+     * @param string $name User's display name
+     * @param string $redirectUrl URL to redirect user after accepting invitation
+     * @return string User ID of the newly invited user
+     * @throws Exception If invitation fails
+     */
+    public function inviteUser($email, $name, $redirectUrl) {
+        $invitationUrl = 'https://graph.microsoft.com/v1.0/invitations';
+        
+        try {
+            $response = $this->httpClient->post($invitationUrl, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->accessToken,
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => [
+                    'invitedUserEmailAddress' => $email,
+                    'invitedUserDisplayName' => $name,
+                    'inviteRedirectUrl' => $redirectUrl,
+                    'sendInvitationMessage' => true
+                ]
+            ]);
+            
+            $body = json_decode($response->getBody()->getContents(), true);
+            
+            if (!isset($body['invitedUser']['id'])) {
+                throw new Exception('User ID not found in invitation response');
+            }
+            
+            return $body['invitedUser']['id'];
+            
+        } catch (GuzzleException $e) {
+            throw new Exception('Failed to invite user: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Assign a role to a user
+     * 
+     * @param string $userId User ID (Object ID from Azure AD)
+     * @param string $roleValue Role value (e.g., 'anwaerter', 'mitglied')
+     * @return bool True if role assignment succeeded
+     * @throws Exception If role assignment fails or role is invalid
+     */
+    public function assignRole($userId, $roleValue) {
+        // Validate role exists in mapping
+        if (!isset(self::ROLE_MAPPING[$roleValue])) {
+            throw new Exception("Invalid role value: {$roleValue}");
+        }
+        
+        $roleId = self::ROLE_MAPPING[$roleValue];
+        
+        // Get Service Principal ID (cached)
+        $resourceId = $this->getServicePrincipalId();
+        
+        $assignmentUrl = "https://graph.microsoft.com/v1.0/users/{$userId}/appRoleAssignments";
+        
+        try {
+            $response = $this->httpClient->post($assignmentUrl, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->accessToken,
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => [
+                    'principalId' => $userId,
+                    'resourceId' => $resourceId,
+                    'appRoleId' => $roleId
+                ]
+            ]);
+            
+            return $response->getStatusCode() === 201;
+            
+        } catch (GuzzleException $e) {
+            throw new Exception('Failed to assign role: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Get Service Principal ID (Object ID) for the application
+     * This ID is cached to avoid repeated API calls
+     * 
+     * @return string Service Principal Object ID
+     * @throws Exception If Service Principal cannot be retrieved
+     */
+    private function getServicePrincipalId() {
+        // Return cached value if available
+        if ($this->servicePrincipalId !== null) {
+            return $this->servicePrincipalId;
+        }
+        
+        $clientId = defined('AZURE_CLIENT_ID') ? AZURE_CLIENT_ID : '';
+        $spUrl = "https://graph.microsoft.com/v1.0/servicePrincipals(appId='{$clientId}')";
+        
+        try {
+            $response = $this->httpClient->get($spUrl, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->accessToken,
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+            
+            $body = json_decode($response->getBody()->getContents(), true);
+            
+            if (!isset($body['id'])) {
+                throw new Exception('Service Principal ID not found in response');
+            }
+            
+            // Cache the ID
+            $this->servicePrincipalId = $body['id'];
+            
+            return $this->servicePrincipalId;
+            
+        } catch (GuzzleException $e) {
+            throw new Exception('Failed to get Service Principal ID: ' . $e->getMessage());
+        }
+    }
+}
