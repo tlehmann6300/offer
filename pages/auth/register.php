@@ -124,7 +124,7 @@ ob_start();
                 name="password" 
                 required 
                 minlength="8"
-                class="w-full px-4 py-3 rounded-lg bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition"
                 placeholder="Mindestens 8 Zeichen"
             >
         </div>
@@ -138,7 +138,7 @@ ob_start();
                 name="confirm_password" 
                 required 
                 minlength="8"
-                class="w-full px-4 py-3 rounded-lg bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition"
+                class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition"
                 placeholder="Passwort wiederholen"
             >
         </div>
