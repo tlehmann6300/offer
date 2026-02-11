@@ -19,8 +19,12 @@ class EasyVereinSync {
      */
     public function fetchDataFromEasyVerein() {
         $apiUrl = 'https://easyverein.com/api/v2.0/inventory-object?limit=100';
-        // Hardcoded token as per requirements
-        $apiToken = '5e7c6d41440d7560d518cd15070d0a8d476139e1';
+        // Get API token from config
+        $apiToken = defined('EASYVEREIN_API_TOKEN') ? EASYVEREIN_API_TOKEN : '';
+        
+        if (empty($apiToken)) {
+            throw new Exception('EasyVerein API token not configured');
+        }
         
         try {
             // Initialize cURL
@@ -430,8 +434,12 @@ class EasyVereinSync {
      */
     public static function updateItem($easyvereinId, $data) {
         $apiUrl = "https://easyverein.com/api/v2.0/inventory-object/{$easyvereinId}";
-        // Hardcoded token as per requirements
-        $apiToken = '5e7c6d41440d7560d518cd15070d0a8d476139e1';
+        // Get API token from config
+        $apiToken = defined('EASYVEREIN_API_TOKEN') ? EASYVEREIN_API_TOKEN : '';
+        
+        if (empty($apiToken)) {
+            throw new Exception('EasyVerein API token not configured');
+        }
         
         try {
             // Map our fields to EasyVerein API fields
