@@ -360,7 +360,7 @@ ob_start();
                             name="first_name" 
                             required 
                             value="<?php echo htmlspecialchars($profile['first_name'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                         >
                     </div>
                     
@@ -371,7 +371,7 @@ ob_start();
                             name="last_name" 
                             required 
                             value="<?php echo htmlspecialchars($profile['last_name'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                         >
                     </div>
                     
@@ -382,7 +382,7 @@ ob_start();
                             name="profile_email" 
                             required 
                             value="<?php echo htmlspecialchars($profile['email'] ?? $user['email']); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                         >
                     </div>
                     
@@ -392,7 +392,7 @@ ob_start();
                             type="text" 
                             name="mobile_phone" 
                             value="<?php echo htmlspecialchars($profile['mobile_phone'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="+49 123 456789"
                         >
                     </div>
@@ -403,7 +403,7 @@ ob_start();
                             type="url" 
                             name="linkedin_url" 
                             value="<?php echo htmlspecialchars($profile['linkedin_url'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="https://linkedin.com/in/..."
                         >
                     </div>
@@ -414,7 +414,7 @@ ob_start();
                             type="url" 
                             name="xing_url" 
                             value="<?php echo htmlspecialchars($profile['xing_url'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="https://xing.com/profile/..."
                         >
                     </div>
@@ -423,7 +423,7 @@ ob_start();
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Geschlecht</label>
                         <select 
                             name="gender"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                         >
                             <option value="">Bitte wählen</option>
                             <option value="m" <?php echo ($profile['gender'] ?? '') === 'm' ? 'selected' : ''; ?>>Männlich</option>
@@ -439,7 +439,7 @@ ob_start();
                             name="birthday" 
                             value="<?php echo htmlspecialchars($profile['birthday'] ?? ''); ?>"
                             max="<?php echo date('Y-m-d'); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                         >
                     </div>
                     
@@ -454,7 +454,7 @@ ob_start();
                             type="file" 
                             name="profile_picture" 
                             accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                         >
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">JPG, PNG, GIF oder WEBP (Max. 5MB)</p>
                     </div>
@@ -475,7 +475,7 @@ ob_start();
                             name="bachelor_studiengang" 
                             required
                             value="<?php echo htmlspecialchars($profile['study_program'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="z.B. Wirtschaftsingenieurwesen"
                         >
                     </div>
@@ -486,7 +486,7 @@ ob_start();
                             type="text" 
                             name="bachelor_semester" 
                             value="<?php echo htmlspecialchars($profile['semester'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="z.B. 5"
                         >
                     </div>
@@ -497,7 +497,7 @@ ob_start();
                             type="text" 
                             name="master_studiengang" 
                             value="<?php echo htmlspecialchars($profile['angestrebter_abschluss'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="z.B. Management & Engineering"
                         >
                     </div>
@@ -508,7 +508,7 @@ ob_start();
                             type="text" 
                             name="master_semester" 
                             value="<?php echo htmlspecialchars($profile['graduation_year'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="z.B. 2"
                         >
                     </div>
@@ -528,7 +528,7 @@ ob_start();
                             name="bachelor_studiengang" 
                             required
                             value="<?php echo htmlspecialchars($profile['study_program'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="z.B. Wirtschaftsingenieurwesen"
                         >
                     </div>
@@ -539,7 +539,7 @@ ob_start();
                             type="text" 
                             name="bachelor_year" 
                             value="<?php echo htmlspecialchars($profile['semester'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="z.B. 2020"
                         >
                     </div>
@@ -550,7 +550,7 @@ ob_start();
                             type="text" 
                             name="master_studiengang" 
                             value="<?php echo htmlspecialchars($profile['angestrebter_abschluss'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="z.B. Management & Engineering"
                         >
                     </div>
@@ -561,7 +561,7 @@ ob_start();
                             type="text" 
                             name="master_year" 
                             value="<?php echo htmlspecialchars($profile['graduation_year'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="z.B. 2022"
                         >
                     </div>
@@ -578,7 +578,7 @@ ob_start();
                             type="text" 
                             name="company" 
                             value="<?php echo htmlspecialchars($profile['company'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="Firmenname"
                         >
                     </div>
@@ -589,7 +589,7 @@ ob_start();
                             type="text" 
                             name="position" 
                             value="<?php echo htmlspecialchars($profile['position'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="z.B. Senior Consultant"
                         >
                     </div>
@@ -600,7 +600,7 @@ ob_start();
                             type="text" 
                             name="industry" 
                             value="<?php echo htmlspecialchars($profile['industry'] ?? ''); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="z.B. Beratung, IT, Finanzen"
                         >
                     </div>
@@ -620,7 +620,7 @@ ob_start();
                         name="about_me" 
                         rows="4"
                         maxlength="400"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                         placeholder="Erzähle etwas über dich..."
                     ><?php echo htmlspecialchars($profile['about_me'] ?? ''); ?></textarea>
                 </div>

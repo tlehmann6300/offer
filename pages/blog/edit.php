@@ -196,7 +196,7 @@ ob_start();
             
             <!-- Title -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Titel *</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Titel *</label>
                 <input 
                     type="text" 
                     name="title" 
@@ -209,7 +209,7 @@ ob_start();
 
             <!-- Category -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Kategorie *</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategorie *</label>
                 <select 
                     name="category" 
                     required 
@@ -227,7 +227,7 @@ ob_start();
 
             <!-- Content -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Inhalt *</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Inhalt *</label>
                 <textarea 
                     name="content" 
                     required 
@@ -243,7 +243,7 @@ ob_start();
 
             <!-- External Link -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Externer Link (optional)</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Externer Link (optional)</label>
                 <input 
                     type="url" 
                     name="external_link" 
@@ -258,7 +258,7 @@ ob_start();
 
             <!-- Image Upload -->
             <div class="pb-6 border-b">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Bild (optional)</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bild (optional)</label>
                 <?php if ($imagePath): ?>
                 <div class="mb-4">
                     <p class="text-sm text-gray-600 mb-2">Aktuelles Bild:</p>

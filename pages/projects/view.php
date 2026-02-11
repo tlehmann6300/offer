@@ -359,7 +359,7 @@ ob_start();
                         <input type="hidden" name="complete_project" value="1">
                         
                         <div>
-                            <label class="flex items-center text-sm font-medium text-gray-700 mb-2">
+                            <label class="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 <i class="fas fa-file-alt text-green-600 mr-2"></i>
                                 Abschlussbericht / Dokumentation <span class="text-red-500 ml-1">*</span>
                             </label>
@@ -367,7 +367,7 @@ ob_start();
                                 name="documentation" 
                                 rows="8"
                                 required
-                                class="w-full bg-white border border-gray-300 rounded-lg p-4 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200"
+                                class="w-full bg-white border-gray-300 text-gray-900 rounded-lg p-4 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition duration-200"
                                 placeholder="Beschreiben Sie die Ergebnisse des Projekts, wichtige Erkenntnisse und weitere relevante Informationen..."
                             ></textarea>
                         </div>

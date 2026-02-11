@@ -116,7 +116,7 @@ ob_start();
         </div>
 
         <div>
-            <label class="block text-gray-700 mb-2 font-medium">
+            <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">
                 <i class="fas fa-lock mr-2"></i>Passwort
             </label>
             <input 
@@ -124,13 +124,13 @@ ob_start();
                 name="password" 
                 required 
                 minlength="8"
-                class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                class="w-full px-4 py-3 rounded-lg bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition"
                 placeholder="Mindestens 8 Zeichen"
             >
         </div>
 
         <div>
-            <label class="block text-gray-700 mb-2 font-medium">
+            <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">
                 <i class="fas fa-lock mr-2"></i>Passwort bestätigen
             </label>
             <input 
@@ -138,14 +138,14 @@ ob_start();
                 name="confirm_password" 
                 required 
                 minlength="8"
-                class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                class="w-full px-4 py-3 rounded-lg bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition"
                 placeholder="Passwort wiederholen"
             >
         </div>
 
         <button 
             type="submit" 
-            class="w-full py-3 px-6 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-green-600 transition transform hover:scale-105 shadow-lg"
+            class="w-full py-3 px-6 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-green-600 dark:hover:from-blue-600 dark:hover:to-green-600 transition transform hover:scale-105 shadow-lg"
         >
             <i class="fas fa-user-check mr-2"></i>
             Konto erstellen

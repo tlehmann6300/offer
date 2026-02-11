@@ -168,22 +168,22 @@ ob_start();
         
         <?php if (!$require2FA): ?>
         <div>
-            <label class="block text-gray-700 mb-2 font-medium"><i class="fas fa-envelope mr-2"></i>E-Mail</label>
-            <input type="email" name="email" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300" placeholder="ihre.email@beispiel.de" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+            <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium"><i class="fas fa-envelope mr-2"></i>E-Mail</label>
+            <input type="email" name="email" required class="w-full px-4 py-3 rounded-lg bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all duration-300" placeholder="ihre.email@beispiel.de" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
         </div>
         <div>
-            <label class="block text-gray-700 mb-2 font-medium"><i class="fas fa-lock mr-2"></i>Passwort</label>
-            <input type="password" name="password" required class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300" placeholder="••••••••">
+            <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium"><i class="fas fa-lock mr-2"></i>Passwort</label>
+            <input type="password" name="password" required class="w-full px-4 py-3 rounded-lg bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all duration-300" placeholder="••••••••">
         </div>
         <?php else: ?>
         <div>
-            <label class="block text-gray-700 mb-2 font-medium"><i class="fas fa-shield-alt mr-2"></i>2FA-Code</label>
-            <input type="text" name="tfa_code" required maxlength="6" pattern="[0-9]{6}" class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center text-2xl tracking-widest" placeholder="000000" autofocus>
+            <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium"><i class="fas fa-shield-alt mr-2"></i>2FA-Code</label>
+            <input type="text" name="tfa_code" required maxlength="6" pattern="[0-9]{6}" class="w-full px-4 py-3 rounded-lg bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 text-center text-2xl tracking-widest" placeholder="000000" autofocus>
             <p class="mt-2 text-gray-600 text-sm">Code aus Authenticator-App eingeben</p>
         </div>
         <?php endif; ?>
 
-        <button type="submit" class="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-green-600 transition-all duration-300 transform hover:scale-105 shadow-lg">
+        <button type="submit" class="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-green-600 dark:hover:from-blue-600 dark:hover:to-green-600 transition-all duration-300 transform hover:scale-105 shadow-lg">
             <i class="fas fa-sign-in-alt mr-2"></i><?php echo $require2FA ? 'Code bestätigen' : 'Anmelden'; ?>
         </button>
     </form>

@@ -160,7 +160,7 @@ ob_start();
         <!-- Basic Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Name *</label>
                 <input 
                     type="text" 
                     name="name" 
@@ -172,7 +172,7 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Kategorie</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategorie</label>
                 <select 
                     name="category_id" 
                     <?php if ($isSyncedItem): ?>disabled<?php endif; ?>
@@ -188,10 +188,10 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Standort</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Standort</label>
                 <select 
                     name="location_id" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
                     <option value="">Kein Standort</option>
                     <?php foreach ($locations as $location): ?>
@@ -203,7 +203,7 @@ ob_start();
             </div>
 
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Beschreibung</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Beschreibung</label>
                 <textarea 
                     name="description" 
                     rows="4"
@@ -218,7 +218,7 @@ ob_start();
             <h2 class="text-xl font-semibold text-gray-800 mb-4">Bestandsinformationen</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Aktueller Bestand</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Aktueller Bestand</label>
                     <input 
                         type="number" 
                         value="<?php echo $item['current_stock']; ?>"
@@ -229,35 +229,35 @@ ob_start();
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Mindestbestand</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mindestbestand</label>
                     <input 
                         type="number" 
                         name="min_stock" 
                         min="0"
                         value="<?php echo $item['min_stock']; ?>"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Einheit</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Einheit</label>
                     <input 
                         type="text" 
                         name="unit" 
                         value="<?php echo htmlspecialchars($item['unit']); ?>"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Stückpreis (€)</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Stückpreis (€)</label>
                     <input 
                         type="number" 
                         name="unit_price" 
                         min="0" 
                         step="0.01"
                         value="<?php echo $item['unit_price']; ?>"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                 </div>
             </div>
@@ -273,12 +273,12 @@ ob_start();
             </div>
             <?php endif; ?>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Neues Bild hochladen (optional)</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Neues Bild hochladen (optional)</label>
                 <input 
                     type="file" 
                     name="image" 
                     accept="image/jpeg,image/png,image/gif,image/webp"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
                 <p class="text-sm text-gray-500 mt-2">Erlaubt: JPG, PNG, GIF, WebP. Maximum: 5MB</p>
             </div>
@@ -286,11 +286,11 @@ ob_start();
 
         <!-- Notes -->
         <div class="border-t pt-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Notizen</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notizen</label>
             <textarea 
                 name="notes" 
                 rows="3"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             ><?php echo htmlspecialchars($item['notes']); ?></textarea>
         </div>
 

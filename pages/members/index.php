@@ -68,7 +68,7 @@ ob_start();
         <form method="GET" action="" class="space-y-4 sm:space-y-0 sm:flex sm:gap-4">
             <!-- Search Input (Text) -->
             <div class="flex-1">
-                <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     <i class="fas fa-search mr-1 text-blue-600"></i>
                     Nach Name suchen
                 </label>
@@ -78,20 +78,20 @@ ob_start();
                     name="search" 
                     value="<?php echo htmlspecialchars($searchKeyword); ?>"
                     placeholder="Name eingeben..."
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    class="w-full px-4 py-3 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all"
                 >
             </div>
             
             <!-- Role Filter (Dropdown) -->
             <div class="flex-1">
-                <label for="role" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     <i class="fas fa-filter mr-1 text-blue-600"></i>
                     Nach Rolle filtern
                 </label>
                 <select 
                     id="role" 
                     name="role"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    class="w-full px-4 py-3 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all"
                 >
                     <option value="">Alle</option>
                     <option value="board" <?php echo $roleFilter === 'board' ? 'selected' : ''; ?>>Vorstand (allgemein)</option>

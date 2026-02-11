@@ -275,7 +275,7 @@ ob_start();
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Title -->
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Titel <span class="text-red-500">*</span>
                     </label>
                     <input 
@@ -284,52 +284,52 @@ ob_start();
                         value="<?php echo htmlspecialchars($_POST['title'] ?? $event['title'] ?? ''); ?>"
                         required 
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Event-Titel"
                     >
                 </div>
 
                 <!-- Description -->
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Beschreibung</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Beschreibung</label>
                     <textarea 
                         name="description" 
                         rows="4"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Event-Beschreibung..."
                     ><?php echo htmlspecialchars($_POST['description'] ?? $event['description'] ?? ''); ?></textarea>
                 </div>
 
                 <!-- Contact Person -->
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Ansprechpartner</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ansprechpartner</label>
                     <input 
                         type="text" 
                         name="contact_person"
                         value="<?php echo htmlspecialchars($_POST['contact_person'] ?? $event['contact_person'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Name des Ansprechpartners"
                     >
                 </div>
 
                 <!-- Location / Room -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Veranstaltungsort / Raum</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Veranstaltungsort / Raum</label>
                     <input 
                         type="text" 
                         name="location"
                         value="<?php echo htmlspecialchars($_POST['location'] ?? $event['location'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="z.B. H-1.88 Aula"
                     >
                 </div>
 
                 <!-- Google Maps Link -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Google Maps Link
                         <span class="text-xs text-gray-500 ml-2">(Optional)</span>
                     </label>
@@ -350,7 +350,7 @@ ob_start();
 
                 <!-- Event Image Upload -->
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Event-Bild
                         <span class="text-xs text-gray-500 ml-2">(Optional)</span>
                     </label>
@@ -382,7 +382,7 @@ ob_start();
                         name="event_image"
                         accept="image/*"
                         <?php echo $readOnly ? 'disabled' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                     >
                     <p class="text-xs text-gray-500 mt-1">Unterstützte Formate: JPG, PNG, GIF. Max. 5MB.</p>
                 </div>
@@ -399,7 +399,7 @@ ob_start();
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Start Time with Flatpickr -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Startzeit <span class="text-red-500">*</span>
                     </label>
                     <input 
@@ -422,7 +422,7 @@ ob_start();
 
                 <!-- End Time with Flatpickr -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Endzeit <span class="text-red-500">*</span>
                     </label>
                     <input 
@@ -445,7 +445,7 @@ ob_start();
 
                 <!-- Registration Start Time -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Anmeldung Start
                         <span class="text-xs text-gray-500 ml-2">(Optional)</span>
                     </label>
@@ -468,7 +468,7 @@ ob_start();
 
                 <!-- Registration End Time -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Anmeldung Ende
                         <span class="text-xs text-gray-500 ml-2">(Optional)</span>
                     </label>
@@ -508,13 +508,13 @@ ob_start();
 
                 <!-- External Link -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Externer Link</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Externer Link</label>
                     <input 
                         type="url" 
                         name="external_link"
                         value="<?php echo htmlspecialchars($_POST['external_link'] ?? $event['external_link'] ?? ''); ?>"
                         <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="https://..."
                     >
                 </div>
@@ -533,7 +533,7 @@ ob_start();
                             }
                             ?>
                             <?php echo $readOnly ? 'disabled' : ''; ?>
-                            class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                            class="w-5 h-5 text-purple-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-blue-500"
                         >
                         <span class="text-sm font-medium text-gray-700">Externes Event</span>
                     </label>
@@ -551,7 +551,7 @@ ob_start();
                             }
                             ?>
                             <?php echo $readOnly ? 'disabled' : ''; ?>
-                            class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                            class="w-5 h-5 text-purple-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-blue-500"
                         >
                         <span class="text-sm font-medium text-gray-700">Helfer benötigt</span>
                     </label>
@@ -576,7 +576,7 @@ ob_start();
                                 value="<?php echo $roleValue; ?>"
                                 <?php echo in_array($roleValue, $allowedRoles) ? 'checked' : ''; ?>
                                 <?php echo $readOnly ? 'disabled' : ''; ?>
-                                class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                                class="w-4 h-4 text-purple-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-blue-500"
                             >
                             <span class="text-sm text-gray-700"><?php echo $roleLabel; ?></span>
                         </label>
@@ -789,7 +789,7 @@ function addHelperType() {
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Titel der Rolle <span class="text-red-500">*</span>
                     </label>
                     <input 
@@ -800,7 +800,7 @@ function addHelperType() {
                     >
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Beschreibung (optional)</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Beschreibung (optional)</label>
                     <input 
                         type="text" 
                         class="helper-type-description w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-ibc-blue"
