@@ -51,28 +51,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_invite'])) {
                     }
                     
                     try {
-                        // Extract display name from email (everything before @)
-                        $displayName = explode('@', $email)[0];
+                        // Extract username from email (local part before @)
+                        $emailLocalPart = explode('@', $email)[0];
                         
                         // Invite user
-                        $userId = $graphService->inviteUser($email, $displayName, $redirectUrl);
+                        $userId = $graphService->inviteUser($email, $emailLocalPart, $redirectUrl);
                         
                         // Assign role
-                        $roleAssigned = $graphService->assignRole($userId, $role);
-                        
-                        if ($roleAssigned) {
-                            $successCount++;
-                            $results[] = [
-                                'email' => $email,
-                                'status' => 'success',
-                                'message' => 'Erfolgreich eingeladen und Rolle zugewiesen'
-                            ];
-                        } else {
+                        try {
+                            $roleAssigned = $graphService->assignRole($userId, $role);
+                            
+                            if ($roleAssigned) {
+                                $successCount++;
+                                $results[] = [
+                                    'email' => $email,
+                                    'status' => 'success',
+                                    'message' => 'Erfolgreich eingeladen und Rolle zugewiesen'
+                                ];
+                            } else {
+                                $errorCount++;
+                                $results[] = [
+                                    'email' => $email,
+                                    'status' => 'warning',
+                                    'message' => 'Eingeladen, aber Rollenzuweisung fehlgeschlagen'
+                                ];
+                            }
+                        } catch (Exception $roleError) {
                             $errorCount++;
                             $results[] = [
                                 'email' => $email,
                                 'status' => 'warning',
-                                'message' => 'Eingeladen, aber Rollenzuweisung fehlgeschlagen'
+                                'message' => 'Eingeladen, aber Rollenzuweisung fehlgeschlagen: ' . $roleError->getMessage()
                             ];
                         }
                     } catch (Exception $e) {
