@@ -11,8 +11,6 @@ if (!Auth::isBoard()) {
     exit;
 }
 
-$user = Auth::user();
-
 // Get databases
 $userDb = Database::getUserDB();
 $contentDb = Database::getContentDB();
