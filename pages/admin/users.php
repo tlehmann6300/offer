@@ -306,7 +306,7 @@ ob_start();
                     <?php 
                     // Get users with 'member' or 'head' role for successor selection
                     foreach ($users as $member):
-                        if ($member['id'] !== $_SESSION['user_id'] && in_array($member['role'], ['member', 'head'])):
+                        if ((int)$member['id'] !== (int)$_SESSION['user_id'] && in_array($member['role'], ['member', 'head'], true)):
                     ?>
                     <option value="<?php echo $member['id']; ?>">
                         <?php echo htmlspecialchars($member['email']); ?> (<?php echo htmlspecialchars(translateRole($member['role'])); ?>)

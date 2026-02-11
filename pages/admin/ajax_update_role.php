@@ -50,7 +50,7 @@ if (!in_array($newRole, Auth::VALID_ROLES)) {
 }
 
 // Check if user is trying to change their own role
-$isOwnRole = ($userId === $_SESSION['user_id']);
+$isOwnRole = ($userId === (int)$_SESSION['user_id']);
 
 // Get current user's role for checks
 $currentUserRole = $_SESSION['user_role'] ?? '';
@@ -87,16 +87,6 @@ if ($isOwnRole && $isBoardMember && in_array($newRole, ['member', 'alumni'])) {
         ]);
         exit;
     }
-}
-
-// For non-succession cases where board member is trying to demote themselves, prevent it
-// Regular users can still change their own roles through other means if allowed
-if ($isOwnRole && $isBoardMember && in_array($newRole, ['member', 'alumni']) && !$successorId) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Du kannst deine Vorstandsrolle nicht ohne Nachfolger abgeben'
-    ]);
-    exit;
 }
 
     // Update the role and set prompt_profile_review flag
