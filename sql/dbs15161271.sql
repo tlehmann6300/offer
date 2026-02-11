@@ -558,7 +558,7 @@ CREATE TABLE IF NOT EXISTS polls (
     created_by INT UNSIGNED NOT NULL,
     start_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     end_date DATETIME NOT NULL,
-    target_groups JSON NOT NULL COMMENT 'Array of roles allowed to vote e.g. ["member", "alumni", "board_finance"]',
+    target_groups JSON NOT NULL COMMENT 'Array of roles allowed to vote, e.g. ["member", "alumni", "board_finance", "board_internal", "board_external", "alumni_board", "alumni_auditor"]',
     is_active BOOLEAN NOT NULL DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
@@ -589,6 +589,8 @@ CREATE TABLE IF NOT EXISTS poll_options (
 -- ============================================
 -- POLL VOTES TABLE
 -- ============================================
+-- Note: CASCADE delete on poll_id and option_id ensures votes are removed
+-- when polls or options are deleted, maintaining data integrity
 CREATE TABLE IF NOT EXISTS poll_votes (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     poll_id INT UNSIGNED NOT NULL,
