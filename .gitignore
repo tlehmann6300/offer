@@ -14,6 +14,14 @@ uploads/events/*
 uploads/inventory/*
 !uploads/inventory/.gitkeep
 
+# Profile uploads directory - keep structure, ignore uploaded files
+uploads/profile/*
+!uploads/profile/.gitkeep
+
+# Invoice uploads directory - keep structure, ignore uploaded files
+uploads/invoices/*
+!uploads/invoices/.gitkeep
+
 # Composer
 composer.lock
 
