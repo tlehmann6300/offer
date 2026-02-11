@@ -17,7 +17,7 @@ if (!Auth::check()) {
 $user = Auth::user();
 
 // Check if user has permission (head or board roles)
-if (!Auth::hasRole(['head', 'board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht'])) {
+if (!(Auth::isBoard() || Auth::hasRole('head'))) {
     header('Location: ../dashboard/index.php');
     exit;
 }
