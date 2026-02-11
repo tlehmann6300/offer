@@ -16,15 +16,17 @@ if (!Auth::check()) {
 }
 
 $user = Auth::user();
-$userRole = $user['role'] ?? '';
 
 // Check if user has permission to submit invoices
-$allowedRoles = ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni_board', 'alumni_finanzprufer', 'head'];
-if (!in_array($userRole, $allowedRoles)) {
+// Allowed: board members, alumni_board, alumni_auditor, head (department leaders)
+$hasInvoiceSubmitAccess = Auth::isBoard() || Auth::hasRole(['alumni_board', 'alumni_auditor', 'head']);
+if (!$hasInvoiceSubmitAccess) {
     $_SESSION['error_message'] = 'Keine Berechtigung';
     header('Location: ' . asset('pages/dashboard/index.php'));
     exit;
 }
+
+$userRole = $user['role'] ?? '';
 
 // Validate POST request
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

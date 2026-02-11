@@ -107,15 +107,15 @@ function asset($path) {
  */
 function translateRole($role) {
     $roleTranslations = [
-        'board' => 'Vorstand',
-        'vorstand_intern' => 'Vorstand',
-        'vorstand_extern' => 'Vorstand',
-        'vorstand_finanzen_recht' => 'Vorstand',
+        'board_finance' => 'Vorstand Finanzen & Recht',
+        'board_internal' => 'Vorstand Intern',
+        'board_external' => 'Vorstand Extern',
         'head' => 'Ressortleiter',
         'member' => 'Mitglied',
         'alumni' => 'Alumni',
         'candidate' => 'Anwärter',
         'alumni_board' => 'Alumni-Vorstand',
+        'alumni_auditor' => 'Alumni-Finanzprüfer',
         'honorary_member' => 'Ehrenmitglied',
         'manager' => 'Ressortleiter'
     ];
@@ -127,15 +127,16 @@ function translateRole($role) {
  * Check if role is an active member role
  * Active member roles: candidate, member, head, board (and board variants)
  * 
- * Note: This includes all board variants (vorstand_intern, vorstand_extern, vorstand_finanzen_recht)
- * to match the Member::ACTIVE_ROLES constant. Previous inline checks that excluded these variants
- * were inconsistent with the member directory filtering logic.
+ * Note: This matches Auth::BOARD_ROLES plus candidate, member, head.
+ * Keep this in sync with Member::ACTIVE_ROLES constant.
  * 
  * @param string $role Role identifier
  * @return bool True if role is an active member role
  */
 function isMemberRole($role) {
-    return in_array($role, ['candidate', 'member', 'head', 'board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht']);
+    // Active roles: board roles + candidate, member, head
+    // Matches Member::ACTIVE_ROLES constant
+    return in_array($role, ['candidate', 'member', 'head', 'board_finance', 'board_internal', 'board_external']);
 }
 
 /**

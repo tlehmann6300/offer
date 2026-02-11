@@ -84,7 +84,7 @@ $helperEvents = $stmt->fetchAll();
 
 // Security Audit - nur für Board/Head
 $securityWarning = '';
-if (in_array($userRole, ['board', 'head'])) {
+if (Auth::isBoard() || Auth::hasRole('head')) {
     require_once __DIR__ . '/../../security_audit.php';
     $securityWarning = SecurityAudit::getDashboardWarning(__DIR__ . '/../..');
 }

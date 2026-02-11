@@ -15,13 +15,16 @@ if (!Auth::check()) {
 }
 
 $user = Auth::user();
-$userRole = $user['role'] ?? '';
 
-// Only board, alumni_board, and alumni_finanzprufer members can export invoices
-if (!in_array($userRole, ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni_board', 'alumni_finanzprufer'])) {
+// Only board members, alumni_board, and alumni_auditor can export invoices
+// Check if user has permission to view invoices
+$hasInvoiceAccess = Auth::isBoard() || Auth::hasRole(['alumni_board', 'alumni_auditor']);
+if (!$hasInvoiceAccess) {
     header('Location: ../pages/dashboard/index.php');
     exit;
 }
+
+$userRole = $user['role'] ?? '';
 
 // Get all invoices
 $invoices = Invoice::getAll($userRole, $user['id']);

@@ -393,8 +393,8 @@ class Project {
             return $project;
         }
         
-        // Board and manager can always see client data
-        if ($userRole === 'board' || $userRole === 'manager') {
+        // Board roles and manager can always see client data
+        if (in_array($userRole, array_merge(Auth::BOARD_ROLES, ['manager']))) {
             return $project;
         }
         

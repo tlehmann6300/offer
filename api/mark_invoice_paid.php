@@ -17,15 +17,14 @@ if (!Auth::check()) {
     exit;
 }
 
-$user = Auth::user();
-$userRole = $user['role'] ?? '';
-
-// Only vorstand_finanzen_recht members can mark as paid
-if ($userRole !== 'vorstand_finanzen_recht') {
+// Only board_finance members can mark invoices as paid
+if (!Auth::canManageInvoices()) {
     http_response_code(403);
     echo json_encode(['success' => false, 'error' => 'Keine Berechtigung - nur Vorstand Finanzen & Recht']);
     exit;
 }
+
+$user = Auth::user();
 
 // Validate POST request
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

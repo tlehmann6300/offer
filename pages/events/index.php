@@ -39,8 +39,10 @@ if ($filter === 'my_registrations') {
         return in_array($event['id'], $myEventIds);
     });
 } else {
-    // Hide past events for normal users (non-board)
-    if (!in_array($userRole, ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni_board', 'alumni_finanzprufer', 'manager'])) {
+    // Hide past events for normal users (non-board, non-manager)
+    // Board members, alumni_board, alumni_auditor, and managers can see past events
+    $canViewPastEvents = Auth::isBoard() || Auth::hasRole(['alumni_board', 'alumni_auditor', 'manager']);
+    if (!$canViewPastEvents) {
         $events = array_filter($events, function($event) use ($now) {
             return $event['end_time'] >= $now;
         });
@@ -67,7 +69,7 @@ ob_start();
         </div>
         
         <!-- Neues Event Button - Board/Head/Manager only -->
-        <?php if (Auth::hasPermission('manage_projects') || in_array($userRole, ['board', 'head', 'alumni_board'])): ?>
+        <?php if (Auth::hasPermission('manage_projects') || Auth::isBoard() || Auth::hasRole(['head', 'alumni_board'])): ?>
         <a href="manage.php" class="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl">
             <i class="fas fa-plus mr-2"></i>
             Neues Event

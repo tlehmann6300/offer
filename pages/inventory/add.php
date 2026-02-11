@@ -10,7 +10,7 @@ if (!Auth::check() || !Auth::hasPermission('manager')) {
 }
 
 // Check if user is board member (can bypass sync requirement for backward compatibility)
-$isAdmin = isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht']);
+$isAdmin = Auth::isBoard();
 
 $message = '';
 $error = '';
