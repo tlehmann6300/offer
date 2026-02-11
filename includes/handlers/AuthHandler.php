@@ -7,6 +7,7 @@
 require_once __DIR__ . '/../database.php';
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../src/Auth.php';
 
 class AuthHandler {
     
@@ -180,6 +181,8 @@ class AuthHandler {
         // Role hierarchy: alumni and member have read-only access (level 1)
         // manager can edit inventory (level 2)
         // board roles and alumni_board have full board access (level 3)
+        // Note: 'admin' kept for backward compatibility with legacy code paths.
+        // This role is NOT in VALID_ROLES and cannot be assigned to new users.
         $roleHierarchy = [
             'alumni' => 1, 
             'member' => 1, 
@@ -189,7 +192,7 @@ class AuthHandler {
             'board_finance' => 3,
             'board_internal' => 3,
             'board_external' => 3,
-            'admin' => 3  // Keep for backward compatibility
+            'admin' => 3  // DEPRECATED: Keep for backward compatibility only. Not assignable to new users.
         ];
         $userRole = $_SESSION['user_role'];
         
@@ -267,7 +270,7 @@ class AuthHandler {
         }
         
         $userRole = $_SESSION['user_role'] ?? '';
-        return in_array($userRole, ['board_finance', 'board_internal', 'board_external']);
+        return in_array($userRole, Auth::BOARD_ROLES);
     }
     
     /**
@@ -297,7 +300,7 @@ class AuthHandler {
         }
         
         $userRole = $_SESSION['user_role'] ?? '';
-        return in_array($userRole, ['board_finance', 'board_internal', 'board_external']);
+        return in_array($userRole, Auth::BOARD_ROLES);
     }
 
     /**

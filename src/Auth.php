@@ -329,8 +329,9 @@ class Auth {
         }
         
         // Role hierarchy
-        // Note: 'admin' kept at level 3 for backward compatibility only
-        // New users cannot be assigned 'admin' role (not in VALID_ROLES)
+        // Note: 'admin' kept at level 3 for backward compatibility with legacy code paths.
+        // This role is NOT in VALID_ROLES and cannot be assigned to new users.
+        // Existing code checking for 'admin' will be handled through hasRole() mapping to board_finance.
         $roleHierarchy = [
             'candidate' => 0,
             'alumni' => 1,
@@ -344,7 +345,7 @@ class Auth {
             'board_finance' => 3,
             'board_internal' => 3,
             'board_external' => 3,
-            'admin' => 3  // Keep for backward compatibility, treat as board level
+            'admin' => 3  // DEPRECATED: Keep for backward compatibility only. Not assignable to new users.
         ];
         
         $userRole = $_SESSION['user_role'] ?? '';
