@@ -5,10 +5,14 @@ require_once __DIR__ . '/../../includes/models/Inventory.php';
 require_once __DIR__ . '/../../includes/models/Project.php';
 
 // Check authentication and authorization
-// Accessible only to: Board members (board_finance, board_internal, board_external)
-if (!Auth::isBoard()) {
-    header('Location: /index.php');
-    exit;
+if (!Auth::canViewAdminStats()) {
+    die('Zugriff verweigert');
+}
+
+// Get authenticated user
+$user = Auth::user();
+if (!$user) {
+    die('Zugriff verweigert');
 }
 
 // Get databases

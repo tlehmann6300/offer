@@ -53,13 +53,13 @@ ob_start();
             <p class="text-gray-600 dark:text-gray-300">Aktive Umfragen für Ihre Rolle</p>
         </div>
         
-        <?php if (Auth::hasRole(['head', 'board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht'])): ?>
+        <?php if (Auth::canCreateComplexContent()): ?>
         <a 
             href="<?php echo asset('pages/polls/create.php'); ?>"
             class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg"
         >
             <i class="fas fa-plus mr-2"></i>
-            Umfrage erstellen
+            Neue Umfrage erstellen
         </a>
         <?php endif; ?>
     </div>
