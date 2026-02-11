@@ -99,9 +99,9 @@ require_once __DIR__ . '/../helpers.php';
 </head>
 <body class="min-h-screen">
     <!-- Decorative floating elements -->
-    <div class="floating-dot w-64 h-64 top-20 -left-20 bg-green-500" style="animation-delay: 0s;"></div>
-    <div class="floating-dot w-48 h-48 top-40 right-10 bg-blue-500" style="animation-delay: -5s;"></div>
-    <div class="floating-dot w-32 h-32 bottom-20 left-1/4 bg-blue-400" style="animation-delay: -10s;"></div>
+    <div class="floating-dot w-64 h-64 top-20 -left-20 bg-green-500" style="animation-delay: 0s;" aria-hidden="true"></div>
+    <div class="floating-dot w-48 h-48 top-40 right-10 bg-blue-500" style="animation-delay: -5s;" aria-hidden="true"></div>
+    <div class="floating-dot w-32 h-32 bottom-20 left-1/4 bg-blue-400" style="animation-delay: -10s;" aria-hidden="true"></div>
 
     <div class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
         <!-- IBC Logo above content -->

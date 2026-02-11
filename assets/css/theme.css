@@ -28,6 +28,8 @@
     --ibc-accent-light: #ff8b5d;
     --ibc-accent-dark: #e55220;
     
+    --ibc-green-mid: #00c464;
+    
     /* Neutral Colors */
     --ibc-gray-50: #f9fafb;
     --ibc-gray-100: #f3f4f6;
@@ -1530,7 +1532,7 @@ body.dark-mode .text-green-500 {
 
 /* Premium Button System */
 .btn-primary {
-    background: linear-gradient(135deg, var(--ibc-green) 0%, #00c464 50%, var(--ibc-blue) 100%);
+    background: linear-gradient(135deg, var(--ibc-green) 0%, var(--ibc-green-mid) 50%, var(--ibc-blue) 100%);
     background-size: 200% 200%;
     animation: gradientShift 6s ease infinite;
     color: white;

@@ -151,7 +151,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             opacity: 1;
         }
         .btn-primary {
-            background: linear-gradient(135deg, var(--ibc-green) 0%, #00c464 50%, var(--ibc-blue) 100%);
+            background: linear-gradient(135deg, var(--ibc-green) 0%, var(--ibc-green-mid) 50%, var(--ibc-blue) 100%);
             background-size: 200% 200%;
             color: white;
             padding: 0.75rem 2rem;

@@ -191,8 +191,9 @@ function dismissProfileReviewPrompt() {
             <div class="relative z-10">
                 <p class="text-blue-100 text-sm font-medium uppercase tracking-wider mb-2">
                     <i class="fas fa-sun mr-1"></i> <?php
-                        $germanMonths = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-                        echo date('d') . '. ' . $germanMonths[(int)date('n') - 1] . ' ' . date('Y');
+                        $germanMonths = [1=>'Januar',2=>'Februar',3=>'März',4=>'April',5=>'Mai',6=>'Juni',7=>'Juli',8=>'August',9=>'September',10=>'Oktober',11=>'November',12=>'Dezember'];
+                        $monthNum = (int)date('n');
+                        echo date('d') . '. ' . ($germanMonths[$monthNum] ?? '') . ' ' . date('Y');
                     ?>
                 </p>
                 <h1 class="text-3xl md:text-5xl font-extrabold mb-3 tracking-tight" style="color: white !important;">

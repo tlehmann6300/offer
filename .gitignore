@@ -53,3 +53,5 @@ layout_preview.html
 verify_repair.php
 test-css-display.html
 test_auth_permissions.php
+preview_login.html
+preview_dashboard.html
