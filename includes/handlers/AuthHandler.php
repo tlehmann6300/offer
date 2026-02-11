@@ -238,13 +238,7 @@ class AuthHandler {
      * @return bool True if user has any board role (board_finance, board_internal, board_external)
      */
     public static function isAdmin() {
-        self::startSession();
-        if (!self::isAuthenticated()) {
-            return false;
-        }
-        
-        $userRole = $_SESSION['user_role'] ?? '';
-        return in_array($userRole, Auth::BOARD_ROLES);
+        return self::isBoard();
     }
 
     /**
@@ -310,13 +304,7 @@ class AuthHandler {
      * @return bool True if user has any board role (board_finance, board_internal, board_external)
      */
     public static function canSeeSystemStats() {
-        self::startSession();
-        if (!self::isAuthenticated()) {
-            return false;
-        }
-        
-        $userRole = $_SESSION['user_role'] ?? '';
-        return in_array($userRole, Auth::BOARD_ROLES);
+        return self::isBoard();
     }
 
     /**
