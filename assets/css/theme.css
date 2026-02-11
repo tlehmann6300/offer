@@ -1810,7 +1810,7 @@ body.dark-mode .sidebar {
     }
     
     /* Grid Improvements - Single column on mobile */
-    .grid {
+    .grid:not(.grid-no-stack):not(.grid-cols-1) {
         grid-template-columns: 1fr !important;
         gap: 1rem !important;
     }

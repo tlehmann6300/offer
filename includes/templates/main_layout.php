@@ -866,14 +866,14 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         const menuIconBottom = document.getElementById('menu-icon-bottom');
         
         function toggleSidebar() {
-            const isOpen = !sidebar.classList.contains('-translate-x-full');
+            const isOpen = sidebar.classList.contains('-translate-x-full');
             
             sidebar.classList.toggle('-translate-x-full');
             sidebarOverlay.classList.toggle('hidden');
             
             // Animate hamburger to X and back
-            if (!isOpen) {
-                // Transform to X
+            if (isOpen) {
+                // Transform to X (opening sidebar)
                 menuIconTop?.setAttribute('d', 'M6 18L18 6');
                 menuIconMiddle?.setAttribute('d', 'M12 12h0');
                 menuIconMiddle?.setAttribute('opacity', '0');
