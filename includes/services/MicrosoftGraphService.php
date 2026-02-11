@@ -68,7 +68,7 @@ class MicrosoftGraphService {
      * @return string Access token
      * @throws Exception If token request fails
      */
-    private function getAccessToken($tenantId, $clientId, $clientSecret) {
+    private function getAccessToken(string $tenantId, string $clientId, string $clientSecret) {
         $tokenUrl = "https://login.microsoftonline.com/{$tenantId}/oauth2/v2.0/token";
         
         try {
@@ -103,7 +103,7 @@ class MicrosoftGraphService {
      * @return string User ID of the newly invited user
      * @throws Exception If invitation fails
      */
-    public function inviteUser($email, $name, $redirectUrl) {
+    public function inviteUser(string $email, string $name, string $redirectUrl) {
         $invitationUrl = 'https://graph.microsoft.com/v1.0/invitations';
         
         try {
@@ -141,7 +141,7 @@ class MicrosoftGraphService {
      * @return bool True if role assignment succeeded
      * @throws Exception If role assignment fails or role is invalid
      */
-    public function assignRole($userId, $roleValue) {
+    public function assignRole(string $userId, string $roleValue) {
         // Validate role exists in mapping
         if (!isset(self::ROLE_MAPPING[$roleValue])) {
             throw new Exception("Invalid role value: {$roleValue}");
