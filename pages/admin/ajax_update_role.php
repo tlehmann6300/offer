@@ -65,6 +65,7 @@ $currentUserRole = $currentUserData['role'];
 $isBoardMember = in_array($currentUserRole, Auth::BOARD_ROLES);
 
 // If board member is demoting themselves to member or alumni, require a successor
+$successor = null;
 if ($isOwnRole && $isBoardMember && in_array($newRole, ['member', 'alumni'])) {
     if (!$successorId || $successorId <= 0) {
         echo json_encode([
@@ -107,13 +108,10 @@ if ($isOwnRole && $isBoardMember && in_array($newRole, ['member', 'alumni'])) {
     if (User::update($userId, $updateData)) {
         $message = 'Rolle erfolgreich geändert';
         
-        // Add succession message if applicable
-        if ($isOwnRole && $successorId) {
-            $successorUser = User::getById($successorId);
-            if ($successorUser) {
-                $message = 'Rollenwechsel erfolgreich durchgeführt. Deine Rolle wurde an ' . 
-                           $successorUser['email'] . ' übertragen.';
-            }
+        // Add succession message if applicable (reuse successor data from earlier fetch)
+        if ($isOwnRole && $successor) {
+            $message = 'Rollenwechsel erfolgreich durchgeführt. Deine Rolle wurde an ' . 
+                       $successor['email'] . ' übertragen.';
         }
         
         echo json_encode([

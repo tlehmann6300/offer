@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Define board roles and current user's role
     const boardRoles = <?php echo json_encode(Auth::BOARD_ROLES); ?>;
     const currentUserRole = '<?php echo $currentUserRole; ?>';
-    const currentUserId = <?php echo $_SESSION['user_id']; ?>;
+    const currentUserId = <?php echo $currentUser['id']; ?>;
     
     const roleSelects = document.querySelectorAll('.role-select');
     const modal = document.getElementById('successionModal');
@@ -538,7 +538,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'ajax-message mb-6 p-4 rounded-lg ' + 
             (type === 'success' ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700');
-        messageDiv.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check' : 'exclamation') + '-circle mr-2"></i>' + message;
+        
+        // Create icon
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-' + (type === 'success' ? 'check' : 'exclamation') + '-circle mr-2';
+        
+        // Create text node for message (safe from XSS)
+        const messageText = document.createTextNode(message);
+        
+        // Append elements
+        messageDiv.appendChild(icon);
+        messageDiv.appendChild(messageText);
         
         // Insert at the top of main content
         const mainContent = document.querySelector('main > div:first-child') || document.querySelector('main');
