@@ -140,13 +140,13 @@ ob_start();
             </h2>
             <form method="POST" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">E-Mail-Adresse</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">E-Mail-Adresse</label>
                     <input 
                         type="email" 
                         name="email" 
                         required 
                         value="<?php echo htmlspecialchars($user['email']); ?>"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                 </div>
                 <button type="submit" name="update_email" class="w-full btn-primary">
@@ -163,32 +163,32 @@ ob_start();
             </h2>
             <form method="POST" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Aktuelles Passwort</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Aktuelles Passwort</label>
                     <input 
                         type="password" 
                         name="current_password" 
                         required 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Neues Passwort</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Neues Passwort</label>
                     <input 
                         type="password" 
                         name="new_password" 
                         required 
                         minlength="8"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Passwort bestätigen</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Passwort bestätigen</label>
                     <input 
                         type="password" 
                         name="confirm_password" 
                         required 
                         minlength="8"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                 </div>
                 <button type="submit" name="change_password" class="w-full btn-primary">
@@ -211,34 +211,34 @@ ob_start();
                 <form method="POST" class="space-y-4">
                     <div class="space-y-4">
                         <!-- New Projects Notification -->
-                        <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
                             <input 
                                 type="checkbox" 
                                 name="notify_new_projects" 
                                 id="notify_new_projects"
                                 <?php echo ($user['notify_new_projects'] ?? true) ? 'checked' : ''; ?>
-                                class="mt-1 h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                                class="mt-1 h-5 w-5 text-purple-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-blue-500"
                             >
                             <label for="notify_new_projects" class="ml-3 flex-1 cursor-pointer">
-                                <span class="block text-sm font-medium text-gray-900">Neue Projekte</span>
-                                <span class="block text-sm text-gray-600">
+                                <span class="block text-sm font-medium text-gray-900 dark:text-gray-100">Neue Projekte</span>
+                                <span class="block text-sm text-gray-600 dark:text-gray-400">
                                     Erhalte eine E-Mail-Benachrichtigung, wenn ein neues Projekt veröffentlicht wird
                                 </span>
                             </label>
                         </div>
 
                         <!-- New Events Notification -->
-                        <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
                             <input 
                                 type="checkbox" 
                                 name="notify_new_events" 
                                 id="notify_new_events"
                                 <?php echo ($user['notify_new_events'] ?? false) ? 'checked' : ''; ?>
-                                class="mt-1 h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                                class="mt-1 h-5 w-5 text-purple-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-blue-500"
                             >
                             <label for="notify_new_events" class="ml-3 flex-1 cursor-pointer">
-                                <span class="block text-sm font-medium text-gray-900">Neue Events</span>
-                                <span class="block text-sm text-gray-600">
+                                <span class="block text-sm font-medium text-gray-900 dark:text-gray-100">Neue Events</span>
+                                <span class="block text-sm text-gray-600 dark:text-gray-400">
                                     Erhalte eine E-Mail-Benachrichtigung, wenn ein neues Event erstellt wird
                                 </span>
                             </label>
@@ -311,20 +311,20 @@ ob_start();
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Aktuelle Rolle</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Aktuelle Rolle</label>
                         <input 
                             type="text" 
                             readonly
                             value="<?php echo htmlspecialchars(translateRole($user['role'])); ?>"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+                            class="w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-300 rounded-lg cursor-not-allowed"
                         >
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Neue Rolle</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Neue Rolle</label>
                         <select 
                             id="newRoleSelect"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         >
                             <option value="">-- Bitte wählen --</option>
                             <option value="member">Mitglied</option>
@@ -367,10 +367,10 @@ ob_start();
             </div>
             
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Nachfolger auswählen</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nachfolger auswählen</label>
                 <select 
                     id="successorSelect"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
                     <option value="">-- Bitte wählen --</option>
                     <?php 
@@ -391,10 +391,10 @@ ob_start();
             </div>
             
             <div class="flex justify-end space-x-3">
-                <button id="cancelSuccession" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                <button id="cancelSuccession" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                     Abbrechen
                 </button>
-                <button id="confirmSuccession" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                <button id="confirmSuccession" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600">
                     <i class="fas fa-check mr-2"></i>Rollenwechsel durchführen
                 </button>
             </div>
