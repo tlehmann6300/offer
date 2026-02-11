@@ -1017,3 +1017,144 @@ body.dark-mode .bg-black.bg-opacity-50 {
 body.dark-mode .bg-gray-900 {
     background-color: #0f172a !important;
 }
+
+/* Dark Mode: Divide Utilities (borders between items) */
+body.dark-mode .divide-gray-200 > * + * {
+    border-color: var(--border-color) !important;
+}
+
+body.dark-mode .divide-gray-300 > * + * {
+    border-color: #4b5563 !important;
+}
+
+/* Dark Mode: Ring Utilities (focus rings) */
+body.dark-mode .ring-gray-300 {
+    --tw-ring-color: #4b5563 !important;
+}
+
+/* Dark Mode: Placeholder Colors */
+body.dark-mode ::placeholder {
+    color: #6b7280 !important;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder,
+body.dark-mode select::placeholder {
+    color: #6b7280 !important;
+}
+
+/* Dark Mode: SVG and Icon Colors */
+body.dark-mode svg {
+    color: inherit;
+}
+
+/* Dark Mode: Ensure proper contrast for all heading levels */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6,
+body.dark-mode .h1,
+body.dark-mode .h2,
+body.dark-mode .h3,
+body.dark-mode .h4,
+body.dark-mode .h5,
+body.dark-mode .h6 {
+    color: #f3f4f6 !important;
+}
+
+/* Dark Mode: Strong emphasis text */
+body.dark-mode strong,
+body.dark-mode b {
+    color: #f9fafb;
+}
+
+/* Dark Mode: Code and Pre elements */
+body.dark-mode code {
+    background-color: #1f2937;
+    color: #e5e7eb;
+}
+
+body.dark-mode pre {
+    background-color: #1f2937;
+    color: #e5e7eb;
+    border-color: #374151;
+}
+
+/* Dark Mode: Scrollbar Styling */
+body.dark-mode ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+body.dark-mode ::-webkit-scrollbar-track {
+    background: #1e293b;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 4px;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* Dark Mode: Selection Colors */
+body.dark-mode ::selection {
+    background-color: rgba(59, 130, 246, 0.3);
+    color: #f3f4f6;
+}
+
+body.dark-mode ::-moz-selection {
+    background-color: rgba(59, 130, 246, 0.3);
+    color: #f3f4f6;
+}
+
+/* Dark Mode: HR Elements */
+body.dark-mode hr {
+    border-color: var(--border-color);
+}
+
+/* Dark Mode: Blockquote */
+body.dark-mode blockquote {
+    color: #d1d5db;
+    border-left-color: #4b5563;
+}
+
+/* Dark Mode: List markers */
+body.dark-mode ul,
+body.dark-mode ol {
+    color: #d1d5db;
+}
+
+/* Dark Mode: Form Labels and Legends */
+body.dark-mode legend,
+body.dark-mode fieldset {
+    color: #e5e7eb;
+    border-color: var(--border-color);
+}
+
+/* Dark Mode: Ensure all form controls have proper contrast */
+body.dark-mode input[type="checkbox"],
+body.dark-mode input[type="radio"] {
+    border-color: #4b5563;
+}
+
+body.dark-mode input[type="checkbox"]:checked,
+body.dark-mode input[type="radio"]:checked {
+    background-color: var(--ibc-green);
+    border-color: var(--ibc-green);
+}
+
+/* Dark Mode: Select dropdowns arrow */
+body.dark-mode select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* Dark Mode: Ensure proper contrast for small text */
+body.dark-mode .text-xs,
+body.dark-mode .text-sm {
+    color: #d1d5db;
+}
