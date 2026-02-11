@@ -93,9 +93,9 @@ body {
 .dark-mode input,
 .dark-mode select,
 .dark-mode textarea {
-    background-color: #374151 !important;
+    background-color: #0f172a !important; /* slate-900 */
     color: #ffffff !important;
-    border: 1px solid #4b5563 !important;
+    border: 1px solid #334155 !important; /* slate-700 */
 }
 
 .dark-mode input::placeholder,
@@ -182,9 +182,9 @@ body.dark-mode td {
 input,
 select,
 textarea {
-    background-color: var(--bg-card);
+    background-color: #ffffff; /* white */
     color: var(--text-main);
-    border-color: var(--ibc-gray-300);
+    border-color: #d1d5db; /* gray-300 */
     transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
@@ -580,8 +580,9 @@ body:not(.dark-mode) span:not(.badge):not(.btn-primary):not(.text-white),
 body:not(.dark-mode) label,
 body:not(.dark-mode) input,
 body:not(.dark-mode) select,
-body:not(.dark-mode) textarea {
-    color: #111827 !important; /* Fast Schwarz */
+body:not(.dark-mode) textarea,
+body:not(.dark-mode) td {
+    color: #0f172a !important; /* slate-900 - Almost black for max readability */
 }
 
 /* Light Mode: Kartenhintergrund sicherstellen */
@@ -597,17 +598,18 @@ body.dark-mode h3,
 body.dark-mode p,
 body.dark-mode li,
 body.dark-mode span:not(.badge):not(.text-black),
-body.dark-mode label {
-    color: #f3f4f6 !important; /* Fast Weiß */
+body.dark-mode label,
+body.dark-mode td {
+    color: #f1f5f9 !important; /* slate-100 - Almost white for dark mode */
 }
 
 /* Dark Mode Inputs fixen */
 body.dark-mode input,
 body.dark-mode select,
 body.dark-mode textarea {
-    background-color: #374151 !important;
+    background-color: #0f172a !important; /* slate-900 */
     color: #ffffff !important;
-    border-color: #4b5563 !important;
+    border-color: #334155 !important; /* slate-700 */
 }
 
 /* Dark Mode Links (außer Buttons) */
