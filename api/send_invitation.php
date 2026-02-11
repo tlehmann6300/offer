@@ -61,8 +61,8 @@ if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 // Validate role - only allow specific roles for invitations
-// Note: Use new role names (board_finance, board_internal, board_external, alumni_auditor)
-$validInvitationRoles = ['member', 'alumni', 'manager', 'alumni_board', 'alumni_auditor', 'board_finance', 'board_internal', 'board_external'];
+// Note: Use Auth::VALID_ROLES for all available roles
+$validInvitationRoles = ['candidate', 'member', 'head', 'alumni', 'honorary_member', 'alumni_board', 'alumni_auditor', 'board_finance', 'board_internal', 'board_external'];
 if (!in_array($role, $validInvitationRoles)) {
     echo json_encode([
         'success' => false,

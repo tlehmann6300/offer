@@ -61,12 +61,16 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
                     name="role" 
                     class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
+                    <option value="candidate">Anwärter</option>
                     <option value="member">Mitglied</option>
+                    <option value="head">Ressortleiter</option>
                     <option value="alumni">Alumni</option>
-                    <option value="manager">Ressortleiter</option>
+                    <option value="honorary_member">Ehrenmitglied</option>
                     <option value="alumni_board">Alumni-Vorstand</option>
-                    <option value="alumni_finanzprufer">Alumni-Finanzprüfer</option>
-                    <option value="board">Vorstand</option>
+                    <option value="alumni_auditor">Alumni-Finanzprüfer</option>
+                    <option value="board_finance">Vorstand Finanzen und Recht</option>
+                    <option value="board_internal">Vorstand Intern</option>
+                    <option value="board_external">Vorstand Extern</option>
                 </select>
             </div>
             
@@ -234,7 +238,7 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
   }
 ]</code></pre>
                     <p class="text-xs text-blue-700 mt-2">
-                        <strong>Verfügbare Rollen:</strong> member, alumni, manager, alumni_board, alumni_finanzprufer, board
+                        <strong>Verfügbare Rollen:</strong> candidate, member, head, alumni, honorary_member, alumni_board, alumni_auditor, board_finance, board_internal, board_external
                     </p>
                 </div>
             </div>
@@ -313,12 +317,16 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
     
     // Role name mapping
     const roleNames = {
+        'candidate': 'Anwärter',
         'member': 'Mitglied',
+        'head': 'Ressortleiter',
         'alumni': 'Alumni',
-        'manager': 'Ressortleiter',
+        'honorary_member': 'Ehrenmitglied',
         'alumni_board': 'Alumni-Vorstand',
-        'alumni_finanzprufer': 'Alumni-Finanzprüfer',
-        'board': 'Vorstand'
+        'alumni_auditor': 'Alumni-Finanzprüfer',
+        'board_finance': 'Vorstand Finanzen und Recht',
+        'board_internal': 'Vorstand Intern',
+        'board_external': 'Vorstand Extern'
     };
     
     // Load invitations on page load
