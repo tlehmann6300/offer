@@ -8,99 +8,17 @@ require_once __DIR__ . '/../../config/config.php';
 
 // 3. Weitere Abhängigkeiten laden
 require_once __DIR__ . '/../../src/Auth.php';
-require_once __DIR__ . '/../../src/Database.php';
-require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/helpers.php';
 
 try {
-    // 4. Logik in einem try-catch Block schützen
-    // 2FA timeout (5 minutes)
-    define('PENDING_2FA_TIMEOUT', 300);
-    
     // Redirect if already authenticated
     if (Auth::check()) {
         header('Location: ../dashboard/index.php');
         exit;
     }
 
-    $error = '';
-    $require2FA = false;
-
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
-        
-        $email = $_POST['email'] ?? '';
-        $password = $_POST['password'] ?? '';
-        $tfaCode = $_POST['tfa_code'] ?? null;
-        
-        // Step 1: Initial login attempt (email and password)
-        if ($tfaCode === null && !isset($_SESSION['pending_2fa'])) {
-            // Verify credentials
-            $result = Auth::verifyCredentials($email, $password);
-            
-            // Check if verification returned an error
-            if (isset($result['error'])) {
-                $error = $result['error'];
-            } else {
-                $user = $result;
-                
-                if ($user['tfa_enabled']) {
-                    // 2FA is enabled, store only user_id in session
-                    $_SESSION['pending_2fa'] = [
-                        'user_id' => $user['id'],
-                        'timestamp' => time()
-                    ];
-                    $require2FA = true;
-                } else {
-                    // No 2FA, create session directly
-                    Auth::createSession($user);
-                    unset($_SESSION['pending_2fa']);
-                    header('Location: ../dashboard/index.php');
-                    exit;
-                }
-            }
-        }
-        // Step 2: 2FA verification
-        elseif ($tfaCode !== null && isset($_SESSION['pending_2fa'])) {
-            $userId = $_SESSION['pending_2fa']['user_id'];
-            
-            // Fetch user by ID from database
-            $db = Database::getUserDB();
-            $stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
-            $stmt->execute([$userId]);
-            $user = $stmt->fetch();
-            
-            if (!$user) {
-                $error = 'Sitzung ungültig. Bitte melden Sie sich erneut an.';
-                unset($_SESSION['pending_2fa']);
-            } else {
-                // Verify 2FA code
-                require_once __DIR__ . '/../../includes/handlers/GoogleAuthenticator.php';
-                $ga = new PHPGangsta_GoogleAuthenticator();
-                
-                if ($ga->verifyCode($user['tfa_secret'], $tfaCode, 2)) {
-                    // 2FA code is valid, create session
-                    Auth::createSession($user);
-                    unset($_SESSION['pending_2fa']);
-                    header('Location: ../dashboard/index.php');
-                    exit;
-                } else {
-                    $error = 'Ungültiger 2FA-Code';
-                    $require2FA = true;
-                }
-            }
-        }
-    } else {
-        // GET request - check if there's a pending 2FA session
-        if (isset($_SESSION['pending_2fa'])) {
-            if (time() - $_SESSION['pending_2fa']['timestamp'] > PENDING_2FA_TIMEOUT) {
-                unset($_SESSION['pending_2fa']);
-                $error = '2FA-Sitzung abgelaufen. Bitte melden Sie sich erneut an.';
-            } else {
-                $require2FA = true;
-            }
-        }
-    }
+    // Check for error message from OAuth
+    $error = isset($_GET['error']) ? urldecode($_GET['error']) : '';
 
 } catch (Throwable $e) {
     // 5. Display error information based on environment
@@ -163,33 +81,14 @@ ob_start();
     </div>
     <?php endif; ?>
 
-    <form method="POST" class="space-y-6">
-        <input type="hidden" name="csrf_token" value="<?php echo CSRFHandler::getToken(); ?>">
-        
-        <?php if (!$require2FA): ?>
-        <div>
-            <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium"><i class="fas fa-envelope mr-2"></i>E-Mail</label>
-            <input type="email" name="email" required class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all duration-300" placeholder="ihre.email@beispiel.de" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
-        </div>
-        <div>
-            <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium"><i class="fas fa-lock mr-2"></i>Passwort</label>
-            <input type="password" name="password" required class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all duration-300" placeholder="••••••••">
-        </div>
-        <?php else: ?>
-        <div>
-            <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium"><i class="fas fa-shield-alt mr-2"></i>2FA-Code</label>
-            <input type="text" name="tfa_code" required maxlength="6" pattern="[0-9]{6}" class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 text-center text-2xl tracking-widest" placeholder="000000" autofocus>
-            <p class="mt-2 text-gray-600 text-sm">Code aus Authenticator-App eingeben</p>
-        </div>
-        <?php endif; ?>
-
-        <button type="submit" class="w-full py-4 px-6 bg-gradient-to-r from-blue-600 via-blue-500 to-emerald-500 text-white rounded-xl font-bold hover:from-blue-700 hover:via-blue-600 hover:to-emerald-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg shadow-blue-300/30 hover:shadow-xl hover:shadow-blue-400/30 tracking-wide">
-            <i class="fas fa-sign-in-alt mr-2"></i><?php echo $require2FA ? 'Code bestätigen' : 'Anmelden'; ?>
-        </button>
-    </form>
+    <!-- Microsoft Login Button -->
+    <a href="<?php echo BASE_URL; ?>/auth/login_start.php" class="flex items-center justify-center w-full py-4 px-6 bg-[#2F2F2F] hover:bg-[#1a1a1a] text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl tracking-wide border border-[#8C8C8C]/20">
+        <img src="<?php echo asset('assets/img/microsoft-logo.svg'); ?>" alt="Microsoft" class="w-5 h-5 mr-3">
+        <span>Mit Microsoft anmelden</span>
+    </a>
     
     <div class="mt-6 text-center">
-        <p class="text-gray-400 text-sm font-medium">Passwort vergessen? Wende dich an einen Administrator.</p>
+        <p class="text-gray-400 text-sm font-medium">Verwende dein Microsoft-Konto zum Anmelden.</p>
     </div>
 </div>
 
