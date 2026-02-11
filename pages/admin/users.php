@@ -206,7 +206,6 @@ ob_start();
                         <select 
                             data-user-id="<?php echo $user['id']; ?>"
                             class="role-select px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            <?php echo ($user['id'] == $_SESSION['user_id']) ? 'disabled' : ''; ?>
                         >
                             <option value="candidate" <?php echo ($user['role'] == 'candidate') ? 'selected' : ''; ?>>Anwärter</option>
                             <option value="member" <?php echo ($user['role'] == 'member') ? 'selected' : ''; ?>>Mitglied</option>
@@ -307,7 +306,7 @@ ob_start();
                     <?php 
                     // Get users with 'member' or 'head' role for successor selection
                     foreach ($users as $member):
-                        if ($member['id'] != $_SESSION['user_id'] && in_array($member['role'], ['member', 'head'])):
+                        if ($member['id'] !== $_SESSION['user_id'] && in_array($member['role'], ['member', 'head'])):
                     ?>
                     <option value="<?php echo $member['id']; ?>">
                         <?php echo htmlspecialchars($member['email']); ?> (<?php echo htmlspecialchars(translateRole($member['role'])); ?>)
@@ -489,7 +488,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (userId === currentUserId) {
                     setTimeout(() => {
                         window.location.reload();
-                    }, 2000);
+                    }, 1000);
                 } else {
                     // Update the selected option
                     selectElement.querySelectorAll('option').forEach(opt => {

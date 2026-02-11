@@ -89,11 +89,12 @@ if ($isOwnRole && $isBoardMember && in_array($newRole, ['member', 'alumni'])) {
     }
 }
 
-// For non-succession cases, prevent self role changes
-if ($isOwnRole && !$successorId) {
+// For non-succession cases where board member is trying to demote themselves, prevent it
+// Regular users can still change their own roles through other means if allowed
+if ($isOwnRole && $isBoardMember && in_array($newRole, ['member', 'alumni']) && !$successorId) {
     echo json_encode([
         'success' => false,
-        'message' => 'Du kannst Deine eigene Rolle nicht direkt ändern'
+        'message' => 'Du kannst deine Vorstandsrolle nicht ohne Nachfolger abgeben'
     ]);
     exit;
 }
@@ -112,7 +113,7 @@ if ($isOwnRole && !$successorId) {
         if ($isOwnRole && $successorId) {
             $successorUser = User::getById($successorId);
             $message = 'Rollenwechsel erfolgreich durchgeführt. Deine Rolle wurde an ' . 
-                       htmlspecialchars($successorUser['email']) . ' übertragen.';
+                       $successorUser['email'] . ' übertragen.';
         }
         
         echo json_encode([
