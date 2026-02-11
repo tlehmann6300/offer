@@ -345,12 +345,12 @@ ob_start();
             <!-- Badges -->
             <div class="absolute top-2 right-2 flex flex-col gap-1">
                 <?php if (!empty($item['easyverein_id'])): ?>
-                <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded" title="Synchronized with EasyVerein">
+                <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded" title="Synchronisiert mit EasyVerein">
                     <i class="fas fa-sync-alt"></i>
                 </span>
                 <?php endif; ?>
                 <?php if ($item['is_archived_in_easyverein']): ?>
-                <span class="px-2 py-1 text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded" title="Archived in EasyVerein">
+                <span class="px-2 py-1 text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded" title="Archiviert in EasyVerein">
                     <i class="fas fa-archive"></i>
                 </span>
                 <?php endif; ?>
