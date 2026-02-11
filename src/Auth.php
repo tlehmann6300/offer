@@ -562,10 +562,10 @@ class Auth {
             'alumni_auditor' => 'Alumni-Finanzprüfer',
             'alumni_board' => 'Alumni-Vorstand',
             'candidate' => 'Anwärter',
-            'member' => 'Mitglieder',
+            'member' => 'Mitglied',
             'head' => 'Ressortleiter',
             'honorary_member' => 'Ehrenmitglied',
-            'board_finance' => 'Vorstand Finanzen & Recht',
+            'board_finance' => 'Vorstand Finanzen und Recht',
             'board_external' => 'Vorstand Extern',
             'board_internal' => 'Vorstand Intern'
         ];
