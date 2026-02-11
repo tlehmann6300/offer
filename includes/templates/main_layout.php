@@ -653,28 +653,28 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         document.querySelectorAll('.menu-item-with-submenu > a').forEach(menuItem => {
             menuItem.addEventListener('click', (e) => {
                 const parent = menuItem.closest('.menu-item-with-submenu');
-                const isExpanded = parent.classList.contains('expanded');
+                const isCurrentlyExpanded = parent.classList.contains('expanded');
                 
-                // Close all other submenus
-                document.querySelectorAll('.menu-item-with-submenu').forEach(item => {
-                    if (item !== parent) {
-                        item.classList.remove('expanded');
-                    }
-                });
-                
-                // Toggle current submenu
-                parent.classList.toggle('expanded');
-                
-                // If clicking the parent link, prevent navigation to allow toggle
-                // Only navigate if clicking while already expanded
-                if (!isExpanded) {
+                // If the submenu is collapsed, prevent navigation and expand it
+                if (!isCurrentlyExpanded) {
                     e.preventDefault();
+                    
+                    // Close all other submenus
+                    document.querySelectorAll('.menu-item-with-submenu').forEach(item => {
+                        if (item !== parent) {
+                            item.classList.remove('expanded');
+                        }
+                    });
+                    
+                    // Expand current submenu
+                    parent.classList.add('expanded');
                 }
+                // If already expanded, allow navigation to proceed normally
             });
         });
         
-        // Auto-expand submenu if current page is a child item
-        document.addEventListener('DOMContentLoaded', () => {
+        // Auto-expand submenu if current page is a child item (execute immediately)
+        (function() {
             const activeSubmenuItem = document.querySelector('.submenu a.bg-white\\/20, .submenu a[class*="border-ibc-green"]');
             if (activeSubmenuItem) {
                 const parent = activeSubmenuItem.closest('.menu-item-with-submenu');
@@ -682,7 +682,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     parent.classList.add('expanded');
                 }
             }
-        });
+        })();
         
         // Dark/Light Mode Toggle
         const themeToggle = document.getElementById('theme-toggle');

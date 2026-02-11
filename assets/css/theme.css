@@ -192,7 +192,7 @@ body.dark-mode .sidebar::-webkit-scrollbar-thumb:hover {
 }
 
 .menu-item-with-submenu.expanded .submenu {
-    max-height: 500px;
+    max-height: 200px;
     transition: max-height 0.3s ease-in;
 }
 
