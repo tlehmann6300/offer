@@ -177,7 +177,7 @@ ob_start();
                     <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2"><?php echo htmlspecialchars($item['name']); ?></h1>
                     <div class="flex flex-wrap gap-2">
                         <?php if ($item['category_name']): ?>
-                        <span class="px-3 py-1 text-sm rounded-full" style="background-color: <?php echo htmlspecialchars($item['category_color']); ?>20; color: <?php echo htmlspecialchars($item['category_color']); ?>">
+                        <span class="px-3 py-1 text-sm rounded-full inline-color-badge" style="background-color: <?php echo htmlspecialchars($item['category_color']); ?>20; color: <?php echo htmlspecialchars($item['category_color']); ?>">
                             <?php echo htmlspecialchars($item['category_name']); ?>
                         </span>
                         <?php endif; ?>

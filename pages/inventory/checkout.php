@@ -77,7 +77,7 @@ ob_start();
                 <div>
                     <h2 class="font-bold text-lg text-gray-800"><?php echo htmlspecialchars($item['name']); ?></h2>
                     <?php if ($item['category_name']): ?>
-                    <span class="inline-block px-2 py-1 text-xs rounded-full mt-2" style="background-color: <?php echo htmlspecialchars($item['category_color']); ?>20; color: <?php echo htmlspecialchars($item['category_color']); ?>">
+                    <span class="inline-block px-2 py-1 text-xs rounded-full mt-2 inline-color-badge" style="background-color: <?php echo htmlspecialchars($item['category_color']); ?>20; color: <?php echo htmlspecialchars($item['category_color']); ?>">
                         <?php echo htmlspecialchars($item['category_name']); ?>
                     </span>
                     <?php endif; ?>

@@ -142,7 +142,7 @@ ob_start();
                     <div class="flex items-start justify-between mb-2">
                         <div class="flex items-center space-x-3">
                             <div 
-                                class="w-4 h-4 rounded-full" 
+                                class="w-4 h-4 rounded-full inline-color-badge" 
                                 style="background-color: <?php echo htmlspecialchars($category['color']); ?>"
                             ></div>
                             <h3 class="font-bold text-gray-800"><?php echo htmlspecialchars($category['name']); ?></h3>
