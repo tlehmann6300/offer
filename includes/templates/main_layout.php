@@ -381,21 +381,39 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </a>
                 <?php endif; ?>
 
-                <!-- Einstellungen (All board members who can manage users) -->
-                <?php if (Auth::canManageUsers()): ?>
-                <a href="<?php echo asset('pages/auth/settings.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/auth/settings.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
-                    <i class="fas fa-cog w-5 mr-3"></i>
-                    <span>Einstellungen</span>
-                </a>
-                <?php endif; ?>
-
-                <!-- Statistiken (All board members who can manage users) -->
-                <?php if (Auth::canManageUsers()): ?>
+                <!-- Statistiken (All board members) -->
+                <?php if (Auth::isAdmin()): ?>
                 <a href="<?php echo asset('pages/admin/stats.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/admin/stats.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-chart-bar w-5 mr-3"></i>
                     <span>Statistiken</span>
+                </a>
+                <?php endif; ?>
+
+                <!-- Audit Logs (All board members) -->
+                <?php if (Auth::isAdmin()): ?>
+                <a href="<?php echo asset('pages/admin/audit.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/admin/audit.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                    <i class="fas fa-clipboard-list w-5 mr-3"></i>
+                    <span>Audit Logs</span>
+                </a>
+                <?php endif; ?>
+
+                <!-- System Health (All board members) -->
+                <?php if (Auth::isAdmin()): ?>
+                <a href="<?php echo asset('pages/admin/db_maintenance.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/admin/db_maintenance.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                    <i class="fas fa-database w-5 mr-3"></i>
+                    <span>System Health</span>
+                </a>
+                <?php endif; ?>
+
+                <!-- Einstellungen (All board members) -->
+                <?php if (Auth::isAdmin()): ?>
+                <a href="<?php echo asset('pages/auth/settings.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/auth/settings.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                    <i class="fas fa-cog w-5 mr-3"></i>
+                    <span>Einstellungen</span>
                 </a>
                 <?php endif; ?>
                 
