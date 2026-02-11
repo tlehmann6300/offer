@@ -385,7 +385,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const newRole = this.value;
             
             // Check if current logged-in user (board member) is trying to demote themselves
-            const isCurrentUser = (userId === currentUserId);
+            const isCurrentUser = (userId === parseInt(currentUserId, 10));
             const isCurrentUserBoard = boardRoles.includes(currentUserRole);
             const isTargetRoleNonBoard = (newRole === 'member' || newRole === 'alumni');
             

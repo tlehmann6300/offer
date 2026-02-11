@@ -85,6 +85,15 @@ if ($isOwnRole && $isBoardMember && in_array($newRole, ['member', 'alumni'])) {
         exit;
     }
     
+    // Ensure successor has a 'member' or 'head' role (not already a board member or other role)
+    if (!in_array($successor['role'], ['member', 'head'])) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Der gewählte Nachfolger muss die Rolle "Mitglied" oder "Ressortleiter" haben'
+        ]);
+        exit;
+    }
+    
     // Use a database transaction to ensure atomicity
     $db = Database::getUserDB();
     
