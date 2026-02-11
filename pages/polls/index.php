@@ -53,7 +53,7 @@ ob_start();
             <p class="text-gray-600 dark:text-gray-300">Aktive Umfragen für Ihre Rolle</p>
         </div>
         
-        <?php if (Auth::canCreateComplexContent()): ?>
+        <?php if (Auth::isBoard() || Auth::hasRole('head')): ?>
         <a 
             href="<?php echo asset('pages/polls/create.php'); ?>"
             class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg"
