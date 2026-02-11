@@ -203,8 +203,8 @@ private const ROLE_MAPPING = [
 Ensure your `.env` file contains the correct Azure credentials:
 
 ```bash
-# Check if variables are set (run from project root)
-cd /home/runner/work/offer/offer && php -r "require 'config/config.php'; echo AZURE_TENANT_ID . PHP_EOL;"
+# Check if variables are set (run from project root directory)
+php -r "require 'config/config.php'; echo AZURE_TENANT_ID . PHP_EOL;"
 ```
 
 ### 3. Test the Service

@@ -19,19 +19,20 @@ class MicrosoftGraphService {
     
     /**
      * Role mapping: role values to their respective Azure App Role IDs
-     * TODO: Replace placeholder IDs with actual Azure App Role IDs
+     * TODO: Replace placeholder IDs with actual Azure App Role IDs from your Azure Portal
+     * Each role must have a unique GUID from Azure AD App Roles
      */
     private const ROLE_MAPPING = [
-        'anwaerter' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
-        'mitglied' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
-        'vorstand_intern' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
-        'vorstand_extern' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
-        'berater' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
-        'alumni' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
-        'ehrenmitglied' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
-        'senior' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
-        'partner' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN',
-        'gast' => 'DEINE_ECHTE_ID_HIER_EINFUEGEN'
+        'anwaerter' => 'PLACEHOLDER_ANWAERTER_ID',
+        'mitglied' => 'PLACEHOLDER_MITGLIED_ID',
+        'vorstand_intern' => 'PLACEHOLDER_VORSTAND_INTERN_ID',
+        'vorstand_extern' => 'PLACEHOLDER_VORSTAND_EXTERN_ID',
+        'berater' => 'PLACEHOLDER_BERATER_ID',
+        'alumni' => 'PLACEHOLDER_ALUMNI_ID',
+        'ehrenmitglied' => 'PLACEHOLDER_EHRENMITGLIED_ID',
+        'senior' => 'PLACEHOLDER_SENIOR_ID',
+        'partner' => 'PLACEHOLDER_PARTNER_ID',
+        'gast' => 'PLACEHOLDER_GAST_ID'
     ];
     
     /**
@@ -150,7 +151,7 @@ class MicrosoftGraphService {
         $roleId = self::ROLE_MAPPING[$roleValue];
         
         // Validate that role ID has been configured (not using placeholder)
-        if ($roleId === 'DEINE_ECHTE_ID_HIER_EINFUEGEN') {
+        if (strpos($roleId, 'PLACEHOLDER_') === 0) {
             throw new Exception("Role ID for '{$roleValue}' is not configured. Please update ROLE_MAPPING with actual Azure App Role IDs.");
         }
         
