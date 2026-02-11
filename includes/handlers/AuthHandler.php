@@ -233,21 +233,16 @@ class AuthHandler {
     }
 
     /**
-     * Check if user is admin (board_finance has full system access)
+     * Check if user is admin (general system access for Logs, Stats, User Management)
      * 
-     * @return bool True if user is board_finance
+     * @return bool True if user has any board role (board_finance, board_internal, board_external)
      */
     public static function isAdmin() {
-        self::startSession();
-        if (!self::isAuthenticated()) {
-            return false;
-        }
-        
-        return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'board_finance';
+        return self::isBoard();
     }
 
     /**
-     * Require admin privileges (board_finance only)
+     * Require admin privileges (any board role)
      * Redirects to login if not authorized
      */
     public static function requireAdmin() {
@@ -294,13 +289,16 @@ class AuthHandler {
      * @return bool True if user has any board role
      */
     public static function canManageUsers() {
-        self::startSession();
-        if (!self::isAuthenticated()) {
-            return false;
-        }
-        
-        $userRole = $_SESSION['user_role'] ?? '';
-        return in_array($userRole, Auth::BOARD_ROLES);
+        return self::isBoard();
+    }
+    
+    /**
+     * Check if user can see system stats (Logs, Stats, Dashboard)
+     * 
+     * @return bool True if user has any board role (board_finance, board_internal, board_external)
+     */
+    public static function canSeeSystemStats() {
+        return self::isBoard();
     }
 
     /**

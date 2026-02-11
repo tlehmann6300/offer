@@ -262,17 +262,12 @@ class Auth {
     }
     
     /**
-     * Check if user is admin (board_finance has full system access)
+     * Check if user is admin (general system access for Logs, Stats, User Management)
      * 
-     * @return bool True if user is board_finance
+     * @return bool True if user has any board role (board_finance, board_internal, board_external)
      */
     public static function isAdmin() {
-        if (!self::check()) {
-            return false;
-        }
-        
-        $userRole = $_SESSION['user_role'] ?? '';
-        return $userRole === 'board_finance';
+        return self::isBoard();
     }
     
     /**
@@ -309,12 +304,16 @@ class Auth {
      * @return bool True if user has any board role
      */
     public static function canManageUsers() {
-        if (!self::check()) {
-            return false;
-        }
-        
-        $userRole = $_SESSION['user_role'] ?? '';
-        return in_array($userRole, self::BOARD_ROLES);
+        return self::isBoard();
+    }
+    
+    /**
+     * Check if user can see system stats (Logs, Stats, Dashboard)
+     * 
+     * @return bool True if user has any board role (board_finance, board_internal, board_external)
+     */
+    public static function canSeeSystemStats() {
+        return self::isBoard();
     }
     
     /**
