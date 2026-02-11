@@ -484,10 +484,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     pendingRoleChange = null;
                 }
                 
-                // If this was a self-demotion, reload the page after a short delay
+                // If this was a self-demotion, redirect to dashboard after a short delay
                 if (userId === currentUserId) {
                     setTimeout(() => {
-                        window.location.reload();
+                        window.location.href = '../dashboard/index.php';
                     }, 1000);
                 } else {
                     // Update the selected option

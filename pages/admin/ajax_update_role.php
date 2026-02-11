@@ -50,7 +50,7 @@ if (!in_array($newRole, Auth::VALID_ROLES)) {
 }
 
 // Check if user is trying to change their own role
-$isOwnRole = ($userId === (int)$_SESSION['user_id']);
+$isOwnRole = ($userId === (int)$currentUserData['id']);
 
 // Get current user's actual role from the database for consistency
 $currentUserData = Auth::user();
@@ -85,45 +85,81 @@ if ($isOwnRole && $isBoardMember && in_array($newRole, ['member', 'alumni'])) {
         exit;
     }
     
-    // Update successor's role to the current user's board role
-    if (!User::update($successorId, [
-        'role' => $currentUserRole,
-        'prompt_profile_review' => 1
-    ])) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Fehler beim Zuweisen der Rolle an den Nachfolger'
-        ]);
-        exit;
-    }
-}
-
-    // Update the role and set prompt_profile_review flag
-    // When role is updated by Board/Admin, prompt user to review their profile
-    $updateData = [
-        'role' => $newRole,
-        'prompt_profile_review' => 1
-    ];
+    // Use a database transaction to ensure atomicity
+    $db = Database::getUserDB();
     
-    if (User::update($userId, $updateData)) {
-        $message = 'Rolle erfolgreich geändert';
+    try {
+        $db->beginTransaction();
         
-        // Add succession message if applicable (reuse successor data from earlier fetch)
-        if ($isOwnRole && $successor) {
-            $message = 'Rollenwechsel erfolgreich durchgeführt. Deine Rolle wurde an ' . 
-                       $successor['email'] . ' übertragen.';
+        // Update successor's role to the current user's board role
+        if (!User::update($successorId, [
+            'role' => $currentUserRole,
+            'prompt_profile_review' => 1
+        ])) {
+            $db->rollBack();
+            echo json_encode([
+                'success' => false,
+                'message' => 'Fehler beim Zuweisen der Rolle an den Nachfolger'
+            ]);
+            exit;
         }
+        
+        // Update current user's role to the new role
+        if (!User::update($userId, [
+            'role' => $newRole,
+            'prompt_profile_review' => 1
+        ])) {
+            $db->rollBack();
+            echo json_encode([
+                'success' => false,
+                'message' => 'Fehler beim Ändern deiner Rolle'
+            ]);
+            exit;
+        }
+        
+        // Commit the transaction
+        $db->commit();
+        
+        // Build success message
+        $message = 'Rollenwechsel erfolgreich durchgeführt. Deine Rolle wurde an ' . 
+                   $successor['email'] . ' übertragen.';
         
         echo json_encode([
             'success' => true,
             'message' => $message
         ]);
-    } else {
+        exit;
+        
+    } catch (Exception $e) {
+        $db->rollBack();
+        error_log('Transaction failed in ajax_update_role.php: ' . $e->getMessage());
         echo json_encode([
             'success' => false,
-            'message' => 'Fehler beim Ändern der Rolle'
+            'message' => 'Fehler beim Rollenwechsel'
         ]);
+        exit;
     }
+}
+
+// For non-succession role changes, update the role normally
+// Update the role and set prompt_profile_review flag
+// When role is updated by Board/Admin, prompt user to review their profile
+$updateData = [
+    'role' => $newRole,
+    'prompt_profile_review' => 1
+];
+
+if (User::update($userId, $updateData)) {
+    echo json_encode([
+        'success' => true,
+        'message' => 'Rolle erfolgreich geändert'
+    ]);
+} else {
+    echo json_encode([
+        'success' => false,
+        'message' => 'Fehler beim Ändern der Rolle'
+    ]);
+}
 } catch (Exception $e) {
     // Log the full error details
     error_log('Error in ajax_update_role.php: ' . $e->getMessage() . ' | File: ' . $e->getFile() . ' | Line: ' . $e->getLine());
