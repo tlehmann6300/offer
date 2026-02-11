@@ -21,6 +21,15 @@ if (!$currentUser) {
     exit;
 }
 
+// Check if profile is complete - if not, redirect to profile edit page
+// Only enforce for roles that need profiles (not for test/system accounts)
+$rolesRequiringProfile = ['board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor', 'alumni', 'member', 'head', 'candidate', 'honorary_member'];
+if (in_array($currentUser['role'], $rolesRequiringProfile) && isset($currentUser['profile_complete']) && $currentUser['profile_complete'] == 0) {
+    $_SESSION['profile_incomplete_message'] = 'Bitte vervollständige dein Profil (Vorname und Nachname) um fortzufahren.';
+    header('Location: ../alumni/edit.php');
+    exit;
+}
+
 $user = $currentUser;
 $userRole = $user['role'] ?? '';
 $stats = Inventory::getDashboardStats();

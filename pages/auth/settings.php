@@ -535,21 +535,25 @@ function performRoleChange(newRole, successorId) {
 
 // Sync theme preference with localStorage after successful save
 <?php if ($message && strpos($message, 'Design-Einstellungen') !== false): ?>
-// Theme was just saved, sync with localStorage
-const savedTheme = document.body.getAttribute('data-user-theme') || 'auto';
-localStorage.setItem('theme', savedTheme);
+// Theme was just saved, update data-user-theme attribute and apply theme immediately
+const newTheme = '<?php echo htmlspecialchars($user['theme_preference'] ?? 'auto'); ?>';
+document.body.setAttribute('data-user-theme', newTheme);
+localStorage.setItem('theme', newTheme);
 
 // Apply theme immediately
-if (savedTheme === 'dark') {
-    document.body.classList.add('dark-mode');
-} else if (savedTheme === 'light') {
-    document.body.classList.remove('dark-mode');
+// Note: Both 'dark-mode' and 'dark' classes are required:
+// - 'dark-mode' is used by custom CSS rules for sidebar and specific components
+// - 'dark' is used by Tailwind's dark mode (darkMode: 'class' in config)
+if (newTheme === 'dark') {
+    document.body.classList.add('dark-mode', 'dark');
+} else if (newTheme === 'light') {
+    document.body.classList.remove('dark-mode', 'dark');
 } else { // auto
     // Check system preference
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.body.classList.add('dark-mode');
+        document.body.classList.add('dark-mode', 'dark');
     } else {
-        document.body.classList.remove('dark-mode');
+        document.body.classList.remove('dark-mode', 'dark');
     }
 }
 <?php endif; ?>
