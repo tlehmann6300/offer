@@ -12,25 +12,27 @@ if (!Auth::check()) {
 }
 
 $user = Auth::user();
-$userRole = $user['role'] ?? '';
 
-// Check if user has one of the allowed roles
-$allowedRoles = ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni_board', 'alumni_finanzprufer', 'head', 'alumni', 'honorary_member'];
-if (!in_array($userRole, $allowedRoles)) {
+// Check if user has permission to access invoices page
+$hasInvoiceAccess = Auth::canAccessPage('invoices');
+if (!$hasInvoiceAccess) {
     header('Location: ../dashboard/index.php');
     exit;
 }
 
+$userRole = $user['role'] ?? '';
+
 // Check if user has permission to mark invoices as paid
-// Only users with role 'vorstand_finanzen_recht' can mark invoices as paid
-$canMarkAsPaid = Auth::hasRole('vorstand_finanzen_recht');
+// Only board_finance members can mark invoices as paid
+$canMarkAsPaid = Auth::canManageInvoices();
 
 // Get invoices based on role
 $invoices = Invoice::getAll($userRole, $user['id']);
 
-// Get statistics (only for board roles, alumni_board, and alumni_finanzprufer)
+// Get statistics (only for board roles and alumni_board/alumni_auditor)
 $stats = null;
-if (in_array($userRole, ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni_board', 'alumni_finanzprufer'])) {
+$canViewStats = Auth::isBoard() || Auth::hasRole(['alumni_board', 'alumni_auditor']);
+if ($canViewStats) {
     $stats = Invoice::getStats();
 }
 
@@ -116,8 +118,8 @@ ob_start();
     </div>
     <?php endif; ?>
 
-    <!-- Export Button (Board, Alumni Board, Alumni Finanzprüfer) -->
-    <?php if (in_array($userRole, ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni_board', 'alumni_finanzprufer'])): ?>
+    <!-- Export Button (Board, Alumni Board, Alumni Auditor) -->
+    <?php if (Auth::isBoard() || Auth::hasRole(['alumni_board', 'alumni_auditor'])): ?>
     <div class="mb-6 flex justify-end">
         <a 
             href="<?php echo asset('api/export_invoices.php'); ?>"
@@ -182,7 +184,7 @@ ob_start();
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Bezahlt Infos
                             </th>
-                            <?php if (in_array($userRole, ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht'])): ?>
+                            <?php if (Auth::isBoard()): ?>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 Aktionen
                             </th>
@@ -280,7 +282,7 @@ ob_start();
                                         <span class="text-gray-400 dark:text-gray-500">-</span>
                                     <?php endif; ?>
                                 </td>
-                                <?php if (in_array($userRole, ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht'])): ?>
+                                <?php if (Auth::isBoard()): ?>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     <?php if ($invoice['status'] === 'pending'): ?>
                                         <div class="flex gap-2">
