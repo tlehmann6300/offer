@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../includes/handlers/GoogleAuthenticator.php';
 require_once __DIR__ . '/../../includes/models/User.php';
 require_once __DIR__ . '/../../includes/models/Alumni.php';
 require_once __DIR__ . '/../../includes/models/Member.php';
+require_once __DIR__ . '/../../includes/utils/SecureImageUpload.php';
 
 if (!Auth::check()) {
     header('Location: login.php');
@@ -84,67 +85,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'birthday' => trim($_POST['birthday'] ?? '')
             ];
             
-            // Handle profile picture upload
+            // Handle profile picture upload using secure upload utility
             if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
                 $uploadDir = __DIR__ . '/../../uploads/profile/';
                 
-                // Create directory if it doesn't exist
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0750, true);
-                }
+                // Use SecureImageUpload for secure file validation and upload
+                $uploadResult = SecureImageUpload::uploadImage($_FILES['profile_picture'], $uploadDir);
                 
-                // Validate file extension
-                $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-                $extension = strtolower(pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION));
-                
-                if (!in_array($extension, $allowedExtensions)) {
-                    throw new Exception('Ungültiger Dateityp. Nur JPG, PNG, GIF und WEBP sind erlaubt.');
-                }
-                
-                // Validate actual file type using finfo
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                $mimeType = finfo_file($finfo, $_FILES['profile_picture']['tmp_name']);
-                finfo_close($finfo);
-                
-                $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                if (!in_array($mimeType, $allowedMimeTypes)) {
-                    throw new Exception('Ungültiger Dateityp. Die Datei ist kein gültiges Bild.');
-                }
-                
-                // Validate file size (max 5MB)
-                if ($_FILES['profile_picture']['size'] > 5 * 1024 * 1024) {
-                    throw new Exception('Datei ist zu groß. Maximale Größe ist 5MB.');
-                }
-                
-                // Verify it's a valid image
-                $imageInfo = getimagesize($_FILES['profile_picture']['tmp_name']);
-                if ($imageInfo === false) {
-                    throw new Exception('Die Datei ist kein gültiges Bild.');
-                }
-                
-                // Generate unique filename with validated extension
-                $filename = 'profile_' . $user['id'] . '_' . time() . '.' . $extension;
-                $targetPath = $uploadDir . $filename;
-                
-                // Move uploaded file
-                if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetPath)) {
+                if ($uploadResult['success']) {
                     // Delete old profile picture if exists
                     if (!empty($profile['image_path'])) {
-                        $oldFilePath = __DIR__ . '/../../' . $profile['image_path'];
-                        // Validate that the old file is within the uploads directory
-                        $realUploadDir = realpath(__DIR__ . '/../../uploads/');
-                        $realOldFile = realpath($oldFilePath);
-                        
-                        if ($realOldFile && $realUploadDir && strpos($realOldFile, $realUploadDir) === 0 && file_exists($realOldFile)) {
-                            if (!unlink($realOldFile)) {
-                                error_log("Failed to delete old profile picture: " . $realOldFile);
-                            }
-                        }
+                        SecureImageUpload::deleteImage($profile['image_path']);
                     }
                     
-                    $profileData['image_path'] = 'uploads/profile/' . $filename;
+                    // Store relative path in profile data
+                    $profileData['image_path'] = $uploadResult['path'];
                 } else {
-                    throw new Exception('Fehler beim Hochladen der Datei.');
+                    throw new Exception($uploadResult['error']);
                 }
             }
             
