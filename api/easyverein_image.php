@@ -11,6 +11,12 @@ if (empty($url) || strpos($url, 'easyverein.com') === false) {
 // Get API Token from config or env
 $token = defined('EASYVEREIN_API_TOKEN') ? EASYVEREIN_API_TOKEN : ($_ENV['EASYVEREIN_API_TOKEN'] ?? '');
 
+// Validate token exists
+if (empty($token)) {
+    header("HTTP/1.0 500 Internal Server Error");
+    exit;
+}
+
 // Init cURL
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -26,7 +32,7 @@ $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
-if ($httpCode == 200 && $data) {
+if ($httpCode == 200 && $data !== false && strpos($contentType, 'image/') === 0) {
     header("Content-Type: $contentType");
     echo $data;
 } else {
