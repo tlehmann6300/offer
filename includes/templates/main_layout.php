@@ -710,4 +710,4 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
     </script>
 </body>
 </html>
-<!-- ✅ Sidebar updated: Invoices visible for Board, Head & Alumni Board -->
+<!-- ✅ Sidebar visibility: Invoices restricted to board_finance only via canManageInvoices() -->
