@@ -172,8 +172,16 @@ class SecureImageUpload {
                 // Normalize path separators for consistency
                 $relativePath = str_replace('\\', '/', $relativePath);
             } else {
-                // Fallback: extract relative path from uploadDir
-                $relativePath = str_replace(__DIR__ . '/../../', '', $uploadDir) . $filename;
+                // Fallback: try to extract relative path from uploadDir
+                $realUploadDir = realpath(dirname($uploadPath));
+                if ($realUploadDir && $projectRoot && strpos($realUploadDir, $projectRoot) === 0) {
+                    $relativeDir = substr($realUploadDir, strlen($projectRoot) + 1);
+                    $relativePath = str_replace('\\', '/', $relativeDir) . '/' . $filename;
+                } else {
+                    // Last resort: return just the filename (not ideal but better than failing)
+                    error_log("SecureImageUpload: Could not determine relative path for uploaded file");
+                    $relativePath = $filename;
+                }
             }
         } else {
             // Use the UPLOAD_DIR constant to maintain single source of truth
