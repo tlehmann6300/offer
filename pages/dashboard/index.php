@@ -194,26 +194,28 @@ function dismissProfileReviewPrompt() {
     </h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- My Open Tasks Widget -->
-        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-orange-50 hover:shadow-2xl transition-all duration-300">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-bold text-gray-800">
-                    <i class="fas fa-tasks text-orange-600 mr-2"></i>
-                    Meine offenen Ausleihen
-                </h3>
-                <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <span class="text-2xl font-bold text-orange-600"><?php echo $openTasksCount; ?></span>
+        <a href="/pages/inventory/my_rentals.php" class="block">
+            <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-orange-50 hover:shadow-2xl transition-all duration-300 cursor-pointer">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">
+                        <i class="fas fa-tasks text-orange-600 mr-2"></i>
+                        Meine offenen Ausleihen
+                    </h3>
+                    <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                        <span class="text-2xl font-bold text-orange-600"><?php echo $openTasksCount; ?></span>
+                    </div>
                 </div>
+                <?php if ($openTasksCount > 0): ?>
+                <p class="text-gray-600 mb-3">Du hast aktuell <?php echo $openTasksCount; ?> offene Ausleihen</p>
+                <span class="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold">
+                    Ausleihen verwalten <i class="fas fa-arrow-right ml-2"></i>
+                </span>
+                <?php else: ?>
+                <p class="text-gray-600">Keine offenen Ausleihen</p>
+                <p class="text-sm text-gray-500 mt-2">Alle Artikel wurden zurückgegeben</p>
+                <?php endif; ?>
             </div>
-            <?php if ($openTasksCount > 0): ?>
-            <p class="text-gray-600 mb-3">Du hast aktuell <?php echo $openTasksCount; ?> offene Ausleihen</p>
-            <a href="/pages/inventory/my_checkouts.php" class="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold">
-                Ausleihen verwalten <i class="fas fa-arrow-right ml-2"></i>
-            </a>
-            <?php else: ?>
-            <p class="text-gray-600">Keine offenen Ausleihen</p>
-            <p class="text-sm text-gray-500 mt-2">Alle Artikel wurden zurückgegeben</p>
-            <?php endif; ?>
-        </div>
+        </a>
 
         <!-- Next Event Widget -->
         <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-blue-50 hover:shadow-2xl transition-all duration-300">

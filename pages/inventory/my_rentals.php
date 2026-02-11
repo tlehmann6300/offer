@@ -53,8 +53,8 @@ ob_start();
         </div>
         <div class="mt-4 md:mt-0">
             <a href="index.php" class="btn-primary inline-block">
-                <i class="fas fa-box mr-2"></i>
-                Zum Inventar
+                <i class="fas fa-plus-circle mr-2"></i>
+                Neuen Gegenstand ausleihen
             </a>
         </div>
     </div>
