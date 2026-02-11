@@ -361,4 +361,199 @@ class AuthHandler {
             error_log("Failed to log system action: " . $e->getMessage());
         }
     }
+
+    /**
+     * Initiate Microsoft Entra ID OAuth login
+     */
+    public static function initiateMicrosoftLogin() {
+        require_once __DIR__ . '/../../vendor/autoload.php';
+        
+        self::startSession();
+        
+        // Load credentials from environment
+        $clientId = $_ENV['AZURE_CLIENT_ID'] ?? null;
+        $clientSecret = $_ENV['AZURE_CLIENT_SECRET'] ?? null;
+        $redirectUri = $_ENV['AZURE_REDIRECT_URI'] ?? null;
+        $tenantId = $_ENV['AZURE_TENANT_ID'] ?? null;
+        
+        // Validate required environment variables
+        if (!$clientId || !$clientSecret || !$redirectUri || !$tenantId) {
+            throw new Exception('Missing Azure OAuth configuration');
+        }
+        
+        // Initialize Azure OAuth provider
+        $provider = new \TheNetworg\OAuth2\Client\Provider\Azure([
+            'clientId'     => $clientId,
+            'clientSecret' => $clientSecret,
+            'redirectUri'  => $redirectUri,
+            'tenant'       => $tenantId
+        ]);
+        
+        // Set scope
+        $provider->scope = 'openid profile email offline_access User.Read';
+        
+        // Generate authorization URL
+        $authorizationUrl = $provider->getAuthorizationUrl();
+        
+        // Store state in session for CSRF protection
+        $_SESSION['oauth2state'] = $provider->getState();
+        
+        // Redirect to authorization URL
+        header('Location: ' . $authorizationUrl);
+        exit;
+    }
+
+    /**
+     * Handle Microsoft Entra ID OAuth callback
+     */
+    public static function handleMicrosoftCallback() {
+        require_once __DIR__ . '/../../vendor/autoload.php';
+        
+        self::startSession();
+        
+        // Validate state for CSRF protection
+        if (!isset($_GET['state']) || !isset($_SESSION['oauth2state']) || $_GET['state'] !== $_SESSION['oauth2state']) {
+            unset($_SESSION['oauth2state']);
+            throw new Exception('Invalid state parameter');
+        }
+        
+        // Clear state
+        unset($_SESSION['oauth2state']);
+        
+        // Check for error
+        if (isset($_GET['error'])) {
+            throw new Exception('OAuth error: ' . ($_GET['error_description'] ?? $_GET['error']));
+        }
+        
+        // Check for authorization code
+        if (!isset($_GET['code'])) {
+            throw new Exception('No authorization code received');
+        }
+        
+        // Load credentials from environment
+        $clientId = $_ENV['AZURE_CLIENT_ID'] ?? null;
+        $clientSecret = $_ENV['AZURE_CLIENT_SECRET'] ?? null;
+        $redirectUri = $_ENV['AZURE_REDIRECT_URI'] ?? null;
+        $tenantId = $_ENV['AZURE_TENANT_ID'] ?? null;
+        
+        // Validate required environment variables
+        if (!$clientId || !$clientSecret || !$redirectUri || !$tenantId) {
+            throw new Exception('Missing Azure OAuth configuration');
+        }
+        
+        // Initialize Azure OAuth provider
+        $provider = new \TheNetworg\OAuth2\Client\Provider\Azure([
+            'clientId'     => $clientId,
+            'clientSecret' => $clientSecret,
+            'redirectUri'  => $redirectUri,
+            'tenant'       => $tenantId
+        ]);
+        
+        try {
+            // Get access token using authorization code
+            $token = $provider->getAccessToken('authorization_code', [
+                'code' => $_GET['code']
+            ]);
+            
+            // Get user details
+            $user = $provider->get('me', $token);
+            
+            // Get user claims (including roles)
+            $claims = $user->getClaims();
+            $azureRoles = $claims['roles'] ?? [];
+            
+            // Define role mapping from Azure roles to internal role IDs
+            $roleMapping = [
+                'anwaerter' => 1,           // candidate
+                'mitglied' => 2,            // member
+                'ressortleiter' => 3,       // head
+                'vorstand_finanzen' => 4,   // board_finance
+                'vorstand_intern' => 5,     // board_internal
+                'vorstand_extern' => 6,     // board_external
+                'alumni' => 7,              // alumni
+                'alumni_vorstand' => 8,     // alumni_board
+                'alumni_finanz' => 9,       // alumni_auditor
+                'ehrenmitglied' => 10       // honorary_member
+            ];
+            
+            // Map role IDs back to role names for session
+            $roleIdToName = [
+                1 => 'candidate',
+                2 => 'member',
+                3 => 'head',
+                4 => 'board_finance',
+                5 => 'board_internal',
+                6 => 'board_external',
+                7 => 'alumni',
+                8 => 'alumni_board',
+                9 => 'alumni_auditor',
+                10 => 'honorary_member'
+            ];
+            
+            // Find the role with the highest ID (priority)
+            $highestRoleId = 0;
+            foreach ($azureRoles as $azureRole) {
+                if (isset($roleMapping[$azureRole])) {
+                    $roleId = $roleMapping[$azureRole];
+                    if ($roleId > $highestRoleId) {
+                        $highestRoleId = $roleId;
+                    }
+                }
+            }
+            
+            // If no valid role found, default to member (ID 2)
+            if ($highestRoleId === 0) {
+                $highestRoleId = 2; // member
+            }
+            
+            // Get the role name from the ID
+            $roleName = $roleIdToName[$highestRoleId] ?? 'member';
+            
+            // Get user email
+            $email = $user->getEmail();
+            
+            // Check if user exists in database
+            $db = Database::getUserDB();
+            $stmt = $db->prepare("SELECT * FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            $existingUser = $stmt->fetch();
+            
+            if ($existingUser) {
+                // Update existing user
+                $userId = $existingUser['id'];
+                
+                // Update last login
+                $stmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+                $stmt->execute([$userId]);
+            } else {
+                // Create new user without password (OAuth login only)
+                $stmt = $db->prepare("INSERT INTO users (email, password, role, is_alumni_validated, profile_complete) VALUES (?, ?, ?, ?, ?)");
+                $isAlumniValidated = ($roleName === 'alumni') ? 0 : 1;
+                $profileComplete = 0;
+                // Use a random password hash since user will login via OAuth
+                $randomPassword = password_hash(bin2hex(random_bytes(32)), HASH_ALGO);
+                $stmt->execute([$email, $randomPassword, $roleName, $isAlumniValidated, $profileComplete]);
+                $userId = $db->lastInsertId();
+            }
+            
+            // Set session variables
+            $_SESSION['user_id'] = $userId;
+            $_SESSION['user_email'] = $email;
+            $_SESSION['user_role'] = $roleName;
+            $_SESSION['authenticated'] = true;
+            $_SESSION['last_activity'] = time();
+            
+            // Log successful login
+            self::logSystemAction($userId, 'login_success_microsoft', 'user', $userId, 'Successful Microsoft Entra ID login');
+            
+            // Redirect to dashboard
+            $dashboardUrl = (defined('BASE_URL') && BASE_URL) ? BASE_URL . '/pages/dashboard/index.php' : '/pages/dashboard/index.php';
+            header('Location: ' . $dashboardUrl);
+            exit;
+            
+        } catch (Exception $e) {
+            self::logSystemAction(null, 'login_failed_microsoft', 'user', null, 'Microsoft login error: ' . $e->getMessage());
+            throw new Exception('Failed to authenticate with Microsoft: ' . $e->getMessage());
+        }
+    }
 }
