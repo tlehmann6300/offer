@@ -113,18 +113,21 @@ class EasyVereinSync {
     }
     
     /**
-     * Process inventory item and download image if available
+     * Extract image URL from EasyVerein API item data
      * 
      * @param array $evItem EasyVerein API item data
-     * @param int $easyvereinId EasyVerein item ID
-     * @return string|null Local image path or null if no image
+     * @return string|null EasyVerein image URL or null if no image
      */
-    private function processInventoryItem($evItem, $easyvereinId) {
+    private function extractImageUrl($evItem) {
         // Check for image in various possible field names
         $imageUrl = null;
         
+        // Check 'picture' field first (as per requirements)
+        if (isset($evItem['picture']) && !empty($evItem['picture'])) {
+            $imageUrl = $evItem['picture'];
+        }
         // Check common field names for image
-        if (isset($evItem['image']) && !empty($evItem['image'])) {
+        elseif (isset($evItem['image']) && !empty($evItem['image'])) {
             $imageUrl = $evItem['image'];
         } elseif (isset($evItem['avatar']) && !empty($evItem['avatar'])) {
             $imageUrl = $evItem['avatar'];
@@ -137,7 +140,7 @@ class EasyVereinSync {
         // Check in custom_fields if exists
         if (!$imageUrl && isset($evItem['custom_fields']) && is_array($evItem['custom_fields'])) {
             foreach ($evItem['custom_fields'] as $field) {
-                if (isset($field['name']) && in_array(strtolower($field['name']), ['image', 'avatar', 'bild', 'foto'])) {
+                if (isset($field['name']) && in_array(strtolower($field['name']), ['picture', 'image', 'avatar', 'bild', 'foto'])) {
                     if (isset($field['value']) && !empty($field['value'])) {
                         $imageUrl = $field['value'];
                         break;
@@ -146,76 +149,8 @@ class EasyVereinSync {
             }
         }
         
-        // If no image URL found, return null
-        if (!$imageUrl) {
-            return null;
-        }
-        
-        try {
-            // Generate unique local filename
-            $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION);
-            
-            // Validate extension - only allow common image formats
-            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-            if (!$extension || !in_array(strtolower($extension), $allowedExtensions)) {
-                $extension = 'jpg'; // Default to jpg for safety
-            }
-            
-            $localFilename = 'item_' . $easyvereinId . '.' . strtolower($extension);
-            $uploadDir = __DIR__ . '/../../uploads/inventory/';
-            $localPath = $uploadDir . $localFilename;
-            
-            // Check if file already exists and matches (to avoid unnecessary downloads)
-            if (file_exists($localPath)) {
-                // File exists, optionally check if it needs updating
-                // For now, we'll skip re-downloading existing files
-                return '/uploads/inventory/' . $localFilename;
-            }
-            
-            // Download the image using cURL with auth headers
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $imageUrl);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-            
-            // Add authorization header if the URL is from EasyVerein domain
-            if (strpos($imageUrl, 'easyverein.com') !== false) {
-                $apiToken = '0277d541c6bb7044e901a8a985ea74a9894df724';
-                curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                    'Authorization: Bearer ' . $apiToken
-                ]);
-            }
-            
-            $imageData = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-            
-            // Check if download was successful
-            if ($imageData === false || $httpCode !== 200) {
-                error_log("Failed to download image for item {$easyvereinId}: HTTP {$httpCode}");
-                return null;
-            }
-            
-            // Ensure upload directory exists
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-            
-            // Save image to local file
-            if (file_put_contents($localPath, $imageData) === false) {
-                error_log("Failed to save image for item {$easyvereinId} to {$localPath}");
-                return null;
-            }
-            
-            // Return relative path for database storage
-            return '/uploads/inventory/' . $localFilename;
-            
-        } catch (Exception $e) {
-            error_log("Error processing image for item {$easyvereinId}: " . $e->getMessage());
-            return null;
-        }
+        // Return the EasyVerein URL directly (not downloaded)
+        return $imageUrl;
     }
     
     /**
@@ -257,26 +192,20 @@ class EasyVereinSync {
             foreach ($easyvereinItems as $evItem) {
                 try {
                     // Map API fields to our expected format
-                    // Map: name -> name, note -> description, pieces -> quantity (DB: quantity), price -> unit_price
+                    // Map: name -> name, note -> description, pieces -> quantity (DB: quantity), 
+                    // acquisitionPrice -> unit_price, locationName -> location, picture -> image_path
                     $easyvereinId = $evItem['id'] ?? $evItem['EasyVereinID'] ?? null;
                     $name = $evItem['name'] ?? $evItem['Name'] ?? 'Unnamed Item';
                     $description = $evItem['note'] ?? $evItem['description'] ?? $evItem['Description'] ?? '';
                     $totalQuantity = $evItem['pieces'] ?? $evItem['quantity'] ?? $evItem['total_stock'] ?? $evItem['TotalQuantity'] ?? 0;
-                    $unitPrice = $evItem['price'] ?? $evItem['unit_price'] ?? 0;
+                    // Use acquisitionPrice as primary, fall back to price
+                    $unitPrice = $evItem['acquisitionPrice'] ?? $evItem['price'] ?? $evItem['unit_price'] ?? 0;
                     $serialNumber = $evItem['serial_number'] ?? $evItem['SerialNumber'] ?? null;
+                    // Extract location name
+                    $locationName = $evItem['locationName'] ?? $evItem['location'] ?? null;
                     
-                    // Debug: Log relevant API item data to identify image field (sanitized)
-                    error_log('EasyVerein API Item ID: ' . ($easyvereinId ?? 'unknown') . 
-                             ' - Fields: ' . json_encode([
-                                 'name' => $name,
-                                 'has_image' => isset($evItem['image']),
-                                 'has_avatar' => isset($evItem['avatar']),
-                                 'has_image_path' => isset($evItem['image_path']),
-                                 'has_custom_fields' => isset($evItem['custom_fields'])
-                             ]));
-                    
-                    // Process inventory item and handle image download
-                    $imagePath = $this->processInventoryItem($evItem, $easyvereinId);
+                    // Extract image URL (do NOT download - save URL directly)
+                    $imageUrl = $this->extractImageUrl($evItem);
                     
                     if (!$easyvereinId) {
                         $stats['errors'][] = "Skipping item without ID: " . ($name ?? 'Unknown');
@@ -306,9 +235,9 @@ class EasyVereinSync {
                             'is_archived_in_easyverein' => 0
                         ];
                         
-                        // Update image if provided
-                        if ($imagePath) {
-                            $updateData['image_path'] = $imagePath;
+                        // Always update image URL if provided (EasyVerein URL, not downloaded)
+                        if ($imageUrl) {
+                            $updateData['image_path'] = $imageUrl;
                         }
                         
                         // Use Inventory::update() with $isSyncUpdate = true to bypass protection
@@ -358,7 +287,7 @@ class EasyVereinSync {
                             $serialNumber,
                             $totalQuantity,
                             $unitPrice,
-                            $imagePath
+                            $imageUrl
                         ]);
                         
                         $newItemId = $db->lastInsertId();
