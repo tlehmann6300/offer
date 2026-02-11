@@ -28,6 +28,16 @@ $stmt = $userDb->query("
 ");
 $activeUsersCount = $stmt->fetch()['active_users'] ?? 0;
 
+// Active Users trend (compare with previous 7 days)
+$stmt = $userDb->query("
+    SELECT COUNT(*) as active_users_prev 
+    FROM users 
+    WHERE last_login IS NOT NULL 
+    AND last_login BETWEEN DATE_SUB(NOW(), INTERVAL 14 DAY) AND DATE_SUB(NOW(), INTERVAL 7 DAY)
+");
+$activeUsersPrev = $stmt->fetch()['active_users_prev'] ?? 0;
+$activeUsersTrend = $activeUsersPrev > 0 ? (($activeUsersCount - $activeUsersPrev) / $activeUsersPrev) * 100 : 0;
+
 // Metric 2: Open Invitations Count
 $stmt = $userDb->query("
     SELECT COUNT(*) as open_invitations 
@@ -36,9 +46,28 @@ $stmt = $userDb->query("
 ");
 $openInvitationsCount = $stmt->fetch()['open_invitations'] ?? 0;
 
+// Open Invitations trend (compare with last week)
+$stmt = $userDb->query("
+    SELECT COUNT(*) as open_invitations_prev 
+    FROM invitation_tokens 
+    WHERE created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)
+    AND expires_at > DATE_SUB(NOW(), INTERVAL 7 DAY)
+");
+$openInvitationsPrev = $stmt->fetch()['open_invitations_prev'] ?? 0;
+$openInvitationsTrend = $openInvitationsPrev > 0 ? (($openInvitationsCount - $openInvitationsPrev) / $openInvitationsPrev) * 100 : 0;
+
 // Metric 3: Total User Count
 $stmt = $userDb->query("SELECT COUNT(*) as total_users FROM users");
 $totalUsersCount = $stmt->fetch()['total_users'] ?? 0;
+
+// Total Users trend (new users in last 7 days)
+$stmt = $userDb->query("
+    SELECT COUNT(*) as new_users 
+    FROM users 
+    WHERE created_at > DATE_SUB(NOW(), INTERVAL 7 DAY)
+");
+$newUsersCount = $stmt->fetch()['new_users'] ?? 0;
+$totalUsersTrend = $newUsersCount;
 
 // Get inventory stats (for dashboard content that will be moved here)
 $stats = Inventory::getDashboardStats();
@@ -198,18 +227,28 @@ ob_start();
 <div class="max-w-7xl mx-auto">
     <!-- Header -->
     <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-            <i class="fas fa-chart-bar mr-3 text-purple-600 dark:text-purple-400"></i>
-            Statistiken
-        </h1>
-        <p class="text-gray-600 dark:text-gray-300">Übersicht über wichtige Kennzahlen und Aktivitäten</p>
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                    <i class="fas fa-chart-bar mr-3 text-purple-600 dark:text-purple-400"></i>
+                    Statistiken
+                </h1>
+                <p class="text-gray-600 dark:text-gray-300">Übersicht über wichtige Kennzahlen und Aktivitäten</p>
+            </div>
+            <button 
+                id="exportStats" 
+                class="px-6 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg hover:from-green-700 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl font-medium"
+            >
+                <i class="fas fa-download mr-2"></i>Export Report
+            </button>
+        </div>
     </div>
 
     <!-- Metrics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <!-- Active Users (7 Days) -->
-        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-900/20 border-l-4 border-blue-500 dark:border-blue-600">
-            <div class="flex items-center justify-between">
+        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-900/20 border-l-4 border-blue-500 dark:border-blue-600 hover:shadow-xl transition-shadow duration-300">
+            <div class="flex items-center justify-between mb-3">
                 <div>
                     <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase mb-1">Aktive Nutzer</h3>
                     <p class="text-3xl font-bold text-blue-600 dark:text-blue-400"><?php echo number_format($activeUsersCount); ?></p>
@@ -219,11 +258,24 @@ ob_start();
                     <i class="fas fa-users text-blue-600 dark:text-blue-400 text-2xl"></i>
                 </div>
             </div>
+            <?php if ($activeUsersTrend != 0): ?>
+            <div class="flex items-center text-sm mt-2 pt-2 border-t border-blue-200 dark:border-blue-800">
+                <?php if ($activeUsersTrend > 0): ?>
+                    <i class="fas fa-arrow-up text-green-600 dark:text-green-400 mr-1"></i>
+                    <span class="text-green-600 dark:text-green-400 font-semibold"><?php echo number_format(abs($activeUsersTrend), 1); ?>%</span>
+                    <span class="text-gray-500 dark:text-gray-400 ml-1">vs. vorherige Woche</span>
+                <?php else: ?>
+                    <i class="fas fa-arrow-down text-red-600 dark:text-red-400 mr-1"></i>
+                    <span class="text-red-600 dark:text-red-400 font-semibold"><?php echo number_format(abs($activeUsersTrend), 1); ?>%</span>
+                    <span class="text-gray-500 dark:text-gray-400 ml-1">vs. vorherige Woche</span>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
         </div>
 
         <!-- Open Invitations -->
-        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-green-50 dark:from-gray-800 dark:to-green-900/20 border-l-4 border-green-500 dark:border-green-600">
-            <div class="flex items-center justify-between">
+        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-green-50 dark:from-gray-800 dark:to-green-900/20 border-l-4 border-green-500 dark:border-green-600 hover:shadow-xl transition-shadow duration-300">
+            <div class="flex items-center justify-between mb-3">
                 <div>
                     <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase mb-1">Offene Einladungen</h3>
                     <p class="text-3xl font-bold text-green-600 dark:text-green-400"><?php echo number_format($openInvitationsCount); ?></p>
@@ -233,11 +285,15 @@ ob_start();
                     <i class="fas fa-envelope-open-text text-green-600 dark:text-green-400 text-2xl"></i>
                 </div>
             </div>
+            <div class="flex items-center text-sm mt-2 pt-2 border-t border-green-200 dark:border-green-800">
+                <i class="fas fa-clock text-gray-500 dark:text-gray-400 mr-1"></i>
+                <span class="text-gray-500 dark:text-gray-400">Gültig bis Ablauf</span>
+            </div>
         </div>
 
         <!-- Total Users -->
-        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-purple-50 dark:from-gray-800 dark:to-purple-900/20 border-l-4 border-purple-500 dark:border-purple-600">
-            <div class="flex items-center justify-between">
+        <div class="card p-6 rounded-xl shadow-lg bg-gradient-to-br from-white to-purple-50 dark:from-gray-800 dark:to-purple-900/20 border-l-4 border-purple-500 dark:border-purple-600 hover:shadow-xl transition-shadow duration-300">
+            <div class="flex items-center justify-between mb-3">
                 <div>
                     <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase mb-1">Gesamtanzahl User</h3>
                     <p class="text-3xl font-bold text-purple-600 dark:text-purple-400"><?php echo number_format($totalUsersCount); ?></p>
@@ -247,6 +303,18 @@ ob_start();
                     <i class="fas fa-user-friends text-purple-600 dark:text-purple-400 text-2xl"></i>
                 </div>
             </div>
+            <?php if ($totalUsersTrend > 0): ?>
+            <div class="flex items-center text-sm mt-2 pt-2 border-t border-purple-200 dark:border-purple-800">
+                <i class="fas fa-user-plus text-green-600 dark:text-green-400 mr-1"></i>
+                <span class="text-green-600 dark:text-green-400 font-semibold">+<?php echo number_format($totalUsersTrend); ?></span>
+                <span class="text-gray-500 dark:text-gray-400 ml-1">neue in 7 Tagen</span>
+            </div>
+            <?php else: ?>
+            <div class="flex items-center text-sm mt-2 pt-2 border-t border-purple-200 dark:border-purple-800">
+                <i class="fas fa-minus text-gray-500 dark:text-gray-400 mr-1"></i>
+                <span class="text-gray-500 dark:text-gray-400">Keine neuen User</span>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -697,6 +765,74 @@ ob_start();
         </div>
     </div>
 </div>
+
+<script>
+// Export Statistics Report
+document.addEventListener('DOMContentLoaded', function() {
+    const exportBtn = document.getElementById('exportStats');
+    
+    if (exportBtn) {
+        exportBtn.addEventListener('click', function() {
+            // Gather data from the page
+            const activeUsers = <?php echo $activeUsersCount; ?>;
+            const openInvitations = <?php echo $openInvitationsCount; ?>;
+            const totalUsers = <?php echo $totalUsersCount; ?>;
+            
+            // Create CSV content
+            let csv = 'Statistik Report - IBC Intranet\n';
+            csv += 'Generiert am: ' + new Date().toLocaleString('de-DE') + '\n\n';
+            
+            csv += 'Metriken\n';
+            csv += 'Kategorie,Wert\n';
+            csv += 'Aktive Nutzer (7 Tage),' + activeUsers + '\n';
+            csv += 'Offene Einladungen,' + openInvitations + '\n';
+            csv += 'Gesamtanzahl User,' + totalUsers + '\n\n';
+            
+            // Add database stats if available
+            <?php if (!empty($databaseStats)): ?>
+            csv += 'Datenbank Speicherverbrauch\n';
+            csv += 'Datenbank,Größe (MB),Auslastung (%)\n';
+            <?php foreach ($databaseStats as $db): ?>
+            csv += '<?php echo htmlspecialchars($db['label']); ?>,<?php echo $db['size_mb']; ?>,<?php echo number_format($db['percentage'], 2); ?>\n';
+            <?php endforeach; ?>
+            csv += '\n';
+            <?php endif; ?>
+            
+            // Add active checkouts
+            <?php if (!empty($activeCheckouts)): ?>
+            csv += 'Aktive Ausleihen\n';
+            csv += 'Artikel,Benutzer,Ausgeliehen am,Fällig am,Überfällig\n';
+            <?php foreach ($activeCheckouts as $checkout): ?>
+            csv += '"<?php echo str_replace('"', '""', $checkout['item_name']); ?>","<?php echo str_replace('"', '""', $checkout['user_name']); ?>","<?php echo $checkout['checked_out_at']; ?>","<?php echo $checkout['due_date'] ?? 'N/A'; ?>","<?php echo $checkout['is_overdue'] ? 'Ja' : 'Nein'; ?>"\n';
+            <?php endforeach; ?>
+            csv += '\n';
+            <?php endif; ?>
+            
+            // Add project applications
+            <?php if (!empty($projectApplications)): ?>
+            csv += 'Projekt Bewerbungen\n';
+            csv += 'Projekt,Typ,Status,Bewerbungen\n';
+            <?php foreach ($projectApplications as $project): ?>
+            csv += '"<?php echo str_replace('"', '""', $project['title']); ?>","<?php echo $project['type']; ?>","<?php echo $project['status']; ?>",<?php echo $project['application_count']; ?>\n';
+            <?php endforeach; ?>
+            <?php endif; ?>
+            
+            // Create download link
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'statistik_report_' + new Date().toISOString().split('T')[0] + '.csv');
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    }
+});
+</script>
 
 <?php
 $content = ob_get_clean();
