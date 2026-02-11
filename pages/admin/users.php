@@ -2,13 +2,13 @@
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/User.php';
 
-if (!Auth::check() || !Auth::hasPermission('board')) {
+if (!Auth::check() || !Auth::canManageUsers()) {
     header('Location: ../auth/login.php');
     exit;
 }
 
 // Check if user has permission for invitation management (board or higher)
-$canManageInvitations = Auth::hasPermission('board');
+$canManageInvitations = Auth::canManageUsers();
 
 $message = '';
 $error = '';
@@ -61,6 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $users = User::getAll();
+
+// Get current user data
+$currentUser = Auth::user();
+$currentUserRole = $currentUser['role'] ?? '';
 
 $title = 'Benutzerverwaltung - IBC Intranet';
 ob_start();
@@ -140,11 +144,10 @@ ob_start();
                     <option value="head">Ressortleiter</option>
                     <option value="alumni">Alumni</option>
                     <option value="alumni_board">Alumni-Vorstand</option>
-                    <option value="alumni_finanzprufer">Alumni-Finanzprüfer</option>
-                    <option value="board">Vorstand</option>
-                    <option value="vorstand_intern">Vorstand Intern</option>
-                    <option value="vorstand_extern">Vorstand Extern</option>
-                    <option value="vorstand_finanzen_recht">Vorstand Finanzen & Recht</option>
+                    <option value="alumni_auditor">Alumni-Finanzprüfer</option>
+                    <option value="board_finance">Vorstand Finanzen & Recht</option>
+                    <option value="board_internal">Vorstand Intern</option>
+                    <option value="board_external">Vorstand Extern</option>
                     <option value="honorary_member">Ehrenmitglied</option>
                 </select>
             </div>
@@ -203,18 +206,16 @@ ob_start();
                         <select 
                             data-user-id="<?php echo $user['id']; ?>"
                             class="role-select px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            <?php echo ($user['id'] == $_SESSION['user_id']) ? 'disabled' : ''; ?>
                         >
                             <option value="candidate" <?php echo ($user['role'] == 'candidate') ? 'selected' : ''; ?>>Anwärter</option>
                             <option value="member" <?php echo ($user['role'] == 'member') ? 'selected' : ''; ?>>Mitglied</option>
                             <option value="head" <?php echo ($user['role'] == 'head') ? 'selected' : ''; ?>>Ressortleiter</option>
                             <option value="alumni" <?php echo ($user['role'] == 'alumni') ? 'selected' : ''; ?>>Alumni</option>
                             <option value="alumni_board" <?php echo ($user['role'] == 'alumni_board') ? 'selected' : ''; ?>>Alumni-Vorstand</option>
-                            <option value="alumni_finanzprufer" <?php echo ($user['role'] == 'alumni_finanzprufer') ? 'selected' : ''; ?>>Alumni-Finanzprüfer</option>
-                            <option value="board" <?php echo ($user['role'] == 'board') ? 'selected' : ''; ?>>Vorstand</option>
-                            <option value="vorstand_intern" <?php echo ($user['role'] == 'vorstand_intern') ? 'selected' : ''; ?>>Vorstand Intern</option>
-                            <option value="vorstand_extern" <?php echo ($user['role'] == 'vorstand_extern') ? 'selected' : ''; ?>>Vorstand Extern</option>
-                            <option value="vorstand_finanzen_recht" <?php echo ($user['role'] == 'vorstand_finanzen_recht') ? 'selected' : ''; ?>>Vorstand Finanzen & Recht</option>
+                            <option value="alumni_auditor" <?php echo ($user['role'] == 'alumni_auditor') ? 'selected' : ''; ?>>Alumni-Finanzprüfer</option>
+                            <option value="board_finance" <?php echo ($user['role'] == 'board_finance') ? 'selected' : ''; ?>>Vorstand Finanzen & Recht</option>
+                            <option value="board_internal" <?php echo ($user['role'] == 'board_internal') ? 'selected' : ''; ?>>Vorstand Intern</option>
+                            <option value="board_external" <?php echo ($user['role'] == 'board_external') ? 'selected' : ''; ?>>Vorstand Extern</option>
                             <option value="honorary_member" <?php echo ($user['role'] == 'honorary_member') ? 'selected' : ''; ?>>Ehrenmitglied</option>
                         </select>
                     </td>
@@ -276,6 +277,59 @@ ob_start();
 <?php endif; ?>
 <!-- End Tab Content: Invitations -->
 
+<!-- Succession Modal -->
+<div id="successionModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50" style="display: none;">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-2xl font-bold text-gray-800">
+                    <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
+                    Nachfolger bestimmen
+                </h3>
+                <button id="closeSuccessionModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800">
+                <p class="font-medium mb-2">Hinweis: Wenn du deine Vorstandsrolle abgibst, musst du einen Nachfolger bestimmen.</p>
+                <p>Bitte wähle ein Mitglied aus, das deine Vorstandsrolle übernehmen soll.</p>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nachfolger auswählen</label>
+                <select 
+                    id="successorSelect"
+                    class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                >
+                    <option value="">-- Bitte wählen --</option>
+                    <?php 
+                    // Get users with 'member' or 'head' role for successor selection
+                    foreach ($users as $member):
+                        if ((int)$member['id'] !== (int)$currentUser['id'] && in_array($member['role'], ['member', 'head'], true)):
+                    ?>
+                    <option value="<?php echo $member['id']; ?>">
+                        <?php echo htmlspecialchars($member['email']); ?> (<?php echo htmlspecialchars(translateRole($member['role'])); ?>)
+                    </option>
+                    <?php 
+                        endif;
+                    endforeach; 
+                    ?>
+                </select>
+            </div>
+            
+            <div class="flex justify-end space-x-3">
+                <button id="cancelSuccession" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                    Abbrechen
+                </button>
+                <button id="confirmSuccession" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                    <i class="fas fa-check mr-2"></i>Rollenwechsel durchführen
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 // Tab switching functionality
 document.addEventListener('DOMContentLoaded', function() {
@@ -307,56 +361,172 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 // AJAX role change handler
 document.addEventListener('DOMContentLoaded', function() {
+    // Define board roles and current user's role
+    const boardRoles = <?php echo json_encode(Auth::BOARD_ROLES); ?>;
+    const currentUserRole = '<?php echo $currentUserRole; ?>';
+    const currentUserId = <?php echo $currentUser['id']; ?>;
+    
     const roleSelects = document.querySelectorAll('.role-select');
+    const modal = document.getElementById('successionModal');
+    const successorSelect = document.getElementById('successorSelect');
+    const confirmSuccessionBtn = document.getElementById('confirmSuccession');
+    const closeModalBtn = document.getElementById('closeSuccessionModal');
+    const cancelSuccessionBtn = document.getElementById('cancelSuccession');
+    
+    // Store for pending role change
+    let pendingRoleChange = null;
     
     roleSelects.forEach(select => {
         // Store original value when attaching event listener
         const originalValue = select.value;
         
         select.addEventListener('change', function() {
-            const userId = this.getAttribute('data-user-id');
+            const userId = parseInt(this.getAttribute('data-user-id'));
             const newRole = this.value;
+            
+            // Check if current logged-in user (board member) is trying to demote themselves
+            const isCurrentUser = (userId === parseInt(currentUserId, 10));
+            const isCurrentUserBoard = boardRoles.includes(currentUserRole);
+            const isTargetRoleNonBoard = (newRole === 'member' || newRole === 'alumni');
+            
+            if (isCurrentUser && isCurrentUserBoard && isTargetRoleNonBoard) {
+                // Show succession modal
+                pendingRoleChange = {
+                    userId: userId,
+                    newRole: newRole,
+                    selectElement: this
+                };
+                
+                modal.style.display = 'flex';
+                successorSelect.value = '';
+                return;
+            }
             
             // Disable select while processing
             this.disabled = true;
             
             // Send AJAX request
-            fetch('ajax_update_role.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'user_id=' + encodeURIComponent(userId) + '&new_role=' + encodeURIComponent(newRole)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Show success message
-                    showMessage(data.message, 'success');
+            performRoleChange(userId, newRole, null, this, originalValue);
+        });
+    });
+    
+    // Close modal handlers
+    closeModalBtn.addEventListener('click', closeModal);
+    cancelSuccessionBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+    
+    function closeModal() {
+        modal.style.display = 'none';
+        
+        // Revert the select if pending change exists
+        if (pendingRoleChange) {
+            const originalOptions = pendingRoleChange.selectElement.querySelectorAll('option');
+            originalOptions.forEach(opt => {
+                if (opt.hasAttribute('selected')) {
+                    pendingRoleChange.selectElement.value = opt.value;
+                }
+            });
+            pendingRoleChange = null;
+        }
+        
+        successorSelect.value = '';
+    }
+    
+    // Confirm succession
+    confirmSuccessionBtn.addEventListener('click', function() {
+        const successorId = successorSelect.value;
+        
+        if (!successorId) {
+            alert('Bitte wähle einen Nachfolger aus');
+            return;
+        }
+        
+        if (pendingRoleChange) {
+            pendingRoleChange.selectElement.disabled = true;
+            confirmSuccessionBtn.disabled = true;
+            
+            performRoleChange(
+                pendingRoleChange.userId, 
+                pendingRoleChange.newRole, 
+                successorId, 
+                pendingRoleChange.selectElement,
+                currentUserRole  // Use current role as original value for revert
+            );
+        }
+    });
+    
+    function performRoleChange(userId, newRole, successorId, selectElement, originalValue) {
+        let body = 'user_id=' + encodeURIComponent(userId) + '&new_role=' + encodeURIComponent(newRole);
+        if (successorId) {
+            body += '&successor_id=' + encodeURIComponent(successorId);
+        }
+        
+        fetch('ajax_update_role.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: body
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                showMessage(data.message, 'success');
+                
+                // Close modal if it was open
+                if (modal.style.display === 'flex') {
+                    modal.style.display = 'none';
+                    pendingRoleChange = null;
+                }
+                
+                // If this was a self-demotion, redirect to dashboard after a short delay
+                if (userId === currentUserId) {
+                    setTimeout(() => {
+                        window.location.href = '../dashboard/index.php';
+                    }, 1000);
+                } else {
                     // Update the selected option
-                    this.querySelectorAll('option').forEach(opt => {
+                    selectElement.querySelectorAll('option').forEach(opt => {
                         opt.removeAttribute('selected');
                         if (opt.value === newRole) {
                             opt.setAttribute('selected', 'selected');
                         }
                     });
-                } else {
-                    // Show error and revert selection
-                    showMessage(data.message, 'error');
-                    this.value = originalValue;
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showMessage('Fehler beim Ändern der Rolle', 'error');
-                this.value = originalValue;
-            })
-            .finally(() => {
-                // Re-enable select
-                this.disabled = false;
-            });
+            } else {
+                // Show error and revert selection
+                showMessage(data.message, 'error');
+                selectElement.value = originalValue;
+                
+                // Close modal on error
+                if (modal.style.display === 'flex') {
+                    modal.style.display = 'none';
+                    pendingRoleChange = null;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Fehler beim Ändern der Rolle', 'error');
+            selectElement.value = originalValue;
+            
+            // Close modal on error
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+                pendingRoleChange = null;
+            }
+        })
+        .finally(() => {
+            // Re-enable select and button
+            selectElement.disabled = false;
+            confirmSuccessionBtn.disabled = false;
         });
-    });
+    }
     
     // Function to show messages
     function showMessage(message, type) {
@@ -368,7 +538,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'ajax-message mb-6 p-4 rounded-lg ' + 
             (type === 'success' ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700');
-        messageDiv.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check' : 'exclamation') + '-circle mr-2"></i>' + message;
+        
+        // Create icon
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-' + (type === 'success' ? 'check' : 'exclamation') + '-circle mr-2';
+        
+        // Create text node for message (safe from XSS)
+        const messageText = document.createTextNode(message);
+        
+        // Append elements
+        messageDiv.appendChild(icon);
+        messageDiv.appendChild(messageText);
         
         // Insert at the top of main content
         const mainContent = document.querySelector('main > div:first-child') || document.querySelector('main');

@@ -329,10 +329,9 @@ ob_start();
                             <option value="">-- Bitte wählen --</option>
                             <option value="member">Mitglied</option>
                             <option value="head">Ressortleiter</option>
-                            <option value="board">Vorstand</option>
-                            <option value="vorstand_intern">Vorstand Intern</option>
-                            <option value="vorstand_extern">Vorstand Extern</option>
-                            <option value="vorstand_finanzen_recht">Vorstand Finanzen & Recht</option>
+                            <option value="board_finance">Vorstand Finanzen & Recht</option>
+                            <option value="board_internal">Vorstand Intern</option>
+                            <option value="board_external">Vorstand Extern</option>
                         </select>
                     </div>
                     
