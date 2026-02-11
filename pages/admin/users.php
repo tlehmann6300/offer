@@ -79,19 +79,25 @@ ob_start();
             </h1>
             <p class="text-gray-600 dark:text-gray-300"><?php echo count($users); ?> Benutzer gesamt</p>
         </div>
-        <div class="flex items-center space-x-2 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-            <i class="fas fa-chart-line text-green-600 dark:text-green-400 text-xl"></i>
-            <div class="text-sm">
-                <div class="font-semibold text-gray-900 dark:text-gray-100"><?php 
-                    $activeToday = 0;
-                    foreach ($users as $u) {
-                        if ($u['last_login'] && strtotime($u['last_login']) > strtotime('-24 hours')) {
-                            $activeToday++;
+        <div class="flex items-center space-x-4">
+            <a href="bulk_invite.php" class="btn-primary flex items-center">
+                <i class="fas fa-user-plus mr-2"></i>
+                Masseneinladung
+            </a>
+            <div class="flex items-center space-x-2 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                <i class="fas fa-chart-line text-green-600 dark:text-green-400 text-xl"></i>
+                <div class="text-sm">
+                    <div class="font-semibold text-gray-900 dark:text-gray-100"><?php 
+                        $activeToday = 0;
+                        foreach ($users as $u) {
+                            if ($u['last_login'] && strtotime($u['last_login']) > strtotime('-24 hours')) {
+                                $activeToday++;
+                            }
                         }
-                    }
-                    echo $activeToday;
-                ?></div>
-                <div class="text-gray-500 dark:text-gray-400">Aktiv heute</div>
+                        echo $activeToday;
+                    ?></div>
+                    <div class="text-gray-500 dark:text-gray-400">Aktiv heute</div>
+                </div>
             </div>
         </div>
     </div>
