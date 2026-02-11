@@ -514,7 +514,9 @@ class AuthHandler {
             $email = $claims['email'] ?? $claims['preferred_username'] ?? $claims['upn'] ?? null;
             
             if (!$email) {
-                throw new Exception('Unable to retrieve user email from Azure AD claims');
+                // Log available claims for debugging
+                error_log('Azure AD claims received: ' . json_encode(array_keys($claims)));
+                throw new Exception('Unable to retrieve user email from Azure AD claims. Expected one of: email, preferred_username, or upn');
             }
             
             // Check if user exists in database
