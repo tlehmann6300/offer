@@ -80,7 +80,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         
         /* Dark mode sidebar styling */
         body.dark-mode .sidebar {
-            background: #0f172a; /* Rich dark blue/slate */
+            background: #020617; /* slate-950 for subtle contrast */
             border-right: 1px solid rgba(255, 255, 255, 0.1);
         }
         
@@ -232,7 +232,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100" data-user-theme="<?php echo htmlspecialchars($currentUser['theme_preference'] ?? 'auto'); ?>">
+<body class="bg-gray-50 text-slate-800 dark:bg-slate-900 dark:text-slate-200" data-user-theme="<?php echo htmlspecialchars($currentUser['theme_preference'] ?? 'auto'); ?>">
     <script>
         // Apply theme immediately to prevent flash of unstyled content (FOUC)
         (function() {
@@ -255,7 +255,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
 
     <!-- Mobile Menu Toggle -->
     <div class="lg:hidden fixed top-4 left-4 z-50">
-        <button id="mobile-menu-btn" class="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg">
+        <button id="mobile-menu-btn" class="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-lg">
             <i class="fas fa-bars text-gray-600 dark:text-white"></i>
         </button>
     </div>
@@ -279,7 +279,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             <nav>
                 <!-- Dashboard (All) -->
                 <a href="<?php echo asset('pages/dashboard/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/dashboard/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/dashboard/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-home w-5 mr-3"></i>
                     <span>Dashboard</span>
                 </a>
@@ -287,7 +287,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Mitglieder (Board, Head, Member, Candidate) -->
                 <?php if (Auth::canAccessPage('members')): ?>
                 <a href="<?php echo asset('pages/members/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/members/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/members/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-users w-5 mr-3"></i>
                     <span>Mitglieder</span>
                 </a>
@@ -295,21 +295,21 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
 
                 <!-- Alumni (All) -->
                 <a href="<?php echo asset('pages/alumni/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/alumni/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/alumni/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-user-graduate w-5 mr-3"></i>
                     <span>Alumni</span>
                 </a>
 
                 <!-- Projekte (All) -->
                 <a href="<?php echo asset('pages/projects/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/projects/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/projects/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-folder w-5 mr-3"></i>
                     <span>Projekte</span>
                 </a>
 
                 <!-- Events (All) -->
                 <a href="<?php echo asset('pages/events/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/events/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/events/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-calendar w-5 mr-3"></i>
                     <span>Events</span>
                 </a>
@@ -317,21 +317,21 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Helfersystem (All) - Indented -->
                 <a href="<?php echo asset('pages/events/helpers.php'); ?>" 
                    style="padding-left: 2.5rem;"
-                   class="flex items-center pr-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/events/helpers.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center pr-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/events/helpers.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-hands-helping w-5 mr-3"></i>
                     <span>Helfersystem</span>
                 </a>
 
                 <!-- Inventar (All) -->
                 <a href="<?php echo asset('pages/inventory/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo (isActivePath('/inventory/') && !isActivePath('/my_rentals.php')) ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo (isActivePath('/inventory/') && !isActivePath('/my_rentals.php')) ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-box w-5 mr-3"></i>
                     <span>Inventar</span>
                 </a>
 
                 <!-- Blog (All) -->
                 <a href="<?php echo asset('pages/blog/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/blog/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/blog/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-newspaper w-5 mr-3"></i>
                     <span>Blog</span>
                 </a>
@@ -339,7 +339,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Rechnungen (Only board_finance) -->
                 <?php if (Auth::canManageInvoices()): ?>
                 <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-file-invoice-dollar w-5 mr-3"></i>
                     <span>Rechnungen</span>
                 </a>
@@ -348,7 +348,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Ideenbox (Members, Candidates, Head, Board) -->
                 <?php if (Auth::canAccessPage('ideas')): ?>
                 <a href="<?php echo asset('pages/ideas/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/ideas/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/ideas/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-lightbulb w-5 mr-3"></i>
                     <span>Ideenbox</span>
                 </a>
@@ -357,7 +357,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Umfragen (Polls - All authenticated users) -->
                 <?php if (Auth::canAccessPage('polls')): ?>
                 <a href="<?php echo asset('pages/polls/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/polls/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/polls/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-poll w-5 mr-3"></i>
                     <span>Umfragen</span>
                 </a>
@@ -366,7 +366,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Schulungsanfrage (Alumni, Alumni-Board) -->
                 <?php if (Auth::canAccessPage('training_requests')): ?>
                 <a href="<?php echo asset('pages/alumni/requests.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/alumni/requests.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/alumni/requests.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-chalkboard-teacher w-5 mr-3"></i>
                     <span>Schulungsanfrage</span>
                 </a>
@@ -375,7 +375,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Benutzer (All board members who can manage users) -->
                 <?php if (Auth::canManageUsers()): ?>
                 <a href="<?php echo asset('pages/admin/users.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/admin/users.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/admin/users.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-users-cog w-5 mr-3"></i>
                     <span>Benutzer</span>
                 </a>
@@ -384,7 +384,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Statistiken (All board members) -->
                 <?php if (Auth::isAdmin()): ?>
                 <a href="<?php echo asset('pages/admin/stats.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/admin/stats.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/admin/stats.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-chart-bar w-5 mr-3"></i>
                     <span>Statistiken</span>
                 </a>
@@ -393,7 +393,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Audit Logs (All board members) -->
                 <?php if (Auth::isAdmin()): ?>
                 <a href="<?php echo asset('pages/admin/audit.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/admin/audit.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/admin/audit.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-clipboard-list w-5 mr-3"></i>
                     <span>Audit Logs</span>
                 </a>
@@ -402,7 +402,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- System Health (All board members) -->
                 <?php if (Auth::isAdmin()): ?>
                 <a href="<?php echo asset('pages/admin/db_maintenance.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/admin/db_maintenance.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/admin/db_maintenance.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-database w-5 mr-3"></i>
                     <span>System Health</span>
                 </a>
@@ -411,7 +411,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Einstellungen (All board members) -->
                 <?php if (Auth::isAdmin()): ?>
                 <a href="<?php echo asset('pages/auth/settings.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/auth/settings.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
+                   class="flex items-center px-6 py-2 text-slate-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors duration-200 <?php echo isActivePath('/auth/settings.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-cog w-5 mr-3"></i>
                     <span>Einstellungen</span>
                 </a>
@@ -481,14 +481,14 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </div>
                 <div class='flex-1 min-w-0'>
                     <?php if (!empty($firstname) || !empty($lastname)): ?>
-                    <p class='text-sm font-semibold text-white dark:text-gray-100 truncate leading-snug mb-0.5' title='<?php echo htmlspecialchars($firstname . ' ' . $lastname); ?>'>
+                    <p class='text-sm font-semibold text-white dark:text-slate-200 truncate leading-snug mb-0.5' title='<?php echo htmlspecialchars($firstname . ' ' . $lastname); ?>'>
                         <?php echo htmlspecialchars($firstname . ' ' . $lastname); ?>
                     </p>
                     <?php endif; ?>
                     <p class='text-[11px] text-white/80 truncate leading-snug mb-1' title='<?php echo htmlspecialchars($email); ?>'>
                         <?php echo htmlspecialchars($email); ?>
                     </p>
-                    <span class='inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-white/10 text-white dark:text-gray-100 border border-white/20'>
+                    <span class='inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-white/10 text-white dark:text-slate-200 border border-white/20'>
                         <?php 
                         // Translate role to German
                         $roleTranslations = [
@@ -514,14 +514,14 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             <div class='mb-3 space-y-2'>
                 <!-- Profilangaben -->
                 <a href='<?php echo asset('pages/auth/profile.php'); ?>' 
-                   class='flex items-center justify-center w-full px-4 py-2 text-xs font-medium text-white/90 dark:text-gray-100 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm <?php echo isActivePath('/auth/profile.php') ? 'bg-white/10' : ''; ?>'>
+                   class='flex items-center justify-center w-full px-4 py-2 text-xs font-medium text-white/90 dark:text-slate-200 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm <?php echo isActivePath('/auth/profile.php') ? 'bg-white/10' : ''; ?>'>
                     <i class='fas fa-user text-xs mr-2'></i> 
                     <span>Mein Profil</span>
                 </a>
                 
                 <!-- Einstellungen -->
                 <a href='<?php echo asset('pages/auth/settings.php'); ?>' 
-                   class='flex items-center justify-center w-full px-4 py-2 text-xs font-medium text-white/90 dark:text-gray-100 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm <?php echo isActivePath('/auth/settings.php') ? 'bg-white/10' : ''; ?>'>
+                   class='flex items-center justify-center w-full px-4 py-2 text-xs font-medium text-white/90 dark:text-slate-200 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm <?php echo isActivePath('/auth/settings.php') ? 'bg-white/10' : ''; ?>'>
                     <i class='fas fa-cog text-xs mr-2'></i> 
                     <span>Einstellungen</span>
                 </a>
@@ -529,7 +529,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             
             <!-- Logout Button -->
             <a href='<?php echo asset('pages/auth/logout.php'); ?>' 
-               class='flex items-center justify-center w-full px-4 py-2 mb-3 text-xs font-medium text-white/90 dark:text-gray-100 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm'>
+               class='flex items-center justify-center w-full px-4 py-2 mb-3 text-xs font-medium text-white/90 dark:text-slate-200 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm'>
                 <i class='fas fa-sign-out-alt text-xs mr-2 group-hover:translate-x-0.5 transition-transform'></i> 
                 <span>Abmelden</span>
             </a>
@@ -537,7 +537,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             <!-- Dark/Light Mode Toggle -->
             <button id="theme-toggle" class='flex items-center justify-center w-full px-4 py-2 text-xs font-medium text-white/90 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm'>
                 <i id="theme-icon" class='fas fa-moon text-xs mr-2'></i>
-                <span id="theme-text">Dunkelmodus</span>
+                <span id="theme-text">Darkmode</span>
             </button>
             
             <!-- Live Clock -->
@@ -554,7 +554,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
         <?php if (isset($_SESSION['show_2fa_nudge']) && $_SESSION['show_2fa_nudge']): ?>
         <!-- 2FA Nudge Modal -->
         <div id="tfa-nudge-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden transform transition-all">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden transform transition-all">
                 <!-- Modal Header -->
                 <div class="bg-gradient-to-r from-blue-600 to-green-600 px-6 py-4">
                     <div class="flex items-center">
@@ -567,17 +567,17 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 
                 <!-- Modal Body -->
                 <div class="px-6 py-6">
-                    <p class="text-gray-700 dark:text-gray-300 text-lg mb-2 font-semibold">
+                    <p class="text-slate-800 dark:text-slate-200 text-lg mb-2 font-semibold">
                         Erhöhe deine Sicherheit!
                     </p>
-                    <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    <p class="text-slate-800 dark:text-slate-200 mb-6">
                         Aktiviere jetzt die 2-Faktor-Authentifizierung für zusätzlichen Schutz deines Kontos.
                     </p>
                     
                     <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-6">
                         <div class="flex items-start">
                             <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-1 mr-3"></i>
-                            <p class="text-sm text-gray-700 dark:text-gray-300">
+                            <p class="text-sm text-slate-800 dark:text-slate-200">
                                 Die 2-Faktor-Authentifizierung macht dein Konto deutlich sicherer, indem bei der Anmeldung ein zusätzlicher Code erforderlich ist.
                             </p>
                         </div>
@@ -585,12 +585,12 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </div>
                 
                 <!-- Modal Footer -->
-                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 flex flex-col sm:flex-row gap-3">
+                <div class="px-6 py-4 bg-gray-50 dark:bg-slate-700 flex flex-col sm:flex-row gap-3">
                     <a href="<?php echo asset('pages/auth/profile.php'); ?>" class="flex-1 inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
                         <i class="fas fa-shield-alt mr-2"></i>
                         Jetzt einrichten
                     </a>
-                    <button onclick="dismissTfaNudge()" class="flex-1 px-6 py-3 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-semibold hover:bg-gray-400 dark:hover:bg-gray-500 transition-all duration-300">
+                    <button onclick="dismissTfaNudge()" class="flex-1 px-6 py-3 bg-gray-300 dark:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-lg font-semibold hover:bg-gray-400 dark:hover:bg-slate-500 transition-all duration-300">
                         Später
                     </button>
                 </div>
@@ -659,24 +659,24 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 document.body.classList.add('dark-mode', 'dark');
                 themeIcon.classList.remove('fa-moon');
                 themeIcon.classList.add('fa-sun');
-                themeText.textContent = 'Hellmodus';
+                themeText.textContent = 'Lightmode';
             } else if (theme === 'light') {
                 document.body.classList.remove('dark-mode', 'dark');
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
-                themeText.textContent = 'Dunkelmodus';
+                themeText.textContent = 'Darkmode';
             } else { // auto
                 // Check system preference
                 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                     document.body.classList.add('dark-mode', 'dark');
                     themeIcon.classList.remove('fa-moon');
                     themeIcon.classList.add('fa-sun');
-                    themeText.textContent = 'Hellmodus';
+                    themeText.textContent = 'Lightmode';
                 } else {
                     document.body.classList.remove('dark-mode', 'dark');
                     themeIcon.classList.remove('fa-sun');
                     themeIcon.classList.add('fa-moon');
-                    themeText.textContent = 'Dunkelmodus';
+                    themeText.textContent = 'Darkmode';
                 }
             }
         }
@@ -694,14 +694,14 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 localStorage.setItem('theme', 'light');
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
-                themeText.textContent = 'Dunkelmodus';
+                themeText.textContent = 'Darkmode';
             } else {
                 // Switch to dark mode
                 document.body.classList.add('dark-mode', 'dark');
                 localStorage.setItem('theme', 'dark');
                 themeIcon.classList.remove('fa-moon');
                 themeIcon.classList.add('fa-sun');
-                themeText.textContent = 'Hellmodus';
+                themeText.textContent = 'Lightmode';
             }
         });
         
