@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description = $_POST['description'] ?? '';
     $category_id = $_POST['category_id'] ?? null;
     $location_id = $_POST['location_id'] ?? null;
-    $current_stock = intval($_POST['current_stock'] ?? 0);
+    $quantity = intval($_POST['current_stock'] ?? 0);
     $min_stock = intval($_POST['min_stock'] ?? 0);
     $unit = $_POST['unit'] ?? 'Stück';
     // Handle German decimal format (comma) by replacing it with dot for float conversion
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'description' => $description,
                 'category_id' => $category_id,
                 'location_id' => $location_id,
-                'current_stock' => $current_stock,
+                'quantity' => $quantity,
                 'min_stock' => $min_stock,
                 'unit' => $unit,
                 'unit_price' => $unit_price,

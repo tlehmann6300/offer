@@ -221,7 +221,7 @@ ob_start();
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Aktueller Bestand</label>
                     <input 
                         type="number" 
-                        value="<?php echo $item['current_stock']; ?>"
+                        value="<?php echo $item['quantity']; ?>"
                         disabled
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100<?php if ($isSyncedItem): ?> cursor-not-allowed<?php endif; ?>"
                     >

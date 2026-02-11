@@ -208,15 +208,15 @@ ob_start();
             <?php endif; ?>
             <div class="flex items-center">
                 <i class="fas fa-box w-5 text-purple-600"></i>
-                <span>Bestand: <?php echo htmlspecialchars($item['current_stock']); ?> <?php echo htmlspecialchars($item['unit'] ?? 'Stk'); ?></span>
+                <span>Bestand: <?php echo htmlspecialchars($item['quantity']); ?> <?php echo htmlspecialchars($item['unit'] ?? 'Stk'); ?></span>
             </div>
         </div>
 
         <!-- Stock Warning -->
         <?php 
         $lowStockThreshold = $item['min_stock'] ?? DEFAULT_LOW_STOCK_THRESHOLD;
-        // FIX: Nutze current_stock für die Warnung
-        if ($item['current_stock'] <= $lowStockThreshold): 
+        // FIX: Nutze quantity für die Warnung
+        if ($item['quantity'] <= $lowStockThreshold): 
         ?>
         <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
             <div class="flex items-center text-sm text-yellow-800 dark:text-yellow-200">
