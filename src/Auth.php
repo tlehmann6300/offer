@@ -315,10 +315,16 @@ class Auth {
     /**
      * Check if user can manage users
      * 
-     * @return bool True if user has any board role
+     * @return bool True if user has any board role, alumni_board, or alumni_auditor
      */
     public static function canManageUsers() {
-        return self::isBoard();
+        if (!self::check()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        $allowedRoles = ['board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor'];
+        return in_array($userRole, $allowedRoles);
     }
     
     /**
@@ -328,6 +334,66 @@ class Auth {
      */
     public static function canSeeSystemStats() {
         return self::isBoard();
+    }
+    
+    /**
+     * Check if user can create complex content (Events, Projects, Polls, Blog)
+     * 
+     * @return bool True if user has any board role
+     */
+    public static function canCreateComplexContent() {
+        if (!self::check()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        $allowedRoles = ['board_finance', 'board_internal', 'board_external'];
+        return in_array($userRole, $allowedRoles);
+    }
+    
+    /**
+     * Check if user can create basic content (Events, Blog)
+     * 
+     * @return bool True if user has any board role or is head (Ressortleiter)
+     */
+    public static function canCreateBasicContent() {
+        if (!self::check()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        $allowedRoles = ['board_finance', 'board_internal', 'board_external', 'head'];
+        return in_array($userRole, $allowedRoles);
+    }
+    
+    /**
+     * Check if user can view admin stats
+     * 
+     * @return bool True for all 3 Boards + alumni_board + alumni_auditor
+     */
+    public static function canViewAdminStats() {
+        if (!self::check()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        $allowedRoles = ['board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor'];
+        return in_array($userRole, $allowedRoles);
+    }
+    
+    /**
+     * Check if user can edit admin settings
+     * 
+     * @return bool True ONLY for the 3 Boards (board_finance, board_internal, board_external)
+     */
+    public static function canEditAdminSettings() {
+        if (!self::check()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        $allowedRoles = ['board_finance', 'board_internal', 'board_external'];
+        return in_array($userRole, $allowedRoles);
     }
     
     /**
@@ -502,9 +568,9 @@ class Auth {
             'alumni_board' => 'Alumni-Vorstand',
             'candidate' => 'Anwärter',
             'member' => 'Mitglieder',
-            'head' => 'Resortleiter',
+            'head' => 'Ressortleiter',
             'honorary_member' => 'Ehrenmitglied',
-            'board_finance' => 'Vorstand Finanzen und Recht',
+            'board_finance' => 'Vorstand Finanzen & Recht',
             'board_external' => 'Vorstand Extern',
             'board_internal' => 'Vorstand Intern'
         ];
