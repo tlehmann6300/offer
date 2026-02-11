@@ -123,6 +123,29 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
             color: var(--text-primary);
         }
         
+        /* Sidebar link styles - consistent hover and active states */
+        .sidebar a {
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        /* Active state with green indicator bar */
+        .sidebar a.bg-blue-50,
+        .sidebar a[class*="bg-blue-50"],
+        .sidebar a.dark\:bg-blue-900\/20 {
+            border-right: 4px solid var(--ibc-green) !important;
+            padding-right: calc(1.5rem - 4px); /* Adjust padding to account for border */
+        }
+        
+        /* Ensure sidebar icons inherit text color */
+        .sidebar i,
+        .sidebar i.fas {
+            color: inherit !important;
+        }
+        
         .card {
             background: white;
             border-radius: 16px;

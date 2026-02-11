@@ -114,9 +114,9 @@ body {
 
 /* Fix Tables - Improved contrast */
 .dark-mode th {
-    background-color: #1f2937 !important;
+    background-color: #374151 !important; /* Slightly gray to differentiate from table content */
     color: #ffffff !important;
-    border-color: #374151 !important;
+    border-color: #4b5563 !important;
 }
 
 .dark-mode td {
@@ -132,6 +132,17 @@ body {
 .dark-mode .sidebar a:hover {
     color: #ffffff !important;
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Sidebar Links - Consistent Hover and Active States */
+.sidebar a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar a.active,
+.sidebar a[class*="bg-blue-50"],
+.sidebar a[class*="bg-blue-900"] {
+    border-right: 4px solid var(--ibc-green);
 }
 
 body.dark-mode main {
@@ -168,7 +179,7 @@ body.dark-mode table {
 }
 
 body.dark-mode th {
-    background-color: #1f2937 !important;
+    background-color: #374151 !important; /* Slightly gray to differentiate from table content */
     color: #ffffff !important;
     font-weight: 600;
 }
@@ -591,6 +602,12 @@ body:not(.dark-mode) .sidebar a,
 body:not(.dark-mode) .sidebar i,
 body:not(.dark-mode) .sidebar label {
     color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Sidebar Icons - Inherit text color */
+.sidebar i,
+.sidebar i.fas {
+    color: inherit !important;
 }
 
 /* Light Mode: Kartenhintergrund sicherstellen */
