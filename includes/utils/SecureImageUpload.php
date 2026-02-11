@@ -103,6 +103,7 @@ class SecureImageUpload {
         }
         
         // Determine upload directory
+        $customUploadDir = ($uploadDir !== null);
         if ($uploadDir === null) {
             $uploadDir = __DIR__ . '/../../' . self::UPLOAD_DIR;
         }
@@ -162,8 +163,22 @@ class SecureImageUpload {
         chmod($uploadPath, 0644);
         
         // Return relative path for database storage
-        // Use the UPLOAD_DIR constant to maintain single source of truth
-        $relativePath = trim(self::UPLOAD_DIR, '/') . '/' . $filename;
+        if ($customUploadDir) {
+            // For custom upload directories, calculate relative path from project root
+            $projectRoot = realpath(__DIR__ . '/../../');
+            $realUploadPath = realpath($uploadPath);
+            if ($realUploadPath && $projectRoot && strpos($realUploadPath, $projectRoot) === 0) {
+                $relativePath = substr($realUploadPath, strlen($projectRoot) + 1);
+                // Normalize path separators for consistency
+                $relativePath = str_replace('\\', '/', $relativePath);
+            } else {
+                // Fallback: extract relative path from uploadDir
+                $relativePath = str_replace(__DIR__ . '/../../', '', $uploadDir) . $filename;
+            }
+        } else {
+            // Use the UPLOAD_DIR constant to maintain single source of truth
+            $relativePath = trim(self::UPLOAD_DIR, '/') . '/' . $filename;
+        }
         
         return [
             'success' => true,
