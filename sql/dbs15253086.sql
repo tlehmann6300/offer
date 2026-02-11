@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
     locked_until DATETIME DEFAULT NULL,
     is_locked_permanently BOOLEAN NOT NULL DEFAULT 0,
     tfa_enabled BOOLEAN NOT NULL DEFAULT 0,
+    tfa_secret VARCHAR(255) DEFAULT NULL COMMENT 'Two-factor authentication secret for Google Authenticator',
     pending_email_update_request BOOLEAN NOT NULL DEFAULT 0,
     prompt_profile_review BOOLEAN NOT NULL DEFAULT 0,
     theme_preference VARCHAR(10) DEFAULT 'auto',
