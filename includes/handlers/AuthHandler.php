@@ -462,52 +462,52 @@ class AuthHandler {
             $claims = $user->getClaims();
             $azureRoles = $claims['roles'] ?? [];
             
-            // Define role mapping from Azure roles to internal role IDs
+            // Define role mapping from Azure roles (string) to internal role names (string)
+            // Azure roles should not contain umlauts for technical compatibility
             $roleMapping = [
-                'anwaerter' => 1,           // candidate
-                'mitglied' => 2,            // member
-                'ressortleiter' => 3,       // head
-                'vorstand_finanzen' => 4,   // board_finance
-                'vorstand_intern' => 5,     // board_internal
-                'vorstand_extern' => 6,     // board_external
-                'alumni' => 7,              // alumni
-                'alumni_vorstand' => 8,     // alumni_board
-                'alumni_finanz' => 9,       // alumni_auditor
-                'ehrenmitglied' => 10       // honorary_member
+                'anwaerter' => 'candidate',
+                'mitglied' => 'member',
+                'ressortleiter' => 'head',
+                'vorstand_finanzen' => 'board_finance',
+                'vorstand_intern' => 'board_internal',
+                'vorstand_extern' => 'board_external',
+                'alumni' => 'alumni',
+                'alumni_vorstand' => 'alumni_board',
+                'alumni_finanz' => 'alumni_auditor',
+                'ehrenmitglied' => 'honorary_member'
             ];
             
-            // Map role IDs back to role names for session
-            $roleIdToName = [
-                1 => 'candidate',
-                2 => 'member',
-                3 => 'head',
-                4 => 'board_finance',
-                5 => 'board_internal',
-                6 => 'board_external',
-                7 => 'alumni',
-                8 => 'alumni_board',
-                9 => 'alumni_auditor',
-                10 => 'honorary_member'
+            // Define role hierarchy for priority selection (higher value = higher priority)
+            $roleHierarchy = [
+                'candidate' => 1,
+                'member' => 2,
+                'head' => 3,
+                'alumni' => 4,
+                'honorary_member' => 5,
+                'board_finance' => 6,
+                'board_internal' => 7,
+                'board_external' => 8,
+                'alumni_board' => 9,
+                'alumni_auditor' => 10
             ];
             
-            // Find the role with the highest ID (priority)
-            $highestRoleId = 0;
+            // Find the role with the highest priority
+            $highestPriority = 0;
+            $selectedRole = 'member'; // Default to member if no valid role found
+            
             foreach ($azureRoles as $azureRole) {
                 if (isset($roleMapping[$azureRole])) {
-                    $roleId = $roleMapping[$azureRole];
-                    if ($roleId > $highestRoleId) {
-                        $highestRoleId = $roleId;
+                    $internalRole = $roleMapping[$azureRole];
+                    $priority = $roleHierarchy[$internalRole] ?? 0;
+                    
+                    if ($priority > $highestPriority) {
+                        $highestPriority = $priority;
+                        $selectedRole = $internalRole;
                     }
                 }
             }
             
-            // If no valid role found, default to member (ID 2)
-            if ($highestRoleId === 0) {
-                $highestRoleId = 2; // member
-            }
-            
-            // Get the role name from the ID
-            $roleName = $roleIdToName[$highestRoleId] ?? 'member';
+            $roleName = $selectedRole;
             
             // Get user email
             $email = $user->getEmail();
