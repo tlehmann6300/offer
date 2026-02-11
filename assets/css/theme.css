@@ -75,6 +75,10 @@
     --bg-tertiary: #374151;
     --text-primary: #f3f4f6;
     --text-secondary: #9ca3af;
+    
+    /* Enhanced Dark Mode Shadows for depth */
+    --shadow-premium: 0 20px 40px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.3);
+    --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Force Overrides - The 'Hammer' to overwrite Tailwind defaults */
