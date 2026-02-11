@@ -528,10 +528,10 @@ class MailService {
             'alumni_board' => 'Alumni-Vorstand',
             'alumni_auditor' => 'Alumni-Finanzprüfer',
             'manager' => 'Ressortleiter',
+            'head' => 'Ressortleiter',
             'member' => 'Mitglied',
             'alumni' => 'Alumni',
-            'candidate' => 'Anwärter',
-            'head' => 'Ressortleiter'
+            'candidate' => 'Anwärter'
         ];
         $roleDisplay = $roleNames[$role] ?? ucfirst($role);
         

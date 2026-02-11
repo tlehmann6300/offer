@@ -221,7 +221,7 @@ class Member {
             if ($currentUser['id'] !== $userId) {
                 throw new Exception("Keine Berechtigung zum Aktualisieren anderer Mitgliederprofile");
             }
-        } elseif (!in_array($currentRole, ['board_finance', 'board_internal', 'board_external', 'head'])) {
+        } elseif (!in_array($currentRole, array_merge(Auth::BOARD_ROLES, ['head']))) {
             throw new Exception("Keine Berechtigung zum Aktualisieren des Mitgliederprofils");
         }
         

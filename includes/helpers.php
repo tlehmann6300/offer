@@ -127,13 +127,15 @@ function translateRole($role) {
  * Check if role is an active member role
  * Active member roles: candidate, member, head, board (and board variants)
  * 
- * Note: This includes all board role variants (board_finance, board_internal, board_external)
- * to match the Member::ACTIVE_ROLES constant.
+ * Note: This matches Auth::BOARD_ROLES plus candidate, member, head.
+ * Keep this in sync with Member::ACTIVE_ROLES constant.
  * 
  * @param string $role Role identifier
  * @return bool True if role is an active member role
  */
 function isMemberRole($role) {
+    // Active roles: board roles + candidate, member, head
+    // Matches Member::ACTIVE_ROLES constant
     return in_array($role, ['candidate', 'member', 'head', 'board_finance', 'board_internal', 'board_external']);
 }
 

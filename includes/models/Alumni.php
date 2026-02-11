@@ -128,7 +128,7 @@ class Alumni extends Database {
             if ($currentUser['id'] !== $userId) {
                 throw new Exception("Keine Berechtigung zum Aktualisieren anderer Alumni-Profile");
             }
-        } elseif (!in_array($currentRole, ['alumni_board', 'alumni_auditor', 'board_finance', 'board_internal', 'board_external'])) {
+        } elseif (!in_array($currentRole, array_merge(Auth::BOARD_ROLES, ['alumni_board', 'alumni_auditor']))) {
             throw new Exception("Keine Berechtigung zum Aktualisieren des Alumni-Profils");
         }
         

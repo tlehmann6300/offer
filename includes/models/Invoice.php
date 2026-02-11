@@ -252,7 +252,7 @@ class Invoice {
         $db = Database::getConnection('rech');
         
         // Board roles (board_finance, board_internal, board_external), alumni_board, and alumni_auditor see all invoices
-        if (in_array($userRole, ['board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor'])) {
+        if (in_array($userRole, array_merge(Auth::BOARD_ROLES, ['alumni_board', 'alumni_auditor']))) {
             // Join with users table from user database
             $userDb = Database::getUserDB();
             
