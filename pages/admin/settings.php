@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/../../src/Auth.php';
 
-if (!Auth::check() || !Auth::hasPermission('board')) {
-    header('Location: ../auth/login.php');
+if (!Auth::isBoard()) {
+    header('Location: /index.php');
     exit;
 }
 
