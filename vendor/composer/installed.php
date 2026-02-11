@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => '__root__',
-        'pretty_version' => 'dev-copilot/fix-default-scopes-return-type',
-        'version' => 'dev-copilot/fix-default-scopes-return-type',
-        'reference' => '4ffa88c28a3dbe3b85738f8779732c8efa5d88e4',
+        'pretty_version' => 'dev-copilot/fix-login-authentication-error',
+        'version' => 'dev-copilot/fix-login-authentication-error',
+        'reference' => '59176f97bfd5b411ffdaec1fd93e75aa421f777a',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => 'dev-copilot/fix-default-scopes-return-type',
-            'version' => 'dev-copilot/fix-default-scopes-return-type',
-            'reference' => '4ffa88c28a3dbe3b85738f8779732c8efa5d88e4',
+            'pretty_version' => 'dev-copilot/fix-login-authentication-error',
+            'version' => 'dev-copilot/fix-login-authentication-error',
+            'reference' => '59176f97bfd5b411ffdaec1fd93e75aa421f777a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
