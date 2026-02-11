@@ -154,10 +154,14 @@ class EasyVereinSync {
         try {
             // Generate unique local filename
             $extension = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION);
-            if (!$extension) {
-                $extension = 'jpg'; // Default extension
+            
+            // Validate extension - only allow common image formats
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            if (!$extension || !in_array(strtolower($extension), $allowedExtensions)) {
+                $extension = 'jpg'; // Default to jpg for safety
             }
-            $localFilename = 'item_' . $easyvereinId . '.' . $extension;
+            
+            $localFilename = 'item_' . $easyvereinId . '.' . strtolower($extension);
             $uploadDir = __DIR__ . '/../../uploads/inventory/';
             $localPath = $uploadDir . $localFilename;
             
@@ -261,8 +265,15 @@ class EasyVereinSync {
                     $unitPrice = $evItem['price'] ?? $evItem['unit_price'] ?? 0;
                     $serialNumber = $evItem['serial_number'] ?? $evItem['SerialNumber'] ?? null;
                     
-                    // Debug: Log raw API item data to identify image field
-                    error_log('EasyVerein API Item Data: ' . json_encode($evItem));
+                    // Debug: Log relevant API item data to identify image field (sanitized)
+                    error_log('EasyVerein API Item ID: ' . ($easyvereinId ?? 'unknown') . 
+                             ' - Fields: ' . json_encode([
+                                 'name' => $name,
+                                 'has_image' => isset($evItem['image']),
+                                 'has_avatar' => isset($evItem['avatar']),
+                                 'has_image_path' => isset($evItem['image_path']),
+                                 'has_custom_fields' => isset($evItem['custom_fields'])
+                             ]));
                     
                     // Process inventory item and handle image download
                     $imagePath = $this->processInventoryItem($evItem, $easyvereinId);
