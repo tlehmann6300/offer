@@ -17,11 +17,10 @@ class Auth {
         'head',
         'alumni',
         'alumni_board',
-        'alumni_finanzprufer',
-        'board',
-        'vorstand_intern',
-        'vorstand_extern',
-        'vorstand_finanzen_recht',
+        'alumni_auditor',
+        'board_finance',
+        'board_internal',
+        'board_external',
         'honorary_member'
     ];
     
@@ -29,10 +28,9 @@ class Auth {
      * Board role types (all variants)
      */
     const BOARD_ROLES = [
-        'board',
-        'vorstand_intern',
-        'vorstand_extern',
-        'vorstand_finanzen_recht'
+        'board_finance',
+        'board_internal',
+        'board_external'
     ];
     
 
@@ -264,6 +262,62 @@ class Auth {
     }
     
     /**
+     * Check if user is admin (board_finance has full system access)
+     * 
+     * @return bool True if user is board_finance
+     */
+    public static function isAdmin() {
+        if (!self::check()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        return $userRole === 'board_finance';
+    }
+    
+    /**
+     * Check if user is a board member (any board role)
+     * 
+     * @return bool True if user has any board role (board_finance, board_internal, board_external)
+     */
+    public static function isBoard() {
+        if (!self::check()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        return in_array($userRole, self::BOARD_ROLES);
+    }
+    
+    /**
+     * Check if user can manage invoices
+     * 
+     * @return bool True if user is board_finance
+     */
+    public static function canManageInvoices() {
+        if (!self::check()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        return $userRole === 'board_finance';
+    }
+    
+    /**
+     * Check if user can manage users
+     * 
+     * @return bool True if user has any board role
+     */
+    public static function canManageUsers() {
+        if (!self::check()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        return in_array($userRole, self::BOARD_ROLES);
+    }
+    
+    /**
      * Check if user has specific permission/role
      * 
      * @param string $role Required role
@@ -286,11 +340,10 @@ class Auth {
             'manager' => 2,
             'manage_projects' => 2,  // Permission for manager-level project access
             'alumni_board' => 3,
-            'alumni_finanzprufer' => 3,
-            'board' => 3,
-            'vorstand_intern' => 3,
-            'vorstand_extern' => 3,
-            'vorstand_finanzen_recht' => 3,
+            'alumni_auditor' => 3,  // Same level as alumni_board
+            'board_finance' => 3,
+            'board_internal' => 3,
+            'board_external' => 3,
             'admin' => 3  // Keep for backward compatibility, treat as board level
         ];
         
@@ -319,11 +372,11 @@ class Auth {
         
         // Define page access permissions
         $pagePermissions = [
-            'members' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate'],
-            'invoices' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni', 'alumni_board', 'alumni_finanzprufer', 'honorary_member'],
-            'ideas' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'member', 'candidate', 'head'],
-            'training_requests' => ['alumni', 'alumni_board', 'alumni_finanzprufer'],
-            'polls' => ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'head', 'member', 'candidate', 'alumni', 'alumni_board', 'alumni_finanzprufer', 'honorary_member']
+            'members' => ['board_finance', 'board_internal', 'board_external', 'head', 'member', 'candidate'],
+            'invoices' => ['board_finance', 'board_internal', 'board_external', 'alumni', 'alumni_board', 'alumni_auditor', 'honorary_member'],
+            'ideas' => ['board_finance', 'board_internal', 'board_external', 'member', 'candidate', 'head'],
+            'training_requests' => ['alumni', 'alumni_board', 'alumni_auditor'],
+            'polls' => ['board_finance', 'board_internal', 'board_external', 'head', 'member', 'candidate', 'alumni', 'alumni_board', 'alumni_auditor', 'honorary_member']
         ];
         
         // Check if page exists in permissions map
