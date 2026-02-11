@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_rental'])) {
         exit;
     }
     
-    if ($item['current_stock'] < $amount) {
+    if ($item['quantity'] < $amount) {
         $_SESSION['rental_error'] = 'Nicht genügend Bestand verfügbar';
         header('Location: view.php?id=' . $itemId);
         exit;
@@ -67,8 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_rental'])) {
         ]);
         
         // Update inventory stock
-        $newStock = $item['current_stock'] - $amount;
-        $stmt = $db->prepare("UPDATE inventory_items SET current_stock = ? WHERE id = ?");
+        $newStock = $item['quantity'] - $amount;
+        $stmt = $db->prepare("UPDATE inventory_items SET quantity = ? WHERE id = ?");
         $stmt->execute([$newStock, $itemId]);
         
         // Log the change
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_rental'])) {
             $itemId,
             $_SESSION['user_id'],
             'checkout',
-            $item['current_stock'],
+            $item['quantity'],
             $newStock,
             -$amount,
             'Ausgeliehen',
@@ -114,9 +114,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['return_rental'])) {
         
         // Get rental details
         $stmt = $db->prepare("
-            SELECT r.*, i.current_stock, i.name as item_name
+            SELECT r.*, i.quantity, i.name as item_name
             FROM rentals r
-            JOIN inventory i ON r.item_id = i.id
+            JOIN inventory_items i ON r.item_id = i.id
             WHERE r.id = ? AND r.user_id = ? AND r.status = 'active'
         ");
         $stmt->execute([$rentalId, $_SESSION['user_id']]);
@@ -146,9 +146,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['return_rental'])) {
         
         // Update inventory stock (only add back if not defective)
         $returnAmount = $isDefective ? 0 : $rental['amount'];
-        $newStock = $rental['current_stock'] + $returnAmount;
+        $newStock = $rental['quantity'] + $returnAmount;
         
-        $stmt = $db->prepare("UPDATE inventory_items SET current_stock = ? WHERE id = ?");
+        $stmt = $db->prepare("UPDATE inventory_items SET quantity = ? WHERE id = ?");
         $stmt->execute([$newStock, $rental['item_id']]);
         
         // Log the change
@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['return_rental'])) {
             $rental['item_id'],
             $_SESSION['user_id'],
             $changeType,
-            $rental['current_stock'],
+            $rental['quantity'],
             $newStock,
             $returnAmount,
             $reason,
