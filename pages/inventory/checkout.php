@@ -84,8 +84,8 @@ ob_start();
                 </div>
                 <div class="text-right">
                     <p class="text-sm text-gray-500">Verfügbarer Bestand</p>
-                    <p class="text-2xl font-bold <?php echo $item['current_stock'] <= $item['min_stock'] && $item['min_stock'] > 0 ? 'text-red-600' : 'text-gray-800'; ?>">
-                        <?php echo $item['current_stock']; ?> <?php echo htmlspecialchars($item['unit']); ?>
+                    <p class="text-2xl font-bold <?php echo $item['available_quantity'] <= $item['min_stock'] && $item['min_stock'] > 0 ? 'text-red-600' : 'text-gray-800'; ?>">
+                        <?php echo $item['available_quantity']; ?> <?php echo htmlspecialchars($item['unit']); ?>
                     </p>
                 </div>
             </div>
@@ -104,13 +104,13 @@ ob_start();
                     type="number" 
                     name="quantity" 
                     min="1" 
-                    max="<?php echo $item['current_stock']; ?>"
+                    max="<?php echo $item['available_quantity']; ?>"
                     required 
                     class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Anzahl der auszuleihenden Artikel"
                 >
                 <p class="text-xs text-gray-500 mt-1">
-                    Maximal verfügbar: <?php echo $item['current_stock']; ?> <?php echo htmlspecialchars($item['unit']); ?>
+                    Maximal verfügbar: <?php echo $item['available_quantity']; ?> <?php echo htmlspecialchars($item['unit']); ?>
                 </p>
             </div>
 

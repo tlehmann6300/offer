@@ -341,8 +341,8 @@ ob_start();
 </div>
 
 <!-- Warning Notice -->
-<div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-    <p class="text-yellow-800 text-sm">
+<div class="mt-6 bg-yellow-400 border-4 border-yellow-600 rounded-lg p-4">
+    <p class="text-gray-900 font-bold text-sm">
         <i class="fas fa-exclamation-triangle mr-2"></i>
         <strong>Hinweis:</strong> Wartungsaktionen können nicht rückgängig gemacht werden. Stelle sicher, dass Du vor dem Bereinigen wichtiger Daten ein Backup erstellt hast.
     </p>
