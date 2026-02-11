@@ -336,8 +336,8 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <span>Blog</span>
                 </a>
 
-                <!-- Rechnungen (Board roles, Alumni, Alumni-Board, Honorary Member) -->
-                <?php if (Auth::canAccessPage('invoices')): ?>
+                <!-- Rechnungen (Only board_finance) -->
+                <?php if (Auth::canManageInvoices()): ?>
                 <a href="<?php echo asset('pages/invoices/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/invoices/') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-file-invoice-dollar w-5 mr-3"></i>
@@ -372,8 +372,8 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </a>
                 <?php endif; ?>
 
-                <!-- Benutzer (Board roles ONLY) -->
-                <?php if (Auth::isBoardMember()): ?>
+                <!-- Benutzer (All board members who can manage users) -->
+                <?php if (Auth::canManageUsers()): ?>
                 <a href="<?php echo asset('pages/admin/users.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/admin/users.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-users-cog w-5 mr-3"></i>
@@ -381,8 +381,8 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </a>
                 <?php endif; ?>
 
-                <!-- Einstellungen (Board roles ONLY) -->
-                <?php if (Auth::isBoardMember()): ?>
+                <!-- Einstellungen (All board members who can manage users) -->
+                <?php if (Auth::canManageUsers()): ?>
                 <a href="<?php echo asset('pages/auth/settings.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/auth/settings.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-cog w-5 mr-3"></i>
@@ -390,8 +390,8 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 </a>
                 <?php endif; ?>
 
-                <!-- Statistiken (Board roles ONLY) -->
-                <?php if (Auth::isBoardMember()): ?>
+                <!-- Statistiken (All board members who can manage users) -->
+                <?php if (Auth::canManageUsers()): ?>
                 <a href="<?php echo asset('pages/admin/stats.php'); ?>" 
                    class="flex items-center px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 <?php echo isActivePath('/admin/stats.php') ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : ''; ?>">
                     <i class="fas fa-chart-bar w-5 mr-3"></i>
