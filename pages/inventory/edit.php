@@ -148,7 +148,7 @@ ob_start();
             <i class="fas fa-edit text-purple-600 mr-2"></i>
             Artikel bearbeiten
         </h1>
-        <?php if (Auth::hasPermission('admin')): ?>
+        <?php if (Auth::hasPermission('board')): ?>
         <button onclick="confirmDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
             <i class="fas fa-trash mr-2"></i>Löschen
         </button>

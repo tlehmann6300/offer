@@ -19,7 +19,7 @@ $user = Auth::user();
 $userRole = $user['role'] ?? '';
 
 // Check if user has permission to submit invoices
-$allowedRoles = ['admin', 'board', 'alumni_board', 'head'];
+$allowedRoles = ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni_board', 'alumni_finanzprufer', 'head'];
 if (!in_array($userRole, $allowedRoles)) {
     $_SESSION['error_message'] = 'Keine Berechtigung';
     header('Location: ' . asset('pages/dashboard/index.php'));

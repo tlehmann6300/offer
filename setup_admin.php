@@ -85,7 +85,7 @@ try {
                 $lastName, 
                 $adminEmail, 
                 'IBC e.V.', 
-                'Administrator', 
+                'Vorstand', 
                 'Vereinsmanagement'
             ]);
             

@@ -39,8 +39,8 @@ if ($filter === 'my_registrations') {
         return in_array($event['id'], $myEventIds);
     });
 } else {
-    // Hide past events for normal users (non-admin)
-    if (!in_array($userRole, ['admin', 'board', 'alumni_board', 'manager'])) {
+    // Hide past events for normal users (non-board)
+    if (!in_array($userRole, ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni_board', 'alumni_finanzprufer', 'manager'])) {
         $events = array_filter($events, function($event) use ($now) {
             return $event['end_time'] >= $now;
         });

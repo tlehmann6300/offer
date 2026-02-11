@@ -522,9 +522,9 @@ class MailService {
         
         // Build body content
         $roleNames = [
-            'admin' => 'Administrator',
             'board' => 'Vorstand',
             'alumni_board' => 'Alumni-Vorstand',
+            'alumni_finanzprufer' => 'Alumni-Finanzprüfer',
             'manager' => 'Ressortleiter',
             'member' => 'Mitglied',
             'alumni' => 'Alumni',
@@ -539,7 +539,7 @@ class MailService {
         // Create call-to-action button
         $callToAction = '<a href="' . htmlspecialchars($registrationLink) . '" class="button">Jetzt registrieren</a>';
         
-        $bodyContent .= '<p class="email-text" style="margin-top: 20px; font-size: 14px; color: #6b7280;">Dieser Einladungslink ist nur einmal verwendbar. Falls du Probleme beim Registrieren hast, wende dich bitte an den Administrator.</p>';
+        $bodyContent .= '<p class="email-text" style="margin-top: 20px; font-size: 14px; color: #6b7280;">Dieser Einladungslink ist nur einmal verwendbar. Falls du Probleme beim Registrieren hast, wende dich bitte an den Vorstand.</p>';
         
         // Get complete HTML template
         $htmlBody = self::getTemplate('Einladung zum IBC Intranet', $bodyContent, $callToAction);

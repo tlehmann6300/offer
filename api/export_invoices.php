@@ -17,8 +17,8 @@ if (!Auth::check()) {
 $user = Auth::user();
 $userRole = $user['role'] ?? '';
 
-// Only board and alumni_board members can export invoices
-if (!in_array($userRole, ['admin', 'board', 'alumni_board'])) {
+// Only board, alumni_board, and alumni_finanzprufer members can export invoices
+if (!in_array($userRole, ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht', 'alumni_board', 'alumni_finanzprufer'])) {
     header('Location: ../pages/dashboard/index.php');
     exit;
 }

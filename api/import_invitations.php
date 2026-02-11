@@ -2,7 +2,7 @@
 /**
  * API: Import Invitations from JSON
  * Bulk import invitations from uploaded JSON file
- * Required permissions: board or admin
+ * Required permissions: board
  */
 
 require_once __DIR__ . '/../includes/handlers/AuthHandler.php';
@@ -19,7 +19,7 @@ header('Content-Type: application/json');
 if (!AuthHandler::isAuthenticated() || !AuthHandler::hasPermission('board')) {
     echo json_encode([
         'success' => false,
-        'message' => 'Nicht autorisiert. Nur Vorstände und Administratoren können Einladungen importieren.'
+        'message' => 'Nicht autorisiert. Nur Vorstände können Einladungen importieren.'
     ]);
     exit;
 }
@@ -116,7 +116,7 @@ foreach ($invitations as $index => $invitation) {
     }
     
     // Validate role
-    if (!in_array($role, ['member', 'alumni', 'manager', 'alumni_board', 'board', 'admin'])) {
+    if (!in_array($role, ['member', 'alumni', 'manager', 'alumni_board', 'alumni_finanzprufer', 'board'])) {
         $failedCount++;
         $errors[] = "Zeile " . ($index + 1) . ": Ungültige Rolle: " . htmlspecialchars($role);
         continue;

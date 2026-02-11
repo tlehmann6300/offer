@@ -23,7 +23,7 @@ try {
 if (!AuthHandler::isAuthenticated() || !AuthHandler::hasPermission('board')) {
     echo json_encode([
         'success' => false,
-        'message' => 'Nicht autorisiert. Nur Vorstände und Administratoren können Einladungen erstellen.'
+        'message' => 'Nicht autorisiert. Nur Vorstände können Einladungen erstellen.'
     ]);
     exit;
 }
@@ -60,7 +60,7 @@ if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
-if (!in_array($role, ['member', 'alumni', 'manager', 'alumni_board', 'board', 'admin'])) {
+if (!in_array($role, ['member', 'alumni', 'manager', 'alumni_board', 'alumni_finanzprufer', 'board'])) {
     echo json_encode([
         'success' => false,
         'message' => 'Ungültige Rolle'

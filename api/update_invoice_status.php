@@ -21,7 +21,7 @@ $user = Auth::user();
 $userRole = $user['role'] ?? '';
 
 // Only board members can update invoice status
-if (!in_array($userRole, ['admin', 'board'])) {
+if (!in_array($userRole, ['board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht'])) {
     http_response_code(403);
     echo json_encode(['success' => false, 'error' => 'Keine Berechtigung']);
     exit;

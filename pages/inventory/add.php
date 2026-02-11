@@ -9,8 +9,8 @@ if (!Auth::check() || !Auth::hasPermission('manager')) {
     exit;
 }
 
-// Check if user is admin (can bypass sync requirement)
-$isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
+// Check if user is board member (can bypass sync requirement for backward compatibility)
+$isAdmin = isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'board', 'vorstand_intern', 'vorstand_extern', 'vorstand_finanzen_recht']);
 
 $message = '';
 $error = '';
@@ -134,7 +134,7 @@ ob_start();
     <p class="text-gray-600 mb-6">
         <?php if ($isAdmin): ?>
             Erstellen Sie einen neuen Artikel im Inventar
-            <span class="text-yellow-600 font-semibold">(Administrator-Bypass aktiv)</span>
+            <span class="text-yellow-600 font-semibold">(Vorstand-Bypass aktiv)</span>
         <?php else: ?>
             Formular ist deaktiviert - Neue Artikel müssen über EasyVerein synchronisiert werden
         <?php endif; ?>
