@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Light Mode Design Demo - IBC Intranet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .demo-section {
+            margin-bottom: 3rem;
+        }
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .demo-header {
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-header">
+        <h1 style="color: var(--ibc-blue); margin-bottom: 0.5rem;">
+            <i class="fas fa-palette"></i> Light Mode Design Showcase
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.1rem;">
+            Impressive and Perfect Design Enhancement ✨
+        </p>
+    </div>
+
+    <!-- Cards Section -->
+    <div class="demo-section">
+        <h2 style="color: var(--ibc-green); margin-bottom: 1rem;">
+            <i class="fas fa-layer-group"></i> Enhanced Cards with Gradients
+        </h2>
+        <div class="demo-grid">
+            <div class="card" style="padding: 2rem;">
+                <h3 style="margin-top: 0; color: var(--ibc-blue);">
+                    <i class="fas fa-star"></i> Standard Card
+                </h3>
+                <p style="color: var(--text-muted);">
+                    Subtle gradient background with animated top border on hover. 
+                    Inner glow effect adds depth.
+                </p>
+                <div style="margin-top: 1rem;">
+                    <span class="status-indicator status-success"></span>
+                    <span style="margin-left: 0.5rem; color: var(--text-muted);">Active Status</span>
+                </div>
+            </div>
+
+            <div class="card card-elevated" style="padding: 2rem;">
+                <h3 style="margin-top: 0; color: var(--ibc-green);">
+                    <i class="fas fa-gem"></i> Elevated Card
+                </h3>
+                <p style="color: var(--text-muted);">
+                    Premium card with enhanced shadows and animated gradient border on hover.
+                </p>
+                <div style="margin-top: 1rem;">
+                    <span class="status-indicator status-info"></span>
+                    <span style="margin-left: 0.5rem; color: var(--text-muted);">Premium Feature</span>
+                </div>
+            </div>
+
+            <div class="card glass-effect" style="padding: 2rem;">
+                <h3 style="margin-top: 0; color: var(--ibc-accent);">
+                    <i class="fas fa-magic"></i> Glass Effect
+                </h3>
+                <p style="color: var(--text-muted);">
+                    Glassmorphism design with backdrop blur and subtle transparency.
+                </p>
+                <div style="margin-top: 1rem;">
+                    <span class="status-indicator status-warning"></span>
+                    <span style="margin-left: 0.5rem; color: var(--text-muted);">Special Effect</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buttons Section -->
+    <div class="demo-section">
+        <h2 style="color: var(--ibc-green); margin-bottom: 1rem;">
+            <i class="fas fa-hand-pointer"></i> Interactive Buttons
+        </h2>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button class="btn-primary">
+                <i class="fas fa-rocket"></i> Primary Action
+            </button>
+            <button class="btn-primary">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+            <button class="btn-primary">
+                <i class="fas fa-download"></i> Download
+            </button>
+        </div>
+        <p style="color: var(--text-muted); margin-top: 1rem; font-size: 0.9rem;">
+            <i class="fas fa-info-circle"></i> Click buttons to see ripple effect!
+        </p>
+    </div>
+
+    <!-- Links Section -->
+    <div class="demo-section">
+        <h2 style="color: var(--ibc-green); margin-bottom: 1rem;">
+            <i class="fas fa-link"></i> Animated Links
+        </h2>
+        <div class="card" style="padding: 2rem;">
+            <p style="line-height: 1.8;">
+                Hover over these links to see the animated underline effect: 
+                <a href="#">Dashboard</a>, 
+                <a href="#">Projects</a>, 
+                <a href="#">Team Members</a>, 
+                <a href="#">Settings</a>.
+            </p>
+            <p style="line-height: 1.8; margin-top: 1rem;">
+                The underline slides in smoothly with a gradient color from 
+                <a href="#">IBC Blue to IBC Green</a> creating a premium feel.
+            </p>
+        </div>
+    </div>
+
+    <!-- Forms Section -->
+    <div class="demo-section">
+        <h2 style="color: var(--ibc-green); margin-bottom: 1rem;">
+            <i class="fas fa-keyboard"></i> Enhanced Form Inputs
+        </h2>
+        <div class="card" style="padding: 2rem;">
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-main);">
+                    Name
+                </label>
+                <input type="text" placeholder="Enter your name..." style="width: 100%; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-main);">
+                    Email Address
+                </label>
+                <input type="email" placeholder="your.email@example.com" style="width: 100%; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-main);">
+                    Message
+                </label>
+                <textarea placeholder="Your message here..." rows="4" style="width: 100%; box-sizing: border-box;"></textarea>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                <i class="fas fa-info-circle"></i> Click on inputs to see the enhanced focus glow effect!
+            </p>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="demo-section">
+        <h2 style="color: var(--ibc-green); margin-bottom: 1rem;">
+            <i class="fas fa-table"></i> Enhanced Tables
+        </h2>
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <table style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">Project</th>
+                        <th style="text-align: left;">Status</th>
+                        <th style="text-align: left;">Priority</th>
+                        <th style="text-align: right;">Progress</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Website Redesign</strong></td>
+                        <td>
+                            <span class="status-indicator status-success"></span>
+                            <span style="margin-left: 0.5rem;">Active</span>
+                        </td>
+                        <td><span style="color: var(--ibc-green); font-weight: 600;">High</span></td>
+                        <td style="text-align: right;">85%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mobile App</strong></td>
+                        <td>
+                            <span class="status-indicator status-warning"></span>
+                            <span style="margin-left: 0.5rem;">In Review</span>
+                        </td>
+                        <td><span style="color: var(--ibc-warning); font-weight: 600;">Medium</span></td>
+                        <td style="text-align: right;">60%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>API Integration</strong></td>
+                        <td>
+                            <span class="status-indicator status-info"></span>
+                            <span style="margin-left: 0.5rem;">Planning</span>
+                        </td>
+                        <td><span style="color: var(--ibc-blue); font-weight: 600;">Low</span></td>
+                        <td style="text-align: right;">25%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Database Optimization</strong></td>
+                        <td>
+                            <span class="status-indicator status-error"></span>
+                            <span style="margin-left: 0.5rem;">Blocked</span>
+                        </td>
+                        <td><span style="color: var(--ibc-error); font-weight: 600;">High</span></td>
+                        <td style="text-align: right;">10%</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem 2rem;">
+                <i class="fas fa-info-circle"></i> Hover over rows to see the gradient animation effect!
+            </p>
+        </div>
+    </div>
+
+    <!-- Staggered List Section -->
+    <div class="demo-section">
+        <h2 style="color: var(--ibc-green); margin-bottom: 1rem;">
+            <i class="fas fa-list"></i> Staggered List Animation
+        </h2>
+        <div class="staggered-list" style="display: grid; gap: 1rem;">
+            <div class="card" style="padding: 1.5rem;">
+                <h3 style="margin: 0 0 0.5rem 0; color: var(--ibc-blue);">
+                    <i class="fas fa-check-circle" style="color: var(--ibc-success);"></i> Feature One
+                </h3>
+                <p style="margin: 0; color: var(--text-muted);">Subtle gradient backgrounds on all cards</p>
+            </div>
+            <div class="card" style="padding: 1.5rem;">
+                <h3 style="margin: 0 0 0.5rem 0; color: var(--ibc-blue);">
+                    <i class="fas fa-check-circle" style="color: var(--ibc-success);"></i> Feature Two
+                </h3>
+                <p style="margin: 0; color: var(--text-muted);">Animated gradient borders on hover</p>
+            </div>
+            <div class="card" style="padding: 1.5rem;">
+                <h3 style="margin: 0 0 0.5rem 0; color: var(--ibc-blue);">
+                    <i class="fas fa-check-circle" style="color: var(--ibc-success);"></i> Feature Three
+                </h3>
+                <p style="margin: 0; color: var(--text-muted);">Ripple click effects on buttons</p>
+            </div>
+            <div class="card" style="padding: 1.5rem;">
+                <h3 style="margin: 0 0 0.5rem 0; color: var(--ibc-blue);">
+                    <i class="fas fa-check-circle" style="color: var(--ibc-success);"></i> Feature Four
+                </h3>
+                <p style="margin: 0; color: var(--text-muted);">Sliding underline animations on links</p>
+            </div>
+            <div class="card" style="padding: 1.5rem;">
+                <h3 style="margin: 0 0 0.5rem 0; color: var(--ibc-blue);">
+                    <i class="fas fa-check-circle" style="color: var(--ibc-success);"></i> Feature Five
+                </h3>
+                <p style="margin: 0; color: var(--text-muted);">Enhanced focus states with glowing effects</p>
+            </div>
+        </div>
+        <p style="color: var(--text-muted); margin-top: 1rem; font-size: 0.9rem;">
+            <i class="fas fa-info-circle"></i> Items fade in with staggered delays for a smooth entrance!
+        </p>
+    </div>
+
+    <!-- Status Indicators -->
+    <div class="demo-section">
+        <h2 style="color: var(--ibc-green); margin-bottom: 1rem;">
+            <i class="fas fa-circle"></i> Pulsing Status Indicators
+        </h2>
+        <div class="card" style="padding: 2rem;">
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span class="status-indicator status-success"></span>
+                    <span style="font-weight: 600;">Success</span>
+                    <span style="color: var(--text-muted);">- System operational</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span class="status-indicator status-info"></span>
+                    <span style="font-weight: 600;">Info</span>
+                    <span style="color: var(--text-muted);">- New updates available</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span class="status-indicator status-warning"></span>
+                    <span style="font-weight: 600;">Warning</span>
+                    <span style="color: var(--text-muted);">- Action required soon</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span class="status-indicator status-error"></span>
+                    <span style="font-weight: 600;">Error</span>
+                    <span style="color: var(--text-muted);">- Critical issue detected</span>
+                </div>
+            </div>
+            <p style="color: var(--text-muted); margin-top: 1.5rem; font-size: 0.9rem;">
+                <i class="fas fa-info-circle"></i> Status indicators pulse with a glowing effect!
+            </p>
+        </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="demo-section">
+        <div class="card card-elevated" style="padding: 2rem; background: linear-gradient(135deg, var(--ibc-green) 0%, var(--ibc-blue) 100%); color: white;">
+            <h2 style="margin-top: 0; color: white;">
+                <i class="fas fa-trophy"></i> Light Mode Enhancement Summary
+            </h2>
+            <ul style="line-height: 2; list-style-type: none; padding-left: 0;">
+                <li><i class="fas fa-check" style="color: #fff;"></i> Subtle gradient backgrounds for depth</li>
+                <li><i class="fas fa-check" style="color: #fff;"></i> Glassmorphism effects for premium feel</li>
+                <li><i class="fas fa-check" style="color: #fff;"></i> Animated gradient borders on hover</li>
+                <li><i class="fas fa-check" style="color: #fff;"></i> Ripple click effects on buttons</li>
+                <li><i class="fas fa-check" style="color: #fff;"></i> Sliding underline animations on links</li>
+                <li><i class="fas fa-check" style="color: #fff;"></i> Enhanced focus states with glow</li>
+                <li><i class="fas fa-check" style="color: #fff;"></i> Pulsing status indicators</li>
+                <li><i class="fas fa-check" style="color: #fff;"></i> Staggered list animations</li>
+                <li><i class="fas fa-check" style="color: #fff;"></i> Premium table hover effects</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
