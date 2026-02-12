@@ -41,12 +41,28 @@ require_once __DIR__ . '/../helpers.php';
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Advanced Animated Gradient Background */
         body {
-            background: linear-gradient(135deg, #0a1628 0%, #0d2137 30%, #0f172a 60%, #162033 100%);
+            background: linear-gradient(135deg, 
+                #0a1628 0%, 
+                #0d2137 25%, 
+                #0f172a 50%, 
+                #162033 75%,
+                #1a1f3a 100%
+            );
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
+            animation: gradientShift 20s ease infinite;
+            background-size: 200% 200%;
         }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        /* Enhanced Glowing Orbs with Pulsing */
         body::before {
             content: '';
             position: absolute;
@@ -54,9 +70,11 @@ require_once __DIR__ . '/../helpers.php';
             right: -30%;
             width: 80%;
             height: 100%;
-            background: radial-gradient(circle, rgba(0, 166, 81, 0.08) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 166, 81, 0.15) 0%, rgba(0, 166, 81, 0.05) 40%, transparent 70%);
             pointer-events: none;
+            animation: pulse 8s ease-in-out infinite;
         }
+        
         body::after {
             content: '';
             position: absolute;
@@ -64,43 +82,166 @@ require_once __DIR__ . '/../helpers.php';
             left: -20%;
             width: 60%;
             height: 80%;
-            background: radial-gradient(circle, rgba(0, 102, 179, 0.08) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 102, 179, 0.15) 0%, rgba(0, 102, 179, 0.05) 40%, transparent 70%);
+            pointer-events: none;
+            animation: pulse 8s ease-in-out infinite;
+            animation-delay: -4s;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+        }
+        
+        /* Premium Glassmorphism Card */
+        .auth-card {
+            background: linear-gradient(145deg, 
+                rgba(255, 255, 255, 0.08) 0%, 
+                rgba(255, 255, 255, 0.04) 50%,
+                rgba(255, 255, 255, 0.06) 100%
+            );
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            border-radius: 28px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                0 30px 60px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: cardEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes cardEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        /* Shimmer Effect on Card */
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.03) 50%,
+                transparent 70%
+            );
+            animation: shimmer 6s ease-in-out infinite;
             pointer-events: none;
         }
-        .auth-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
+        
         .auth-card .bg-white {
-            background: rgba(255, 255, 255, 0.95) !important;
-            border-radius: 20px !important;
+            background: rgba(255, 255, 255, 0.98) !important;
+            border-radius: 24px !important;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
         }
-        .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-        }
+        
+        /* Enhanced Floating Elements with 3D Effect */
         .floating-dot {
             position: absolute;
             border-radius: 50%;
-            opacity: 0.15;
-            animation: float 15s ease-in-out infinite;
+            opacity: 0.18;
+            animation: float3D 20s ease-in-out infinite;
             will-change: transform;
+            filter: blur(40px);
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            33% { transform: translateY(-20px) rotate(120deg); }
-            66% { transform: translateY(10px) rotate(240deg); }
+        
+        .delay-0 { animation-delay: 0s; }
+        .delay-3 { animation-delay: -3s; }
+        .delay-7 { animation-delay: -7s; }
+        .delay-14 { animation-delay: -14s; }
+        
+        @keyframes float3D {
+            0%, 100% { 
+                transform: translate(0, 0) scale(1) rotate(0deg);
+            }
+            25% { 
+                transform: translate(30px, -40px) scale(1.1) rotate(90deg);
+            }
+            50% { 
+                transform: translate(-20px, 20px) scale(0.9) rotate(180deg);
+            }
+            75% { 
+                transform: translate(40px, 30px) scale(1.05) rotate(270deg);
+            }
+        }
+        
+        /* Particle System */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            pointer-events: none;
+            animation: particleFloat 15s linear infinite;
+        }
+        
+        .particle-1 { width: 3px; height: 3px; left: 10%; animation-delay: 0s; }
+        .particle-2 { width: 2px; height: 2px; left: 20%; animation-delay: 2s; }
+        .particle-3 { width: 4px; height: 4px; left: 30%; animation-delay: 4s; }
+        .particle-4 { width: 2px; height: 2px; left: 40%; animation-delay: 6s; }
+        .particle-5 { width: 3px; height: 3px; left: 50%; animation-delay: 8s; }
+        .particle-6 { width: 2px; height: 2px; left: 60%; animation-delay: 10s; }
+        .particle-7 { width: 4px; height: 4px; left: 70%; animation-delay: 12s; }
+        .particle-8 { width: 3px; height: 3px; left: 80%; animation-delay: 14s; }
+        .particle-9 { width: 2px; height: 2px; left: 90%; animation-delay: 16s; }
+        
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px) scale(1);
+                opacity: 0;
+            }
+        }
+        
+        /* Logo Animation */
+        .logo-container {
+            animation: logoFloat 3s ease-in-out infinite;
+            filter: drop-shadow(0 8px 30px rgba(0, 166, 81, 0.4));
+        }
+        
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
         
         /* Perfect Responsive Auth Layout */
         @media (max-width: 640px) {
             body::before,
             body::after {
-                opacity: 0.5; /* Reduce decorative elements on mobile */
+                opacity: 0.5;
             }
             
             .floating-dot {
@@ -109,13 +250,17 @@ require_once __DIR__ . '/../helpers.php';
             }
             
             .auth-card {
-                border-radius: 16px;
+                border-radius: 20px;
                 padding: 0.75rem !important;
             }
             
             .auth-card .bg-white {
                 padding: 1.5rem !important;
-                border-radius: 14px !important;
+                border-radius: 16px !important;
+            }
+            
+            .particle {
+                display: none;
             }
         }
         
@@ -124,18 +269,31 @@ require_once __DIR__ . '/../helpers.php';
                 padding: 2rem !important;
             }
         }
+
     </style>
 </head>
 <body class="min-h-screen">
-    <!-- Decorative floating elements -->
-    <div class="floating-dot w-64 h-64 top-20 -left-20 bg-green-500" style="animation-delay: 0s;" aria-hidden="true"></div>
-    <div class="floating-dot w-48 h-48 top-40 right-10 bg-blue-500" style="animation-delay: -5s;" aria-hidden="true"></div>
-    <div class="floating-dot w-32 h-32 bottom-20 left-1/4 bg-blue-400" style="animation-delay: -10s;" aria-hidden="true"></div>
+    <!-- Enhanced Decorative floating elements with 3D effect -->
+    <div class="floating-dot w-80 h-80 top-20 -left-32 bg-gradient-to-br from-green-400 to-emerald-600 delay-0" aria-hidden="true"></div>
+    <div class="floating-dot w-64 h-64 top-40 right-10 bg-gradient-to-br from-blue-400 to-cyan-600 delay-7" aria-hidden="true"></div>
+    <div class="floating-dot w-48 h-48 bottom-20 left-1/4 bg-gradient-to-br from-blue-300 to-blue-500 delay-14" aria-hidden="true"></div>
+    <div class="floating-dot w-56 h-56 bottom-40 right-1/3 bg-gradient-to-br from-emerald-400 to-green-600 delay-3" aria-hidden="true"></div>
+    
+    <!-- Particle System -->
+    <div class="particle particle-1"></div>
+    <div class="particle particle-2"></div>
+    <div class="particle particle-3"></div>
+    <div class="particle particle-4"></div>
+    <div class="particle particle-5"></div>
+    <div class="particle particle-6"></div>
+    <div class="particle particle-7"></div>
+    <div class="particle particle-8"></div>
+    <div class="particle particle-9"></div>
 
     <div class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
-        <!-- IBC Logo above content -->
-        <div class="mb-8">
-            <img src="<?php echo asset('assets/img/ibc_logo_original.webp'); ?>" alt="IBC Logo" class="mx-auto h-20 w-auto drop-shadow-2xl" style="filter: brightness(1.1) drop-shadow(0 4px 20px rgba(0, 166, 81, 0.3));">
+        <!-- IBC Logo above content with enhanced animation -->
+        <div class="mb-10 logo-container">
+            <img src="<?php echo asset('assets/img/ibc_logo_original.webp'); ?>" alt="IBC Logo" class="mx-auto h-24 w-auto" style="filter: brightness(1.15) drop-shadow(0 8px 30px rgba(0, 166, 81, 0.5)) drop-shadow(0 4px 20px rgba(0, 166, 81, 0.3));">
         </div>
         
         <!-- Content area wrapped in auth-card -->
@@ -143,8 +301,17 @@ require_once __DIR__ . '/../helpers.php';
             <?php echo $content ?? ''; ?>
         </div>
         
-        <!-- Footer text -->
-        <p class="mt-8 text-sm text-white/30 font-medium tracking-wide">© <?php echo date('Y'); ?> IBC · Intranet Platform</p>
+        <!-- Enhanced Footer text with gradient -->
+        <div class="mt-10 text-center">
+            <p class="text-sm font-semibold tracking-wide" style="color: rgba(255, 255, 255, 0.35); background: linear-gradient(to right, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.4)); -webkit-background-clip: text; background-clip: text; animation: pulse 2s ease-in-out infinite;">
+                © <?php echo date('Y'); ?> IBC · Intranet Platform
+            </p>
+            <div class="mt-2 flex justify-center space-x-1">
+                <div class="w-1 h-1 rounded-full bg-white/20"></div>
+                <div class="w-1 h-1 rounded-full bg-white/30"></div>
+                <div class="w-1 h-1 rounded-full bg-white/20"></div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
