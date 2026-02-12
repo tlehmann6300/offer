@@ -589,8 +589,13 @@ class AuthHandler {
                     $photoData = $graphService->getUserPhoto($objectId);
                     
                     if ($photoData) {
-                        // Ensure profile_photos directory exists
-                        $uploadDir = __DIR__ . '/../../uploads/profile_photos';
+                        // Ensure profile_photos directory exists using realpath for security
+                        $baseDir = realpath(__DIR__ . '/../../uploads');
+                        if ($baseDir === false) {
+                            throw new Exception('Base uploads directory does not exist');
+                        }
+                        
+                        $uploadDir = $baseDir . '/profile_photos';
                         if (!is_dir($uploadDir)) {
                             mkdir($uploadDir, 0755, true);
                         }
@@ -599,17 +604,38 @@ class AuthHandler {
                         $filename = "user_{$userId}.jpg";
                         $filepath = $uploadDir . '/' . $filename;
                         
-                        if (file_put_contents($filepath, $photoData) !== false) {
+                        $bytesWritten = file_put_contents($filepath, $photoData);
+                        if ($bytesWritten !== false) {
                             // Update alumni profile with image path
                             $imagePath = '/uploads/profile_photos/' . $filename;
                             
                             try {
                                 $contentDb = Database::getContentDB();
-                                $stmt = $contentDb->prepare("UPDATE alumni_profiles SET image_path = ? WHERE user_id = ?");
-                                $stmt->execute([$imagePath, $userId]);
+                                
+                                // Check if alumni profile exists before updating image path
+                                $stmt = $contentDb->prepare("SELECT id FROM alumni_profiles WHERE user_id = ?");
+                                $stmt->execute([$userId]);
+                                $profileExists = $stmt->fetch();
+                                
+                                if ($profileExists) {
+                                    $stmt = $contentDb->prepare("UPDATE alumni_profiles SET image_path = ? WHERE user_id = ?");
+                                    $stmt->execute([$imagePath, $userId]);
+                                } else {
+                                    // Create minimal profile with image if it doesn't exist
+                                    $stmt = $contentDb->prepare("INSERT INTO alumni_profiles (user_id, first_name, last_name, email, image_path) VALUES (?, ?, ?, ?, ?)");
+                                    $stmt->execute([
+                                        $userId,
+                                        $firstName ?? 'Unknown',
+                                        $lastName ?? 'User',
+                                        $email,
+                                        $imagePath
+                                    ]);
+                                }
                             } catch (Exception $e) {
                                 error_log("Failed to update profile image path: " . $e->getMessage());
                             }
+                        } else {
+                            error_log("Failed to save profile photo for user {$userId}: file_put_contents returned false");
                         }
                     }
                 }
