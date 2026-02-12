@@ -210,6 +210,8 @@ function init_session() {
         // Set secure cookie parameters BEFORE starting session
         // Only require secure flag over HTTPS to prevent session issues over HTTP
         // Check for HTTPS considering proxy/load balancer scenarios
+        // Note: X-Forwarded-* headers are checked assuming trusted infrastructure (ionos.de hosting)
+        // In environments with untrusted proxies, consider validating proxy IPs before trusting these headers
         $isSecure = false;
         if (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off') {
             $isSecure = true;
