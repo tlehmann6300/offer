@@ -2653,15 +2653,20 @@ body.dark-mode select:focus {
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(51, 133, 196, 0.25) !important;
 }
 
-/* Dark Mode: Better transitions everywhere */
-body.dark-mode * {
-    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+/* Dark Mode: Better transitions for interactive elements */
+body.dark-mode .card,
+body.dark-mode button,
+body.dark-mode a,
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select,
+body.dark-mode .btn,
+body.dark-mode [class*="hover:"],
+body.dark-mode .dropdown-menu,
+body.dark-mode .modal {
+    transition-property: background-color, border-color, color, box-shadow, transform, opacity;
     transition-duration: 300ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-body.dark-mode *:not(input):not(textarea):not(select) {
-    transition-property: background-color, border-color, color, box-shadow, transform;
 }
 
 /* Dark Mode: Improved glass effect */
