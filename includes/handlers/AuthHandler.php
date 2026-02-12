@@ -556,20 +556,16 @@ class AuthHandler {
                 try {
                     $contentDb = Database::getContentDB();
                     
-                    // Check if alumni profile exists
-                    $stmt = $contentDb->prepare("SELECT id FROM alumni_profiles WHERE user_id = ?");
-                    $stmt->execute([$userId]);
-                    $profileExists = $stmt->fetch();
-                    
-                    if ($profileExists) {
-                        // Update existing profile with Microsoft data
-                        $stmt = $contentDb->prepare("UPDATE alumni_profiles SET first_name = ?, last_name = ?, email = ? WHERE user_id = ?");
-                        $stmt->execute([$firstName, $lastName, $email, $userId]);
-                    } else {
-                        // Create new alumni profile
-                        $stmt = $contentDb->prepare("INSERT INTO alumni_profiles (user_id, first_name, last_name, email) VALUES (?, ?, ?, ?)");
-                        $stmt->execute([$userId, $firstName, $lastName, $email]);
-                    }
+                    // Use INSERT ... ON DUPLICATE KEY UPDATE for upsert logic (prevents race conditions)
+                    $stmt = $contentDb->prepare("
+                        INSERT INTO alumni_profiles (user_id, first_name, last_name, email)
+                        VALUES (?, ?, ?, ?)
+                        ON DUPLICATE KEY UPDATE 
+                            first_name = VALUES(first_name),
+                            last_name = VALUES(last_name),
+                            email = VALUES(email)
+                    ");
+                    $stmt->execute([$userId, $firstName, $lastName, $email]);
                 } catch (Exception $e) {
                     error_log("Failed to update alumni profile: " . $e->getMessage());
                     // Don't throw - allow login to proceed even if profile update fails
@@ -606,30 +602,29 @@ class AuthHandler {
                         
                         $bytesWritten = file_put_contents($filepath, $photoData);
                         if ($bytesWritten !== false) {
-                            // Update alumni profile with image path
+                            // Update alumni profile with image path using upsert logic
                             $imagePath = '/uploads/profile_photos/' . $filename;
                             
                             try {
                                 $contentDb = Database::getContentDB();
                                 
-                                // Check if alumni profile exists before updating image path
-                                $stmt = $contentDb->prepare("SELECT id FROM alumni_profiles WHERE user_id = ?");
-                                $stmt->execute([$userId]);
-                                $profileExists = $stmt->fetch();
-                                
-                                if ($profileExists) {
+                                // Only create/update profile if we have name data
+                                if ($firstName && $lastName) {
+                                    // Use INSERT ... ON DUPLICATE KEY UPDATE for upsert (prevents race conditions)
+                                    $stmt = $contentDb->prepare("
+                                        INSERT INTO alumni_profiles (user_id, first_name, last_name, email, image_path)
+                                        VALUES (?, ?, ?, ?, ?)
+                                        ON DUPLICATE KEY UPDATE 
+                                            first_name = VALUES(first_name),
+                                            last_name = VALUES(last_name),
+                                            email = VALUES(email),
+                                            image_path = VALUES(image_path)
+                                    ");
+                                    $stmt->execute([$userId, $firstName, $lastName, $email, $imagePath]);
+                                } else {
+                                    // Only update image_path if profile already exists
                                     $stmt = $contentDb->prepare("UPDATE alumni_profiles SET image_path = ? WHERE user_id = ?");
                                     $stmt->execute([$imagePath, $userId]);
-                                } else {
-                                    // Create minimal profile with image if it doesn't exist
-                                    $stmt = $contentDb->prepare("INSERT INTO alumni_profiles (user_id, first_name, last_name, email, image_path) VALUES (?, ?, ?, ?, ?)");
-                                    $stmt->execute([
-                                        $userId,
-                                        $firstName ?? 'Unknown',
-                                        $lastName ?? 'User',
-                                        $email,
-                                        $imagePath
-                                    ]);
                                 }
                             } catch (Exception $e) {
                                 error_log("Failed to update profile image path: " . $e->getMessage());
