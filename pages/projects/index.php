@@ -363,6 +363,23 @@ ob_start();
             transform: translateY(0);
         }
     }
+    
+    /* Respect user motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+        .project-card {
+            animation: none;
+        }
+        
+        .status-badge .animate-pulse,
+        .priority-badge .animate-pulse,
+        .type-badge .animate-pulse {
+            animation: none;
+        }
+        
+        .project-image-wrapper img {
+            transition: none;
+        }
+    }
 </style>
 
 <?php

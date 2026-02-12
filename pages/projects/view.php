@@ -164,7 +164,7 @@ ob_start();
     <!-- Project Card with Enhanced Design -->
     <div class="project-detail-card card p-8 relative overflow-hidden">
         <!-- Decorative gradient background -->
-        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 via-blue-600 to-green-600"></div>
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 via-blue-600 to-green-600" aria-hidden="true"></div>
         
         <!-- Image with Hero Effect -->
         <?php if (!empty($project['image_path'])): ?>
@@ -647,6 +647,30 @@ ob_start();
         to {
             opacity: 1;
             transform: translateY(0);
+        }
+    }
+    
+    /* Respect user motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+        .project-detail-card {
+            animation: none;
+        }
+        
+        .animate-gradient {
+            animation: none;
+        }
+        
+        .status-detail-badge .animate-pulse,
+        .priority-detail-badge .animate-pulse,
+        .type-detail-badge .animate-pulse {
+            animation: none;
+        }
+        
+        .info-card,
+        .status-detail-badge,
+        .priority-detail-badge,
+        .type-detail-badge {
+            transition: none;
         }
     }
 </style>
