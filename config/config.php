@@ -227,7 +227,7 @@ function init_session() {
             'domain' => $domain,
             'secure' => $isSecure,
             'httponly' => true,
-            'samesite' => 'Strict'
+            'samesite' => 'Lax'
         ]);
         
         // Set session name if defined

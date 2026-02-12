@@ -24,9 +24,14 @@ try {
     error_log("Microsoft callback error: " . $e->getMessage());
     error_log("Stack trace: " . $e->getTraceAsString());
     
-    // Redirect to login page with a generic error message
+    // For debugging: Show detailed error message
+    // Comment out the die() statement below and uncomment the redirect section once debugging is complete
+    die("DEBUG ERROR: " . $e->getMessage());
+    
+    /* // Redirect to login page with a generic error message (re-enable after debugging)
     $loginUrl = (defined('BASE_URL') && BASE_URL) ? BASE_URL . '/pages/auth/login.php' : '/pages/auth/login.php';
     $errorMessage = urlencode('Authentifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.');
     header('Location: ' . $loginUrl . '?error=' . $errorMessage);
     exit;
+    */
 }
