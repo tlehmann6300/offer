@@ -88,7 +88,7 @@ ob_start();
                     Zentral verwaltetes Profil
                 </h3>
                 <p class="text-blue-800 dark:text-blue-200">
-                    Ihr Profil wird zentral über Microsoft verwaltet. Änderungen an Name, E-Mail oder Passwort bitte dort vornehmen.
+                    Ihr Profil wird zentral über Microsoft verwaltet. Änderungen an E-Mail oder Passwort bitte dort vornehmen.
                 </p>
             </div>
         </div>
