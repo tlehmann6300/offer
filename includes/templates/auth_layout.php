@@ -170,18 +170,23 @@ require_once __DIR__ . '/../helpers.php';
             filter: blur(40px);
         }
         
+        .delay-0 { animation-delay: 0s; }
+        .delay-3 { animation-delay: -3s; }
+        .delay-7 { animation-delay: -7s; }
+        .delay-14 { animation-delay: -14s; }
+        
         @keyframes float3D {
             0%, 100% { 
-                transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+                transform: translate(0, 0) scale(1) rotate(0deg);
             }
             25% { 
-                transform: translate3d(30px, -40px, 50px) scale(1.1) rotate(90deg);
+                transform: translate(30px, -40px) scale(1.1) rotate(90deg);
             }
             50% { 
-                transform: translate3d(-20px, 20px, -30px) scale(0.9) rotate(180deg);
+                transform: translate(-20px, 20px) scale(0.9) rotate(180deg);
             }
             75% { 
-                transform: translate3d(40px, 30px, 40px) scale(1.05) rotate(270deg);
+                transform: translate(40px, 30px) scale(1.05) rotate(270deg);
             }
         }
         
@@ -193,6 +198,16 @@ require_once __DIR__ . '/../helpers.php';
             pointer-events: none;
             animation: particleFloat 15s linear infinite;
         }
+        
+        .particle-1 { width: 3px; height: 3px; left: 10%; animation-delay: 0s; }
+        .particle-2 { width: 2px; height: 2px; left: 20%; animation-delay: 2s; }
+        .particle-3 { width: 4px; height: 4px; left: 30%; animation-delay: 4s; }
+        .particle-4 { width: 2px; height: 2px; left: 40%; animation-delay: 6s; }
+        .particle-5 { width: 3px; height: 3px; left: 50%; animation-delay: 8s; }
+        .particle-6 { width: 2px; height: 2px; left: 60%; animation-delay: 10s; }
+        .particle-7 { width: 4px; height: 4px; left: 70%; animation-delay: 12s; }
+        .particle-8 { width: 3px; height: 3px; left: 80%; animation-delay: 14s; }
+        .particle-9 { width: 2px; height: 2px; left: 90%; animation-delay: 16s; }
         
         @keyframes particleFloat {
             0% {
@@ -254,30 +269,26 @@ require_once __DIR__ . '/../helpers.php';
                 padding: 2rem !important;
             }
         }
-        
-        /* Smooth transitions for all elements */
-        * {
-            transition: all 0.3s ease;
-        }
+
     </style>
 </head>
 <body class="min-h-screen">
     <!-- Enhanced Decorative floating elements with 3D effect -->
-    <div class="floating-dot w-80 h-80 top-20 -left-32 bg-gradient-to-br from-green-400 to-emerald-600" style="animation-delay: 0s;" aria-hidden="true"></div>
-    <div class="floating-dot w-64 h-64 top-40 right-10 bg-gradient-to-br from-blue-400 to-cyan-600" style="animation-delay: -7s;" aria-hidden="true"></div>
-    <div class="floating-dot w-48 h-48 bottom-20 left-1/4 bg-gradient-to-br from-blue-300 to-blue-500" style="animation-delay: -14s;" aria-hidden="true"></div>
-    <div class="floating-dot w-56 h-56 bottom-40 right-1/3 bg-gradient-to-br from-emerald-400 to-green-600" style="animation-delay: -3s;" aria-hidden="true"></div>
+    <div class="floating-dot w-80 h-80 top-20 -left-32 bg-gradient-to-br from-green-400 to-emerald-600 delay-0" aria-hidden="true"></div>
+    <div class="floating-dot w-64 h-64 top-40 right-10 bg-gradient-to-br from-blue-400 to-cyan-600 delay-7" aria-hidden="true"></div>
+    <div class="floating-dot w-48 h-48 bottom-20 left-1/4 bg-gradient-to-br from-blue-300 to-blue-500 delay-14" aria-hidden="true"></div>
+    <div class="floating-dot w-56 h-56 bottom-40 right-1/3 bg-gradient-to-br from-emerald-400 to-green-600 delay-3" aria-hidden="true"></div>
     
     <!-- Particle System -->
-    <div class="particle" style="width: 3px; height: 3px; left: 10%; animation-delay: 0s;"></div>
-    <div class="particle" style="width: 2px; height: 2px; left: 20%; animation-delay: 2s;"></div>
-    <div class="particle" style="width: 4px; height: 4px; left: 30%; animation-delay: 4s;"></div>
-    <div class="particle" style="width: 2px; height: 2px; left: 40%; animation-delay: 6s;"></div>
-    <div class="particle" style="width: 3px; height: 3px; left: 50%; animation-delay: 8s;"></div>
-    <div class="particle" style="width: 2px; height: 2px; left: 60%; animation-delay: 10s;"></div>
-    <div class="particle" style="width: 4px; height: 4px; left: 70%; animation-delay: 12s;"></div>
-    <div class="particle" style="width: 3px; height: 3px; left: 80%; animation-delay: 14s;"></div>
-    <div class="particle" style="width: 2px; height: 2px; left: 90%; animation-delay: 16s;"></div>
+    <div class="particle particle-1"></div>
+    <div class="particle particle-2"></div>
+    <div class="particle particle-3"></div>
+    <div class="particle particle-4"></div>
+    <div class="particle particle-5"></div>
+    <div class="particle particle-6"></div>
+    <div class="particle particle-7"></div>
+    <div class="particle particle-8"></div>
+    <div class="particle particle-9"></div>
 
     <div class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
         <!-- IBC Logo above content with enhanced animation -->
@@ -292,7 +303,7 @@ require_once __DIR__ . '/../helpers.php';
         
         <!-- Enhanced Footer text with gradient -->
         <div class="mt-10 text-center">
-            <p class="text-sm bg-gradient-to-r from-white/40 via-white/30 to-white/40 bg-clip-text text-transparent font-semibold tracking-wide animate-pulse">
+            <p class="text-sm font-semibold tracking-wide" style="color: rgba(255, 255, 255, 0.35); background: linear-gradient(to right, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.4)); -webkit-background-clip: text; background-clip: text; animation: pulse 2s ease-in-out infinite;">
                 © <?php echo date('Y'); ?> IBC · Intranet Platform
             </p>
             <div class="mt-2 flex justify-center space-x-1">

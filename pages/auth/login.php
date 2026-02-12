@@ -110,7 +110,7 @@ ob_start();
         <div class="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-emerald-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:via-emerald-500/10 group-hover:to-blue-500/10 transition-all duration-700"></div>
         
         <!-- Glow Effect on Hover -->
-        <div class="absolute inset-0 opacity-0 group-hover:opacity-100 blur-2xl bg-gradient-to-r from-blue-400 to-emerald-400 transition-opacity duration-500"></div>
+        <div class="absolute inset-0 opacity-0 group-hover:opacity-100 blur-xl bg-gradient-to-r from-blue-400 to-emerald-400 transition-opacity duration-500"></div>
         
         <!-- Microsoft logo with enhanced animation -->
         <img src="<?php echo asset('assets/img/microsoft-logo.svg'); ?>" alt="Microsoft" class="relative z-10 w-7 h-7 mr-4 transition-all duration-500 group-hover:scale-125 group-hover:rotate-12 drop-shadow-lg">
