@@ -66,6 +66,9 @@ $users = User::getAll();
 $currentUser = Auth::user();
 $currentUserRole = $currentUser['role'] ?? '';
 
+// Pre-calculate base path for profile photos (used in table rendering)
+$profilePhotosBasePath = realpath(__DIR__ . '/../../uploads/profile_photos');
+
 $title = 'Benutzerverwaltung - IBC Intranet';
 ob_start();
 ?>
@@ -141,51 +144,23 @@ ob_start();
 
 <!-- Tab Content: Users -->
 <div id="tab-users" class="tab-content">
-    <!-- Invite User -->
-    <div class="card p-6 mb-6 bg-gradient-to-r from-white to-green-50 dark:from-gray-800 dark:to-green-900/20">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-            <i class="fas fa-user-plus text-green-600 dark:text-green-400 mr-2"></i>
-            Neuen Benutzer einladen
-        </h2>
-        <form method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">E-Mail</label>
-                <input 
-                    type="email" 
-                    name="email" 
-                    required 
-                    class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="benutzer@beispiel.de"
-                >
+    <!-- Info about Microsoft Only System -->
+    <div class="card p-6 mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-l-4 border-blue-500 dark:border-blue-400">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 text-2xl mt-1"></i>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rolle</label>
-                <select 
-                    name="role" 
-                    class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                >
-                    <?php foreach (Auth::VALID_ROLES as $role): ?>
-                    <option value="<?php echo htmlspecialchars($role); ?>"><?php echo htmlspecialchars(translateRole($role)); ?></option>
-                    <?php endforeach; ?>
-                </select>
+            <div class="ml-4">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Microsoft Only Authentifizierung</h3>
+                <p class="text-gray-700 dark:text-gray-300 mb-2">
+                    Benutzer werden ausschließlich über Microsoft Entra ID verwaltet. Neue Benutzer können nur über Einladungen hinzugefügt werden.
+                </p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    <i class="fas fa-arrow-right mr-2"></i>
+                    Verwenden Sie <a href="bulk_invite.php" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">Masseneinladung</a> zum Einladen neuer Benutzer.
+                </p>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Token Validity</label>
-                <select 
-                    name="validity_hours" 
-                    class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                >
-                    <option value="24">24 hours</option>
-                    <option value="168" selected>7 days</option>
-                    <option value="720">30 days</option>
-                </select>
-            </div>
-            <div class="flex items-end">
-                <button type="submit" name="invite_user" class="w-full btn-primary">
-                    <i class="fas fa-paper-plane mr-2"></i>Einladung senden
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
 
     <!-- Users List -->
@@ -253,6 +228,7 @@ ob_start();
             <table class="w-full" id="usersTable">
                 <thead class="bg-gray-50 dark:bg-gray-700">
                     <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Profilbild</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Benutzer</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Rolle</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">2FA / Validierung</th>
@@ -268,10 +244,38 @@ ob_start();
                     data-id="<?php echo $user['id']; ?>"
                     data-login="<?php echo $user['last_login'] ? strtotime($user['last_login']) : 0; ?>">
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
+                        <?php 
+                        // Validate user ID is a positive integer to prevent path traversal
+                        $userId = intval($user['id']);
+                        if ($userId > 0 && $userId <= 999999) { // Reasonable ID range check
+                            $profilePhotoPath = __DIR__ . '/../../uploads/profile_photos/user_' . $userId . '.jpg';
+                            $profilePhotoUrl = '/uploads/profile_photos/user_' . $userId . '.jpg';
+                            
+                            // Ensure the path is within the expected directory
+                            $realProfilePath = realpath($profilePhotoPath);
+                            
+                            if ($realProfilePath && $profilePhotosBasePath && strpos($realProfilePath, $profilePhotosBasePath) === 0) {
+                        ?>
+                            <img src="<?php echo htmlspecialchars($profilePhotoUrl); ?>" 
+                                 alt="Profilbild" 
+                                 class="h-10 w-10 rounded-full object-cover border-2 border-purple-200 dark:border-purple-700">
+                        <?php 
+                            } else {
+                        ?>
                             <div class="flex-shrink-0 h-10 w-10 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center">
                                 <i class="fas fa-user text-purple-600 dark:text-purple-400"></i>
                             </div>
+                        <?php 
+                            }
+                        } else {
+                        ?>
+                            <div class="flex-shrink-0 h-10 w-10 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-purple-600 dark:text-purple-400"></i>
+                            </div>
+                        <?php } ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
                             <div class="ml-4">
                                 <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                                     <?php echo htmlspecialchars($user['email']); ?>
@@ -284,14 +288,14 @@ ob_start();
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <select 
-                            data-user-id="<?php echo $user['id']; ?>"
-                            class="role-select px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        >
-                            <?php foreach (Auth::VALID_ROLES as $role): ?>
-                            <option value="<?php echo htmlspecialchars($role); ?>" <?php echo ($user['role'] == $role) ? 'selected' : ''; ?>><?php echo htmlspecialchars(translateRole($role)); ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <div class="flex flex-col space-y-1">
+                            <span class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg font-medium">
+                                <?php echo htmlspecialchars(translateRole($user['role'])); ?>
+                            </span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 italic">
+                                <i class="fas fa-info-circle mr-1"></i>Rolle in Microsoft Entra zuweisen
+                            </span>
+                        </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex flex-col space-y-1">
@@ -350,59 +354,6 @@ ob_start();
 </div>
 <?php endif; ?>
 <!-- End Tab Content: Invitations -->
-
-<!-- Succession Modal -->
-<div id="successionModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50" style="display: none;">
-    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div class="p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-2xl font-bold text-gray-800">
-                    <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
-                    Nachfolger bestimmen
-                </h3>
-                <button id="closeSuccessionModal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            
-            <div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800">
-                <p class="font-medium mb-2">Hinweis: Wenn du deine Vorstandsrolle abgibst, musst du einen Nachfolger bestimmen.</p>
-                <p>Bitte wähle ein Mitglied aus, das deine Vorstandsrolle übernehmen soll.</p>
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Nachfolger auswählen</label>
-                <select 
-                    id="successorSelect"
-                    class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                >
-                    <option value="">-- Bitte wählen --</option>
-                    <?php 
-                    // Get users with 'member' or 'head' role for successor selection
-                    foreach ($users as $member):
-                        if ((int)$member['id'] !== (int)$currentUser['id'] && in_array($member['role'], ['member', 'head'], true)):
-                    ?>
-                    <option value="<?php echo $member['id']; ?>">
-                        <?php echo htmlspecialchars($member['email']); ?> (<?php echo htmlspecialchars(translateRole($member['role'])); ?>)
-                    </option>
-                    <?php 
-                        endif;
-                    endforeach; 
-                    ?>
-                </select>
-            </div>
-            
-            <div class="flex justify-end space-x-3">
-                <button id="cancelSuccession" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                    Abbrechen
-                </button>
-                <button id="confirmSuccession" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
-                    <i class="fas fa-check mr-2"></i>Rollenwechsel durchführen
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
 // Tab switching functionality
@@ -546,206 +497,11 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-// AJAX role change handler
+// Role change functionality removed - roles are now managed via Microsoft Entra
+// Users should use the bulk_invite.php tool to assign roles during invitation
 document.addEventListener('DOMContentLoaded', function() {
-    // Define board roles and current user's role
-    const boardRoles = <?php echo json_encode(Auth::BOARD_ROLES); ?>;
-    const currentUserRole = '<?php echo $currentUserRole; ?>';
-    const currentUserId = <?php echo $currentUser['id']; ?>;
-    
-    const roleSelects = document.querySelectorAll('.role-select');
-    const modal = document.getElementById('successionModal');
-    const successorSelect = document.getElementById('successorSelect');
-    const confirmSuccessionBtn = document.getElementById('confirmSuccession');
-    const closeModalBtn = document.getElementById('closeSuccessionModal');
-    const cancelSuccessionBtn = document.getElementById('cancelSuccession');
-    
-    // Store for pending role change
-    let pendingRoleChange = null;
-    
-    roleSelects.forEach(select => {
-        // Store original value when attaching event listener
-        const originalValue = select.value;
-        
-        select.addEventListener('change', function() {
-            const userId = parseInt(this.getAttribute('data-user-id'));
-            const newRole = this.value;
-            
-            // Check if current logged-in user (board member) is trying to demote themselves
-            const isCurrentUser = (userId === parseInt(currentUserId, 10));
-            const isCurrentUserBoard = boardRoles.includes(currentUserRole);
-            const isTargetRoleNonBoard = (newRole === 'member' || newRole === 'alumni');
-            
-            if (isCurrentUser && isCurrentUserBoard && isTargetRoleNonBoard) {
-                // Show succession modal
-                pendingRoleChange = {
-                    userId: userId,
-                    newRole: newRole,
-                    selectElement: this
-                };
-                
-                modal.style.display = 'flex';
-                successorSelect.value = '';
-                return;
-            }
-            
-            // Disable select while processing
-            this.disabled = true;
-            
-            // Send AJAX request
-            performRoleChange(userId, newRole, null, this, originalValue);
-        });
-    });
-    
-    // Close modal handlers
-    closeModalBtn.addEventListener('click', closeModal);
-    cancelSuccessionBtn.addEventListener('click', closeModal);
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeModal();
-        }
-    });
-    
-    function closeModal() {
-        modal.style.display = 'none';
-        
-        // Revert the select if pending change exists
-        if (pendingRoleChange) {
-            const originalOptions = pendingRoleChange.selectElement.querySelectorAll('option');
-            originalOptions.forEach(opt => {
-                if (opt.hasAttribute('selected')) {
-                    pendingRoleChange.selectElement.value = opt.value;
-                }
-            });
-            pendingRoleChange = null;
-        }
-        
-        successorSelect.value = '';
-    }
-    
-    // Confirm succession
-    confirmSuccessionBtn.addEventListener('click', function() {
-        const successorId = successorSelect.value;
-        
-        if (!successorId) {
-            alert('Bitte wähle einen Nachfolger aus');
-            return;
-        }
-        
-        if (pendingRoleChange) {
-            pendingRoleChange.selectElement.disabled = true;
-            confirmSuccessionBtn.disabled = true;
-            
-            performRoleChange(
-                pendingRoleChange.userId, 
-                pendingRoleChange.newRole, 
-                successorId, 
-                pendingRoleChange.selectElement,
-                currentUserRole  // Use current role as original value for revert
-            );
-        }
-    });
-    
-    function performRoleChange(userId, newRole, successorId, selectElement, originalValue) {
-        let body = 'user_id=' + encodeURIComponent(userId) + '&new_role=' + encodeURIComponent(newRole);
-        if (successorId) {
-            body += '&successor_id=' + encodeURIComponent(successorId);
-        }
-        
-        fetch('ajax_update_role.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: body
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Show success message
-                showMessage(data.message, 'success');
-                
-                // Close modal if it was open
-                if (modal.style.display === 'flex') {
-                    modal.style.display = 'none';
-                    pendingRoleChange = null;
-                }
-                
-                // If this was a self-demotion, redirect to dashboard after a short delay
-                if (userId === currentUserId) {
-                    setTimeout(() => {
-                        window.location.href = '../dashboard/index.php';
-                    }, 1000);
-                } else {
-                    // Update the selected option
-                    selectElement.querySelectorAll('option').forEach(opt => {
-                        opt.removeAttribute('selected');
-                        if (opt.value === newRole) {
-                            opt.setAttribute('selected', 'selected');
-                        }
-                    });
-                }
-            } else {
-                // Show error and revert selection
-                showMessage(data.message, 'error');
-                selectElement.value = originalValue;
-                
-                // Close modal on error
-                if (modal.style.display === 'flex') {
-                    modal.style.display = 'none';
-                    pendingRoleChange = null;
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage('Fehler beim Ändern der Rolle', 'error');
-            selectElement.value = originalValue;
-            
-            // Close modal on error
-            if (modal.style.display === 'flex') {
-                modal.style.display = 'none';
-                pendingRoleChange = null;
-            }
-        })
-        .finally(() => {
-            // Re-enable select and button
-            selectElement.disabled = false;
-            confirmSuccessionBtn.disabled = false;
-        });
-    }
-    
-    // Function to show messages
-    function showMessage(message, type) {
-        // Remove existing messages
-        const existingMessages = document.querySelectorAll('.ajax-message');
-        existingMessages.forEach(msg => msg.remove());
-        
-        // Create new message element
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'ajax-message mb-6 p-4 rounded-lg ' + 
-            (type === 'success' ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700');
-        
-        // Create icon
-        const icon = document.createElement('i');
-        icon.className = 'fas fa-' + (type === 'success' ? 'check' : 'exclamation') + '-circle mr-2';
-        
-        // Create text node for message (safe from XSS)
-        const messageText = document.createTextNode(message);
-        
-        // Append elements
-        messageDiv.appendChild(icon);
-        messageDiv.appendChild(messageText);
-        
-        // Insert at the top of main content
-        const mainContent = document.querySelector('main > div:first-child') || document.querySelector('main');
-        mainContent.insertBefore(messageDiv, mainContent.firstChild);
-        
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            messageDiv.remove();
-        }, 5000);
-    }
+    // Note: Role dropdowns have been replaced with read-only display
+    console.log('User management running in Microsoft Only mode');
 });
 </script>
 
