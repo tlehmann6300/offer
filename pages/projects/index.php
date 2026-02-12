@@ -370,9 +370,9 @@ ob_start();
             animation: none;
         }
         
-        .status-badge .animate-pulse,
-        .priority-badge .animate-pulse,
-        .type-badge .animate-pulse {
+        .status-badge .fas,
+        .priority-badge .fas,
+        .type-badge .fas {
             animation: none;
         }
         

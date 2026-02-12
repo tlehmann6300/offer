@@ -660,9 +660,9 @@ ob_start();
             animation: none;
         }
         
-        .status-detail-badge .animate-pulse,
-        .priority-detail-badge .animate-pulse,
-        .type-detail-badge .animate-pulse {
+        .status-detail-badge .fas,
+        .priority-detail-badge .fas,
+        .type-detail-badge .fas {
             animation: none;
         }
         
