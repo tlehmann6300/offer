@@ -82,25 +82,34 @@
 
 /* Dark Mode Variables - Source of Truth */
 .dark-mode {
-    --bg-body: #0f172a; /* Deep Dark Blue - slate-900 */
-    --bg-card: #1e293b; /* Lighter Slate - slate-800 */
-    --text-main: #f3f4f6; /* Almost White - Critical */
-    --text-muted: #9ca3af; /* Light Gray */
-    --border-color: #374151;
+    --bg-body: #0a0f1e; /* Ultra Deep Dark - Enhanced from slate-900 */
+    --bg-card: #1a1f2e; /* Rich Dark Slate - Warmer tone */
+    --bg-card-elevated: #242938; /* Elevated cards for layering */
+    --text-main: #f8fafc; /* Ultra White - Maximum readability */
+    --text-muted: #94a3b8; /* Slate-400 - Better muted text */
+    --border-color: #334155; /* Slate-700 - More visible borders */
+    --border-light: #475569; /* Slate-600 - Lighter borders for emphasis */
     
     /* Legacy compatibility variables */
-    --bg-color: #0f172a;
-    --text-color: #f3f4f6;
-    --card-bg: #1e293b;
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-tertiary: #374151;
-    --text-primary: #f3f4f6;
-    --text-secondary: #9ca3af;
+    --bg-color: #0a0f1e;
+    --text-color: #f8fafc;
+    --card-bg: #1a1f2e;
+    --bg-primary: #0a0f1e;
+    --bg-secondary: #1a1f2e;
+    --bg-tertiary: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
     
-    /* Enhanced Dark Mode Shadows for depth */
-    --shadow-premium: 0 20px 40px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.3);
-    --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* Enhanced Dark Mode Shadows for depth perception */
+    --shadow-premium: 0 25px 50px rgba(0, 0, 0, 0.6), 0 12px 24px rgba(0, 0, 0, 0.4);
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.4);
+    --shadow-card-hover: 0 8px 16px rgba(0, 0, 0, 0.4), 0 16px 48px rgba(0, 0, 0, 0.5);
+    --shadow-elevated: 0 12px 36px rgba(0, 0, 0, 0.5);
+    
+    /* Dark mode specific gradients */
+    --gradient-hero-dark: linear-gradient(135deg, #1e3a5f 0%, #0f2847 50%, #0a1f3d 100%);
+    --gradient-card-dark: linear-gradient(145deg, #1a1f2e 0%, #141822 100%);
 }
 
 /* Force Overrides - The 'Hammer' to overwrite Tailwind defaults */
@@ -119,27 +128,39 @@ body {
     color: var(--text-main) !important;
 }
 
-/* Fix Input Fields in Dark Mode */
+/* Fix Input Fields in Dark Mode - Perfect Contrast */
 .dark-mode input,
 .dark-mode select,
 .dark-mode textarea {
-    background-color: #0c1222 !important; /* Darker than card background for contrast */
-    color: #ffffff !important;
-    border: 1px solid #334155 !important; /* slate-700 */
+    background-color: #0f1419 !important; /* Ultra dark for maximum contrast */
+    color: #f8fafc !important; /* Ultra white text */
+    border: 1.5px solid #475569 !important; /* Stronger border - slate-600 */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+.dark-mode input:focus,
+.dark-mode select:focus,
+.dark-mode textarea:focus {
+    border-color: var(--ibc-blue-light) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(51, 133, 196, 0.2) !important;
+    outline: none !important;
 }
 
 .dark-mode input::placeholder,
 .dark-mode textarea::placeholder {
-    color: var(--text-muted);
+    color: #64748b !important; /* Lighter muted text - slate-500 */
+    opacity: 1;
 }
 
 .dark-mode input:disabled,
 .dark-mode select:disabled,
 .dark-mode textarea:disabled {
-    background-color: #1f2937 !important;
-    color: #6b7280 !important;
+    background-color: #1e293b !important;
+    color: #475569 !important;
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: 0.6;
+    border-color: #334155 !important;
 }
 
 /* Sidebar - Permanent Corporate Blue (IBC-Blau) for Light and Dark Mode */
@@ -227,9 +248,17 @@ body.dark-mode main {
 }
 
 body.dark-mode .card {
-    background-color: var(--bg-card) !important;
+    background: var(--gradient-card-dark) !important;
     color: var(--text-main) !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+body.dark-mode .card:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    transform: translateY(-4px);
+    border-color: rgba(51, 133, 196, 0.3) !important;
 }
 
 /* Table Styles - Light Mode */
@@ -2430,3 +2459,307 @@ a.disabled {
 }
 
 /* Perfect end of file */
+
+/* ============================================
+   PERFECT DARK MODE ENHANCEMENTS
+   ============================================ */
+
+/* Dark Mode: Enhanced Gradient Sections */
+body.dark-mode .bg-gradient-to-r,
+body.dark-mode .bg-gradient-to-br,
+body.dark-mode [class*="bg-gradient"] {
+    position: relative;
+}
+
+/* Dark mode hero gradient override */
+body.dark-mode [class*="from-blue-"]:not(.from-blue-50) {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1e3a8a 100%) !important;
+}
+
+body.dark-mode [class*="from-green-"]:not(.from-green-50) {
+    background: linear-gradient(135deg, #065f46 0%, #047857 50%, #065f46 100%) !important;
+}
+
+/* Dark Mode: Better Button Styles */
+body.dark-mode .btn-primary {
+    background: linear-gradient(135deg, var(--ibc-green-dark) 0%, var(--ibc-green) 50%, var(--ibc-blue-dark) 100%);
+    box-shadow: 0 4px 20px rgba(0, 166, 81, 0.4), 0 2px 8px rgba(0, 166, 81, 0.3);
+}
+
+body.dark-mode .btn-primary:hover {
+    box-shadow: 0 8px 32px rgba(0, 166, 81, 0.5), 0 4px 16px rgba(0, 166, 81, 0.4);
+    transform: translateY(-2px);
+}
+
+body.dark-mode button,
+body.dark-mode .btn {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Dark Mode: Enhanced borders for better structure */
+body.dark-mode .border {
+    border-color: var(--border-color) !important;
+}
+
+body.dark-mode .border-t,
+body.dark-mode .border-b,
+body.dark-mode .border-l,
+body.dark-mode .border-r {
+    border-color: var(--border-color) !important;
+}
+
+body.dark-mode .divide-y > * {
+    border-color: var(--border-color) !important;
+}
+
+/* Dark Mode: Better separation for list items */
+body.dark-mode .space-y-4 > *:not(:last-child),
+body.dark-mode .space-y-6 > *:not(:last-child) {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem !important;
+}
+
+/* Dark Mode: Enhanced shadows for depth */
+body.dark-mode .shadow-sm {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.24) !important;
+}
+
+body.dark-mode .shadow {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .shadow-md {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.dark-mode .shadow-lg {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), 0 12px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .shadow-xl {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 16px 48px rgba(0, 0, 0, 0.45) !important;
+}
+
+body.dark-mode .shadow-2xl {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.55), 0 24px 64px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Dark Mode: Card gradient backgrounds for visual interest */
+body.dark-mode .card:not(.no-gradient) {
+    background: linear-gradient(145deg, #1a1f2e 0%, #141822 100%) !important;
+}
+
+/* Dark Mode: Better colored cards */
+body.dark-mode .bg-gradient-to-br.from-white {
+    background: linear-gradient(to bottom right, var(--bg-card) 0%, var(--bg-body) 100%) !important;
+}
+
+body.dark-mode .bg-gradient-to-br.from-white.to-orange-50 {
+    background: linear-gradient(to bottom right, #2a1f1a 0%, #1a1410 100%) !important;
+}
+
+body.dark-mode .bg-gradient-to-br.from-white.to-blue-50 {
+    background: linear-gradient(to bottom right, #1a1f2e 0%, #141822 100%) !important;
+}
+
+body.dark-mode .bg-gradient-to-br.from-white.to-green-50 {
+    background: linear-gradient(to bottom right, #1a251f 0%, #14181a 100%) !important;
+}
+
+body.dark-mode .bg-gradient-to-br.from-white.to-purple-50 {
+    background: linear-gradient(to bottom right, #211a2e 0%, #181422 100%) !important;
+}
+
+body.dark-mode .bg-gradient-to-br.from-white.to-gray-50 {
+    background: linear-gradient(to bottom right, #1e1e1e 0%, #141414 100%) !important;
+}
+
+/* Dark Mode: Improve icon visibility */
+body.dark-mode i,
+body.dark-mode .fa,
+body.dark-mode [class*="fas"],
+body.dark-mode [class*="far"] {
+    opacity: 0.95;
+}
+
+/* Dark Mode: Better badge/tag styling */
+body.dark-mode .badge,
+body.dark-mode .tag {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Dark Mode: Perfect text colors for specific elements */
+body.dark-mode .text-blue-600 {
+    color: #60a5fa !important; /* blue-400 */
+}
+
+body.dark-mode .text-green-600 {
+    color: #4ade80 !important; /* green-400 */
+}
+
+body.dark-mode .text-orange-600 {
+    color: #fb923c !important; /* orange-400 */
+}
+
+body.dark-mode .text-purple-600 {
+    color: #c084fc !important; /* purple-400 */
+}
+
+body.dark-mode .text-red-600 {
+    color: #f87171 !important; /* red-400 */
+}
+
+body.dark-mode .text-yellow-600 {
+    color: #fbbf24 !important; /* yellow-400 */
+}
+
+/* Dark Mode: Enhanced hover states */
+body.dark-mode a:hover:not(.btn):not(.no-hover) {
+    color: var(--ibc-blue-light) !important;
+    text-decoration: underline;
+    text-decoration-color: rgba(51, 133, 196, 0.5);
+}
+
+body.dark-mode .hover\:shadow-2xl:hover {
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Dark Mode: Perfect modal/overlay styling */
+body.dark-mode .modal,
+body.dark-mode .overlay {
+    background-color: rgba(10, 15, 30, 0.95) !important;
+}
+
+body.dark-mode .modal-content {
+    background: linear-gradient(145deg, #1a1f2e 0%, #141822 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Dark Mode: Perfect form styling */
+body.dark-mode .form-group label {
+    color: #e2e8f0 !important; /* slate-200 */
+    font-weight: 500;
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode input:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus {
+    background-color: #0f1419 !important;
+    border-color: var(--ibc-blue-light) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(51, 133, 196, 0.25) !important;
+}
+
+/* Dark Mode: Better transitions everywhere */
+body.dark-mode * {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.dark-mode *:not(input):not(textarea):not(select) {
+    transition-property: background-color, border-color, color, box-shadow, transform;
+}
+
+/* Dark Mode: Improved glass effect */
+body.dark-mode .glass,
+body.dark-mode .glass-card {
+    background: rgba(26, 31, 46, 0.8) !important;
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Dark Mode: Perfect code block styling */
+body.dark-mode code,
+body.dark-mode pre {
+    background-color: #0f1419 !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #334155;
+}
+
+/* Dark Mode: Better alert/notification styling */
+body.dark-mode .alert {
+    border-left-width: 4px;
+    border-left-color: var(--ibc-blue-light);
+    background-color: rgba(51, 133, 196, 0.1) !important;
+}
+
+body.dark-mode .alert-success {
+    border-left-color: var(--ibc-green) !important;
+    background-color: rgba(0, 166, 81, 0.1) !important;
+}
+
+body.dark-mode .alert-warning {
+    border-left-color: var(--ibc-warning) !important;
+    background-color: rgba(245, 158, 11, 0.1) !important;
+}
+
+body.dark-mode .alert-error,
+body.dark-mode .alert-danger {
+    border-left-color: var(--ibc-error) !important;
+    background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Dark Mode: Smooth scrollbar */
+body.dark-mode::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+body.dark-mode::-webkit-scrollbar-track {
+    background: var(--bg-body);
+}
+
+body.dark-mode::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 6px;
+    border: 2px solid var(--bg-body);
+}
+
+body.dark-mode::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* Dark Mode: Perfect loading states */
+body.dark-mode .skeleton {
+    background: linear-gradient(90deg, #1a1f2e 25%, #242938 50%, #1a1f2e 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Dark Mode: Better dropdown menus */
+body.dark-mode .dropdown-menu,
+body.dark-mode .menu {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.dark-mode .dropdown-item:hover,
+body.dark-mode .menu-item:hover {
+    background-color: rgba(51, 133, 196, 0.15) !important;
+}
+
+/* Dark Mode: Perfect finish for all interactive elements */
+body.dark-mode button:not(:disabled):hover,
+body.dark-mode a.btn:not(.disabled):hover {
+    filter: brightness(1.15);
+}
+
+body.dark-mode button:not(:disabled):active,
+body.dark-mode a.btn:not(.disabled):active {
+    transform: scale(0.98);
+}
+
+/* ============================================
+   END OF PERFECT DARK MODE ENHANCEMENTS
+   ============================================ */
