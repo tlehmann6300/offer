@@ -186,20 +186,20 @@ function dismissProfileReviewPrompt() {
 <!-- Hero Section with Personalized Greeting -->
 <div class="mb-10">
     <div class="max-w-4xl mx-auto">
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-blue-700 to-emerald-600 p-8 md:p-12 text-white shadow-xl">
+        <div class="hero-gradient relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-blue-700 to-emerald-600 p-8 md:p-12 text-white shadow-xl">
             <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptMCAwdi02aC02djZoNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-50"></div>
             <div class="relative z-10">
-                <p class="text-blue-100 text-sm font-medium uppercase tracking-wider mb-2">
+                <p class="text-blue-100 text-sm font-medium uppercase tracking-wider mb-2 hero-date">
                     <i class="fas fa-sun mr-1"></i> <?php
                         $germanMonths = [1=>'Januar',2=>'Februar',3=>'März',4=>'April',5=>'Mai',6=>'Juni',7=>'Juli',8=>'August',9=>'September',10=>'Oktober',11=>'November',12=>'Dezember'];
                         $monthNum = (int)date('n');
                         echo date('d') . '. ' . ($germanMonths[$monthNum] ?? '') . ' ' . date('Y');
                     ?>
                 </p>
-                <h1 class="text-3xl md:text-5xl font-extrabold mb-3 tracking-tight" style="color: white !important;">
+                <h1 class="text-3xl md:text-5xl font-extrabold mb-3 tracking-tight hero-title">
                     <?php echo htmlspecialchars($greeting); ?>, <?php echo htmlspecialchars($displayName); ?>! 👋
                 </h1>
-                <p class="text-lg text-blue-100 font-medium" style="color: rgba(219, 234, 254, 0.9) !important;">
+                <p class="text-lg text-blue-100 font-medium hero-subtitle">
                     Willkommen zurück im IBC Intranet
                 </p>
             </div>
