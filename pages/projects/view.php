@@ -161,14 +161,18 @@ ob_start();
     </div>
     <?php endif; ?>
 
-    <!-- Project Card -->
-    <div class="card p-8">
-        <!-- Image -->
+    <!-- Project Card with Enhanced Design -->
+    <div class="project-detail-card card p-8 relative overflow-hidden">
+        <!-- Decorative gradient background -->
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 via-blue-600 to-green-600" aria-hidden="true"></div>
+        
+        <!-- Image with Hero Effect -->
         <?php if (!empty($project['image_path'])): ?>
-        <div class="mb-6 rounded-lg overflow-hidden">
+        <div class="mb-8 rounded-xl overflow-hidden shadow-2xl relative group">
             <img src="/<?php echo htmlspecialchars($project['image_path']); ?>" 
                  alt="<?php echo htmlspecialchars($project['title']); ?>"
-                 class="w-full h-96 object-cover">
+                 class="w-full h-96 object-cover transform group-hover:scale-105 transition-transform duration-700">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </div>
         <?php endif; ?>
         
@@ -187,31 +191,32 @@ ob_start();
         }
         if ($showPdfButton): 
         ?>
-        <div class="mb-6">
+        <div class="mb-8">
             <a href="/<?php echo htmlspecialchars($project['file_path']); ?>" 
-               class="inline-flex items-center px-5 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-semibold hover:from-red-700 hover:to-red-800 shadow-md hover:shadow-lg transform hover:-translate-y-1 transition duration-200"
+               class="inline-flex items-center px-6 py-4 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-xl font-bold hover:from-red-700 hover:to-rose-700 shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
                download>
-                <i class="fas fa-file-pdf mr-2"></i>
-                Projekt-Datei herunterladen (PDF)
+                <i class="fas fa-file-pdf mr-3 text-xl"></i>
+                <span>Projekt-Datei herunterladen (PDF)</span>
             </a>
         </div>
         <?php endif; ?>
         
-        <!-- Status and Priority -->
-        <div class="flex items-center gap-3 mb-6">
-            <span class="px-4 py-2 text-sm font-semibold rounded-full
+        <!-- Status and Priority with Modern Badges -->
+        <div class="flex items-center gap-3 mb-8 flex-wrap">
+            <span class="status-detail-badge px-5 py-2.5 text-sm font-bold rounded-full shadow-md
                 <?php 
                 switch($project['status']) {
-                    case 'draft': echo 'bg-gray-100 text-gray-800'; break;
-                    case 'open': echo 'bg-yellow-100 text-yellow-800'; break;
-                    case 'applying': echo 'bg-yellow-100 text-yellow-800'; break;
-                    case 'assigned': echo 'bg-blue-100 text-blue-800'; break;
-                    case 'running': echo 'bg-blue-100 text-blue-800'; break;
-                    case 'completed': echo 'bg-green-100 text-green-800'; break;
+                    case 'draft': echo 'bg-gradient-to-r from-gray-400 to-gray-500 text-white'; break;
+                    case 'open': echo 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'; break;
+                    case 'applying': echo 'bg-gradient-to-r from-yellow-500 to-amber-600 text-white'; break;
+                    case 'assigned': echo 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'; break;
+                    case 'running': echo 'bg-gradient-to-r from-purple-500 to-purple-600 text-white'; break;
+                    case 'completed': echo 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white'; break;
                     case 'archived': echo 'bg-gray-200 text-gray-600'; break;
                     default: echo 'bg-gray-100 text-gray-800'; break;
                 }
                 ?>">
+                <i class="fas fa-circle text-[10px] mr-2 animate-pulse"></i>
                 <?php 
                 switch($project['status']) {
                     case 'draft': echo 'Entwurf'; break;
@@ -226,93 +231,110 @@ ob_start();
                 ?>
             </span>
             
-            <span class="px-3 py-2 text-sm font-semibold rounded-full
+            <span class="priority-detail-badge px-4 py-2.5 text-sm font-bold rounded-full shadow-md
                 <?php 
                 switch($project['priority']) {
-                    case 'low': echo 'bg-blue-100 text-blue-800'; break;
-                    case 'medium': echo 'bg-yellow-100 text-yellow-800'; break;
-                    case 'high': echo 'bg-red-100 text-red-800'; break;
+                    case 'low': echo 'bg-gradient-to-r from-blue-400 to-blue-500 text-white'; break;
+                    case 'medium': echo 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white'; break;
+                    case 'high': echo 'bg-gradient-to-r from-red-500 to-rose-600 text-white'; break;
                     default: echo 'bg-gray-100 text-gray-800'; break;
                 }
                 ?>">
                 <?php 
                 switch($project['priority']) {
-                    case 'low': echo '<i class="fas fa-arrow-down"></i> Niedrig'; break;
-                    case 'medium': echo '<i class="fas fa-minus"></i> Mittel'; break;
-                    case 'high': echo '<i class="fas fa-arrow-up"></i> Hoch'; break;
+                    case 'low': echo '<i class="fas fa-arrow-down mr-1"></i> Niedrig'; break;
+                    case 'medium': echo '<i class="fas fa-minus mr-1"></i> Mittel'; break;
+                    case 'high': echo '<i class="fas fa-arrow-up mr-1"></i> Hoch'; break;
                     default: echo ucfirst($project['priority']); break;
                 }
                 ?>
             </span>
             
-            <span class="px-3 py-2 text-sm font-semibold rounded-full
+            <span class="type-detail-badge px-4 py-2.5 text-sm font-bold rounded-full shadow-md
                 <?php 
                 $projectType = $project['type'] ?? 'internal';
-                echo $projectType === 'internal' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800';
+                echo $projectType === 'internal' ? 'bg-gradient-to-r from-indigo-500 to-blue-600 text-white' : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white';
                 ?>">
-                <i class="fas fa-tag mr-1"></i>
+                <i class="fas fa-tag mr-2"></i>
                 <?php echo $projectType === 'internal' ? 'Intern' : 'Extern'; ?>
             </span>
         </div>
         
-        <!-- Title -->
-        <h1 class="text-3xl font-bold text-gray-800 mb-6">
+        <!-- Title with Gradient Effect -->
+        <h1 class="text-4xl font-bold mb-8 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
             <?php echo htmlspecialchars($project['title']); ?>
         </h1>
         
-        <!-- Project Information -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+        <!-- Project Information with Modern Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
             <?php if (!empty($project['client_name'])): ?>
-            <div class="flex items-center">
-                <i class="fas fa-user-tie w-6 text-purple-600 mr-2"></i>
+            <div class="info-card flex items-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200 hover:shadow-lg transition-all duration-300">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mr-4 shadow-md">
+                    <i class="fas fa-user-tie text-white text-lg"></i>
+                </div>
                 <div>
-                    <div class="text-xs text-gray-500">Kunde</div>
-                    <div class="font-semibold"><?php echo htmlspecialchars($project['client_name']); ?></div>
+                    <div class="text-xs text-purple-600 font-semibold uppercase tracking-wide">Kunde</div>
+                    <div class="font-bold text-gray-800"><?php echo htmlspecialchars($project['client_name']); ?></div>
                 </div>
             </div>
             <?php endif; ?>
             
             <?php if (!empty($project['start_date'])): ?>
-            <div class="flex items-center">
-                <i class="fas fa-calendar-start w-6 text-purple-600 mr-2"></i>
+            <div class="info-card flex items-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 hover:shadow-lg transition-all duration-300">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mr-4 shadow-md">
+                    <i class="fas fa-calendar-start text-white text-lg"></i>
+                </div>
                 <div>
-                    <div class="text-xs text-gray-500">Startdatum</div>
-                    <div class="font-semibold"><?php echo date('d.m.Y', strtotime($project['start_date'])); ?></div>
+                    <div class="text-xs text-blue-600 font-semibold uppercase tracking-wide">Startdatum</div>
+                    <div class="font-bold text-gray-800"><?php echo date('d.m.Y', strtotime($project['start_date'])); ?></div>
                 </div>
             </div>
             <?php endif; ?>
             
             <?php if (!empty($project['end_date'])): ?>
-            <div class="flex items-center">
-                <i class="fas fa-calendar-check w-6 text-purple-600 mr-2"></i>
+            <div class="info-card flex items-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200 hover:shadow-lg transition-all duration-300">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mr-4 shadow-md">
+                    <i class="fas fa-calendar-check text-white text-lg"></i>
+                </div>
                 <div>
-                    <div class="text-xs text-gray-500">Enddatum</div>
-                    <div class="font-semibold"><?php echo date('d.m.Y', strtotime($project['end_date'])); ?></div>
+                    <div class="text-xs text-green-600 font-semibold uppercase tracking-wide">Enddatum</div>
+                    <div class="font-bold text-gray-800"><?php echo date('d.m.Y', strtotime($project['end_date'])); ?></div>
                 </div>
             </div>
             <?php endif; ?>
         </div>
         
-        <!-- Team Progress Bar -->
-        <div class="mb-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-100">
-            <div class="flex items-center justify-between mb-2">
-                <h3 class="text-lg font-bold text-gray-800">
-                    <i class="fas fa-users text-purple-600 mr-2"></i>
-                    Team
+        <!-- Team Progress Bar with Enhanced Design -->
+        <div class="mb-8 p-6 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 rounded-2xl border-2 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-800 flex items-center">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center mr-3 shadow-md">
+                        <i class="fas fa-users text-white"></i>
+                    </div>
+                    Team Status
                 </h3>
-                <span class="text-xl font-bold text-purple-600">
-                    <?php echo $teamSize; ?> / <?php echo $maxConsultants; ?> besetzt
+                <span class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                    <?php echo $teamSize; ?> / <?php echo $maxConsultants; ?>
                 </span>
             </div>
-            <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-                <div class="bg-gradient-to-r from-purple-500 to-blue-500 h-4 rounded-full transition-all duration-300 flex items-center justify-end pr-2"
-                     style="width: <?php echo $teamPercentage; ?>%">
+            <div class="relative w-full bg-gray-200 rounded-full h-6 overflow-hidden shadow-inner">
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-500 via-blue-500 to-purple-500 h-6 rounded-full transition-all duration-700 flex items-center justify-end pr-3 animate-gradient"
+                     style="width: <?php echo $teamPercentage; %>%; background-size: 200% 100%;">
                     <?php if ($teamSize > 0): ?>
-                    <span class="text-xs font-semibold text-white">
+                    <span class="text-sm font-bold text-white drop-shadow-lg">
                         <?php echo $teamPercentage; ?>%
                     </span>
                     <?php endif; ?>
                 </div>
+            </div>
+            <div class="mt-3 text-sm text-gray-600 font-medium">
+                <?php if ($teamPercentage >= 100): ?>
+                    <i class="fas fa-check-circle text-green-500 mr-1"></i> Team vollständig besetzt
+                <?php elseif ($teamPercentage >= 75): ?>
+                    <i class="fas fa-info-circle text-blue-500 mr-1"></i> Nur noch wenige Plätze verfügbar
+                <?php else: ?>
+                    <i class="fas fa-users text-purple-500 mr-1"></i> Weitere Teammitglieder gesucht
+                <?php endif; ?>
             </div>
         </div>
         
@@ -547,6 +569,115 @@ ob_start();
         <?php endif; ?>
     </div>
 </div>
+
+<style>
+    /* Enhanced project detail card */
+    .project-detail-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f9fafb 50%, #ffffff 100%);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        animation: fadeIn 0.5s ease-out;
+    }
+    
+    .project-detail-card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+    
+    /* Status badge hover effects */
+    .status-detail-badge, .priority-detail-badge, .type-detail-badge {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .status-detail-badge:hover, .priority-detail-badge:hover, .type-detail-badge:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Info card hover effects */
+    .info-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .info-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .info-card:hover::before {
+        left: 100%;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-3px);
+    }
+    
+    /* Animated gradient for progress bar */
+    @keyframes gradient {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+    
+    .animate-gradient {
+        animation: gradient 3s ease infinite;
+    }
+    
+    /* Fade in animation */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Respect user motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+        .project-detail-card {
+            animation: none;
+        }
+        
+        .animate-gradient {
+            animation: none;
+        }
+        
+        .status-detail-badge .animate-pulse,
+        .priority-detail-badge .animate-pulse,
+        .type-detail-badge .animate-pulse,
+        .status-detail-badge .fas,
+        .priority-detail-badge .fas,
+        .type-detail-badge .fas {
+            animation: none !important;
+        }
+        
+        .info-card,
+        .status-detail-badge,
+        .priority-detail-badge,
+        .type-detail-badge {
+            transition: none;
+            transform: none !important;
+        }
+    }
+</style>
 
 <?php
 $content = ob_get_clean();

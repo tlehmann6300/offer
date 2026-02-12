@@ -135,20 +135,21 @@ ob_start();
                         </a>
                     <?php endif; ?>
                     
-                    <!-- Status and Priority Badges -->
+                    <!-- Status and Priority Badges with Animation -->
                     <div class="flex items-start justify-between mb-4 gap-2">
-                        <span class="px-3 py-1 text-xs font-semibold rounded-full
+                        <span class="status-badge px-3 py-1.5 text-xs font-bold rounded-full shadow-sm
                             <?php 
                             switch($project['status']) {
-                                case 'open': echo 'bg-blue-100 text-blue-800'; break;
-                                case 'applying': echo 'bg-yellow-100 text-yellow-800'; break;
-                                case 'assigned': echo 'bg-green-100 text-green-800'; break;
-                                case 'running': echo 'bg-purple-100 text-purple-800'; break;
-                                case 'completed': echo 'bg-teal-100 text-teal-800'; break;
+                                case 'open': echo 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'; break;
+                                case 'applying': echo 'bg-gradient-to-r from-yellow-500 to-amber-600 text-white'; break;
+                                case 'assigned': echo 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'; break;
+                                case 'running': echo 'bg-gradient-to-r from-purple-500 to-purple-600 text-white'; break;
+                                case 'completed': echo 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white'; break;
                                 case 'archived': echo 'bg-gray-200 text-gray-600'; break;
                                 default: echo 'bg-gray-100 text-gray-800'; break;
                             }
                             ?>">
+                            <i class="fas fa-circle text-[8px] mr-1 animate-pulse"></i>
                             <?php 
                             switch($project['status']) {
                                 case 'open': echo 'Offen'; break;
@@ -161,12 +162,12 @@ ob_start();
                             }
                             ?>
                         </span>
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full
+                        <span class="priority-badge px-3 py-1.5 text-xs font-bold rounded-full shadow-sm
                             <?php 
                             switch($project['priority']) {
-                                case 'low': echo 'bg-blue-100 text-blue-800'; break;
-                                case 'medium': echo 'bg-yellow-100 text-yellow-800'; break;
-                                case 'high': echo 'bg-red-100 text-red-800'; break;
+                                case 'low': echo 'bg-gradient-to-r from-blue-400 to-blue-500 text-white'; break;
+                                case 'medium': echo 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white'; break;
+                                case 'high': echo 'bg-gradient-to-r from-red-500 to-rose-600 text-white'; break;
                                 default: echo 'bg-gray-100 text-gray-800'; break;
                             }
                             ?>">
@@ -183,19 +184,19 @@ ob_start();
 
                     <!-- Project Type Badge -->
                     <div class="mb-4">
-                        <span class="px-3 py-1 text-xs font-semibold rounded-full
+                        <span class="type-badge px-3 py-1.5 text-xs font-bold rounded-full shadow-sm
                             <?php 
                             $projectType = $project['type'] ?? 'internal';
-                            echo $projectType === 'internal' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800';
+                            echo $projectType === 'internal' ? 'bg-gradient-to-r from-indigo-500 to-blue-600 text-white' : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white';
                             ?>">
                             <i class="fas fa-tag mr-1"></i>
                             <?php echo $projectType === 'internal' ? 'Intern' : 'Extern'; ?>
                         </span>
                     </div>
 
-                    <!-- Title -->
-                    <a href="view.php?id=<?php echo $project['id']; ?>" class="block mb-2 hover:text-purple-600 transition">
-                        <h3 class="text-xl font-bold text-gray-800">
+                    <!-- Title with Hover Effect -->
+                    <a href="view.php?id=<?php echo $project['id']; ?>" class="block mb-3 group">
+                        <h3 class="text-xl font-bold text-gray-800 group-hover:text-purple-600 transition-colors duration-300">
                             <?php echo htmlspecialchars($project['title']); ?>
                         </h3>
                     </a>
@@ -207,39 +208,45 @@ ob_start();
                         </p>
                     <?php endif; ?>
 
-                    <!-- Project Info -->
-                    <div class="space-y-2 mb-4 text-sm text-gray-600">
+                    <!-- Project Info with Enhanced Icons -->
+                    <div class="space-y-2.5 mb-5 text-sm text-gray-600">
                         <?php if (!empty($project['client_name'])): ?>
-                            <div class="flex items-center">
-                                <i class="fas fa-user-tie w-5 text-purple-600"></i>
-                                <span><?php echo htmlspecialchars($project['client_name']); ?></span>
+                            <div class="flex items-center group">
+                                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center mr-3">
+                                    <i class="fas fa-user-tie text-purple-600 text-sm"></i>
+                                </div>
+                                <span class="group-hover:text-purple-600 transition-colors"><?php echo htmlspecialchars($project['client_name']); ?></span>
                             </div>
                         <?php endif; ?>
                         <?php if (!empty($project['start_date'])): ?>
-                            <div class="flex items-center">
-                                <i class="fas fa-calendar-start w-5 text-purple-600"></i>
-                                <span>Start: <?php echo date('d.m.Y', strtotime($project['start_date'])); ?></span>
+                            <div class="flex items-center group">
+                                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center mr-3">
+                                    <i class="fas fa-calendar-start text-blue-600 text-sm"></i>
+                                </div>
+                                <span class="group-hover:text-blue-600 transition-colors">Start: <?php echo date('d.m.Y', strtotime($project['start_date'])); ?></span>
                             </div>
                         <?php endif; ?>
                         <?php if (!empty($project['end_date'])): ?>
-                            <div class="flex items-center">
-                                <i class="fas fa-calendar-check w-5 text-purple-600"></i>
-                                <span>Ende: <?php echo date('d.m.Y', strtotime($project['end_date'])); ?></span>
+                            <div class="flex items-center group">
+                                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center mr-3">
+                                    <i class="fas fa-calendar-check text-green-600 text-sm"></i>
+                                </div>
+                                <span class="group-hover:text-green-600 transition-colors">Ende: <?php echo date('d.m.Y', strtotime($project['end_date'])); ?></span>
                             </div>
                         <?php endif; ?>
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="flex flex-col space-y-2">
+                    <!-- Action Buttons with Modern Design -->
+                    <div class="flex flex-col space-y-2.5">
                         <a href="view.php?id=<?php echo $project['id']; ?>" 
-                           class="block w-full text-center px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition">
+                           class="block w-full text-center px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-bold hover:from-purple-700 hover:to-indigo-700 transform hover:-translate-y-0.5 transition-all duration-200 shadow-md hover:shadow-xl">
                             <i class="fas fa-eye mr-2"></i>
                             Details ansehen
                         </a>
                         
                         <?php if ($canApply): ?>
                             <a href="view.php?id=<?php echo $project['id']; ?>&action=apply" 
-                               class="block w-full text-center px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition">
+                               class="block w-full text-center px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-bold hover:from-green-700 hover:to-emerald-700 transform hover:-translate-y-0.5 transition-all duration-200 shadow-md hover:shadow-xl">
                                 <i class="fas fa-paper-plane mr-2"></i>
                                 Jetzt bewerben
                             </a>
@@ -252,6 +259,7 @@ ob_start();
 </div>
 
 <style>
+    /* Line clamp utility */
     .line-clamp-3 {
         display: -webkit-box;
         -webkit-line-clamp: 3;
@@ -259,8 +267,129 @@ ob_start();
         overflow: hidden;
     }
     
+    /* Grayscale filter for archived projects */
     .grayscale {
         filter: grayscale(80%);
+    }
+    
+    /* Enhanced project card styles */
+    .project-card {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .project-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+        border-color: rgba(139, 92, 246, 0.2);
+    }
+    
+    .project-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .project-card:hover::before {
+        opacity: 1;
+    }
+    
+    /* Image wrapper with overlay */
+    .project-image-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.5rem;
+    }
+    
+    .project-image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .project-image-wrapper:hover .project-image-overlay {
+        opacity: 1;
+    }
+    
+    /* Status badge animations */
+    .status-badge, .priority-badge, .type-badge {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+    
+    .status-badge:hover, .priority-badge:hover, .type-badge:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Grid stagger animation */
+    .project-card {
+        animation: fadeInUp 0.6s ease-out backwards;
+    }
+    
+    .project-card:nth-child(1) { animation-delay: 0.05s; }
+    .project-card:nth-child(2) { animation-delay: 0.1s; }
+    .project-card:nth-child(3) { animation-delay: 0.15s; }
+    .project-card:nth-child(4) { animation-delay: 0.2s; }
+    .project-card:nth-child(5) { animation-delay: 0.25s; }
+    .project-card:nth-child(6) { animation-delay: 0.3s; }
+    .project-card:nth-child(7) { animation-delay: 0.35s; }
+    .project-card:nth-child(8) { animation-delay: 0.4s; }
+    .project-card:nth-child(9) { animation-delay: 0.45s; }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Respect user motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+        .project-card {
+            animation: none;
+        }
+        
+        .status-badge .animate-pulse,
+        .priority-badge .animate-pulse,
+        .type-badge .animate-pulse,
+        .status-badge .fas,
+        .priority-badge .fas,
+        .type-badge .fas {
+            animation: none !important;
+        }
+        
+        .project-image-wrapper img {
+            transition: none;
+        }
+        
+        .project-card,
+        .status-badge,
+        .priority-badge,
+        .type-badge,
+        .info-card {
+            transform: none !important;
+        }
     }
 </style>
 
