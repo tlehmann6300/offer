@@ -588,7 +588,8 @@ class AuthHandler {
                         // Ensure profile_photos directory exists using realpath for security
                         $baseDir = realpath(__DIR__ . '/../../uploads');
                         if ($baseDir === false) {
-                            throw new Exception('Base uploads directory does not exist');
+                            $attemptedPath = __DIR__ . '/../../uploads';
+                            throw new Exception("Base uploads directory does not exist at: {$attemptedPath}");
                         }
                         
                         $uploadDir = $baseDir . '/profile_photos';
@@ -608,21 +609,19 @@ class AuthHandler {
                             try {
                                 $contentDb = Database::getContentDB();
                                 
-                                // Only create/update profile if we have name data
+                                // Update image_path in profile, creating profile if we have name data
                                 if ($firstName && $lastName) {
                                     // Use INSERT ... ON DUPLICATE KEY UPDATE for upsert (prevents race conditions)
+                                    // This handles both profile creation and update in one statement
                                     $stmt = $contentDb->prepare("
                                         INSERT INTO alumni_profiles (user_id, first_name, last_name, email, image_path)
                                         VALUES (?, ?, ?, ?, ?)
                                         ON DUPLICATE KEY UPDATE 
-                                            first_name = VALUES(first_name),
-                                            last_name = VALUES(last_name),
-                                            email = VALUES(email),
                                             image_path = VALUES(image_path)
                                     ");
                                     $stmt->execute([$userId, $firstName, $lastName, $email, $imagePath]);
                                 } else {
-                                    // Only update image_path if profile already exists
+                                    // Only update image_path if profile already exists (no name data to create profile)
                                     $stmt = $contentDb->prepare("UPDATE alumni_profiles SET image_path = ? WHERE user_id = ?");
                                     $stmt->execute([$imagePath, $userId]);
                                 }
