@@ -208,11 +208,14 @@ function init_session() {
         }
         
         // Set secure cookie parameters BEFORE starting session
+        // Only require secure flag over HTTPS to prevent session issues over HTTP
+        $isSecure = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+        
         session_set_cookie_params([
             'lifetime' => $lifetime,
             'path' => '/',
             'domain' => $domain,
-            'secure' => true,
+            'secure' => $isSecure,
             'httponly' => true,
             'samesite' => 'Strict'
         ]);
