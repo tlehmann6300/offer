@@ -2760,6 +2760,37 @@ body.dark-mode a.btn:not(.disabled):active {
     transform: scale(0.98);
 }
 
+/* Dark Mode: Perfect Hero Section Styling */
+body.dark-mode .hero-gradient {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 30%, #065f46 70%, #047857 100%) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .hero-gradient .hero-title {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .hero-gradient .hero-subtitle {
+    color: rgba(226, 232, 240, 0.95) !important; /* slate-200 */
+}
+
+body.dark-mode .hero-gradient .hero-date {
+    color: rgba(203, 213, 225, 0.9) !important; /* slate-300 */
+}
+
+/* Light Mode: Ensure hero is vibrant */
+body:not(.dark-mode) .hero-gradient .hero-title {
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+body:not(.dark-mode) .hero-gradient .hero-subtitle,
+body:not(.dark-mode) .hero-gradient .hero-date {
+    color: rgba(219, 234, 254, 0.95) !important;
+}
+
 /* ============================================
    END OF PERFECT DARK MODE ENHANCEMENTS
    ============================================ */
