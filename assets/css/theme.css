@@ -8,6 +8,11 @@
     --text-muted: #4b5563; /* Dark Gray */
     --border-color: #e5e7eb;
     
+    /* Light Mode Enhanced Gradients */
+    --gradient-card-light: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    --gradient-hero-light: linear-gradient(135deg, #ffffff 0%, #f3f4f6 50%, #e5e7eb 100%);
+    --gradient-subtle: linear-gradient(180deg, rgba(249, 250, 251, 0) 0%, rgba(249, 250, 251, 0.4) 100%);
+    
     /* Legacy compatibility variables */
     --bg-color: #f9fafb; /* Light Gray */
     --text-color: #111827; /* Dark Grey/Black */
@@ -67,10 +72,12 @@
     --transition-normal: 250ms ease;
     --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
 
-    /* Card Shadows */
+    /* Card Shadows - Enhanced for Light Mode */
     --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06);
     --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.08), 0 20px 40px rgba(0,0,0,0.12);
     --shadow-elevated: 0 8px 30px rgba(0,0,0,0.12);
+    --shadow-glow-blue: 0 0 20px rgba(0, 102, 179, 0.15), 0 4px 12px rgba(0, 102, 179, 0.1);
+    --shadow-inner-glow: inset 0 2px 8px rgba(255, 255, 255, 0.8);
 
     /* Spacing & Layout */
     --mobile-header-offset: 5rem;
@@ -357,8 +364,35 @@ body.dark-mode a:not(.btn-primary) {
 }
 
 /* Light Mode Links - Use IBC Blue for interactive elements */
-body:not(.dark-mode) a:not(.btn-primary) {
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline) {
     color: var(--ibc-blue);
+    position: relative;
+    text-decoration: none;
+    transition: color var(--transition-normal);
+}
+
+/* Light Mode: Animated underline on hover */
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a) {
+    display: inline-block;
+}
+
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a)::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--ibc-blue), var(--ibc-green));
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a):hover::after {
+    width: 100%;
+}
+
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):hover {
+    color: var(--ibc-blue-dark);
 }
 
 body.dark-mode .text-gray-600 {
@@ -1491,7 +1525,7 @@ body.dark-mode .text-green-500 {
 
 /* Premium Card Styles */
 .card {
-    background: var(--bg-card);
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
     border: 1px solid rgba(0, 0, 0, 0.06);
@@ -1512,6 +1546,18 @@ body.dark-mode .text-green-500 {
     transition: opacity var(--transition-normal);
 }
 
+/* Light Mode: Subtle inner glow effect */
+body:not(.dark-mode) .card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+    background: radial-gradient(circle at top left, rgba(0, 166, 81, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-slow);
+}
+
 .card:hover {
     box-shadow: var(--shadow-card-hover);
     transform: translateY(-4px);
@@ -1519,6 +1565,10 @@ body.dark-mode .text-green-500 {
 }
 
 .card:hover::before {
+    opacity: 1;
+}
+
+body:not(.dark-mode) .card:hover::after {
     opacity: 1;
 }
 
@@ -1573,12 +1623,35 @@ body.dark-mode .text-green-500 {
     transition: all var(--transition-normal);
     border: none;
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Light Mode: Button ripple effect */
+body:not(.dark-mode) .btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+body:not(.dark-mode) .btn-primary:active::after {
+    width: 300px;
+    height: 300px;
+    transition: width 0s, height 0s;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 166, 81, 0.4);
     background-size: 200% 200%;
+    filter: brightness(1.05);
 }
 
 @keyframes gradientShift {
@@ -1596,6 +1669,17 @@ textarea {
     border: 2px solid var(--ibc-gray-200);
     transition: all var(--transition-normal);
     font-size: 0.95rem;
+    background: var(--bg-card);
+}
+
+/* Light Mode: Input focus with enhanced glow */
+body:not(.dark-mode) input:not([type="checkbox"]):not([type="radio"]):focus,
+body:not(.dark-mode) select:focus,
+body:not(.dark-mode) textarea:focus {
+    border-color: var(--ibc-blue);
+    box-shadow: 0 0 0 4px rgba(0, 102, 179, 0.1), 0 4px 12px rgba(0, 102, 179, 0.08);
+    outline: none;
+    transform: translateY(-1px);
 }
 
 input:not([type="checkbox"]):not([type="radio"]):focus,
@@ -1641,6 +1725,60 @@ main > .card {
     }
 }
 
+/* Light Mode: Pulsing status indicators */
+@keyframes pulse-glow {
+    0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 8px currentColor;
+    }
+    50% {
+        opacity: 0.6;
+        box-shadow: 0 0 16px currentColor;
+    }
+}
+
+body:not(.dark-mode) .status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+body:not(.dark-mode) .status-indicator.status-success {
+    background-color: var(--ibc-success);
+    color: var(--ibc-success);
+}
+
+body:not(.dark-mode) .status-indicator.status-warning {
+    background-color: var(--ibc-warning);
+    color: var(--ibc-warning);
+}
+
+body:not(.dark-mode) .status-indicator.status-error {
+    background-color: var(--ibc-error);
+    color: var(--ibc-error);
+}
+
+body:not(.dark-mode) .status-indicator.status-info {
+    background-color: var(--ibc-info);
+    color: var(--ibc-info);
+}
+
+/* Light Mode: Staggered list animations */
+body:not(.dark-mode) .staggered-list > * {
+    animation: fadeSlideUp 0.5s ease-out backwards;
+}
+
+body:not(.dark-mode) .staggered-list > *:nth-child(1) { animation-delay: 0.05s; }
+body:not(.dark-mode) .staggered-list > *:nth-child(2) { animation-delay: 0.1s; }
+body:not(.dark-mode) .staggered-list > *:nth-child(3) { animation-delay: 0.15s; }
+body:not(.dark-mode) .staggered-list > *:nth-child(4) { animation-delay: 0.2s; }
+body:not(.dark-mode) .staggered-list > *:nth-child(5) { animation-delay: 0.25s; }
+body:not(.dark-mode) .staggered-list > *:nth-child(6) { animation-delay: 0.3s; }
+body:not(.dark-mode) .staggered-list > *:nth-child(7) { animation-delay: 0.35s; }
+body:not(.dark-mode) .staggered-list > *:nth-child(8) { animation-delay: 0.4s; }
+
 /* Improved Table Design */
 table {
     border-radius: var(--radius-lg);
@@ -1656,12 +1794,25 @@ th {
     padding: 1rem 1.25rem;
 }
 
+/* Light Mode: Enhanced table header */
+body:not(.dark-mode) th {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border-bottom: 2px solid var(--ibc-gray-300);
+    font-weight: 700;
+}
+
 td {
     padding: 0.875rem 1.25rem;
 }
 
 tbody tr {
-    transition: background-color var(--transition-fast);
+    transition: all var(--transition-fast);
+}
+
+/* Light Mode: Enhanced row hover */
+body:not(.dark-mode) tbody tr:hover {
+    background: linear-gradient(90deg, rgba(0, 102, 179, 0.04) 0%, rgba(0, 166, 81, 0.04) 100%);
+    transform: scale(1.005);
 }
 
 tbody tr:hover {
@@ -1674,6 +1825,41 @@ tbody tr:hover {
 [class*="rounded-full"][class*="text-sm"] {
     font-weight: 600;
     letter-spacing: 0.03em;
+}
+
+/* Light Mode: Glassmorphism effect for special cards */
+body:not(.dark-mode) .glass-effect {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 102, 179, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+/* Light Mode: Elevated cards with premium effect */
+body:not(.dark-mode) .card-elevated {
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    box-shadow: var(--shadow-elevated);
+    border: 1px solid rgba(0, 102, 179, 0.08);
+    position: relative;
+}
+
+body:not(.dark-mode) .card-elevated::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: var(--radius-lg);
+    padding: 1px;
+    background: linear-gradient(135deg, var(--ibc-green), var(--ibc-blue));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+body:not(.dark-mode) .card-elevated:hover::before {
+    opacity: 0.5;
 }
 
 /* Smooth Scrollbar for the whole page */
