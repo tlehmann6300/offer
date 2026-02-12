@@ -448,16 +448,16 @@ ob_start();
                     </td>
                     <td class="px-6 py-4">
                         <?php
-                        $typeColors = [
-                            'adjustment' => 'blue',
-                            'create' => 'green',
-                            'update' => 'yellow',
-                            'delete' => 'red',
-                            'checkout' => 'purple',
-                            'checkin' => 'green',
-                            'writeoff' => 'red'
+                        $typeClasses = [
+                            'adjustment' => 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
+                            'create' => 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
+                            'update' => 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
+                            'delete' => 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
+                            'checkout' => 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
+                            'checkin' => 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
+                            'writeoff' => 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
                         ];
-                        $color = $typeColors[$entry['change_type']] ?? 'gray';
+                        $badgeClass = $typeClasses[$entry['change_type']] ?? 'bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300';
                         $typeLabels = [
                             'adjustment' => 'Anpassung',
                             'create' => 'Erstellt',
@@ -469,7 +469,7 @@ ob_start();
                         ];
                         $label = $typeLabels[$entry['change_type']] ?? $entry['change_type'];
                         ?>
-                        <span class="px-3 py-1.5 text-xs font-semibold bg-<?php echo $color; ?>-100 text-<?php echo $color; ?>-700 dark:bg-<?php echo $color; ?>-900 dark:text-<?php echo $color; ?>-300 rounded-full">
+                        <span class="px-3 py-1.5 text-xs font-semibold <?php echo $badgeClass; ?> rounded-full">
                             <?php echo $label; ?>
                         </span>
                     </td>

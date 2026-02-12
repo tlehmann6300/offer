@@ -364,7 +364,7 @@ ob_start();
                 </span>
                 <?php endif; ?>
                 <?php if ($item['quantity'] <= $item['min_stock'] && $item['min_stock'] > 0): ?>
-                <span class="px-2.5 py-1.5 text-xs font-semibold bg-orange-500/90 text-white rounded-lg shadow-lg backdrop-blur-sm animate-pulse" title="Niedriger Bestand">
+                <span class="px-2.5 py-1.5 text-xs font-semibold bg-orange-500/90 text-white rounded-lg shadow-lg backdrop-blur-sm low-stock-badge" title="Niedriger Bestand">
                     <i class="fas fa-exclamation-triangle"></i>
                 </span>
                 <?php endif; ?>
@@ -433,6 +433,29 @@ ob_start();
     <?php endforeach; ?>
 </div>
 <?php endif; ?>
+
+<style>
+/* Accessible animation - respects user's motion preferences */
+.low-stock-badge {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Respect user's preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .low-stock-badge {
+        animation: none;
+    }
+}
+</style>
 
 <?php
 $content = ob_get_clean();
