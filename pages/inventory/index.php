@@ -94,28 +94,28 @@ ob_start();
 <div class="mb-8">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-            <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-                <i class="fas fa-boxes text-purple-600 mr-2"></i>
+            <h1 class="text-4xl font-extrabold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
+                <i class="fas fa-boxes text-purple-600 mr-3"></i>
                 Inventar
             </h1>
-            <p class="text-slate-600 dark:text-slate-400"><?php echo count($items); ?> Artikel gefunden</p>
+            <p class="text-slate-600 dark:text-slate-400 text-lg"><?php echo count($items); ?> Artikel gefunden</p>
         </div>
         <!-- Action Buttons -->
-        <div class="mt-4 md:mt-0 flex gap-2">
+        <div class="mt-4 md:mt-0 flex gap-2 flex-wrap">
             <!-- Neuer Artikel Button -->
-            <a href="add.php" class="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition flex items-center">
+            <a href="add.php" class="px-5 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all transform hover:scale-105 flex items-center shadow-lg font-semibold">
                 <i class="fas fa-plus mr-2"></i>
                 Neuer Artikel
             </a>
             <!-- EasyVerein Sync Button - Admin/Board only -->
             <?php if (AuthHandler::isAdmin()): ?>
-            <a href="sync.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+            <a href="sync.php" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-5 py-3 rounded-xl flex items-center shadow-lg font-semibold transition-all transform hover:scale-105">
                 <i class="fas fa-sync-alt mr-2"></i> EasyVerein Sync
             </a>
             <?php endif; ?>
             <!-- Import Button - Manager level and above -->
             <?php if (Auth::hasPermission('manager')): ?>
-            <button type="button" onclick="document.getElementById('importModal').classList.remove('hidden')" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+            <button type="button" onclick="document.getElementById('importModal').classList.remove('hidden')" class="px-5 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all transform hover:scale-105 shadow-lg font-semibold">
                 <i class="fas fa-file-import mr-2"></i>
                 Massenimport
             </button>
@@ -257,23 +257,27 @@ ob_start();
 </div>
 <?php endif; ?>
 
-<div class="card p-6 mb-6">
+<div class="card p-6 mb-8 shadow-lg border border-gray-200 dark:border-slate-700">
     <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
-            <label class="block text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">Suche</label>
+            <label class="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-2 flex items-center">
+                <i class="fas fa-search mr-2 text-purple-600"></i>Suche
+            </label>
             <input 
                 type="text" 
                 name="search" 
                 placeholder="Name oder Beschreibung..."
                 value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>"
-                class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                class="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-all"
             >
         </div>
         <div>
-            <label class="block text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">Standort</label>
+            <label class="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-2 flex items-center">
+                <i class="fas fa-map-marker-alt mr-2 text-blue-600"></i>Standort
+            </label>
             <select 
                 name="location" 
-                class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                class="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-all"
             >
                 <option value="">Alle Standorte</option>
                 <?php foreach ($distinctLocations as $location): ?>
@@ -284,10 +288,12 @@ ob_start();
             </select>
         </div>
         <div>
-            <label class="block text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">Sortieren nach</label>
+            <label class="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-2 flex items-center">
+                <i class="fas fa-sort mr-2 text-green-600"></i>Sortieren nach
+            </label>
             <select 
                 name="sort" 
-                class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                class="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-all"
             >
                 <option value="name_asc" <?php echo ($sort == 'name_asc') ? 'selected' : ''; ?>>Name (A-Z)</option>
                 <option value="name_desc" <?php echo ($sort == 'name_desc') ? 'selected' : ''; ?>>Name (Z-A)</option>
@@ -298,10 +304,10 @@ ob_start();
             </select>
         </div>
         <div class="flex items-end space-x-2">
-            <button type="submit" class="flex-1 btn-primary">
+            <button type="submit" class="flex-1 btn-primary shadow-md hover:shadow-lg transition-all transform hover:scale-105">
                 <i class="fas fa-search mr-2"></i>Filtern
             </button>
-            <a href="index.php" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+            <a href="index.php" class="px-4 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all hover:scale-105">
                 <i class="fas fa-times"></i>
             </a>
         </div>
@@ -322,9 +328,9 @@ ob_start();
 <?php else: ?>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
     <?php foreach ($items as $item): ?>
-    <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300 <?php echo $item['is_archived_in_easyverein'] ? 'opacity-60' : ''; ?>">
+    <div class="group bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 dark:border-slate-700 <?php echo $item['is_archived_in_easyverein'] ? 'opacity-60' : ''; ?>">
         <!-- Image -->
-        <div class="relative h-48 bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/20 dark:to-blue-900/20 flex items-center justify-center <?php echo $item['is_archived_in_easyverein'] ? 'grayscale' : ''; ?>">
+        <div class="relative h-52 bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-900/30 dark:via-blue-900/30 dark:to-indigo-900/30 flex items-center justify-center overflow-hidden <?php echo $item['is_archived_in_easyverein'] ? 'grayscale' : ''; ?>">
             <?php if (!empty($item['image_path'])): ?>
                 <?php
                 // Check if image is from EasyVerein and needs proxy
@@ -337,25 +343,28 @@ ob_start();
                     $imageSrc = '/' . ltrim($imageSrc, '/');
                 }
                 ?>
-            <img src="<?php echo htmlspecialchars($imageSrc); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="w-full h-full object-cover">
+            <img src="<?php echo htmlspecialchars($imageSrc); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
             <?php else: ?>
-            <i class="fas fa-image text-gray-400 dark:text-gray-500 text-5xl" aria-label="Kein Bild verfügbar"></i>
+            <div class="relative">
+                <div class="absolute inset-0 bg-gradient-to-br from-purple-200/20 to-blue-200/20 dark:from-purple-800/20 dark:to-blue-800/20 rounded-full blur-2xl"></div>
+                <i class="fas fa-box-open text-gray-300 dark:text-gray-600 text-6xl relative z-10" aria-label="Kein Bild verfügbar"></i>
+            </div>
             <?php endif; ?>
             
             <!-- Badges -->
-            <div class="absolute top-2 right-2 flex flex-col gap-1">
+            <div class="absolute top-3 right-3 flex flex-col gap-2">
                 <?php if (!empty($item['easyverein_id'])): ?>
-                <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded" title="Synchronisiert mit EasyVerein">
+                <span class="px-2.5 py-1.5 text-xs font-semibold bg-blue-500/90 text-white rounded-lg shadow-lg backdrop-blur-sm" title="Synchronisiert mit EasyVerein">
                     <i class="fas fa-sync-alt"></i>
                 </span>
                 <?php endif; ?>
                 <?php if ($item['is_archived_in_easyverein']): ?>
-                <span class="px-2 py-1 text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded" title="Archiviert in EasyVerein">
+                <span class="px-2.5 py-1.5 text-xs font-semibold bg-red-500/90 text-white rounded-lg shadow-lg backdrop-blur-sm" title="Archiviert in EasyVerein">
                     <i class="fas fa-archive"></i>
                 </span>
                 <?php endif; ?>
                 <?php if ($item['quantity'] <= $item['min_stock'] && $item['min_stock'] > 0): ?>
-                <span class="px-2 py-1 text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded" title="Niedriger Bestand">
+                <span class="px-2.5 py-1.5 text-xs font-semibold bg-orange-500/90 text-white rounded-lg shadow-lg backdrop-blur-sm animate-pulse" title="Niedriger Bestand">
                     <i class="fas fa-exclamation-triangle"></i>
                 </span>
                 <?php endif; ?>
@@ -363,50 +372,58 @@ ob_start();
         </div>
         
         <!-- Content -->
-        <div class="p-4">
-            <h3 class="font-semibold text-slate-900 dark:text-white text-lg mb-2 truncate" title="<?php echo htmlspecialchars($item['name']); ?>">
+        <div class="p-5">
+            <h3 class="font-bold text-slate-900 dark:text-white text-xl mb-2 truncate group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors" title="<?php echo htmlspecialchars($item['name']); ?>">
                 <?php echo htmlspecialchars($item['name']); ?>
             </h3>
             
             <?php if ($item['category_name']): ?>
-            <p class="text-xs text-slate-600 dark:text-slate-400 mb-3">
-                <i class="fas fa-tag mr-1"></i><?php echo htmlspecialchars($item['category_name']); ?>
-            </p>
+            <div class="flex items-center gap-2 mb-4">
+                <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 dark:from-purple-900/40 dark:to-blue-900/40 dark:text-purple-300">
+                    <i class="fas fa-tag mr-1.5 text-xs"></i><?php echo htmlspecialchars($item['category_name']); ?>
+                </span>
+            </div>
             <?php endif; ?>
             
-            <div class="space-y-2 text-sm mb-4">
+            <div class="space-y-3 text-sm mb-5">
                 <!-- Quantity -->
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600 dark:text-slate-400">Anzahl:</span>
-                    <span class="font-semibold <?php echo $item['quantity'] <= $item['min_stock'] && $item['min_stock'] > 0 ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'; ?>">
-                        <?php echo $item['quantity']; ?> <?php echo htmlspecialchars($item['unit']); ?>
+                <div class="flex justify-between items-center p-2.5 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
+                    <span class="text-slate-600 dark:text-slate-400 font-medium flex items-center">
+                        <i class="fas fa-cubes mr-2 text-purple-500"></i>Anzahl:
+                    </span>
+                    <span class="font-bold text-lg <?php echo $item['quantity'] <= $item['min_stock'] && $item['min_stock'] > 0 ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'; ?>">
+                        <?php echo $item['quantity']; ?> <span class="text-sm font-normal"><?php echo htmlspecialchars($item['unit']); ?></span>
                     </span>
                 </div>
                 
                 <!-- Price -->
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600 dark:text-slate-400">Preis:</span>
-                    <span class="font-semibold text-slate-900 dark:text-white"><?php echo number_format($item['unit_price'], 2, ',', '.') . ' €'; ?></span>
+                <div class="flex justify-between items-center p-2.5 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
+                    <span class="text-slate-600 dark:text-slate-400 font-medium flex items-center">
+                        <i class="fas fa-euro-sign mr-2 text-green-500"></i>Preis:
+                    </span>
+                    <span class="font-bold text-lg text-slate-900 dark:text-white"><?php echo number_format($item['unit_price'], 2, ',', '.') . ' €'; ?></span>
                 </div>
                 
                 <!-- Location -->
                 <?php if ($item['location_name']): ?>
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-600 dark:text-slate-400">Lagerort:</span>
-                    <span class="text-slate-900 dark:text-white truncate ml-2" title="<?php echo htmlspecialchars($item['location_name']); ?>">
-                        <i class="fas fa-map-marker-alt mr-1 text-slate-400"></i><?php echo htmlspecialchars($item['location_name']); ?>
+                <div class="flex justify-between items-center p-2.5 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
+                    <span class="text-slate-600 dark:text-slate-400 font-medium flex items-center">
+                        <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>Lagerort:
+                    </span>
+                    <span class="text-slate-900 dark:text-white truncate ml-2 font-medium" title="<?php echo htmlspecialchars($item['location_name']); ?>">
+                        <?php echo htmlspecialchars($item['location_name']); ?>
                     </span>
                 </div>
                 <?php endif; ?>
             </div>
             
             <!-- Actions -->
-            <div class="flex gap-2 pt-3 border-t border-gray-200 dark:border-slate-700">
-                <a href="view.php?id=<?php echo $item['id']; ?>" class="flex-1 text-center px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition text-sm" title="Details anzeigen">
+            <div class="flex gap-2 pt-4 border-t border-gray-200 dark:border-slate-700">
+                <a href="view.php?id=<?php echo $item['id']; ?>" class="flex-1 text-center px-4 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg transition-all transform hover:scale-105 text-sm font-semibold shadow-md" title="Details anzeigen">
                     <i class="fas fa-eye mr-1"></i>Details
                 </a>
                 <?php if (Auth::hasPermission('manager')): ?>
-                <a href="edit.php?id=<?php echo $item['id']; ?>" class="flex-1 text-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition text-sm" title="Bearbeiten">
+                <a href="edit.php?id=<?php echo $item['id']; ?>" class="flex-1 text-center px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all transform hover:scale-105 text-sm font-semibold shadow-md" title="Bearbeiten">
                     <i class="fas fa-edit mr-1"></i>Bearbeiten
                 </a>
                 <?php endif; ?>

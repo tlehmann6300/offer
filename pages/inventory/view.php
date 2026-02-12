@@ -151,8 +151,8 @@ ob_start();
 ?>
 
 <div class="mb-6">
-    <a href="index.php" class="text-purple-600 hover:text-purple-700 inline-flex items-center mb-4">
-        <i class="fas fa-arrow-left mr-2"></i>Zurück zum Inventar
+    <a href="index.php" class="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 inline-flex items-center mb-4 text-lg font-semibold group transition-all">
+        <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform"></i>Zurück zum Inventar
     </a>
 </div>
 
@@ -171,18 +171,18 @@ ob_start();
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Item Details -->
     <div class="lg:col-span-2">
-        <div class="card p-6">
+        <div class="card p-8 shadow-xl border border-gray-200 dark:border-slate-700">
             <div class="flex items-start justify-between mb-6">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2"><?php echo htmlspecialchars($item['name']); ?></h1>
+                    <h1 class="text-4xl font-extrabold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-3"><?php echo htmlspecialchars($item['name']); ?></h1>
                     <div class="flex flex-wrap gap-2">
                         <?php if ($item['category_name']): ?>
-                        <span class="px-3 py-1 text-sm rounded-full inline-color-badge" style="background-color: <?php echo htmlspecialchars($item['category_color']); ?>20; color: <?php echo htmlspecialchars($item['category_color']); ?>">
-                            <?php echo htmlspecialchars($item['category_name']); ?>
+                        <span class="px-4 py-2 text-sm font-semibold rounded-full inline-color-badge shadow-md" style="background-color: <?php echo htmlspecialchars($item['category_color']); ?>20; color: <?php echo htmlspecialchars($item['category_color']); ?>">
+                            <i class="fas fa-tag mr-1"></i><?php echo htmlspecialchars($item['category_name']); ?>
                         </span>
                         <?php endif; ?>
                         <?php if ($item['location_name']): ?>
-                        <span class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full">
+                        <span class="px-4 py-2 text-sm font-semibold bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-300 rounded-full shadow-md">
                             <i class="fas fa-map-marker-alt mr-1"></i><?php echo htmlspecialchars($item['location_name']); ?>
                         </span>
                         <?php endif; ?>
@@ -190,7 +190,7 @@ ob_start();
                 </div>
                 <?php if (Auth::hasPermission('manager')): ?>
                 <div class="flex space-x-2">
-                    <a href="edit.php?id=<?php echo $item['id']; ?>" class="btn-primary">
+                    <a href="edit.php?id=<?php echo $item['id']; ?>" class="btn-primary shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
                         <i class="fas fa-edit mr-2"></i>Bearbeiten
                     </a>
                 </div>
@@ -199,19 +199,19 @@ ob_start();
 
             <!-- Checkout/Borrow Button for all users -->
             <?php if ($item['quantity'] > 0): ?>
-            <div class="mb-6 flex gap-3">
-                <a href="checkout.php?id=<?php echo $item['id']; ?>" class="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold">
-                    <i class="fas fa-hand-holding-box mr-2"></i>Entnehmen / Ausleihen
+            <div class="mb-8 flex gap-3">
+                <a href="checkout.php?id=<?php echo $item['id']; ?>" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all transform hover:scale-105 font-bold shadow-lg text-lg">
+                    <i class="fas fa-hand-holding-box mr-3"></i>Entnehmen / Ausleihen
                 </a>
-                <button onclick="openRentalModal()" class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold">
-                    <i class="fas fa-calendar-alt mr-2"></i>Ausleihen (mit Rückgabedatum)
+                <button onclick="openRentalModal()" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all transform hover:scale-105 font-bold shadow-lg text-lg">
+                    <i class="fas fa-calendar-alt mr-3"></i>Ausleihen (mit Rückgabedatum)
                 </button>
             </div>
             <?php endif; ?>
 
             <!-- Image -->
             <?php if ($item['image_path']): ?>
-            <div class="mb-6">
+            <div class="mb-8">
                 <?php
                 // Check if image is from EasyVerein and needs proxy
                 $imageSrc = $item['image_path'];
@@ -223,46 +223,56 @@ ob_start();
                     $imageSrc = '/' . ltrim($imageSrc, '/');
                 }
                 ?>
-                <img src="<?php echo htmlspecialchars($imageSrc); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="w-full max-w-lg rounded-lg shadow-md">
+                <img src="<?php echo htmlspecialchars($imageSrc); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" class="w-full max-w-2xl rounded-2xl shadow-2xl border border-gray-200 dark:border-slate-700">
             </div>
             <?php endif; ?>
 
             <!-- Description -->
             <?php if ($item['description']): ?>
-            <div class="mb-6">
-                <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Beschreibung</h2>
-                <p class="text-gray-600 dark:text-gray-300"><?php echo nl2br(htmlspecialchars($item['description'])); ?></p>
+            <div class="mb-8 p-5 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 rounded-xl border border-gray-200 dark:border-slate-600">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-3 flex items-center">
+                    <i class="fas fa-align-left mr-2 text-purple-600"></i>Beschreibung
+                </h2>
+                <p class="text-gray-700 dark:text-gray-300 leading-relaxed"><?php echo nl2br(htmlspecialchars($item['description'])); ?></p>
             </div>
             <?php endif; ?>
 
             <!-- Details Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Aktueller Bestand</p>
-                    <p class="text-2xl font-bold <?php echo $item['quantity'] <= $item['min_stock'] && $item['min_stock'] > 0 ? 'text-red-600' : 'text-gray-800 dark:text-gray-100'; ?>">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
+                <div class="p-5 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 rounded-xl border border-purple-200 dark:border-purple-700 shadow-md">
+                    <p class="text-sm text-purple-600 dark:text-purple-400 mb-2 font-semibold flex items-center">
+                        <i class="fas fa-cubes mr-2"></i>Aktueller Bestand
+                    </p>
+                    <p class="text-3xl font-extrabold <?php echo $item['quantity'] <= $item['min_stock'] && $item['min_stock'] > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-800 dark:text-gray-100'; ?>">
                         <?php echo htmlspecialchars($item['quantity']); ?>
                     </p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400"><?php echo htmlspecialchars($item['unit']); ?></p>
+                    <p class="text-sm text-purple-600 dark:text-purple-400 font-medium mt-1"><?php echo htmlspecialchars($item['unit']); ?></p>
                 </div>
-                <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Mindestbestand</p>
-                    <p class="text-2xl font-bold text-gray-800 dark:text-gray-100"><?php echo $item['min_stock']; ?></p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400"><?php echo htmlspecialchars($item['unit']); ?></p>
+                <div class="p-5 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl border border-blue-200 dark:border-blue-700 shadow-md">
+                    <p class="text-sm text-blue-600 dark:text-blue-400 mb-2 font-semibold flex items-center">
+                        <i class="fas fa-layer-group mr-2"></i>Mindestbestand
+                    </p>
+                    <p class="text-3xl font-extrabold text-gray-800 dark:text-gray-100"><?php echo $item['min_stock']; ?></p>
+                    <p class="text-sm text-blue-600 dark:text-blue-400 font-medium mt-1"><?php echo htmlspecialchars($item['unit']); ?></p>
                 </div>
-                <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Stückpreis</p>
-                    <p class="text-2xl font-bold text-gray-800 dark:text-gray-100"><?php echo number_format($item['unit_price'], 2); ?> €</p>
+                <div class="p-5 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 rounded-xl border border-green-200 dark:border-green-700 shadow-md">
+                    <p class="text-sm text-green-600 dark:text-green-400 mb-2 font-semibold flex items-center">
+                        <i class="fas fa-euro-sign mr-2"></i>Stückpreis
+                    </p>
+                    <p class="text-3xl font-extrabold text-gray-800 dark:text-gray-100"><?php echo number_format($item['unit_price'], 2); ?> €</p>
                 </div>
-                <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Gesamtwert</p>
-                    <p class="text-2xl font-bold text-gray-800 dark:text-gray-100"><?php echo number_format($item['quantity'] * $item['unit_price'], 2); ?> €</p>
+                <div class="p-5 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 rounded-xl border border-orange-200 dark:border-orange-700 shadow-md">
+                    <p class="text-sm text-orange-600 dark:text-orange-400 mb-2 font-semibold flex items-center">
+                        <i class="fas fa-coins mr-2"></i>Gesamtwert
+                    </p>
+                    <p class="text-3xl font-extrabold text-gray-800 dark:text-gray-100"><?php echo number_format($item['quantity'] * $item['unit_price'], 2); ?> €</p>
                 </div>
             </div>
 
             <!-- Notes -->
             <?php if ($item['notes']): ?>
-            <div class="bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-400 dark:border-yellow-600 p-4">
-                <p class="text-sm text-gray-700 dark:text-gray-300"><strong>Notizen:</strong> <?php echo nl2br(htmlspecialchars($item['notes'])); ?></p>
+            <div class="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border-l-4 border-yellow-400 dark:border-yellow-600 p-5 rounded-lg shadow-md">
+                <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"><strong class="text-yellow-700 dark:text-yellow-400 flex items-center mb-2"><i class="fas fa-sticky-note mr-2"></i>Notizen:</strong> <?php echo nl2br(htmlspecialchars($item['notes'])); ?></p>
             </div>
             <?php endif; ?>
         </div>
@@ -271,8 +281,8 @@ ob_start();
     <!-- Stock Adjustment -->
     <div class="lg:col-span-1">
         <?php if (Auth::hasPermission('manager')): ?>
-        <div class="card p-6 mb-6">
-            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+        <div class="card p-6 mb-6 shadow-xl border border-purple-200 dark:border-purple-700 bg-gradient-to-br from-white to-purple-50 dark:from-slate-800 dark:to-purple-900/20">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
                 <i class="fas fa-exchange-alt text-purple-600 mr-2"></i>
                 Bestand anpassen
             </h2>
@@ -280,39 +290,39 @@ ob_start();
                 <input type="hidden" name="adjust_stock" value="1">
                 
                 <!-- Quick Buttons -->
-                <div class="grid grid-cols-2 gap-2 mb-4">
-                    <button type="button" onclick="setAmount(-10)" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition">
+                <div class="grid grid-cols-2 gap-2 mb-5">
+                    <button type="button" onclick="setAmount(-10)" class="px-4 py-3 bg-gradient-to-br from-red-100 to-red-200 text-red-700 rounded-lg hover:from-red-200 hover:to-red-300 transition-all transform hover:scale-105 font-semibold shadow-md">
                         <i class="fas fa-minus mr-1"></i>10
                     </button>
-                    <button type="button" onclick="setAmount(-1)" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition">
+                    <button type="button" onclick="setAmount(-1)" class="px-4 py-3 bg-gradient-to-br from-red-100 to-red-200 text-red-700 rounded-lg hover:from-red-200 hover:to-red-300 transition-all transform hover:scale-105 font-semibold shadow-md">
                         <i class="fas fa-minus mr-1"></i>1
                     </button>
-                    <button type="button" onclick="setAmount(1)" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition">
+                    <button type="button" onclick="setAmount(1)" class="px-4 py-3 bg-gradient-to-br from-green-100 to-green-200 text-green-700 rounded-lg hover:from-green-200 hover:to-green-300 transition-all transform hover:scale-105 font-semibold shadow-md">
                         <i class="fas fa-plus mr-1"></i>1
                     </button>
-                    <button type="button" onclick="setAmount(10)" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition">
+                    <button type="button" onclick="setAmount(10)" class="px-4 py-3 bg-gradient-to-br from-green-100 to-green-200 text-green-700 rounded-lg hover:from-green-200 hover:to-green-300 transition-all transform hover:scale-105 font-semibold shadow-md">
                         <i class="fas fa-plus mr-1"></i>10
                     </button>
                 </div>
 
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Menge</label>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Menge</label>
                     <input 
                         type="number" 
                         id="amount" 
                         name="amount" 
                         required 
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-gray-100"
+                        class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100 transition-all"
                         placeholder="z.B. +5 oder -3"
                     >
                 </div>
 
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Grund *</label>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Grund *</label>
                     <select 
                         name="reason" 
                         required 
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-gray-100"
+                        class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100 transition-all"
                     >
                         <option value="">Bitte wählen...</option>
                         <option value="Verliehen">Verliehen</option>
@@ -326,18 +336,18 @@ ob_start();
                     </select>
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kommentar *</label>
+                <div class="mb-5">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Kommentar *</label>
                     <textarea 
                         name="comment" 
                         required 
                         rows="3"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-gray-100"
+                        class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100 transition-all"
                         placeholder="Bitte beschreiben Sie die Änderung..."
                     ></textarea>
                 </div>
 
-                <button type="submit" class="w-full btn-primary">
+                <button type="submit" class="w-full btn-primary shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
                     <i class="fas fa-check mr-2"></i>Bestätigen
                 </button>
             </form>
@@ -345,16 +355,18 @@ ob_start();
         <?php endif; ?>
 
         <!-- Quick Info -->
-        <div class="card p-6">
-            <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-3">Information</h3>
-            <div class="space-y-2 text-sm">
-                <p class="text-gray-600 dark:text-gray-300">
-                    <i class="fas fa-calendar-alt text-gray-400 mr-2"></i>
-                    Erstellt: <?php echo date('d.m.Y', strtotime($item['created_at'])); ?>
+        <div class="card p-6 shadow-xl border border-blue-200 dark:border-blue-700 bg-gradient-to-br from-white to-blue-50 dark:from-slate-800 dark:to-blue-900/20">
+            <h3 class="font-bold text-gray-800 dark:text-gray-100 mb-4 text-lg flex items-center">
+                <i class="fas fa-info-circle text-blue-600 mr-2"></i>Information
+            </h3>
+            <div class="space-y-3 text-sm">
+                <p class="text-gray-600 dark:text-gray-300 flex items-center p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
+                    <i class="fas fa-calendar-alt text-purple-500 mr-3 text-lg"></i>
+                    <span><strong>Erstellt:</strong><br><?php echo date('d.m.Y', strtotime($item['created_at'])); ?></span>
                 </p>
-                <p class="text-gray-600 dark:text-gray-300">
-                    <i class="fas fa-clock text-gray-400 mr-2"></i>
-                    Aktualisiert: <?php echo date('d.m.Y', strtotime($item['updated_at'])); ?>
+                <p class="text-gray-600 dark:text-gray-300 flex items-center p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
+                    <i class="fas fa-clock text-blue-500 mr-3 text-lg"></i>
+                    <span><strong>Aktualisiert:</strong><br><?php echo date('d.m.Y', strtotime($item['updated_at'])); ?></span>
                 </p>
             </div>
         </div>
@@ -363,40 +375,40 @@ ob_start();
 
 <!-- Active Checkouts -->
 <?php if (!empty($activeCheckouts)): ?>
-<div class="card p-6 mt-6">
-    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-        <i class="fas fa-clipboard-list text-blue-600 mr-2"></i>
+<div class="card p-8 mt-8 shadow-xl border border-green-200 dark:border-green-700 bg-gradient-to-br from-white to-green-50 dark:from-slate-800 dark:to-green-900/10">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center">
+        <i class="fas fa-clipboard-list text-green-600 mr-3"></i>
         Aktive Ausleihen
     </h2>
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto rounded-xl border border-green-200 dark:border-green-700">
         <table class="w-full">
-            <thead class="bg-gray-50 dark:bg-gray-700">
+            <thead class="bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/40 dark:to-emerald-900/40">
                 <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Benutzer</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Menge</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Ausgeliehen am</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Erwartete Rückgabe</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Status</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-green-700 dark:text-green-300 uppercase tracking-wider">Benutzer</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-green-700 dark:text-green-300 uppercase tracking-wider">Menge</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-green-700 dark:text-green-300 uppercase tracking-wider">Ausgeliehen am</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-green-700 dark:text-green-300 uppercase tracking-wider">Erwartete Rückgabe</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-green-700 dark:text-green-300 uppercase tracking-wider">Status</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody class="divide-y divide-green-200 dark:divide-green-700 bg-white dark:bg-slate-800">
                 <?php foreach ($activeCheckouts as $checkout): ?>
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                    <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
+                <tr class="hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors">
+                    <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium">
                         <?php echo htmlspecialchars($checkout['user_email'] ?? 'User ID: ' . $checkout['user_id']); ?>
                     </td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="font-semibold text-gray-800 dark:text-gray-100"><?php echo $checkout['amount']; ?></span>
-                        <span class="text-gray-500 dark:text-gray-400"><?php echo htmlspecialchars($item['unit']); ?></span>
+                    <td class="px-6 py-4 text-sm">
+                        <span class="font-bold text-lg text-gray-800 dark:text-gray-100"><?php echo $checkout['amount']; ?></span>
+                        <span class="text-gray-500 dark:text-gray-400 ml-1"><?php echo htmlspecialchars($item['unit']); ?></span>
                     </td>
-                    <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
+                    <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium">
                         <?php echo date('d.m.Y H:i', strtotime($checkout['rented_at'])); ?>
                     </td>
-                    <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
+                    <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium">
                         <?php echo $checkout['expected_return'] ? date('d.m.Y', strtotime($checkout['expected_return'])) : '-'; ?>
                     </td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full <?php echo $checkout['status'] === 'active' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'; ?>">
+                    <td class="px-6 py-4 text-sm">
+                        <span class="px-3 py-1.5 text-xs font-semibold rounded-full <?php echo $checkout['status'] === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300'; ?>">
                             <?php echo htmlspecialchars($checkout['status']); ?>
                         </span>
                     </td>
@@ -409,32 +421,32 @@ ob_start();
 <?php endif; ?>
 
 <!-- History -->
-<div class="card p-6 mt-6">
-    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-        <i class="fas fa-history text-blue-600 mr-2"></i>
+<div class="card p-8 mt-8 shadow-xl border border-gray-200 dark:border-slate-700">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center">
+        <i class="fas fa-history text-blue-600 mr-3"></i>
         Verlauf
     </h2>
     <?php if (empty($history)): ?>
-    <p class="text-gray-500 dark:text-gray-400 text-center py-4">Keine Verlaufsdaten vorhanden</p>
+    <p class="text-gray-500 dark:text-gray-400 text-center py-8">Keine Verlaufsdaten vorhanden</p>
     <?php else: ?>
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-slate-700">
         <table class="w-full">
-            <thead class="bg-gray-50 dark:bg-gray-700">
+            <thead class="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600">
                 <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Datum</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Typ</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Änderung</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Grund</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Kommentar</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Datum</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Typ</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Änderung</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Grund</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Kommentar</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-slate-800">
                 <?php foreach ($history as $entry): ?>
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                    <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                    <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium">
                         <?php echo date('d.m.Y H:i', strtotime($entry['timestamp'])); ?>
                     </td>
-                    <td class="px-4 py-3">
+                    <td class="px-6 py-4">
                         <?php
                         $typeColors = [
                             'adjustment' => 'blue',
@@ -457,13 +469,13 @@ ob_start();
                         ];
                         $label = $typeLabels[$entry['change_type']] ?? $entry['change_type'];
                         ?>
-                        <span class="px-2 py-1 text-xs bg-<?php echo $color; ?>-100 text-<?php echo $color; ?>-700 rounded-full">
+                        <span class="px-3 py-1.5 text-xs font-semibold bg-<?php echo $color; ?>-100 text-<?php echo $color; ?>-700 dark:bg-<?php echo $color; ?>-900 dark:text-<?php echo $color; ?>-300 rounded-full">
                             <?php echo $label; ?>
                         </span>
                     </td>
-                    <td class="px-4 py-3 text-sm">
+                    <td class="px-6 py-4 text-sm">
                         <?php if ($entry['change_type'] === 'adjustment'): ?>
-                        <span class="font-semibold <?php echo $entry['change_amount'] >= 0 ? 'text-green-600' : 'text-red-600'; ?>">
+                        <span class="font-bold text-lg <?php echo $entry['change_amount'] >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'; ?>">
                             <?php echo ($entry['change_amount'] >= 0 ? '+' : '') . $entry['change_amount']; ?>
                         </span>
                         <span class="text-gray-500 dark:text-gray-400 text-xs ml-2">
@@ -473,10 +485,10 @@ ob_start();
                         <span class="text-gray-500 dark:text-gray-400">-</span>
                         <?php endif; ?>
                     </td>
-                    <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
+                    <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium">
                         <?php echo htmlspecialchars($entry['reason'] ?? '-'); ?>
                     </td>
-                    <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
+                    <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
                         <?php 
                         // Use helper function to format history comment/details
                         $details = $entry['details'] ?? $entry['comment'] ?? '';
