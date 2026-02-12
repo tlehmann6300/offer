@@ -82,13 +82,22 @@ ob_start();
     <?php endif; ?>
 
     <!-- Microsoft Login Button -->
-    <a href="<?php echo BASE_URL; ?>/auth/login_start.php" class="flex items-center justify-center w-full py-4 px-6 bg-[#2F2F2F] hover:bg-[#1a1a1a] text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl tracking-wide border border-[#8C8C8C]/20">
-        <img src="<?php echo asset('assets/img/microsoft-logo.svg'); ?>" alt="Microsoft" class="w-5 h-5 mr-3">
-        <span>Mit Microsoft anmelden</span>
+    <a href="<?php echo BASE_URL; ?>/auth/login_start.php" class="group relative flex items-center justify-center w-full py-4 px-6 bg-white hover:bg-gray-50 text-gray-800 rounded-xl font-semibold transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-0.5 shadow-md hover:shadow-xl tracking-wide border-2 border-gray-200 hover:border-blue-400 overflow-hidden">
+        <!-- Subtle gradient overlay on hover -->
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-50/0 via-blue-50/50 to-blue-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        
+        <!-- Microsoft logo with better sizing -->
+        <img src="<?php echo asset('assets/img/microsoft-logo.svg'); ?>" alt="Microsoft" class="relative w-6 h-6 mr-3 transition-transform duration-300 group-hover:scale-110">
+        
+        <!-- Button text -->
+        <span class="relative font-bold">Mit Microsoft anmelden</span>
+        
+        <!-- Decorative shine effect -->
+        <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
     </a>
     
     <div class="mt-6 text-center">
-        <p class="text-gray-400 text-sm font-medium">Verwende dein Microsoft-Konto zum Anmelden.</p>
+        <p class="text-gray-500 text-sm font-medium">Verwende dein Microsoft-Konto zum Anmelden.</p>
     </div>
 </div>
 
