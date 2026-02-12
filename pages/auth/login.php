@@ -90,7 +90,7 @@ ob_start();
         <img src="<?php echo asset('assets/img/microsoft-logo.svg'); ?>" alt="Microsoft" class="relative w-6 h-6 mr-3 transition-transform duration-300 group-hover:scale-110">
         
         <!-- Button text -->
-        <span class="relative font-bold">Mit Microsoft anmelden</span>
+        <span class="relative">Mit Microsoft anmelden</span>
         
         <!-- Decorative shine effect -->
         <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
