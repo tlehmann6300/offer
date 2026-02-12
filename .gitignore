@@ -24,6 +24,7 @@ uploads/invoices/*
 
 # Composer
 composer.lock
+vendor/*/*/
 
 # IDE
 .idea/
