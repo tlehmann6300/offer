@@ -660,10 +660,13 @@ ob_start();
             animation: none;
         }
         
+        .status-detail-badge .animate-pulse,
+        .priority-detail-badge .animate-pulse,
+        .type-detail-badge .animate-pulse,
         .status-detail-badge .fas,
         .priority-detail-badge .fas,
         .type-detail-badge .fas {
-            animation: none;
+            animation: none !important;
         }
         
         .info-card,
@@ -671,6 +674,7 @@ ob_start();
         .priority-detail-badge,
         .type-detail-badge {
             transition: none;
+            transform: none !important;
         }
     }
 </style>
