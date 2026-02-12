@@ -607,20 +607,15 @@ select:focus {
     box-shadow: 0 4px 12px rgba(147, 51, 234, 0.2);
 }
 
-/* Table row animation */
+/* Table row animation - optimized for performance */
 .user-row {
     transform: translateZ(0);
+    will-change: transform;
 }
 
 .user-row:hover {
-    transform: translateY(-2px);
+    transform: translate3d(0, -2px, 0);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Smooth color transitions */
-* {
-    transition-property: background-color, border-color, color, fill, stroke, transform, box-shadow;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 </style>
 
