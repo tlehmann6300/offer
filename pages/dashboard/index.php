@@ -220,56 +220,65 @@ function dismissProfileReviewPrompt() {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- My Open Tasks Widget -->
         <a href="/pages/inventory/my_rentals.php" class="block group">
-            <div class="card p-6 rounded-2xl bg-gradient-to-br from-white to-orange-50/50 hover:shadow-2xl transition-all duration-300 cursor-pointer border border-orange-100/50">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 mb-1">Ausleihen</p>
-                        <h3 class="text-lg font-bold text-gray-800">Meine offenen Ausleihen</h3>
-                    </div>
-                    <div class="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-200 group-hover:scale-110 group-hover:rotate-[-5deg] transition-transform duration-300">
-                        <span class="text-2xl font-bold text-white"><?php echo $openTasksCount; ?></span>
+            <div class="card p-7 rounded-2xl bg-gradient-to-br from-white to-orange-50/50 hover:shadow-2xl transition-all duration-300 cursor-pointer border border-orange-100/50">
+                <div class="mb-5">
+                    <p class="text-xs font-semibold uppercase tracking-wider text-orange-500 mb-3">Ausleihen</p>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Meine offenen Ausleihen</h3>
+                    <div class="flex items-center justify-center mb-4">
+                        <div class="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-200 group-hover:scale-110 transition-transform duration-300">
+                            <span class="text-4xl font-bold text-white"><?php echo $openTasksCount; ?></span>
+                        </div>
                     </div>
                 </div>
                 <?php if ($openTasksCount > 0): ?>
-                <p class="text-gray-600 mb-3">Du hast aktuell <?php echo $openTasksCount; ?> offene Ausleihen</p>
-                <span class="inline-flex items-center text-orange-600 font-semibold text-sm group-hover:translate-x-1 transition-transform">
-                    Ausleihen verwalten <i class="fas fa-arrow-right ml-2"></i>
-                </span>
+                <div class="text-center">
+                    <p class="text-gray-700 font-medium mb-4"><?php echo $openTasksCount; ?> offene <?php echo $openTasksCount == 1 ? 'Ausleihe' : 'Ausleihen'; ?></p>
+                    <span class="inline-flex items-center text-orange-600 font-semibold text-sm group-hover:translate-x-1 transition-transform">
+                        Ausleihen verwalten <i class="fas fa-arrow-right ml-2"></i>
+                    </span>
+                </div>
                 <?php else: ?>
-                <p class="text-gray-600">Keine offenen Ausleihen</p>
-                <p class="text-sm text-gray-500 mt-2">
-                    <i class="fas fa-check-circle text-green-500 mr-1"></i>
-                    Alle Artikel wurden zurückgegeben
-                </p>
+                <div class="text-center space-y-3">
+                    <p class="text-gray-700 font-medium text-base">Keine offenen Ausleihen</p>
+                    <div class="pt-3 border-t border-orange-100">
+                        <p class="text-sm text-gray-600 flex items-center justify-center">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            Alle Artikel wurden zurückgegeben
+                        </p>
+                    </div>
+                </div>
                 <?php endif; ?>
             </div>
         </a>
 
         <!-- Next Event Widget -->
-        <div class="card p-6 rounded-2xl bg-gradient-to-br from-white to-blue-50/50 hover:shadow-2xl transition-all duration-300 border border-blue-100/50">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 mb-1">Events</p>
-                    <h3 class="text-lg font-bold text-gray-800">Nächstes Event</h3>
-                </div>
-                <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
-                    <i class="fas fa-calendar-check text-white text-xl"></i>
-                </div>
+        <div class="card p-7 rounded-2xl bg-gradient-to-br from-white to-blue-50/50 hover:shadow-2xl transition-all duration-300 border border-blue-100/50">
+            <div class="mb-5">
+                <p class="text-xs font-semibold uppercase tracking-wider text-blue-500 mb-3">Events</p>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Nächstes Event</h3>
             </div>
             <?php if ($nextEvent): ?>
-            <h4 class="font-semibold text-gray-800 mb-2"><?php echo htmlspecialchars($nextEvent['title']); ?></h4>
-            <p class="text-gray-600 mb-3">
-                <i class="fas fa-clock mr-1 text-blue-400"></i>
-                <?php echo date('d.m.Y H:i', strtotime($nextEvent['start_time'])); ?> Uhr
-            </p>
-            <a href="../events/view.php?id=<?php echo $nextEvent['event_id']; ?>" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold text-sm hover:translate-x-1 transition-transform">
-                Details ansehen <i class="fas fa-arrow-right ml-2"></i>
-            </a>
+            <div class="space-y-3">
+                <h4 class="font-semibold text-gray-800 text-lg"><?php echo htmlspecialchars($nextEvent['title']); ?></h4>
+                <p class="text-gray-600">
+                    <i class="fas fa-clock mr-2 text-blue-400"></i>
+                    <?php echo date('d.m.Y H:i', strtotime($nextEvent['start_time'])); ?> Uhr
+                </p>
+                <div class="pt-3">
+                    <a href="../events/view.php?id=<?php echo $nextEvent['event_id']; ?>" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold text-sm hover:translate-x-1 transition-transform">
+                        Details ansehen <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
             <?php else: ?>
-            <p class="text-gray-600 mb-3">Keine anstehenden Events</p>
-            <a href="../events/index.php" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold text-sm hover:translate-x-1 transition-transform">
-                Events durchsuchen <i class="fas fa-arrow-right ml-2"></i>
-            </a>
+            <div class="space-y-4">
+                <p class="text-gray-700 font-medium text-base">Keine anstehenden Events</p>
+                <div class="pt-3">
+                    <a href="../events/index.php" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold text-sm hover:translate-x-1 transition-transform">
+                        Events durchsuchen <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
             <?php endif; ?>
         </div>
     </div>
