@@ -576,6 +576,7 @@ ob_start();
         background: linear-gradient(135deg, #ffffff 0%, #f9fafb 50%, #ffffff 100%);
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         transition: all 0.3s ease;
+        animation: fadeIn 0.5s ease-out;
     }
     
     .project-detail-card:hover {
@@ -647,10 +648,6 @@ ob_start();
             opacity: 1;
             transform: translateY(0);
         }
-    }
-    
-    .project-detail-card {
-        animation: fadeIn 0.5s ease-out;
     }
 </style>
 
