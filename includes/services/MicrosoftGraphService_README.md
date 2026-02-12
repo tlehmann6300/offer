@@ -157,12 +157,15 @@ $userId = 'user-object-id';
 $photoData = $graphService->getUserPhoto($userId);
 
 if ($photoData !== null) {
-    // Save or display the photo
+    // Save the photo
     // Note: Photo format can be JPEG, PNG, GIF, etc.
     file_put_contents('user-photo.jpg', $photoData);
+    
     // Or output directly in browser with proper headers
-    // Use 'image/*' or detect the actual format from image data
-    header('Content-Type: image/jpeg'); // Or use image/* for generic handling
+    // Detect the actual format from image data
+    $imageInfo = getimagesizefromstring($photoData);
+    $mimeType = $imageInfo['mime'] ?? 'application/octet-stream';
+    header('Content-Type: ' . $mimeType);
     echo $photoData;
 } else {
     echo "No photo available for this user";
