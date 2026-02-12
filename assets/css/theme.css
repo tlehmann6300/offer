@@ -1535,6 +1535,7 @@ body.dark-mode .text-green-500 {
 }
 
 .card::before {
+    /* Animated gradient top border - reveals on hover */
     content: '';
     position: absolute;
     top: 0;
@@ -1546,7 +1547,7 @@ body.dark-mode .text-green-500 {
     transition: opacity var(--transition-normal);
 }
 
-/* Light Mode: Subtle inner glow effect */
+/* Light Mode: Subtle inner glow effect for depth perception */
 body:not(.dark-mode) .card::after {
     content: '';
     position: absolute;
@@ -1627,7 +1628,7 @@ body:not(.dark-mode) .card:hover::after {
     overflow: hidden;
 }
 
-/* Light Mode: Button ripple effect */
+/* Light Mode: Button ripple effect on click */
 body:not(.dark-mode) .btn-primary::after {
     content: '';
     position: absolute;
@@ -1641,6 +1642,7 @@ body:not(.dark-mode) .btn-primary::after {
     transition: width 0.6s, height 0.6s;
 }
 
+/* Note: Fixed 300px works for most buttons; scales better than percentage for ripple effect */
 body:not(.dark-mode) .btn-primary:active::after {
     width: 300px;
     height: 300px;
@@ -1765,7 +1767,8 @@ body:not(.dark-mode) .status-indicator.status-info {
     color: var(--ibc-info);
 }
 
-/* Light Mode: Staggered list animations */
+/* Light Mode: Staggered list animations - supports up to 8 items */
+/* Note: For lists with more items, consider using JavaScript-based approach */
 body:not(.dark-mode) .staggered-list > * {
     animation: fadeSlideUp 0.5s ease-out backwards;
 }
@@ -1845,6 +1848,9 @@ body:not(.dark-mode) .card-elevated {
 }
 
 body:not(.dark-mode) .card-elevated::before {
+    /* Gradient border effect using mask composite technique:
+     * Creates a 1px gradient border by masking out the content area,
+     * revealing only the border region with green-to-blue gradient */
     content: '';
     position: absolute;
     inset: -1px;
