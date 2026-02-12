@@ -244,7 +244,7 @@ class MicrosoftGraphService {
             return null;
             
         } catch (GuzzleException $e) {
-            // Return null if photo not found (404) or any other error
+            // Return null if photo not found (404)
             if ($e->hasResponse() && $e->getResponse()->getStatusCode() === 404) {
                 return null;
             }
