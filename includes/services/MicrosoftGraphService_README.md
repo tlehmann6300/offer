@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `MicrosoftGraphService` class provides integration with Microsoft Graph API for user invitation and role assignment functionality. It uses the Azure Client Credentials Flow for authentication and supports the Azure App Permissions `User.Invite.All` and `AppRoleAssignment.ReadWrite.All`.
+The `MicrosoftGraphService` class provides integration with Microsoft Graph API for user invitation, role assignment, and user profile photo retrieval functionality. It uses the Azure Client Credentials Flow for authentication and supports the Azure App Permissions `User.Invite.All`, `AppRoleAssignment.ReadWrite.All`, and `User.Read.All`.
 
 ## Location
 
@@ -15,6 +15,7 @@ The `MicrosoftGraphService` class provides integration with Microsoft Graph API 
 The following Azure App Permissions must be configured in your Azure AD application:
 - `User.Invite.All` - Required for inviting users
 - `AppRoleAssignment.ReadWrite.All` - Required for assigning roles to users
+- `User.Read.All` - Required for reading user profile photos
 
 ### Environment Variables
 
@@ -126,6 +127,46 @@ public function assignRole(string $userId, string $roleValue): bool
 - Service Principal ID cannot be retrieved
 - Role assignment request fails
 
+### getUserPhoto()
+
+```php
+public function getUserPhoto(string $userId): ?string
+```
+
+**Description**: Retrieves the user profile photo from Microsoft Entra ID (Azure AD).
+
+**Parameters**:
+- `$userId` (string) - User ID (Object ID from Azure AD)
+
+**Returns**: `string|null` - Binary content of the photo if it exists, or `null` if no photo is found
+
+**API Endpoint**: `GET https://graph.microsoft.com/v1.0/users/{userId}/photo/$value`
+
+**Behavior**:
+- Returns the binary content (image data) when a photo exists (HTTP 200)
+- Returns `null` when no photo is available (HTTP 404)
+- Throws an exception for other errors (e.g., network failures, authentication errors)
+
+**Throws**: `Exception` if:
+- API request fails (excluding 404 responses)
+- Network or authentication errors occur
+
+**Example**:
+```php
+$userId = 'user-object-id';
+$photoData = $graphService->getUserPhoto($userId);
+
+if ($photoData !== null) {
+    // Save or display the photo
+    file_put_contents('user-photo.jpg', $photoData);
+    // Or output directly in browser with proper headers
+    header('Content-Type: image/jpeg');
+    echo $photoData;
+} else {
+    echo "No photo available for this user";
+}
+```
+
 ### getServicePrincipalId() (Private)
 
 ```php
@@ -170,6 +211,17 @@ try {
         echo "Role '{$roleValue}' assigned successfully to user {$userId}\n";
     } else {
         echo "Failed to assign role\n";
+    }
+    
+    // Get user profile photo
+    $photoData = $graphService->getUserPhoto($userId);
+    
+    if ($photoData !== null) {
+        // Save the photo to a file
+        file_put_contents("photos/{$userId}.jpg", $photoData);
+        echo "User photo downloaded successfully\n";
+    } else {
+        echo "No photo available for this user\n";
     }
     
 } catch (Exception $e) {

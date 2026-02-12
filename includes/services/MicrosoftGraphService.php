@@ -1,8 +1,8 @@
 <?php
 /**
  * Microsoft Graph Service
- * Handles user invitation and role assignment via Microsoft Graph API
- * Requires Azure App Permissions: User.Invite.All and AppRoleAssignment.ReadWrite.All
+ * Handles user invitation, role assignment, and user profile photo retrieval via Microsoft Graph API
+ * Requires Azure App Permissions: User.Invite.All, AppRoleAssignment.ReadWrite.All, and User.Read.All
  */
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -217,6 +217,40 @@ class MicrosoftGraphService {
             
         } catch (GuzzleException $e) {
             throw new Exception('Failed to get Service Principal ID: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Get user profile photo from Microsoft Entra ID
+     * 
+     * @param string $userId User ID (Object ID from Azure AD)
+     * @return string|null Binary content of the photo if exists, null if no photo found
+     */
+    public function getUserPhoto(string $userId): ?string {
+        $photoUrl = "https://graph.microsoft.com/v1.0/users/{$userId}/photo/\$value";
+        
+        try {
+            $response = $this->httpClient->get($photoUrl, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->accessToken
+                ]
+            ]);
+            
+            // Return binary content if photo exists (Status 200)
+            if ($response->getStatusCode() === 200) {
+                return $response->getBody()->getContents();
+            }
+            
+            return null;
+            
+        } catch (GuzzleException $e) {
+            // Return null if photo not found (404) or any other error
+            if ($e->hasResponse() && $e->getResponse()->getStatusCode() === 404) {
+                return null;
+            }
+            
+            // For other errors, re-throw as exception
+            throw new Exception('Failed to get user photo: ' . $e->getMessage());
         }
     }
 }
