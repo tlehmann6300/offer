@@ -66,6 +66,9 @@ $users = User::getAll();
 $currentUser = Auth::user();
 $currentUserRole = $currentUser['role'] ?? '';
 
+// Pre-calculate base path for profile photos (used in table rendering)
+$profilePhotosBasePath = realpath(__DIR__ . '/../../uploads/profile_photos');
+
 $title = 'Benutzerverwaltung - IBC Intranet';
 ob_start();
 ?>
@@ -242,18 +245,34 @@ ob_start();
                     data-login="<?php echo $user['last_login'] ? strtotime($user['last_login']) : 0; ?>">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <?php 
-                        $profilePhotoPath = __DIR__ . '/../../uploads/profile_photos/user_' . $user['id'] . '.jpg';
-                        $profilePhotoUrl = '/uploads/profile_photos/user_' . $user['id'] . '.jpg';
-                        if (file_exists($profilePhotoPath)): 
+                        // Validate user ID is a positive integer to prevent path traversal
+                        $userId = intval($user['id']);
+                        if ($userId > 0 && $userId <= 999999) { // Reasonable ID range check
+                            $profilePhotoPath = __DIR__ . '/../../uploads/profile_photos/user_' . $userId . '.jpg';
+                            $profilePhotoUrl = '/uploads/profile_photos/user_' . $userId . '.jpg';
+                            
+                            // Ensure the path is within the expected directory
+                            $realProfilePath = realpath($profilePhotoPath);
+                            
+                            if ($realProfilePath && $profilePhotosBasePath && strpos($realProfilePath, $profilePhotosBasePath) === 0) {
                         ?>
                             <img src="<?php echo htmlspecialchars($profilePhotoUrl); ?>" 
                                  alt="Profilbild" 
                                  class="h-10 w-10 rounded-full object-cover border-2 border-purple-200 dark:border-purple-700">
-                        <?php else: ?>
+                        <?php 
+                            } else {
+                        ?>
                             <div class="flex-shrink-0 h-10 w-10 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center">
                                 <i class="fas fa-user text-purple-600 dark:text-purple-400"></i>
                             </div>
-                        <?php endif; ?>
+                        <?php 
+                            }
+                        } else {
+                        ?>
+                            <div class="flex-shrink-0 h-10 w-10 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-purple-600 dark:text-purple-400"></i>
+                            </div>
+                        <?php } ?>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
