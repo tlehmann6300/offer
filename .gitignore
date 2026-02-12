@@ -24,9 +24,7 @@ uploads/invoices/*
 
 # Composer
 composer.lock
-vendor/*/
-!vendor/autoload.php
-!vendor/composer/
+vendor/*/*/
 
 # IDE
 .idea/
