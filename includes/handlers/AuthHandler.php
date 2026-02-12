@@ -408,6 +408,8 @@ class AuthHandler {
      */
     public static function handleMicrosoftCallback() {
         require_once __DIR__ . '/../../vendor/autoload.php';
+        require_once __DIR__ . '/../services/MicrosoftGraphService.php';
+        require_once __DIR__ . '/../models/Alumni.php';
         
         self::startSession();
         
@@ -519,6 +521,11 @@ class AuthHandler {
                 throw new Exception('Unable to retrieve user email from Azure AD claims. Expected one of: email, preferred_username, or upn');
             }
             
+            // Extract first name and last name from claims
+            // Standard OpenID Connect claims: given_name, family_name, name
+            $firstName = $claims['given_name'] ?? $claims['givenName'] ?? null;
+            $lastName = $claims['family_name'] ?? $claims['surname'] ?? null;
+            
             // Check if user exists in database
             $db = Database::getUserDB();
             $stmt = $db->prepare("SELECT * FROM users WHERE email = ?");
@@ -526,21 +533,89 @@ class AuthHandler {
             $existingUser = $stmt->fetch();
             
             if ($existingUser) {
-                // Update existing user
+                // Update existing user - always update role and profile_complete on every login
                 $userId = $existingUser['id'];
                 
-                // Update last login
-                $stmt = $db->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
-                $stmt->execute([$userId]);
+                // Update user table with role from Microsoft and set profile_complete=1
+                $stmt = $db->prepare("UPDATE users SET role = ?, profile_complete = 1, last_login = NOW() WHERE id = ?");
+                $stmt->execute([$roleName, $userId]);
             } else {
                 // Create new user without password (OAuth login only)
                 $stmt = $db->prepare("INSERT INTO users (email, password, role, is_alumni_validated, profile_complete) VALUES (?, ?, ?, ?, ?)");
                 $isAlumniValidated = ($roleName === 'alumni') ? 0 : 1;
-                $profileComplete = 0;
+                // Set profile_complete=1 since data comes from Microsoft
+                $profileComplete = 1;
                 // Use a random password hash since user will login via OAuth
                 $randomPassword = password_hash(bin2hex(random_bytes(32)), HASH_ALGO);
                 $stmt->execute([$email, $randomPassword, $roleName, $isAlumniValidated, $profileComplete]);
                 $userId = $db->lastInsertId();
+            }
+            
+            // Update or create alumni profile if first_name and last_name are available
+            if ($firstName && $lastName) {
+                try {
+                    $contentDb = Database::getContentDB();
+                    
+                    // Check if alumni profile exists
+                    $stmt = $contentDb->prepare("SELECT id FROM alumni_profiles WHERE user_id = ?");
+                    $stmt->execute([$userId]);
+                    $profileExists = $stmt->fetch();
+                    
+                    if ($profileExists) {
+                        // Update existing profile with Microsoft data
+                        $stmt = $contentDb->prepare("UPDATE alumni_profiles SET first_name = ?, last_name = ?, email = ? WHERE user_id = ?");
+                        $stmt->execute([$firstName, $lastName, $email, $userId]);
+                    } else {
+                        // Create new alumni profile
+                        $stmt = $contentDb->prepare("INSERT INTO alumni_profiles (user_id, first_name, last_name, email) VALUES (?, ?, ?, ?)");
+                        $stmt->execute([$userId, $firstName, $lastName, $email]);
+                    }
+                } catch (Exception $e) {
+                    error_log("Failed to update alumni profile: " . $e->getMessage());
+                    // Don't throw - allow login to proceed even if profile update fails
+                }
+            }
+            
+            // Sync profile photo from Microsoft Graph
+            try {
+                // Create MicrosoftGraphService instance
+                $graphService = new MicrosoftGraphService();
+                
+                // Get user's Object ID from claims
+                $objectId = $claims['oid'] ?? null;
+                
+                if ($objectId) {
+                    // Get user photo from Microsoft Graph
+                    $photoData = $graphService->getUserPhoto($objectId);
+                    
+                    if ($photoData) {
+                        // Ensure profile_photos directory exists
+                        $uploadDir = __DIR__ . '/../../uploads/profile_photos';
+                        if (!is_dir($uploadDir)) {
+                            mkdir($uploadDir, 0755, true);
+                        }
+                        
+                        // Save photo as user_{id}.jpg
+                        $filename = "user_{$userId}.jpg";
+                        $filepath = $uploadDir . '/' . $filename;
+                        
+                        if (file_put_contents($filepath, $photoData) !== false) {
+                            // Update alumni profile with image path
+                            $imagePath = '/uploads/profile_photos/' . $filename;
+                            
+                            try {
+                                $contentDb = Database::getContentDB();
+                                $stmt = $contentDb->prepare("UPDATE alumni_profiles SET image_path = ? WHERE user_id = ?");
+                                $stmt->execute([$imagePath, $userId]);
+                            } catch (Exception $e) {
+                                error_log("Failed to update profile image path: " . $e->getMessage());
+                            }
+                        }
+                    }
+                }
+            } catch (Exception $e) {
+                error_log("Failed to sync profile photo from Microsoft Graph: " . $e->getMessage());
+                // Don't throw - allow login to proceed even if photo sync fails
             }
             
             // Set session variables
