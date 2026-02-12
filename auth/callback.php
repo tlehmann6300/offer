@@ -24,7 +24,8 @@ try {
     error_log("Microsoft callback error: " . $e->getMessage());
     error_log("Stack trace: " . $e->getTraceAsString());
     
-    // For debugging: Show detailed error message
+    // ⚠️ TEMPORARY DEBUG MODE - FOR TROUBLESHOOTING ONLY ⚠️
+    // WARNING: This displays sensitive error information. Remove before production deployment!
     // Comment out the die() statement below and uncomment the redirect section once debugging is complete
     die("DEBUG ERROR: " . $e->getMessage());
     
