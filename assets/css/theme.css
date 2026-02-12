@@ -328,6 +328,154 @@ textarea:disabled {
     opacity: 0.6;
 }
 
+/* ===== ENHANCED DROPDOWN STYLING ===== */
+/* Beautiful, modern select/dropdown styling for all modules */
+
+select {
+    /* Base Appearance */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    
+    /* Enhanced Padding and Sizing */
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    
+    /* Modern Border and Radius */
+    border: 2px solid var(--ibc-gray-200);
+    border-radius: var(--radius-md);
+    
+    /* Custom Arrow Icon */
+    background-image: var(--select-arrow-light);
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.25rem 1.25rem;
+    
+    /* Smooth Transitions */
+    transition: all var(--transition-normal);
+    
+    /* Cursor */
+    cursor: pointer;
+    
+    /* Typography */
+    font-weight: 500;
+    
+    /* Subtle Shadow */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Hover State */
+select:hover:not(:disabled) {
+    border-color: var(--ibc-blue-light);
+    box-shadow: 0 2px 4px rgba(0, 102, 179, 0.1);
+    background-color: rgba(0, 102, 179, 0.02);
+}
+
+/* Focus State with Ring Effect */
+select:focus {
+    outline: none;
+    border-color: var(--ibc-blue);
+    box-shadow: 0 0 0 3px rgba(0, 102, 179, 0.1), 0 2px 4px rgba(0, 102, 179, 0.15);
+    background-color: #ffffff;
+}
+
+/* Active/Pressed State */
+select:active:not(:disabled) {
+    transform: scale(0.995);
+    border-color: var(--ibc-blue-dark);
+}
+
+/* Disabled State Enhancement */
+select:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    background-image: var(--select-arrow-light);
+    filter: grayscale(1);
+}
+
+/* Dark Mode Select Styling */
+.dark-mode select {
+    background-color: #0f1419 !important;
+    border-color: #475569 !important;
+    color: #f8fafc !important;
+    background-image: var(--select-arrow-dark) !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.dark-mode select:hover:not(:disabled) {
+    border-color: var(--ibc-blue-light) !important;
+    background-color: #151b24 !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(51, 133, 196, 0.15);
+}
+
+.dark-mode select:focus {
+    border-color: var(--ibc-blue-light) !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 0 3px rgba(51, 133, 196, 0.2) !important;
+    background-color: #0f1419 !important;
+}
+
+.dark-mode select:active:not(:disabled) {
+    border-color: var(--ibc-blue) !important;
+}
+
+/* Select Options Styling */
+select option {
+    padding: 0.5rem 1rem;
+    background-color: var(--bg-card);
+    color: var(--text-main);
+}
+
+.dark-mode select option {
+    background-color: #1a1f2e !important;
+    color: #f8fafc !important;
+}
+
+/* Multi-select Styling */
+select[multiple] {
+    padding: 0.5rem;
+    background-image: none;
+}
+
+select[multiple] option {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    margin: 0.125rem 0;
+}
+
+select[multiple] option:checked {
+    background: linear-gradient(135deg, var(--ibc-blue-light), var(--ibc-blue));
+    color: white;
+}
+
+/* Enhanced styling for select with icon wrapper */
+.select-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.select-wrapper select {
+    width: 100%;
+}
+
+.select-wrapper::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Icon-enhanced select (when select has a left icon via padding) */
+select.pl-11 {
+    padding-left: 2.75rem;
+}
+
+/* ===== END ENHANCED DROPDOWN STYLING ===== */
+
 /* Light Mode - Explicit Text Colors */
 body:not(.dark-mode) {
     color: #1f2937 !important;
