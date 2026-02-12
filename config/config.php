@@ -208,11 +208,24 @@ function init_session() {
         }
         
         // Set secure cookie parameters BEFORE starting session
+        // Only require secure flag over HTTPS to prevent session issues over HTTP
+        // Check for HTTPS considering proxy/load balancer scenarios
+        // Note: X-Forwarded-* headers are checked assuming trusted infrastructure (ionos.de hosting)
+        // In environments with untrusted proxies, consider validating proxy IPs before trusting these headers
+        $isSecure = false;
+        if (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off') {
+            $isSecure = true;
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') {
+            $isSecure = true;
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on') {
+            $isSecure = true;
+        }
+        
         session_set_cookie_params([
             'lifetime' => $lifetime,
             'path' => '/',
             'domain' => $domain,
-            'secure' => true,
+            'secure' => $isSecure,
             'httponly' => true,
             'samesite' => 'Strict'
         ]);
