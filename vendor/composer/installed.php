@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => '__root__',
-        'pretty_version' => 'dev-copilot/fix-login-authentication-error',
-        'version' => 'dev-copilot/fix-login-authentication-error',
-        'reference' => '59176f97bfd5b411ffdaec1fd93e75aa421f777a',
+        'pretty_version' => 'dev-copilot/fix-phpmailer-not-found-error',
+        'version' => 'dev-copilot/fix-phpmailer-not-found-error',
+        'reference' => '64fb2f28e1e039d1c43dede4da670b32957e442a',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => 'dev-copilot/fix-login-authentication-error',
-            'version' => 'dev-copilot/fix-login-authentication-error',
-            'reference' => '59176f97bfd5b411ffdaec1fd93e75aa421f777a',
+            'pretty_version' => 'dev-copilot/fix-phpmailer-not-found-error',
+            'version' => 'dev-copilot/fix-phpmailer-not-found-error',
+            'reference' => '64fb2f28e1e039d1c43dede4da670b32957e442a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
