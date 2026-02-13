@@ -537,17 +537,20 @@ class AuthHandler {
                 $userId = $existingUser['id'];
                 
                 // Update user table with role from Microsoft and set profile_complete=1
-                $stmt = $db->prepare("UPDATE users SET role = ?, profile_complete = 1, last_login = NOW() WHERE id = ?");
-                $stmt->execute([$roleName, $userId]);
+                // Also store the original Azure roles as JSON for profile display
+                $azureRolesJson = json_encode($azureRoles);
+                $stmt = $db->prepare("UPDATE users SET role = ?, azure_roles = ?, profile_complete = 1, last_login = NOW() WHERE id = ?");
+                $stmt->execute([$roleName, $azureRolesJson, $userId]);
             } else {
                 // Create new user without password (OAuth login only)
-                $stmt = $db->prepare("INSERT INTO users (email, password, role, is_alumni_validated, profile_complete) VALUES (?, ?, ?, ?, ?)");
+                $azureRolesJson = json_encode($azureRoles);
+                $stmt = $db->prepare("INSERT INTO users (email, password, role, azure_roles, is_alumni_validated, profile_complete) VALUES (?, ?, ?, ?, ?, ?)");
                 $isAlumniValidated = ($roleName === 'alumni') ? 0 : 1;
                 // Set profile_complete=1 since data comes from Microsoft
                 $profileComplete = 1;
                 // Use a random password hash since user will login via OAuth
                 $randomPassword = password_hash(bin2hex(random_bytes(32)), HASH_ALGO);
-                $stmt->execute([$email, $randomPassword, $roleName, $isAlumniValidated, $profileComplete]);
+                $stmt->execute([$email, $randomPassword, $roleName, $azureRolesJson, $isAlumniValidated, $profileComplete]);
                 $userId = $db->lastInsertId();
             }
             

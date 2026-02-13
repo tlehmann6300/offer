@@ -286,6 +286,27 @@ ob_start();
                     </span>
                 </p>
             </div>
+            <?php 
+            // Display Microsoft Entra roles if available
+            if (!empty($user['azure_roles'])):
+                $azureRoles = json_decode($user['azure_roles'], true);
+                if (is_array($azureRoles) && count($azureRoles) > 0):
+            ?>
+            <div>
+                <label class="text-sm text-gray-500 dark:text-gray-400">Microsoft Entra Rolle<?php echo count($azureRoles) > 1 ? 'n' : ''; ?></label>
+                <p class="text-lg">
+                    <?php foreach ($azureRoles as $index => $azureRole): ?>
+                        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full <?php echo $index > 0 ? 'mt-1' : ''; ?>">
+                            <?php echo translateAzureRole($azureRole); ?>
+                        </span>
+                        <?php if ($index < count($azureRoles) - 1): echo ' '; endif; ?>
+                    <?php endforeach; ?>
+                </p>
+            </div>
+            <?php 
+                endif;
+            endif; 
+            ?>
             <div>
                 <label class="text-sm text-gray-500 dark:text-gray-400">Letzter Login</label>
                 <p class="text-lg text-gray-800 dark:text-gray-100">

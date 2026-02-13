@@ -124,6 +124,30 @@ function translateRole($role) {
 }
 
 /**
+ * Translate Azure/Entra ID role to German display name
+ * Maps the original Azure role names to their German equivalents
+ * 
+ * @param string $azureRole Azure role identifier (e.g., 'anwaerter', 'mitglied')
+ * @return string German display name
+ */
+function translateAzureRole($azureRole) {
+    $azureRoleTranslations = [
+        'anwaerter' => 'Anwärter',
+        'mitglied' => 'Mitglied',
+        'ressortleiter' => 'Ressortleiter',
+        'vorstand_finanzen' => 'Vorstand Finanzen',
+        'vorstand_intern' => 'Vorstand Intern',
+        'vorstand_extern' => 'Vorstand Extern',
+        'alumni' => 'Alumni',
+        'alumni_vorstand' => 'Alumni-Vorstand',
+        'alumni_finanz' => 'Alumni-Finanzprüfer',
+        'ehrenmitglied' => 'Ehrenmitglied'
+    ];
+    
+    return $azureRoleTranslations[$azureRole] ?? ucfirst(str_replace('_', ' ', $azureRole));
+}
+
+/**
  * Check if role is an active member role
  * Active member roles: candidate, member, head, board (and board variants)
  * 
