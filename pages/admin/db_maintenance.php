@@ -58,12 +58,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             
             // Log the action
-            $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, ip_address, timestamp) VALUES (?, ?, ?, ?, NOW())");
+            $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, entity_type, entity_id, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $_SESSION['user_id'],
                 'cleanup_logs',
+                'maintenance',
+                null,
                 json_encode($actionResult['details']),
-                $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null
             ]);
             
         } elseif (isset($_POST['clear_cache'])) {
@@ -95,12 +98,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Log the action
             $contentDb = Database::getContentDB();
-            $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, ip_address, timestamp) VALUES (?, ?, ?, ?, NOW())");
+            $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, entity_type, entity_id, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $_SESSION['user_id'],
                 'clear_cache',
+                'maintenance',
+                null,
                 json_encode($actionResult['details']),
-                $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null
             ]);
         }
     } catch (Exception $e) {
