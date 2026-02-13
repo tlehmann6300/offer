@@ -15,6 +15,9 @@ $user = Auth::user();
 // Get profile ID from URL
 $profileId = $_GET['id'] ?? null;
 
+// Get return location (default to alumni index)
+$returnTo = $_GET['return'] ?? 'alumni';
+
 if (!$profileId) {
     header('Location: index.php');
     exit;
@@ -46,10 +49,17 @@ ob_start();
 <div class="max-w-4xl mx-auto">
     <!-- Back Button -->
     <div class="mb-6">
-        <a href="index.php" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors">
-            <i class="fas fa-arrow-left mr-2"></i>
-            Zurück zum Mitgliederverzeichnis
-        </a>
+        <?php if ($returnTo === 'members'): ?>
+            <a href="../members/index.php" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Zurück zum Mitgliederverzeichnis
+            </a>
+        <?php else: ?>
+            <a href="index.php" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Zurück zum Alumni Directory
+            </a>
+        <?php endif; ?>
     </div>
 
     <!-- Profile Card -->
