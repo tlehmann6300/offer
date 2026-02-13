@@ -28,8 +28,8 @@ $contentDb = Database::getContentDB();
 
 // Log cron execution start
 try {
-    $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
-    $stmt->execute([0, 'cron_easyverein_sync', "Started synchronization"]);
+    $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, entity_type, entity_id, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([0, 'cron_easyverein_sync', 'cron', null, "Started synchronization", 'cron', 'cron']);
 } catch (Exception $e) {
     // Ignore logging errors
 }
@@ -59,12 +59,12 @@ try {
     
     // Log cron execution completion
     try {
-        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
+        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, entity_type, entity_id, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $logDetails = "Completed: Created={$result['created']}, Updated={$result['updated']}, Archived={$result['archived']}";
         if (!empty($result['errors'])) {
             $logDetails .= ", Errors=" . count($result['errors']);
         }
-        $stmt->execute([0, 'cron_easyverein_sync', $logDetails]);
+        $stmt->execute([0, 'cron_easyverein_sync', 'cron', null, $logDetails, 'cron', 'cron']);
     } catch (Exception $e) {
         // Ignore logging errors
     }
@@ -78,8 +78,8 @@ try {
         if (!isset($contentDb)) {
             $contentDb = Database::getContentDB();
         }
-        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
-        $stmt->execute([0, 'cron_easyverein_sync', "ERROR: " . $e->getMessage()]);
+        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, entity_type, entity_id, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([0, 'cron_easyverein_sync', 'cron', null, "ERROR: " . $e->getMessage(), 'cron', 'cron']);
     } catch (Exception $logError) {
         // Ignore logging errors
     }

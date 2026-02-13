@@ -59,8 +59,8 @@ try {
     
     // Log cron execution start
     try {
-        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
-        $stmt->execute([0, 'cron_birthday_wishes', "Started: Found {$totalUsers} user(s) with birthday today"]);
+        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, entity_type, entity_id, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([0, 'cron_birthday_wishes', 'cron', null, "Started: Found {$totalUsers} user(s) with birthday today", 'cron', 'cron']);
     } catch (Exception $e) {
         // Ignore logging errors
     }
@@ -120,9 +120,9 @@ try {
     
     // Log cron execution completion
     try {
-        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
+        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, entity_type, entity_id, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $logDetails = "Completed: Total={$totalUsers}, Sent={$emailsSent}, Failed={$emailsFailed}";
-        $stmt->execute([0, 'cron_birthday_wishes', $logDetails]);
+        $stmt->execute([0, 'cron_birthday_wishes', 'cron', null, $logDetails, 'cron', 'cron']);
     } catch (Exception $e) {
         // Ignore logging errors
     }
@@ -136,8 +136,8 @@ try {
         if (!isset($contentDb)) {
             $contentDb = Database::getContentDB();
         }
-        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
-        $stmt->execute([0, 'cron_birthday_wishes', "ERROR: " . $e->getMessage()]);
+        $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, entity_type, entity_id, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([0, 'cron_birthday_wishes', 'cron', null, "ERROR: " . $e->getMessage(), 'cron', 'cron']);
     } catch (Exception $logError) {
         // Ignore logging errors
     }

@@ -30,8 +30,8 @@ echo "Found {$totalOutdated} alumni profiles that need verification.\n";
 
 // Log cron execution start
 try {
-    $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
-    $stmt->execute([0, 'cron_alumni_reminders', "Started: Found {$totalOutdated} outdated profiles"]);
+    $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, entity_type, entity_id, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([0, 'cron_alumni_reminders', 'cron', null, "Started: Found {$totalOutdated} outdated profiles", 'cron', 'cron']);
 } catch (Exception $e) {
     // Ignore logging errors
 }
@@ -85,9 +85,9 @@ echo "Completed at: " . date('Y-m-d H:i:s') . "\n";
 
 // Log cron execution completion
 try {
-    $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, details, timestamp) VALUES (?, ?, ?, NOW())");
+    $stmt = $contentDb->prepare("INSERT INTO system_logs (user_id, action, entity_type, entity_id, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $logDetails = "Completed: Total={$totalOutdated}, Sent={$emailsSent}, Failed={$emailsFailed}, Remaining=" . max(0, $totalOutdated - $maxEmails);
-    $stmt->execute([0, 'cron_alumni_reminders', $logDetails]);
+    $stmt->execute([0, 'cron_alumni_reminders', 'cron', null, $logDetails, 'cron', 'cron']);
 } catch (Exception $e) {
     // Ignore logging errors
 }
