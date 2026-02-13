@@ -46,6 +46,7 @@ if (!$profile) {
         'first_name' => '',
         'last_name' => '',
         'email' => $user['email'],
+        'secondary_email' => '',
         'mobile_phone' => '',
         'linkedin_url' => '',
         'xing_url' => '',
@@ -58,12 +59,14 @@ if (!$profile) {
         'industry' => '',
         'position' => '',
         'gender' => $user['gender'] ?? '',
-        'birthday' => $user['birthday'] ?? ''
+        'birthday' => $user['birthday'] ?? '',
+        'show_birthday' => $user['show_birthday'] ?? 0
     ];
 } else {
-    // Ensure gender, birthday, and about_me from users table are included
+    // Ensure gender, birthday, show_birthday, and about_me from users table are included
     $profile['gender'] = $user['gender'] ?? ($profile['gender'] ?? '');
     $profile['birthday'] = $user['birthday'] ?? ($profile['birthday'] ?? '');
+    $profile['show_birthday'] = $user['show_birthday'] ?? ($profile['show_birthday'] ?? 0);
     $profile['about_me'] = $user['about_me'] ?? ($profile['about_me'] ?? '');
 }
 
@@ -76,13 +79,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'first_name' => trim($_POST['first_name'] ?? ''),
                 'last_name' => trim($_POST['last_name'] ?? ''),
                 'email' => trim($_POST['profile_email'] ?? ''),
+                'secondary_email' => trim($_POST['secondary_email'] ?? ''),
                 'mobile_phone' => trim($_POST['mobile_phone'] ?? ''),
                 'linkedin_url' => trim($_POST['linkedin_url'] ?? ''),
                 'xing_url' => trim($_POST['xing_url'] ?? ''),
                 'about_me' => mb_substr(trim($_POST['about_me'] ?? ''), 0, 400), // Limit to 400 chars
                 'image_path' => $profile['image_path'] ?? '', // Keep existing image by default
                 'gender' => trim($_POST['gender'] ?? ''),
-                'birthday' => trim($_POST['birthday'] ?? '')
+                'birthday' => trim($_POST['birthday'] ?? ''),
+                'show_birthday' => isset($_POST['show_birthday']) ? 1 : 0
             ];
             
             // Handle profile picture upload using secure upload utility
@@ -105,13 +110,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             
-            // Update user fields (about_me, gender, birthday) in users table
+            // Update user fields (about_me, gender, birthday, show_birthday) in users table
             $userUpdateData = [];
             if (isset($profileData['gender'])) {
                 $userUpdateData['gender'] = $profileData['gender'];
             }
             if (isset($profileData['birthday'])) {
                 $userUpdateData['birthday'] = $profileData['birthday'];
+            }
+            if (isset($profileData['show_birthday'])) {
+                $userUpdateData['show_birthday'] = $profileData['show_birthday'];
             }
             if (isset($profileData['about_me'])) {
                 $userUpdateData['about_me'] = $profileData['about_me'];
@@ -183,6 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($profile) {
                     $profile['gender'] = $user['gender'] ?? ($profile['gender'] ?? '');
                     $profile['birthday'] = $user['birthday'] ?? ($profile['birthday'] ?? '');
+                    $profile['show_birthday'] = $user['show_birthday'] ?? ($profile['show_birthday'] ?? 0);
                 }
                 // If neither member nor alumni role, profile will remain as-is
             } else {
@@ -335,6 +344,18 @@ ob_start();
                             value="<?php echo htmlspecialchars($profile['email'] ?? $user['email']); ?>"
                             class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                         >
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Die erste E-Mail ist immer die von Microsoft Entra</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Zweite E-Mail (optional)</label>
+                        <input 
+                            type="email" 
+                            name="secondary_email" 
+                            value="<?php echo htmlspecialchars($profile['secondary_email'] ?? ''); ?>"
+                            class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
+                            placeholder="zusätzliche@email.de"
+                        >
                     </div>
                     
                     <div>
@@ -384,14 +405,27 @@ ob_start();
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Geburtstag</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Geburtstag *</label>
                         <input 
                             type="date" 
                             name="birthday" 
+                            required
                             value="<?php echo htmlspecialchars($profile['birthday'] ?? ''); ?>"
                             max="<?php echo date('Y-m-d'); ?>"
                             class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                         >
+                        <div class="mt-2">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    name="show_birthday" 
+                                    value="1"
+                                    <?php echo (!empty($profile['show_birthday'])) ? 'checked' : ''; ?>
+                                    class="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
+                                >
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Geburtstag öffentlich anzeigen</span>
+                            </label>
+                        </div>
                     </div>
                     
                     <div class="md:col-span-2">
