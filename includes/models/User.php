@@ -91,7 +91,7 @@ class User {
         $values = [];
         
         // Only allow specific profile fields to be updated
-        $allowedFields = ['about_me', 'gender', 'birthday'];
+        $allowedFields = ['about_me', 'gender', 'birthday', 'show_birthday'];
         
         foreach ($allowedFields as $field) {
             if (array_key_exists($field, $data)) {

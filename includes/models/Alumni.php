@@ -19,7 +19,7 @@ class Alumni extends Database {
     public static function getProfileById($id) {
         $db = Database::getContentDB();
         $stmt = $db->prepare("
-            SELECT id, user_id, first_name, last_name, email, mobile_phone, 
+            SELECT id, user_id, first_name, last_name, email, secondary_email, mobile_phone, 
                    linkedin_url, xing_url, industry, company, position, 
                    study_program, semester, angestrebter_abschluss, 
                    degree, graduation_year,
@@ -40,7 +40,7 @@ class Alumni extends Database {
     public static function getProfileByUserId(int $userId) {
         $db = Database::getContentDB();
         $stmt = $db->prepare("
-            SELECT id, user_id, first_name, last_name, email, mobile_phone, 
+            SELECT id, user_id, first_name, last_name, email, secondary_email, mobile_phone, 
                    linkedin_url, xing_url, industry, company, position, 
                    study_program, semester, angestrebter_abschluss, 
                    degree, graduation_year,
@@ -77,11 +77,11 @@ class Alumni extends Database {
         
         $stmt = $db->prepare("
             INSERT INTO alumni_profiles 
-            (user_id, first_name, last_name, email, mobile_phone, 
+            (user_id, first_name, last_name, email, secondary_email, mobile_phone, 
              linkedin_url, xing_url, industry, company, position, image_path,
              study_program, semester, angestrebter_abschluss, 
              degree, graduation_year)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         
         return $stmt->execute([
@@ -89,6 +89,7 @@ class Alumni extends Database {
             $data['first_name'],
             $data['last_name'],
             $data['email'],
+            $data['secondary_email'] ?? null,
             $data['mobile_phone'] ?? null,
             $data['linkedin_url'] ?? null,
             $data['xing_url'] ?? null,
@@ -150,7 +151,7 @@ class Alumni extends Database {
         $values = [];
         
         $allowedFields = [
-            'first_name', 'last_name', 'email', 'mobile_phone',
+            'first_name', 'last_name', 'email', 'secondary_email', 'mobile_phone',
             'linkedin_url', 'xing_url', 'industry', 'company', 
             'position', 'image_path', 'study_program', 
             'semester', 'angestrebter_abschluss', 'degree', 

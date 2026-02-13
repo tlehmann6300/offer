@@ -57,9 +57,9 @@ ob_start();
         
         <!-- Edit My Profile Button - Only for Vorstand (all types), Resortleiter, Mitglied, Anwärter -->
         <?php if (Auth::isBoard() || Auth::hasRole(['head', 'member', 'candidate'])): ?>
-        <a href="edit.php" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl">
+        <a href="../auth/profile.php" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl">
             <i class="fas fa-user-edit mr-2"></i>
-            Edit My Profile
+            Profil bearbeiten
         </a>
         <?php endif; ?>
     </div>
