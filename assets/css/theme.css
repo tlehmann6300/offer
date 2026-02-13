@@ -355,9 +355,8 @@ select {
     background-repeat: no-repeat;
     background-size: 1.5rem 1.5rem;
     
-    /* Smooth Transitions with Transform */
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Smooth Transitions */
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     
     /* Cursor */
     cursor: pointer;
@@ -373,7 +372,7 @@ select {
         inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
-/* Hover State - Enhanced Visual Feedback */
+/* Hover State - Gradient + Lift Animation + Enhanced Shadow */
 select:hover:not(:disabled) {
     border-color: var(--ibc-blue);
     background: linear-gradient(to bottom, #ffffff 0%, #f0f7ff 100%);
@@ -416,15 +415,16 @@ select:disabled {
     filter: grayscale(0.8);
 }
 
-/* Dark Mode Select Styling - Enhanced */
+/* Dark Mode Select Styling - Enhanced with Gradient + Arrow */
 .dark-mode select {
     background: linear-gradient(to bottom, #0f1419 0%, #0a0e13 100%) !important;
     border-color: #475569 !important;
     color: #f8fafc !important;
+    /* Arrow icon - explicitly set with !important to ensure visibility across all states */
     background-image: var(--select-arrow-dark) !important;
-    background-position: right 0.875rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5rem 1.5rem;
+    background-position: right 0.875rem center !important;
+    background-repeat: no-repeat !important;
+    background-size: 1.5rem 1.5rem !important;
     box-shadow: 
         inset 0 1px 3px rgba(0, 0, 0, 0.3), 
         0 1px 2px rgba(0, 0, 0, 0.2),
@@ -433,11 +433,12 @@ select:disabled {
 
 .dark-mode select:hover:not(:disabled) {
     border-color: var(--ibc-blue-light) !important;
+    /* Must explicitly set both gradient and arrow to override base background */
     background: linear-gradient(to bottom, #151b24 0%, #101419 100%) !important;
     background-image: var(--select-arrow-dark) !important;
-    background-position: right 0.875rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5rem 1.5rem;
+    background-position: right 0.875rem center !important;
+    background-repeat: no-repeat !important;
+    background-size: 1.5rem 1.5rem !important;
     box-shadow: 
         inset 0 1px 3px rgba(0, 0, 0, 0.3), 
         0 2px 8px rgba(51, 133, 196, 0.2),
@@ -447,11 +448,12 @@ select:disabled {
 
 .dark-mode select:focus {
     border-color: var(--ibc-blue-light) !important;
+    /* Must explicitly set both gradient and arrow to override base background */
     background: #0f1419 !important;
     background-image: var(--select-arrow-dark) !important;
-    background-position: right 0.875rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5rem 1.5rem;
+    background-position: right 0.875rem center !important;
+    background-repeat: no-repeat !important;
+    background-size: 1.5rem 1.5rem !important;
     box-shadow: 
         inset 0 1px 3px rgba(0, 0, 0, 0.3), 
         0 0 0 4px rgba(51, 133, 196, 0.25),
@@ -476,27 +478,9 @@ select option {
     line-height: 1.5;
 }
 
-select option:hover {
-    background-color: rgba(0, 102, 179, 0.08);
-}
-
 .dark-mode select option {
     background-color: #1a1f2e !important;
     color: #f8fafc !important;
-}
-
-.dark-mode select option:hover {
-    background-color: rgba(51, 133, 196, 0.15) !important;
-}
-
-/* Dark Mode Multi-select */
-.dark-mode select[multiple] {
-    background: linear-gradient(to bottom, #0f1419 0%, #0a0e13 100%) !important;
-}
-
-.dark-mode select[multiple] option:checked {
-    background: linear-gradient(135deg, var(--ibc-blue-light) 0%, var(--ibc-blue) 100%) !important;
-    color: white !important;
 }
 
 /* Multi-select Styling - Enhanced */
@@ -523,6 +507,13 @@ select[multiple] option:checked {
     color: white;
     font-weight: 600;
     box-shadow: 0 2px 4px rgba(0, 102, 179, 0.2);
+}
+
+/* Dark Mode Multi-select */
+.dark-mode select[multiple] option:checked {
+    /* Explicit gradient override for checked state in dark mode */
+    background: linear-gradient(135deg, var(--ibc-blue-light) 0%, var(--ibc-blue) 100%) !important;
+    color: white !important;
 }
 
 /* Enhanced styling for select with icon wrapper */
