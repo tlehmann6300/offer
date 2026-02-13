@@ -14,7 +14,3 @@ AFTER email;
 ALTER TABLE users
 ADD COLUMN IF NOT EXISTS show_birthday BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Whether to display birthday publicly on profile'
 AFTER birthday;
-
--- Add index for secondary_email
-ALTER TABLE alumni_profiles
-ADD INDEX IF NOT EXISTS idx_secondary_email (secondary_email);
