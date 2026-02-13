@@ -40,6 +40,7 @@ if (!$data) {
 $eventId = $data['event_id'] ?? null;
 $calculations = $data['calculations'] ?? '';
 $salesData = $data['sales_data'] ?? [];
+$sellersData = $data['sellers_data'] ?? [];
 
 if (!$eventId) {
     http_response_code(400);
@@ -54,9 +55,16 @@ if (!is_array($salesData)) {
     exit;
 }
 
+// Validate sellers data structure
+if (!is_array($sellersData)) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Ungültige Verkäuferdaten']);
+    exit;
+}
+
 // Save documentation
 try {
-    $success = EventDocumentation::save($eventId, $calculations, $salesData, $user['id']);
+    $success = EventDocumentation::save($eventId, $calculations, $salesData, $sellersData, $user['id']);
     
     if ($success) {
         echo json_encode([

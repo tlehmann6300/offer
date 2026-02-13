@@ -401,34 +401,66 @@ ob_start();
         <div class="glass-card shadow-soft rounded-xl p-8 mt-6">
             <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
                 <i class="fas fa-file-alt mr-2 text-purple-600"></i>
-                Dokumentation
+                Statistiken & Dokumentation
                 <span class="text-sm font-normal text-gray-500 dark:text-gray-400 ml-2">(Nur für Vorstand sichtbar)</span>
             </h2>
             
+            <!-- Sellers Section -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+                        <i class="fas fa-user-tie mr-2 text-blue-600"></i>
+                        Verkäufer-Tracking
+                    </h3>
+                    <button 
+                        id="addSellerBtn"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+                    >
+                        <i class="fas fa-plus mr-2"></i>
+                        Neuen Verkäufer tracken
+                    </button>
+                </div>
+                
+                <!-- Sellers Entries -->
+                <div id="sellersEntries" class="space-y-3 mb-4">
+                    <!-- Sellers entries will be rendered here by JavaScript -->
+                </div>
+            </div>
+            
             <!-- Calculations Section -->
             <div class="mb-8">
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-3">
-                    <i class="fas fa-calculator mr-2 text-blue-600"></i>
-                    Kalkulationen
-                </h3>
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+                        <i class="fas fa-calculator mr-2 text-green-600"></i>
+                        Kalkulationen
+                    </h3>
+                    <button 
+                        id="addCalculationBtn"
+                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
+                        onclick="document.getElementById('calculations').focus()"
+                    >
+                        <i class="fas fa-plus mr-2"></i>
+                        Neue Kalkulation tracken
+                    </button>
+                </div>
                 <textarea 
                     id="calculations"
                     rows="6"
-                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
                     placeholder="Notieren Sie hier Kalkulationen, Kosten, Budget-Details..."
                 ><?php echo htmlspecialchars($documentation['calculations'] ?? ''); ?></textarea>
             </div>
             
-            <!-- Sales Data Section -->
+            <!-- Sales Data Section (Legacy) -->
             <div class="mb-8">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
-                        <i class="fas fa-chart-line mr-2 text-green-600"></i>
-                        Verkaufsdaten
+                        <i class="fas fa-chart-line mr-2 text-purple-600"></i>
+                        Verkaufsdaten (Gesamt)
                     </h3>
                     <button 
                         id="addSaleBtn"
-                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
+                        class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all"
                     >
                         <i class="fas fa-plus mr-2"></i>
                         Verkauf hinzufügen
@@ -582,8 +614,100 @@ function cancelHelperSlot(signupId) {
 <?php if ($canViewDocumentation): ?>
 // ===== Event Documentation Management =====
 
-// Initialize sales data from PHP
+// Initialize sales data and sellers data from PHP
 let salesData = <?php echo json_encode($documentation['sales_data'] ?? []); ?>;
+let sellersData = <?php echo json_encode($documentation['sellers_data'] ?? []); ?>;
+
+// Render sellers entries
+function renderSellersEntries() {
+    const container = document.getElementById('sellersEntries');
+    if (!container) return;
+    
+    if (sellersData.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4">Keine Verkäufer-Daten vorhanden. Klicken Sie auf "Neuen Verkäufer tracken".</p>';
+        return;
+    }
+    
+    container.innerHTML = sellersData.map((seller, index) => `
+        <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-600 rounded-lg border border-gray-200 dark:border-gray-500">
+            <div class="flex-1 grid grid-cols-4 gap-4">
+                <div>
+                    <label class="text-xs text-gray-600 dark:text-gray-300 mb-1 block">Verkäufer/Stand</label>
+                    <input 
+                        type="text" 
+                        value="${seller.seller_name || ''}"
+                        onchange="updateSeller(${index}, 'seller_name', this.value)"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                        placeholder="z.B. BSW, Grillstand"
+                    >
+                </div>
+                <div>
+                    <label class="text-xs text-gray-600 dark:text-gray-300 mb-1 block">Artikel</label>
+                    <input 
+                        type="text" 
+                        value="${seller.items || ''}"
+                        onchange="updateSeller(${index}, 'items', this.value)"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                        placeholder="z.B. Brezeln, Äpfel"
+                    >
+                </div>
+                <div>
+                    <label class="text-xs text-gray-600 dark:text-gray-300 mb-1 block">Menge/Anzahl</label>
+                    <input 
+                        type="text" 
+                        value="${seller.quantity || ''}"
+                        onchange="updateSeller(${index}, 'quantity', this.value)"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                        placeholder="z.B. 50, 25 Verkauft"
+                    >
+                </div>
+                <div>
+                    <label class="text-xs text-gray-600 dark:text-gray-300 mb-1 block">Umsatz (€)</label>
+                    <input 
+                        type="text" 
+                        value="${seller.revenue || ''}"
+                        onchange="updateSeller(${index}, 'revenue', this.value)"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                        placeholder="z.B. 450€ (optional)"
+                    >
+                </div>
+            </div>
+            <button 
+                onclick="removeSeller(${index})"
+                class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-all"
+                title="Löschen"
+            >
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+// Update a seller entry
+function updateSeller(index, field, value) {
+    if (sellersData[index]) {
+        sellersData[index][field] = value;
+    }
+}
+
+// Add new seller entry
+document.getElementById('addSellerBtn')?.addEventListener('click', function() {
+    sellersData.push({
+        seller_name: '',
+        items: '',
+        quantity: '',
+        revenue: ''
+    });
+    renderSellersEntries();
+});
+
+// Remove seller entry
+function removeSeller(index) {
+    if (confirm('Diesen Verkäufer wirklich löschen?')) {
+        sellersData.splice(index, 1);
+        renderSellersEntries();
+    }
+}
 
 // Render sales entries
 function renderSalesEntries() {
@@ -746,7 +870,8 @@ document.getElementById('saveDocumentationBtn')?.addEventListener('click', funct
         body: JSON.stringify({
             event_id: eventId,
             calculations: calculations,
-            sales_data: salesData
+            sales_data: salesData,
+            sellers_data: sellersData
         })
     })
     .then(response => response.json())
@@ -769,6 +894,7 @@ document.getElementById('saveDocumentationBtn')?.addEventListener('click', funct
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
+    renderSellersEntries();
     renderSalesEntries();
     updateChart();
 });
