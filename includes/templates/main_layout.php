@@ -550,8 +550,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <div class="submenu">
                         <!-- Helfersystem (All) - Indented -->
                         <a href="<?php echo asset('pages/events/helpers.php'); ?>" 
-                           style="padding-left: 2.5rem;"
-                           class="flex items-center pr-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/events/helpers.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
+                           class="flex items-center px-6 pr-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 submenu-item <?php echo isActivePath('/events/helpers.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                             <i class="fas fa-hands-helping w-5 mr-3"></i>
                             <span>Helfersystem</span>
                         </a>
@@ -561,7 +560,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                 <!-- Inventar (All) - Parent with submenu -->
                 <div class="menu-item-with-submenu">
                     <a href="<?php echo asset('pages/inventory/index.php'); ?>" 
-                       class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo (isActivePath('/inventory/') && !isActivePath('/my_rentals.php')) ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
+                       class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/inventory/') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                         <i class="fas fa-box w-5 mr-3"></i>
                         <span class="flex-1">Inventar</span>
                         <i class="fas fa-chevron-down text-xs transition-transform duration-200 submenu-chevron"></i>
@@ -571,8 +570,7 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     <div class="submenu">
                         <!-- Meine Ausleihen (All) - Indented -->
                         <a href="<?php echo asset('pages/inventory/my_rentals.php'); ?>" 
-                           style="padding-left: 2.5rem;"
-                           class="flex items-center pr-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/my_rentals.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
+                           class="flex items-center px-6 pr-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 submenu-item <?php echo isActivePath('/my_rentals.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                             <i class="fas fa-clipboard-list w-5 mr-3"></i>
                             <span>Meine Ausleihen</span>
                         </a>
