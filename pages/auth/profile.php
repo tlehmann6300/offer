@@ -290,6 +290,13 @@ ob_start();
             // Display Microsoft Entra roles if available
             if (!empty($user['azure_roles'])):
                 $azureRoles = json_decode($user['azure_roles'], true);
+                
+                // Check for JSON decode errors
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    error_log("Failed to decode azure_roles for user ID {$user['id']}: " . json_last_error_msg());
+                    $azureRoles = null;
+                }
+                
                 if (is_array($azureRoles) && count($azureRoles) > 0):
             ?>
             <div>

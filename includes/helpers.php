@@ -144,7 +144,13 @@ function translateAzureRole($azureRole) {
         'ehrenmitglied' => 'Ehrenmitglied'
     ];
     
-    return $azureRoleTranslations[$azureRole] ?? ucwords(str_replace('_', ' ', $azureRole));
+    // If role not found in mapping, log it for manual addition and return formatted version
+    if (!isset($azureRoleTranslations[$azureRole])) {
+        error_log("Unknown Azure role encountered: '$azureRole'. Consider adding translation to translateAzureRole()");
+        return ucfirst(str_replace('_', ' ', $azureRole));
+    }
+    
+    return $azureRoleTranslations[$azureRole];
 }
 
 /**
