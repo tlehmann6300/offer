@@ -628,6 +628,13 @@ function renderSellersEntries() {
         return;
     }
     
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
     container.innerHTML = sellersData.map((seller, index) => `
         <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-600 rounded-lg border border-gray-200 dark:border-gray-500">
             <div class="flex-1 grid grid-cols-4 gap-4">
@@ -635,7 +642,7 @@ function renderSellersEntries() {
                     <label class="text-xs text-gray-600 dark:text-gray-300 mb-1 block">Verkäufer/Stand</label>
                     <input 
                         type="text" 
-                        value="${seller.seller_name || ''}"
+                        value="${escapeHtml(seller.seller_name || '')}"
                         onchange="updateSeller(${index}, 'seller_name', this.value)"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
                         placeholder="z.B. BSW, Grillstand"
@@ -645,7 +652,7 @@ function renderSellersEntries() {
                     <label class="text-xs text-gray-600 dark:text-gray-300 mb-1 block">Artikel</label>
                     <input 
                         type="text" 
-                        value="${seller.items || ''}"
+                        value="${escapeHtml(seller.items || '')}"
                         onchange="updateSeller(${index}, 'items', this.value)"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
                         placeholder="z.B. Brezeln, Äpfel"
@@ -655,7 +662,7 @@ function renderSellersEntries() {
                     <label class="text-xs text-gray-600 dark:text-gray-300 mb-1 block">Menge/Anzahl</label>
                     <input 
                         type="text" 
-                        value="${seller.quantity || ''}"
+                        value="${escapeHtml(seller.quantity || '')}"
                         onchange="updateSeller(${index}, 'quantity', this.value)"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
                         placeholder="z.B. 50, 25 Verkauft"
@@ -665,7 +672,7 @@ function renderSellersEntries() {
                     <label class="text-xs text-gray-600 dark:text-gray-300 mb-1 block">Umsatz (€)</label>
                     <input 
                         type="text" 
-                        value="${seller.revenue || ''}"
+                        value="${escapeHtml(seller.revenue || '')}"
                         onchange="updateSeller(${index}, 'revenue', this.value)"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
                         placeholder="z.B. 450€ (optional)"
@@ -685,9 +692,20 @@ function renderSellersEntries() {
 
 // Update a seller entry
 function updateSeller(index, field, value) {
-    if (sellersData[index]) {
-        sellersData[index][field] = value;
+    // Validate index
+    if (index < 0 || index >= sellersData.length || !sellersData[index]) {
+        console.error('Invalid seller index:', index);
+        return;
     }
+    
+    // Validate field
+    const validFields = ['seller_name', 'items', 'quantity', 'revenue'];
+    if (!validFields.includes(field)) {
+        console.error('Invalid field:', field);
+        return;
+    }
+    
+    sellersData[index][field] = value;
 }
 
 // Add new seller entry
