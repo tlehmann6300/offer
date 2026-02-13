@@ -68,13 +68,23 @@ ob_start();
             <p class="text-gray-600 dark:text-gray-300">Entdecke kommende Events und melde Dich an</p>
         </div>
         
-        <!-- Neues Event Button - Board/Head/Manager only -->
-        <?php if (Auth::hasPermission('manage_projects') || Auth::isBoard() || Auth::hasRole(['head', 'alumni_board'])): ?>
-        <a href="edit.php" class="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl">
-            <i class="fas fa-plus mr-2"></i>
-            Neues Event
-        </a>
-        <?php endif; ?>
+        <div class="flex gap-3">
+            <!-- Statistiken Button - Board/Alumni Board only -->
+            <?php if (Auth::isBoard() || Auth::hasRole(['alumni_board'])): ?>
+            <a href="statistics.php" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl">
+                <i class="fas fa-chart-bar mr-2"></i>
+                Statistiken
+            </a>
+            <?php endif; ?>
+            
+            <!-- Neues Event Button - Board/Head/Manager only -->
+            <?php if (Auth::hasPermission('manage_projects') || Auth::isBoard() || Auth::hasRole(['head', 'alumni_board'])): ?>
+            <a href="edit.php" class="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 transition-all shadow-lg hover:shadow-xl">
+                <i class="fas fa-plus mr-2"></i>
+                Neues Event
+            </a>
+            <?php endif; ?>
+        </div>
     </div>
 
     <!-- Filter Tabs -->
