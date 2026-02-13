@@ -286,6 +286,33 @@ ob_start();
                     </span>
                 </p>
             </div>
+            <?php 
+            // Display Microsoft Entra roles if available
+            if (!empty($user['azure_roles'])):
+                $azureRoles = json_decode($user['azure_roles'], true);
+                
+                // Check for JSON decode errors
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    error_log("Failed to decode azure_roles for user ID {$user['id']}: " . json_last_error_msg());
+                    $azureRoles = null;
+                }
+                
+                if (is_array($azureRoles) && count($azureRoles) > 0):
+            ?>
+            <div>
+                <label class="text-sm text-gray-500 dark:text-gray-400">Microsoft Entra Rolle<?php echo count($azureRoles) > 1 ? 'n' : ''; ?></label>
+                <div class="flex flex-wrap gap-2">
+                    <?php foreach ($azureRoles as $azureRole): ?>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
+                            <?php echo translateAzureRole($azureRole); ?>
+                        </span>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php 
+                endif;
+            endif; 
+            ?>
             <div>
                 <label class="text-sm text-gray-500 dark:text-gray-400">Letzter Login</label>
                 <p class="text-lg text-gray-800 dark:text-gray-100">
