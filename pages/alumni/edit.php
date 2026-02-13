@@ -59,9 +59,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = 'Bitte geben Sie Ihren Vornamen und Nachnamen ein, um fortzufahren.';
         }
     } else {
-        // For normal edits, require all fields
-        if (empty($firstName) || empty($lastName) || empty($email) || empty($company) || empty($position)) {
-            $errors[] = 'Bitte füllen Sie alle Pflichtfelder aus (Name, E-Mail, Firma, Position)';
+        // For normal edits, require name and email only (company and position are optional)
+        if (empty($firstName) || empty($lastName) || empty($email)) {
+            $errors[] = 'Bitte füllen Sie alle Pflichtfelder aus (Vorname, Nachname, E-Mail)';
         }
     }
     
