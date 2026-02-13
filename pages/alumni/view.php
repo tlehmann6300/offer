@@ -15,8 +15,12 @@ $user = Auth::user();
 // Get profile ID from URL
 $profileId = $_GET['id'] ?? null;
 
-// Get return location (default to alumni index)
+// Get return location (default to alumni index) and validate against allowlist
 $returnTo = $_GET['return'] ?? 'alumni';
+$allowedReturnValues = ['alumni', 'members'];
+if (!in_array($returnTo, $allowedReturnValues, true)) {
+    $returnTo = 'alumni'; // Default to alumni if invalid value provided
+}
 
 if (!$profileId) {
     header('Location: index.php');
