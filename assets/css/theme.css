@@ -250,6 +250,11 @@ body.dark-mode .sidebar::-webkit-scrollbar-thumb:hover {
     transform: rotate(180deg);
 }
 
+/* Submenu item indentation */
+.submenu-item {
+    padding-left: 2.5rem !important;
+}
+
 body.dark-mode main {
     background-color: var(--bg-body);
 }
