@@ -294,14 +294,13 @@ ob_start();
             ?>
             <div>
                 <label class="text-sm text-gray-500 dark:text-gray-400">Microsoft Entra Rolle<?php echo count($azureRoles) > 1 ? 'n' : ''; ?></label>
-                <p class="text-lg">
-                    <?php foreach ($azureRoles as $index => $azureRole): ?>
-                        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full <?php echo $index > 0 ? 'mt-1' : ''; ?>">
+                <div class="flex flex-wrap gap-2">
+                    <?php foreach ($azureRoles as $azureRole): ?>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
                             <?php echo translateAzureRole($azureRole); ?>
                         </span>
-                        <?php if ($index < count($azureRoles) - 1): echo ' '; endif; ?>
                     <?php endforeach; ?>
-                </p>
+                </div>
             </div>
             <?php 
                 endif;

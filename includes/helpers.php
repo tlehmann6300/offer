@@ -144,7 +144,7 @@ function translateAzureRole($azureRole) {
         'ehrenmitglied' => 'Ehrenmitglied'
     ];
     
-    return $azureRoleTranslations[$azureRole] ?? ucfirst(str_replace('_', ' ', $azureRole));
+    return $azureRoleTranslations[$azureRole] ?? ucwords(str_replace('_', ' ', $azureRole));
 }
 
 /**
