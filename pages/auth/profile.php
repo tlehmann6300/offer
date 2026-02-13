@@ -242,12 +242,6 @@ ob_start();
             </h1>
             <p class="text-gray-600 dark:text-gray-300">Verwalte deine Kontoinformationen und Sicherheitseinstellungen</p>
         </div>
-        <div class="mt-4 md:mt-0">
-            <a href="../inventory/my_rentals.php" class="btn-primary inline-block">
-                <i class="fas fa-clipboard-list mr-2"></i>
-                Meine Ausleihen
-            </a>
-        </div>
     </div>
 </div>
 
