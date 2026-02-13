@@ -307,7 +307,7 @@ ob_start();
                     
                     <!-- Action: 'Profil ansehen' Button -->
                     <a 
-                        href="../alumni/view.php?id=<?php echo $member['profile_id']; ?>"
+                        href="../alumni/view.php?id=<?php echo $member['profile_id']; ?>&return=members"
                         class="block w-full text-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-md"
                     >
                         <i class="fas fa-user mr-2"></i>
