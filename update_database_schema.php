@@ -10,7 +10,7 @@
  * Usage: php update_database_schema.php
  */
 
-require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/database.php';
 
 // Enable error reporting
 error_reporting(E_ALL);
@@ -63,7 +63,7 @@ try {
     // ============================================
     echo "--- USER DATABASE UPDATES ---\n";
     
-    $user_db = getUserDb();
+    $user_db = Database::getUserDB();
     
     // Add azure_roles column to users table
     executeSql(
@@ -112,7 +112,7 @@ try {
     // ============================================
     echo "\n--- CONTENT DATABASE UPDATES ---\n";
     
-    $content_db = getContentDb();
+    $content_db = Database::getContentDB();
     
     // Add secondary_email column to alumni_profiles
     executeSql(
