@@ -25,6 +25,7 @@ $stmt = $userDb->query("
     FROM users 
     WHERE last_login IS NOT NULL 
     AND last_login > DATE_SUB(NOW(), INTERVAL 7 DAY)
+    AND deleted_at IS NULL
 ");
 $activeUsersCount = $stmt->fetch()['active_users'] ?? 0;
 
@@ -34,6 +35,7 @@ $stmt = $userDb->query("
     FROM users 
     WHERE last_login IS NOT NULL 
     AND DATE(last_login) BETWEEN DATE(DATE_SUB(NOW(), INTERVAL 14 DAY)) AND DATE(DATE_SUB(NOW(), INTERVAL 7 DAY))
+    AND deleted_at IS NULL
 ");
 $activeUsersPrev = $stmt->fetch()['active_users_prev'] ?? 0;
 $activeUsersTrend = $activeUsersPrev > 0 ? (($activeUsersCount - $activeUsersPrev) / $activeUsersPrev) * 100 : 0;
@@ -57,7 +59,7 @@ $openInvitationsPrev = $stmt->fetch()['open_invitations_prev'] ?? 0;
 $openInvitationsTrend = $openInvitationsPrev > 0 ? (($openInvitationsCount - $openInvitationsPrev) / $openInvitationsPrev) * 100 : 0;
 
 // Metric 3: Total User Count
-$stmt = $userDb->query("SELECT COUNT(*) as total_users FROM users");
+$stmt = $userDb->query("SELECT COUNT(*) as total_users FROM users WHERE deleted_at IS NULL");
 $totalUsersCount = $stmt->fetch()['total_users'] ?? 0;
 
 // Total Users trend (new users in last 7 days)
@@ -65,6 +67,7 @@ $stmt = $userDb->query("
     SELECT COUNT(*) as new_users 
     FROM users 
     WHERE created_at > DATE_SUB(NOW(), INTERVAL 7 DAY)
+    AND deleted_at IS NULL
 ");
 $newUsersCount = $stmt->fetch()['new_users'] ?? 0;
 $totalUsersTrend = $newUsersCount;
@@ -76,6 +79,7 @@ try {
         SELECT id, email, firstname, lastname, last_login, created_at
         FROM users 
         WHERE last_login IS NOT NULL
+        AND deleted_at IS NULL
         ORDER BY last_login DESC
         LIMIT 10
     ");
@@ -117,7 +121,7 @@ try {
     
     if (!empty($userIds)) {
         $placeholders = str_repeat('?,', count($userIds) - 1) . '?';
-        $userStmt = $userDb->prepare("SELECT id, email, firstname, lastname FROM users WHERE id IN ($placeholders)");
+        $userStmt = $userDb->prepare("SELECT id, email, firstname, lastname FROM users WHERE id IN ($placeholders) AND deleted_at IS NULL");
         $userStmt->execute($userIds);
         $users = $userStmt->fetchAll();
         

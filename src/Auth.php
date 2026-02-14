@@ -196,11 +196,17 @@ class Auth {
      * @return array Result with 'success' and 'message' keys
      */
     public static function login($email, $password, $tfaCode = null) {
+        // Capture IP address and user agent for logging
+        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? null;
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+        
         // Verify credentials
         $result = self::verifyCredentials($email, $password);
         
         // Check if verification returned an error
         if (isset($result['error'])) {
+            // Log failed login attempt
+            self::logLoginAttempt(null, $email, 'failed', $result['error'], $ipAddress, $userAgent);
             return ['success' => false, 'message' => $result['error']];
         }
         
@@ -217,12 +223,17 @@ class Auth {
             $ga = new PHPGangsta_GoogleAuthenticator();
             
             if (!$ga->verifyCode($user['tfa_secret'], $tfaCode, 2)) {
+                // Log failed 2FA attempt
+                self::logLoginAttempt($user['id'], $email, 'failed_2fa', 'Invalid 2FA code', $ipAddress, $userAgent);
                 return ['success' => false, 'message' => 'Ungültiger 2FA-Code'];
             }
         }
         
         // Create session
         self::createSession($user);
+        
+        // Log successful login attempt
+        self::logLoginAttempt($user['id'], $email, 'success', 'Login successful', $ipAddress, $userAgent);
         
         return ['success' => true, 'user' => $user];
     }
@@ -577,5 +588,38 @@ class Auth {
         }
         
         return $roleLabels[$role];
+    }
+    
+    /**
+     * Log login attempt to system_logs table
+     * 
+     * @param int|null $userId User ID (null if login failed before user identification)
+     * @param string $email Email used for login attempt
+     * @param string $status Login status ('success', 'failed', 'failed_2fa')
+     * @param string $details Additional details about the login attempt
+     * @param string|null $ipAddress IP address of the client
+     * @param string|null $userAgent User agent string
+     */
+    private static function logLoginAttempt($userId, $email, $status, $details, $ipAddress, $userAgent) {
+        try {
+            $dbContent = Database::getContentDB();
+            $stmt = $dbContent->prepare("INSERT INTO system_logs (user_id, action, entity_type, entity_id, details, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            
+            $action = 'login_' . $status;
+            $logDetails = "Email: {$email}, Status: {$status}, Details: {$details}";
+            
+            $stmt->execute([
+                $userId,
+                $action,
+                'login',
+                $userId,
+                $logDetails,
+                $ipAddress,
+                $userAgent
+            ]);
+        } catch (Exception $e) {
+            // Log to error log if database logging fails
+            error_log("Failed to log login attempt for {$email}: " . $e->getMessage());
+        }
     }
 }
