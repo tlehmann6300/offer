@@ -54,27 +54,27 @@ $title = 'Login - IBC Intranet';
 ob_start();
 ?>
 
-<div class="w-full max-w-md p-10 bg-white rounded-2xl shadow-2xl transition-all duration-500 hover:shadow-3xl">
+<div class="w-full max-w-md p-6 sm:p-8 md:p-10 bg-white rounded-2xl shadow-2xl transition-all duration-500 hover:shadow-3xl">
     <!-- Enhanced Header with Gradient Icon -->
-    <div class="text-center mb-10">
-        <div class="relative inline-flex items-center justify-center mb-6">
+    <div class="text-center mb-8 sm:mb-10">
+        <div class="relative inline-flex items-center justify-center mb-5 sm:mb-6">
             <!-- Animated Glow Ring -->
-            <div class="absolute inset-0 w-20 h-20 bg-gradient-to-br from-blue-400 via-blue-500 to-emerald-400 rounded-2xl opacity-20 animate-pulse blur-xl"></div>
+            <div class="absolute inset-0 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-400 via-blue-500 to-emerald-400 rounded-2xl opacity-20 animate-pulse blur-xl"></div>
             
             <!-- Icon Container with 3D Effect -->
-            <div class="relative inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 via-blue-600 to-emerald-500 rounded-2xl shadow-2xl shadow-blue-500/50 hover:shadow-emerald-500/50 hover:scale-110 transition-all duration-500 hover:rotate-6">
-                <i class="fas fa-building text-4xl text-white drop-shadow-lg"></i>
+            <div class="relative inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 via-blue-600 to-emerald-500 rounded-2xl shadow-2xl shadow-blue-500/50 hover:shadow-emerald-500/50 hover:scale-110 transition-all duration-500 hover:rotate-6">
+                <i class="fas fa-building text-3xl sm:text-4xl text-white drop-shadow-lg"></i>
                 
                 <!-- Sparkle Effects -->
-                <div class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping opacity-75"></div>
-                <div class="absolute -bottom-1 -left-1 w-2 h-2 bg-emerald-300 rounded-full animate-ping opacity-75" style="animation-delay: 0.5s;"></div>
+                <div class="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full animate-ping opacity-75"></div>
+                <div class="absolute -bottom-1 -left-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-300 rounded-full animate-ping opacity-75" style="animation-delay: 0.5s;"></div>
             </div>
         </div>
         
-        <h1 class="text-4xl font-black bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 bg-clip-text text-transparent mb-3 tracking-tight animate-fade-in">
+        <h1 class="text-3xl sm:text-4xl font-black bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 bg-clip-text text-transparent mb-2 sm:mb-3 tracking-tight animate-fade-in">
             Willkommen zurück
         </h1>
-        <p class="text-gray-600 font-semibold text-lg">Melde dich mit deinem Konto an</p>
+        <p class="text-gray-600 font-semibold text-base sm:text-lg">Melde dich mit deinem Konto an</p>
     </div>
 
     <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 1): ?>
@@ -105,38 +105,66 @@ ob_start();
     <?php endif; ?>
 
     <!-- Divider with "Oder" text -->
-    <div class="relative flex items-center justify-center my-8">
+    <div class="relative flex items-center justify-center my-6 sm:my-8">
         <div class="flex-grow border-t border-gray-300"></div>
-        <span class="px-4 text-sm text-gray-500 font-medium bg-white">Oder</span>
+        <span class="px-3 sm:px-4 text-xs sm:text-sm text-gray-500 font-medium bg-white">Anmelden mit</span>
         <div class="flex-grow border-t border-gray-300"></div>
     </div>
 
-    <!-- Microsoft Login Button with embedded SVG -->
-    <a href="<?php echo BASE_URL; ?>/auth/login_start.php" 
-       class="group relative flex items-center justify-center gap-4 w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold text-base transition-all duration-300 shadow-lg hover:shadow-2xl hover:scale-[1.02] transform"
-       aria-label="Mit deinem Microsoft-Konto anmelden">
-        <!-- Microsoft logo - directly embedded SVG -->
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="flex-shrink-0 transition-transform duration-300 group-hover:rotate-12" aria-hidden="true">
-            <rect x="1" y="1" width="10" height="10" fill="#f25022"/>
-            <rect x="1" y="13" width="10" height="10" fill="#00a4ef"/>
-            <rect x="13" y="1" width="10" height="10" fill="#7fba00"/>
-            <rect x="13" y="13" width="10" height="10" fill="#ffb900"/>
-        </svg>
+    <!-- Ultra-Premium Microsoft Login Button with 3D Glass Effect -->
+    <div class="relative group">
+        <!-- Animated Background Glow -->
+        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 rounded-2xl blur-lg opacity-30 group-hover:opacity-60 transition-all duration-500 animate-pulse"></div>
         
-        <!-- Button text -->
-        <span class="font-bold tracking-wide">Mit Microsoft anmelden</span>
-        
-        <!-- Hover arrow indicator -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-        </svg>
-    </a>
+        <!-- Main Button -->
+        <a href="<?php echo BASE_URL; ?>/auth/login_start.php" 
+           class="relative flex items-center justify-center gap-3 sm:gap-4 w-full py-4 sm:py-5 px-6 sm:px-8 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-white rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base transition-all duration-500 shadow-2xl hover:shadow-blue-500/50 hover:scale-[1.03] transform group overflow-hidden"
+           aria-label="Mit deinem Microsoft-Konto anmelden">
+            
+            <!-- Shimmer Effect -->
+            <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+            
+            <!-- Microsoft logo - Enhanced with Animation -->
+            <div class="relative flex-shrink-0 transition-all duration-500 group-hover:rotate-[360deg] group-hover:scale-110">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" class="drop-shadow-lg" aria-hidden="true">
+                    <rect x="1" y="1" width="10" height="10" fill="#f25022"/>
+                    <rect x="1" y="13" width="10" height="10" fill="#00a4ef"/>
+                    <rect x="13" y="1" width="10" height="10" fill="#7fba00"/>
+                    <rect x="13" y="13" width="10" height="10" fill="#ffb900"/>
+                </svg>
+            </div>
+            
+            <!-- Button text with Letter Spacing -->
+            <span class="relative font-black tracking-wider text-shadow-lg flex-1 text-center">Mit Microsoft anmelden</span>
+            
+            <!-- Enhanced Arrow with Bounce Animation -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 transition-all duration-500 group-hover:translate-x-2 group-hover:scale-125" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+            
+            <!-- Floating Sparkles on Hover -->
+            <div class="absolute top-1/4 left-1/4 w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping"></div>
+            <div class="absolute top-1/3 right-1/3 w-1.5 h-1.5 bg-cyan-200 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" style="animation-delay: 0.2s;"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" style="animation-delay: 0.4s;"></div>
+        </a>
+    </div>
     
-    <div class="mt-6 text-center">
-        <p class="text-gray-600 text-sm">Verwende dein Microsoft-Konto zum Anmelden.</p>
-        <div class="flex items-center justify-center space-x-2 text-gray-400 text-xs mt-2">
-            <i class="fas fa-shield-alt"></i>
-            <span>Sichere Anmeldung über Microsoft</span>
+    <!-- Enhanced Info Section with Icons -->
+    <div class="mt-5 sm:mt-6 text-center space-y-2 sm:space-y-3">
+        <p class="text-gray-600 text-xs sm:text-sm font-medium">Verwende dein Microsoft-Konto zum Anmelden</p>
+        <div class="flex items-center justify-center space-x-4 sm:space-x-6 text-gray-500 text-xs">
+            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-blue-600">
+                <i class="fas fa-shield-alt text-sm sm:text-base"></i>
+                <span class="hidden sm:inline">Sicher</span>
+            </div>
+            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-green-600">
+                <i class="fas fa-lock text-sm sm:text-base"></i>
+                <span class="hidden sm:inline">Verschlüsselt</span>
+            </div>
+            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-emerald-600">
+                <i class="fas fa-check-circle text-sm sm:text-base"></i>
+                <span class="hidden sm:inline">Vertraut</span>
+            </div>
         </div>
     </div>
     
@@ -158,6 +186,17 @@ ob_start();
         
         .animate-slide-in {
             animation: slide-in 0.6s ease-out;
+        }
+        
+        .text-shadow-lg {
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Enhanced responsive styles */
+        @media (max-width: 640px) {
+            .w-full.max-w-md {
+                max-width: calc(100vw - 2rem);
+            }
         }
     </style>
 </div>
