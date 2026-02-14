@@ -25,6 +25,7 @@ try {
     // Query to find users with outdated profiles
     // - updated_at older than 1 year (12 months)
     // - last_reminder_sent_at is NULL OR older than 13 months (spam protection)
+    // - deleted_at IS NULL (exclude soft-deleted users)
     $stmt = $userDb->prepare("
         SELECT 
             u.id,
@@ -37,6 +38,7 @@ try {
         LEFT JOIN " . DB_CONTENT_NAME . ".alumni_profiles ap ON u.id = ap.user_id
         WHERE u.updated_at < DATE_SUB(NOW(), INTERVAL 12 MONTH)
         AND (u.last_reminder_sent_at IS NULL OR u.last_reminder_sent_at < DATE_SUB(NOW(), INTERVAL 13 MONTH))
+        AND u.deleted_at IS NULL
         ORDER BY u.updated_at ASC
     ");
     
