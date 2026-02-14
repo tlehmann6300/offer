@@ -135,6 +135,10 @@ ob_start();
                     <i class="fas fa-info-circle mr-1"></i>
                     Fügen Sie die Embed-URL oder die direkte URL zu Ihrem Microsoft Forms ein.
                 </p>
+                <p class="mt-2 text-sm text-blue-600 dark:text-blue-400">
+                    <i class="fas fa-lightbulb mr-1"></i>
+                    <strong>Hinweis:</strong> Microsoft bietet keine API zum automatischen Erstellen. Bitte erstellen Sie das Formular manuell auf forms.office.com und fügen Sie hier den Einbettungs-Code ein.
+                </p>
             </div>
 
             <!-- Target Groups -->

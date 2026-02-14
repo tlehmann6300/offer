@@ -186,6 +186,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($updateSuccess) {
                 $message = 'Profil erfolgreich aktualisiert';
+                
+                // Mark profile as complete if first_name and last_name are provided
+                if (!empty($profileData['first_name']) && !empty($profileData['last_name'])) {
+                    try {
+                        $userDb = Database::getUserDB();
+                        $stmt = $userDb->prepare("UPDATE users SET profile_complete = 1 WHERE id = ?");
+                        $stmt->execute([$user['id']]);
+                        // Clear the profile_incomplete session flag
+                        $_SESSION['profile_incomplete'] = false;
+                    } catch (Exception $e) {
+                        error_log("Failed to mark profile as complete: " . $e->getMessage());
+                    }
+                }
+                
                 // Reload user data to get updated gender and birthday
                 $user = Auth::user();
                 // Reload profile based on role

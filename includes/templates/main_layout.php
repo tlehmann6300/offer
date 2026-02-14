@@ -2,6 +2,17 @@
 require_once __DIR__ . '/../helpers.php';
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../handlers/AuthHandler.php';
+
+// Check if profile is incomplete and redirect to profile page (unless already on profile page)
+if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profile_incomplete'] === true) {
+    $currentPage = basename($_SERVER['PHP_SELF']);
+    // Allow access only to profile.php and logout
+    if ($currentPage !== 'profile.php' && $currentPage !== 'logout.php') {
+        $baseUrl = defined('BASE_URL') ? BASE_URL : '';
+        header('Location: ' . $baseUrl . '/pages/auth/profile.php');
+        exit;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="de">

@@ -278,7 +278,16 @@ ob_start();
 
         <!-- Participation Button -->
         <div class="flex gap-4 mt-6 pt-6 border-t border-gray-200">
-            <?php if ($event['is_external']): ?>
+            <?php if (!empty($event['registration_link'])): ?>
+                <!-- External Registration (Microsoft Forms) - Open Link in new tab -->
+                <a href="<?php echo htmlspecialchars($event['registration_link']); ?>" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="inline-flex items-center px-8 py-3 bg-ibc-green text-white rounded-xl font-semibold hover:shadow-glow-green ease-premium">
+                    <i class="fas fa-external-link-alt mr-2"></i>
+                    Jetzt anmelden
+                </a>
+            <?php elseif ($event['is_external']): ?>
                 <!-- External Event - Open Link -->
                 <?php if (!empty($event['external_link'])): ?>
                     <a href="<?php echo htmlspecialchars($event['external_link']); ?>" 
