@@ -273,7 +273,7 @@ require_once __DIR__ . '/../helpers.php';
         .logo-container {
             animation: logoFloat 3s ease-in-out infinite;
             filter: drop-shadow(0 8px 30px rgba(0, 166, 81, 0.4));
-            transition: all 0.3s ease;
+            transition: filter 0.3s ease, transform 0.3s ease;
         }
         
         .logo-container:hover {
@@ -368,7 +368,11 @@ require_once __DIR__ . '/../helpers.php';
         /* Landscape mobile optimization */
         @media (max-width: 640px) and (orientation: landscape) {
             .logo-container {
-                display: none;
+                margin-bottom: 1rem;
+            }
+            
+            .logo-container img {
+                height: 2.5rem !important;
             }
             
             .relative.z-10 {
