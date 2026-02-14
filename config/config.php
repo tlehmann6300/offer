@@ -179,6 +179,17 @@ define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'image/we
 define('HASH_ALGO', PASSWORD_ARGON2ID);
 define('SESSION_NAME', 'IBC_SESSION');
 
+// Rate Limiting - Exponential Backoff Configuration
+// Progressive lockout durations (in seconds) for failed login attempts
+define('RATE_LIMIT_BACKOFF', [
+    3 => 60,      // 1 minute after 3 failed attempts
+    4 => 120,     // 2 minutes after 4 failed attempts
+    5 => 300,     // 5 minutes after 5 failed attempts
+    6 => 900,     // 15 minutes after 6 failed attempts
+    7 => 1800,    // 30 minutes after 7 failed attempts
+]);
+define('RATE_LIMIT_MAX_BACKOFF', 3600);  // 60 minutes for 8+ attempts (or permanent lock depending on implementation)
+
 // Set error display for production (0) or debugging (1)
 $isProduction = ($env['ENVIRONMENT'] ?? '') === 'production';
 ini_set('display_errors', $isProduction ? '0' : '1');

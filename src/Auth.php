@@ -133,27 +133,18 @@ class Auth {
             $lockedUntil = null;
             $isPermanentlyLocked = 0;
             
-            // Implement exponential backoff rate limiting
-            // After 3 failed attempts: exponential backoff starts
-            // 3 attempts: 1 minute (60 seconds)
-            // 4 attempts: 2 minutes (120 seconds)
-            // 5 attempts: 5 minutes (300 seconds)
-            // 6 attempts: 15 minutes (900 seconds)
-            // 7 attempts: 30 minutes (1800 seconds)
-            // 8+ attempts: Permanently locked
+            // Implement exponential backoff rate limiting using shared configuration
+            // Lockout durations defined in config.php: RATE_LIMIT_BACKOFF
+            // After 8 failed attempts: Account is permanently locked
             if ($failedAttempts >= 3) {
                 if ($failedAttempts >= 8) {
                     // Permanently lock account after 8 failed attempts
                     $isPermanentlyLocked = 1;
                     $lockedUntil = null;
                 } else {
-                    // Exponential backoff for attempts 3-7
-                    $lockoutTimes = [
-                        3 => 60,      // 1 minute
-                        4 => 120,     // 2 minutes
-                        5 => 300,     // 5 minutes
-                        6 => 900,     // 15 minutes
-                        7 => 1800,    // 30 minutes
+                    // Exponential backoff for attempts 3-7 using shared configuration
+                    $lockoutTimes = defined('RATE_LIMIT_BACKOFF') ? RATE_LIMIT_BACKOFF : [
+                        3 => 60, 4 => 120, 5 => 300, 6 => 900, 7 => 1800
                     ];
                     $lockoutDuration = $lockoutTimes[$failedAttempts];
                     $lockedUntil = date('Y-m-d H:i:s', time() + $lockoutDuration);
