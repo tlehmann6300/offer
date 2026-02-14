@@ -178,12 +178,13 @@ class MailService {
      * - Table-based layout for maximum email client compatibility
      * 
      * @param string $title Email title/subject
-     * @param string $content Main content body (HTML)
+     * @param string $content Main content body (HTML). IMPORTANT: Must be pre-sanitized trusted HTML. 
+     *                        This content is inserted directly into the template without further sanitization.
      * @param string|null $ctaLink Optional call-to-action link URL
      * @param string|null $ctaText Optional call-to-action button text
      * @return string Complete HTML email template
      */
-    public static function getBeautifulEmailTemplate($title, $content, $ctaLink = null, $ctaText = null) {
+    public static function getBeautifulEmailTemplate(string $title, string $content, ?string $ctaLink = null, ?string $ctaText = null) {
         // Build CTA button if both link and text are provided
         $ctaButton = '';
         if ($ctaLink && $ctaText) {
@@ -319,13 +320,7 @@ class MailService {
             font-weight: 600;
             font-size: 16px;
             text-align: center;
-            transition: all 0.3s ease;
             box-shadow: 0 2px 8px rgba(109, 151, 68, 0.3);
-        }
-        
-        .cta-button:hover {
-            box-shadow: 0 4px 12px rgba(109, 151, 68, 0.4);
-            transform: translateY(-1px);
         }
         
         .email-footer {
@@ -345,10 +340,6 @@ class MailService {
             color: #6D9744;
             text-decoration: none;
             font-weight: 500;
-        }
-        
-        .email-footer a:hover {
-            text-decoration: underline;
         }
         
         /* Responsive styles */
