@@ -55,26 +55,12 @@ ob_start();
 ?>
 
 <div class="w-full max-w-md p-6 sm:p-8 md:p-10 bg-white rounded-2xl shadow-2xl transition-all duration-500 hover:shadow-3xl">
-    <!-- Enhanced Header with Gradient Icon -->
+    <!-- Welcome Text -->
     <div class="text-center mb-8 sm:mb-10">
-        <div class="relative inline-flex items-center justify-center mb-5 sm:mb-6">
-            <!-- Animated Glow Ring -->
-            <div class="absolute inset-0 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-400 via-blue-500 to-emerald-400 rounded-2xl opacity-30 animate-pulse blur-xl"></div>
-            
-            <!-- Icon Container with 3D Effect -->
-            <div class="relative inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 via-blue-600 to-emerald-500 rounded-2xl shadow-2xl shadow-blue-500/50 hover:shadow-emerald-500/50 hover:scale-110 transition-all duration-500 hover:rotate-6">
-                <i class="fas fa-building text-3xl sm:text-4xl text-white drop-shadow-lg"></i>
-                
-                <!-- Sparkle Effects -->
-                <div class="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full animate-ping opacity-75"></div>
-                <div class="absolute -bottom-1 -left-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-300 rounded-full animate-ping opacity-75" style="animation-delay: 0.5s;"></div>
-            </div>
-        </div>
-        
         <h1 class="text-3xl sm:text-4xl font-black text-white mb-2 sm:mb-3 tracking-tight animate-fade-in text-shadow-strong">
             Willkommen zurück
         </h1>
-        <p class="text-white/90 font-semibold text-base sm:text-lg text-shadow-medium">Melde dich mit deinem Konto an</p>
+        <p class="text-white/90 font-semibold text-base sm:text-lg text-shadow-medium">Melde dich mit deinem Microsoft-Konto an</p>
     </div>
 
     <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 1): ?>
@@ -111,61 +97,32 @@ ob_start();
         <div class="flex-grow border-t border-white/30"></div>
     </div>
 
-    <!-- Ultra-Premium Microsoft Login Button with 3D Glass Effect -->
-    <div class="relative group">
-        <!-- Animated Background Glow -->
-        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 rounded-2xl blur-lg opacity-30 group-hover:opacity-60 transition-all duration-500 animate-pulse"></div>
+    <!-- Microsoft Login Button - Styled like newloginpage.html -->
+    <a href="<?php echo BASE_URL; ?>/auth/login_start.php" 
+       class="microsoft-button relative flex items-center justify-center gap-3 sm:gap-4 w-full py-5 sm:py-6 px-6 sm:px-8 bg-gradient-to-br from-white via-gray-50 to-white hover:from-gray-50 hover:via-white hover:to-gray-50 text-gray-800 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all duration-500 shadow-2xl hover:shadow-3xl hover:scale-[1.02] transform group overflow-hidden border-2 border-green-500/20"
+       aria-label="Mit deinem Microsoft-Konto anmelden"
+       style="box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.8);">
         
-        <!-- Main Button -->
-        <a href="<?php echo BASE_URL; ?>/auth/login_start.php" 
-           class="relative flex items-center justify-center gap-3 sm:gap-4 w-full py-4 sm:py-5 px-6 sm:px-8 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-white rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base transition-all duration-500 shadow-2xl hover:shadow-blue-500/50 hover:scale-[1.03] transform group overflow-hidden"
-           aria-label="Mit deinem Microsoft-Konto anmelden">
-            
-            <!-- Shimmer Effect -->
-            <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-            
-            <!-- Microsoft logo - Enhanced with Animation -->
-            <div class="relative flex-shrink-0 transition-all duration-500 group-hover:rotate-[360deg] group-hover:scale-110">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" class="drop-shadow-lg" aria-hidden="true">
-                    <rect x="1" y="1" width="10" height="10" fill="#f25022"/>
-                    <rect x="1" y="13" width="10" height="10" fill="#00a4ef"/>
-                    <rect x="13" y="1" width="10" height="10" fill="#7fba00"/>
-                    <rect x="13" y="13" width="10" height="10" fill="#ffb900"/>
-                </svg>
-            </div>
-            
-            <!-- Button text with Letter Spacing -->
-            <span class="relative font-black tracking-wider text-shadow-lg flex-1 text-center">Mit Microsoft anmelden</span>
-            
-            <!-- Enhanced Arrow with Bounce Animation -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 transition-all duration-500 group-hover:translate-x-2 group-hover:scale-125" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-            
-            <!-- Floating Sparkles on Hover -->
-            <div class="absolute top-1/4 left-1/4 w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping"></div>
-            <div class="absolute top-1/3 right-1/3 w-1.5 h-1.5 bg-cyan-200 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" style="animation-delay: 0.2s;"></div>
-            <div class="absolute bottom-1/4 right-1/4 w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" style="animation-delay: 0.4s;"></div>
-        </a>
-    </div>
-    
-    <!-- Enhanced Info Section with Icons -->
-    <div class="mt-5 sm:mt-6 text-center space-y-2 sm:space-y-3">
-        <p class="text-white/80 text-xs sm:text-sm font-medium text-shadow-light">Verwende dein Microsoft-Konto zum Anmelden</p>
-        <div class="flex items-center justify-center space-x-4 sm:space-x-6 text-white/70 text-xs text-shadow-light">
-            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-blue-300">
-                <i class="fas fa-shield-alt text-sm sm:text-base"></i>
-                <span class="hidden sm:inline">Sicher</span>
-            </div>
-            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-green-300">
-                <i class="fas fa-lock text-sm sm:text-base"></i>
-                <span class="hidden sm:inline">Verschlüsselt</span>
-            </div>
-            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-emerald-300">
-                <i class="fas fa-check-circle text-sm sm:text-base"></i>
-                <span class="hidden sm:inline">Vertraut</span>
+        <!-- Shimmer Effect -->
+        <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-green-400/30 to-transparent"></div>
+        
+        <!-- Microsoft logo - Grid Style from newloginpage.html -->
+        <div class="relative flex-shrink-0 microsoft-logo">
+            <div style="width: 24px; height: 24px; display: grid; grid-template-columns: repeat(2, 11px); grid-template-rows: repeat(2, 11px); gap: 2px;">
+                <div style="background: #f25022; width: 11px; height: 11px;"></div>
+                <div style="background: #7fba00; width: 11px; height: 11px;"></div>
+                <div style="background: #00a4ef; width: 11px; height: 11px;"></div>
+                <div style="background: #ffb900; width: 11px; height: 11px;"></div>
             </div>
         </div>
+        
+        <!-- Button text -->
+        <span class="relative font-bold tracking-wide flex-1 text-center">Mit Microsoft anmelden</span>
+    </a>
+    
+    <!-- Footer -->
+    <div class="mt-6 sm:mt-8 text-center">
+        <p class="text-white/60 text-xs sm:text-sm font-medium text-shadow-light">&copy; <span id="currentYear"><?php echo date('Y'); ?></span> IBC Business Consulting. Alle Rechte vorbehalten.</p>
     </div>
     
     <!-- Additional Style Tags for Animations -->
@@ -190,6 +147,19 @@ ob_start();
         
         .text-shadow-lg {
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .microsoft-button {
+            position: relative;
+        }
+        
+        /* Microsoft logo animation */
+        .microsoft-logo {
+            transition: all 0.4s ease;
+        }
+        
+        .microsoft-button:hover .microsoft-logo {
+            transform: scale(1.1);
         }
         
         /* Enhanced responsive styles */
