@@ -1908,6 +1908,65 @@ body:not(.dark-mode) .btn-primary:active::after {
     100% { background-position: 0% 50%; }
 }
 
+/* Premium Login Button - Deep Purple to Blue Gradient */
+.btn-login-premium {
+    /* Typography */
+    font-weight: bold;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    
+    /* Background - Modern gradient from deep purple to blue */
+    background: linear-gradient(135deg, #6B46C1 0%, #4C1D95 25%, #1E3A8A 75%, #1E40AF 100%);
+    background-size: 200% 200%;
+    background-position: 0% 50%;
+    
+    /* Layout */
+    padding: 0.75rem 2rem;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    
+    /* Transitions - Smooth animations */
+    transition: transform 0.3s ease-in-out, 
+                background-position 0.3s ease-in-out, 
+                box-shadow 0.3s ease-in-out;
+    
+    /* Initial shadow */
+    box-shadow: 0 4px 15px rgba(107, 70, 193, 0.3);
+}
+
+/* Hover and Focus States - Scale up and add glow effect */
+.btn-login-premium:hover,
+.btn-login-premium:focus {
+    transform: scale(1.02);
+    background-position: 100% 50%;
+    
+    /* Glow effect on hover and focus */
+    box-shadow: 
+        0 0 20px rgba(107, 70, 193, 0.6),
+        0 0 40px rgba(30, 58, 138, 0.4),
+        0 8px 25px rgba(107, 70, 193, 0.4);
+}
+
+/* Focus state - Add outline for accessibility */
+.btn-login-premium:focus {
+    outline: 2px solid rgba(107, 70, 193, 0.5);
+    outline-offset: 2px;
+}
+
+/* Active (Click) State - Press down effect */
+.btn-login-premium:active {
+    transform: scale(0.98);
+    box-shadow: 
+        0 2px 8px rgba(107, 70, 193, 0.4),
+        inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.1s ease-in-out, 
+                box-shadow 0.1s ease-in-out;
+}
+
 /* Microsoft Login Button - Official Branding */
 .microsoft-btn {
     background-color: #2F2F2F !important;
