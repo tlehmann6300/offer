@@ -100,8 +100,7 @@ ob_start();
     <!-- Microsoft Login Button - Styled like newloginpage.html -->
     <a href="<?php echo BASE_URL; ?>/auth/login_start.php" 
        class="microsoft-button relative flex items-center justify-center gap-3 sm:gap-4 w-full py-5 sm:py-6 px-6 sm:px-8 bg-gradient-to-br from-white via-gray-50 to-white hover:from-gray-50 hover:via-white hover:to-gray-50 text-gray-800 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all duration-500 shadow-2xl hover:shadow-3xl hover:scale-[1.02] transform group overflow-hidden border-2 border-green-500/20"
-       aria-label="Mit deinem Microsoft-Konto anmelden"
-       style="box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.8);">
+       aria-label="Mit deinem Microsoft-Konto anmelden">
         
         <!-- Shimmer Effect -->
         <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-green-400/30 to-transparent"></div>
@@ -151,6 +150,7 @@ ob_start();
         
         .microsoft-button {
             position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.8);
         }
         
         /* Microsoft logo animation */

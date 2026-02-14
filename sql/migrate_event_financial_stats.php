@@ -14,7 +14,7 @@ try {
     
     // Check if table already exists
     $stmt = $db->query("SHOW TABLES LIKE 'event_financial_stats'");
-    $tableExists = $stmt->fetch();
+    $tableExists = $stmt->rowCount() > 0;
     
     if ($tableExists) {
         echo "✓ Table 'event_financial_stats' already exists. Skipping migration.\n";
