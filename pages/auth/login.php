@@ -74,7 +74,7 @@ ob_start();
         <h1 class="text-4xl font-black bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 bg-clip-text text-transparent mb-3 tracking-tight animate-fade-in">
             Willkommen zurück
         </h1>
-        <p class="text-gray-600 font-semibold text-lg">Melde dich bei deinem Konto an</p>
+        <p class="text-gray-600 font-semibold text-lg">Melde dich mit deinem Konto an</p>
     </div>
 
     <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 1): ?>
