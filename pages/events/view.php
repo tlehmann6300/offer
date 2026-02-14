@@ -490,6 +490,43 @@ ob_start();
                 </button>
             </div>
         </div>
+        
+        <!-- Financial Statistics Section (New) -->
+        <div class="glass-card shadow-soft rounded-xl p-8 mt-6">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
+                <i class="fas fa-chart-bar mr-2 text-teal-600"></i>
+                Finanzstatistiken & Jahresvergleich
+                <span class="text-sm font-normal text-gray-500 dark:text-gray-400 ml-2">(Nur für Vorstand sichtbar)</span>
+            </h2>
+            
+            <!-- Action Buttons -->
+            <div class="flex gap-3 mb-6">
+                <button 
+                    id="addSalesTrackingBtn"
+                    class="px-5 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-md"
+                    onclick="openFinancialStatsModal('Verkauf')"
+                >
+                    <i class="fas fa-shopping-cart mr-2"></i>
+                    Neue Verkäufe tracken
+                </button>
+                <button 
+                    id="addCalculationTrackingBtn"
+                    class="px-5 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 transition-all shadow-md"
+                    onclick="openFinancialStatsModal('Kalkulation')"
+                >
+                    <i class="fas fa-calculator mr-2"></i>
+                    Neue Kalkulation erfassen
+                </button>
+            </div>
+            
+            <!-- Comparison Table -->
+            <div id="financialStatsContainer">
+                <p class="text-gray-500 dark:text-gray-400 text-center py-8">
+                    <i class="fas fa-spinner fa-spin mr-2"></i>
+                    Lade Finanzstatistiken...
+                </p>
+            </div>
+        </div>
     <?php endif; ?>
 </div>
 
@@ -933,7 +970,313 @@ document.addEventListener('DOMContentLoaded', function() {
     renderSellersEntries();
     renderSalesEntries();
     updateChart();
+    
+    // Load financial stats if section exists
+    if (document.getElementById('financialStatsContainer')) {
+        loadFinancialStats();
+    }
 });
+
+// ===== Financial Stats Management =====
+function openFinancialStatsModal(category) {
+    const modal = document.getElementById('financialStatsModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const categoryInput = document.getElementById('finStatCategory');
+    
+    modalTitle.textContent = category === 'Verkauf' ? 'Neue Verkäufe tracken' : 'Neue Kalkulation erfassen';
+    categoryInput.value = category;
+    
+    // Reset form
+    document.getElementById('financialStatsForm').reset();
+    document.getElementById('finStatCategory').value = category;
+    document.getElementById('finStatYear').value = new Date().getFullYear();
+    
+    modal.classList.remove('hidden');
+}
+
+function closeFinancialStatsModal() {
+    document.getElementById('financialStatsModal').classList.add('hidden');
+}
+
+function saveFinancialStats() {
+    const form = document.getElementById('financialStatsForm');
+    const formData = new FormData(form);
+    
+    const data = {
+        event_id: <?php echo $eventId; ?>,
+        category: formData.get('category'),
+        item_name: formData.get('item_name'),
+        quantity: parseInt(formData.get('quantity')),
+        revenue: formData.get('revenue') ? parseFloat(formData.get('revenue')) : null,
+        record_year: parseInt(formData.get('record_year'))
+    };
+    
+    // Validation
+    if (!data.item_name || data.item_name.trim() === '') {
+        showMessage('Bitte geben Sie einen Artikelnamen ein', 'error');
+        return;
+    }
+    
+    if (isNaN(data.quantity) || data.quantity < 0) {
+        showMessage('Bitte geben Sie eine gültige Menge ein (≥ 0)', 'error');
+        return;
+    }
+    
+    if (data.revenue !== null && (isNaN(data.revenue) || data.revenue < 0)) {
+        showMessage('Bitte geben Sie einen gültigen Umsatz ein (≥ 0)', 'error');
+        return;
+    }
+    
+    // Save via API
+    fetch('../../api/save_financial_stats.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage('Eintrag erfolgreich gespeichert!', 'success');
+            closeFinancialStatsModal();
+            loadFinancialStats();
+        } else {
+            showMessage(data.message || 'Fehler beim Speichern', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Netzwerkfehler beim Speichern', 'error');
+    });
+}
+
+function loadFinancialStats() {
+    const container = document.getElementById('financialStatsContainer');
+    if (!container) return;
+    
+    fetch('../../api/get_financial_stats.php?event_id=<?php echo $eventId; ?>')
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            renderFinancialStats(result.data);
+        } else {
+            container.innerHTML = '<p class="text-red-500 text-center py-4">Fehler beim Laden der Daten</p>';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        container.innerHTML = '<p class="text-red-500 text-center py-4">Netzwerkfehler</p>';
+    });
+}
+
+function renderFinancialStats(data) {
+    const container = document.getElementById('financialStatsContainer');
+    
+    if (!data.comparison || data.comparison.length === 0) {
+        container.innerHTML = `
+            <p class="text-gray-500 dark:text-gray-400 text-center py-8">
+                Noch keine Finanzstatistiken vorhanden. Klicken Sie auf einen der Buttons oben, um Daten zu erfassen.
+            </p>
+        `;
+        return;
+    }
+    
+    // Group by category
+    const verkauf = data.comparison.filter(item => item.category === 'Verkauf');
+    const kalkulation = data.comparison.filter(item => item.category === 'Kalkulation');
+    
+    let html = '';
+    
+    // Render Verkauf section
+    if (verkauf.length > 0) {
+        html += renderCategoryTable('Verkauf', verkauf, data.available_years);
+    }
+    
+    // Render Kalkulation section
+    if (kalkulation.length > 0) {
+        html += renderCategoryTable('Kalkulation', kalkulation, data.available_years);
+    }
+    
+    container.innerHTML = html;
+}
+
+function renderCategoryTable(category, items, availableYears) {
+    const icon = category === 'Verkauf' ? 'fa-shopping-cart' : 'fa-calculator';
+    const color = category === 'Verkauf' ? 'blue' : 'green';
+    
+    // Group items by item_name
+    const grouped = {};
+    items.forEach(item => {
+        if (!grouped[item.item_name]) {
+            grouped[item.item_name] = {};
+        }
+        grouped[item.item_name][item.record_year] = {
+            quantity: item.total_quantity,
+            revenue: item.total_revenue
+        };
+    });
+    
+    let tableHtml = `
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
+                <i class="fas ${icon} mr-2 text-${color}-600"></i>
+                ${category}
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 dark:bg-gray-700">
+                            <th class="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-200">Artikel</th>
+    `;
+    
+    // Add year columns
+    availableYears.forEach(year => {
+        tableHtml += `
+            <th class="border border-gray-300 dark:border-gray-600 px-4 py-3 text-center font-semibold text-gray-700 dark:text-gray-200">${year}</th>
+        `;
+    });
+    
+    tableHtml += `
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+    
+    // Add rows for each item
+    Object.keys(grouped).sort().forEach(itemName => {
+        tableHtml += `
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <td class="border border-gray-300 dark:border-gray-600 px-4 py-3 font-medium text-gray-800 dark:text-gray-200">${escapeHtml(itemName)}</td>
+        `;
+        
+        availableYears.forEach(year => {
+            const data = grouped[itemName][year];
+            if (data) {
+                const revenueText = data.revenue ? ` (${parseFloat(data.revenue).toFixed(2)}€)` : '';
+                tableHtml += `
+                    <td class="border border-gray-300 dark:border-gray-600 px-4 py-3 text-center text-gray-700 dark:text-gray-300">
+                        <span class="font-semibold">${data.quantity}</span>${revenueText}
+                    </td>
+                `;
+            } else {
+                tableHtml += `
+                    <td class="border border-gray-300 dark:border-gray-600 px-4 py-3 text-center text-gray-400">-</td>
+                `;
+            }
+        });
+        
+        tableHtml += `</tr>`;
+    });
+    
+    tableHtml += `
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+    
+    return tableHtml;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+<?php endif; ?>
+</script>
+
+<!-- Financial Stats Modal -->
+<?php if ($canViewDocumentation): ?>
+<div id="financialStatsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h3 id="modalTitle" class="text-2xl font-bold text-gray-800 dark:text-gray-100">Neuer Eintrag</h3>
+            <button onclick="closeFinancialStatsModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+        
+        <form id="financialStatsForm" onsubmit="event.preventDefault(); saveFinancialStats();">
+            <input type="hidden" id="finStatCategory" name="category">
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">
+                    Artikel/Stand-Name *
+                </label>
+                <input 
+                    type="text" 
+                    name="item_name" 
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                    placeholder="z.B. Brezeln, Äpfel, Grillstand"
+                    required
+                >
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">
+                    Menge *
+                </label>
+                <input 
+                    type="number" 
+                    name="quantity" 
+                    min="0"
+                    step="1"
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                    placeholder="z.B. 50"
+                    required
+                >
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">
+                    Umsatz (€) <span class="text-sm font-normal text-gray-500">(optional)</span>
+                </label>
+                <input 
+                    type="number" 
+                    name="revenue" 
+                    min="0"
+                    step="0.01"
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                    placeholder="z.B. 450.00"
+                >
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">
+                    Jahr *
+                </label>
+                <input 
+                    type="number" 
+                    id="finStatYear"
+                    name="record_year" 
+                    min="2020"
+                    max="2100"
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                    required
+                >
+            </div>
+            
+            <div class="flex gap-3">
+                <button 
+                    type="button"
+                    onclick="closeFinancialStatsModal()"
+                    class="flex-1 px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-100 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-all"
+                >
+                    Abbrechen
+                </button>
+                <button 
+                    type="submit"
+                    class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+                >
+                    <i class="fas fa-save mr-2"></i>
+                    Speichern
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 <?php endif; ?>
 </script>
 
