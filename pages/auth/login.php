@@ -105,9 +105,15 @@ ob_start();
     <?php endif; ?>
 
     <!-- Microsoft Login Button - Official Branding -->
-    <a href="<?php echo BASE_URL; ?>/auth/login_start.php" class="microsoft-btn group relative flex items-center justify-center w-full py-4 px-6 text-white rounded-lg font-semibold text-base transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden">
+    <a href="<?php echo BASE_URL; ?>/auth/login_start.php" class="microsoft-btn group relative flex items-center justify-center w-full py-4 px-6 text-white rounded-lg font-semibold text-base transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden" aria-label="Mit deinem Microsoft-Konto anmelden">
         <!-- Microsoft logo -->
-        <img src="<?php echo asset('assets/img/microsoft-logo.svg'); ?>" alt="Microsoft" class="relative z-10 w-5 h-5 transition-transform duration-300 group-hover:scale-110">
+        <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21" class="relative z-10 w-5 h-5 transition-transform duration-300 group-hover:scale-110" role="img" aria-labelledby="ms-logo-title">
+            <title id="ms-logo-title">Microsoft-Logo</title>
+            <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+            <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+            <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+            <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+        </svg>
         
         <!-- Vertical Separator -->
         <div class="relative z-10 w-px h-6 bg-white/20 mx-4"></div>
