@@ -74,22 +74,8 @@ try {
         
         echo "Sending birthday wishes to: {$firstName} ({$email})... ";
         
-        // Determine salutation based on gender
-        if ($gender === 'f') {
-            $salutation = 'Liebe ' . htmlspecialchars($firstName) . ',';
-        } elseif ($gender === 'm') {
-            $salutation = 'Lieber ' . htmlspecialchars($firstName) . ',';
-        } else {
-            $salutation = 'Hallo ' . htmlspecialchars($firstName) . ',';
-        }
-        
-        // Build email content
-        $bodyContent = '<p class="email-text">' . $salutation . '</p>
-        <p class="email-text">wir wünschen dir alles Gute zum Geburtstag und viel Erfolg bei deinem weiteren Werdegang.</p>
-        <p class="email-text">Herzliche Grüße,<br>Dein IBC-Team</p>';
-        
-        // Get complete HTML template
-        $htmlBody = MailService::getTemplate('Herzlichen Glückwunsch zum Geburtstag!', $bodyContent);
+        // Get the festive birthday email template
+        $htmlBody = MailService::getBirthdayEmailTemplate($firstName, $gender);
         
         // Send email using MailService
         try {

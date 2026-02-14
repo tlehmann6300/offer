@@ -426,6 +426,67 @@ class MailService {
     }
     
     /**
+     * Get a festive birthday email template with celebratory design
+     * 
+     * @param string $firstName User's first name for personalization
+     * @param string $gender User's gender ('m', 'f', or other) for proper salutation
+     * @return string Complete HTML birthday email template
+     */
+    public static function getBirthdayEmailTemplate(string $firstName, string $gender = ''): string {
+        // Determine salutation based on gender
+        if ($gender === 'f') {
+            $salutation = 'Liebe ' . htmlspecialchars($firstName);
+        } elseif ($gender === 'm') {
+            $salutation = 'Lieber ' . htmlspecialchars($firstName);
+        } else {
+            $salutation = 'Hallo ' . htmlspecialchars($firstName);
+        }
+        
+        // Build the birthday content with festive styling
+        $content = '
+            <div style="text-align: center; margin-bottom: 30px;">
+                <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&h=300&fit=crop" alt="Birthday Celebration" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px; display: block; margin: 0 auto;" />
+            </div>
+            
+            <div style="background-image: url(\'https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif\'); background-size: cover; background-position: center; background-repeat: no-repeat; padding: 40px 20px; border-radius: 12px; position: relative;">
+                <div style="background-color: rgba(255, 255, 255, 0.95); padding: 30px; border-radius: 8px;">
+                    <p style="font-size: 48px; font-weight: bold; text-align: center; margin: 0 0 20px 0; background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF6347 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">
+                        🎉 Alles Gute zum Geburtstag! 🎂
+                    </p>
+                    
+                    <p style="font-size: 20px; color: #1d1d1f; margin: 0 0 20px 0; line-height: 1.6;">
+                        ' . $salutation . ',
+                    </p>
+                    
+                    <p style="font-size: 16px; color: #1d1d1f; margin: 0 0 16px 0; line-height: 1.7;">
+                        heute ist dein besonderer Tag! 🎈
+                    </p>
+                    
+                    <p style="font-size: 16px; color: #1d1d1f; margin: 0 0 16px 0; line-height: 1.7;">
+                        Wir wünschen dir von Herzen alles Gute zum Geburtstag! Möge dieser Tag voller Freude, Lachen und wunderbarer Momente sein. Wir hoffen, dass all deine Wünsche in Erfüllung gehen und dass das kommende Jahr dir Gesundheit, Erfolg und Glück bringt.
+                    </p>
+                    
+                    <p style="font-size: 16px; color: #1d1d1f; margin: 0 0 16px 0; line-height: 1.7;">
+                        Wir wünschen dir viel Erfolg bei deinem weiteren Werdegang und freuen uns auf die weitere Zusammenarbeit mit dir!
+                    </p>
+                    
+                    <p style="font-size: 18px; color: #1d1d1f; margin: 20px 0 0 0; font-weight: 600; line-height: 1.6;">
+                        Herzliche Grüße und feiere schön! 🥳<br>
+                        <span style="color: #6D9744;">Dein IBC-Team</span>
+                    </p>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px; font-size: 36px;">
+                🎊 🎁 🎈 🎉 🎂 🎊
+            </div>
+        ';
+        
+        // Use the beautiful email template with our birthday content
+        return self::getBeautifulEmailTemplate('Herzlichen Glückwunsch zum Geburtstag!', $content);
+    }
+    
+    /**
      * Create and configure PHPMailer instance with SMTP settings
      * SMTPDebug is hard-coded to 0 (disabled) by default for security.
      * Debug mode is only enabled when ENVIRONMENT === 'development'.
