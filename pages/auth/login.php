@@ -113,10 +113,10 @@ ob_start();
 
     <!-- Microsoft Login Button with embedded SVG -->
     <a href="<?php echo BASE_URL; ?>/auth/login_start.php" 
-       class="group relative flex items-center justify-center gap-4 w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold text-base transition-all duration-300 shadow-lg hover:shadow-2xl hover:scale-[1.02] transform" 
+       class="group relative flex items-center justify-center gap-4 w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold text-base transition-all duration-300 shadow-lg hover:shadow-2xl hover:scale-[1.02] transform"
        aria-label="Mit deinem Microsoft-Konto anmelden">
         <!-- Microsoft logo - directly embedded SVG -->
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="flex-shrink-0 transition-transform duration-300 group-hover:rotate-12" role="img" aria-label="Microsoft Logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="flex-shrink-0 transition-transform duration-300 group-hover:rotate-12" aria-hidden="true">
             <rect x="1" y="1" width="10" height="10" fill="#f25022"/>
             <rect x="1" y="13" width="10" height="10" fill="#00a4ef"/>
             <rect x="13" y="1" width="10" height="10" fill="#7fba00"/>
@@ -127,7 +127,7 @@ ob_start();
         <span class="font-bold tracking-wide">Mit Microsoft anmelden</span>
         
         <!-- Hover arrow indicator -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
         </svg>
     </a>
