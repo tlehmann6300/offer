@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS users (
     tfa_enabled BOOLEAN NOT NULL DEFAULT 0,
     tfa_secret VARCHAR(255) DEFAULT NULL COMMENT 'Two-factor authentication secret for Google Authenticator',
     azure_roles JSON DEFAULT NULL COMMENT 'Original Microsoft Entra ID roles from Azure AD authentication',
+    azure_oid VARCHAR(255) DEFAULT NULL COMMENT 'Azure Object ID (oid) from Microsoft Entra ID',
     entra_roles TEXT DEFAULT NULL COMMENT 'Comma-separated Microsoft Entra role names for display',
     job_title VARCHAR(255) DEFAULT NULL COMMENT 'Job title from Microsoft Entra ID',
     company VARCHAR(255) DEFAULT NULL COMMENT 'Company name from Microsoft Entra ID',
@@ -47,7 +48,8 @@ CREATE TABLE IF NOT EXISTS users (
     INDEX idx_birthday (birthday),
     INDEX idx_profile_complete (profile_complete),
     INDEX idx_deleted_at (deleted_at),
-    INDEX idx_last_reminder_sent_at (last_reminder_sent_at)
+    INDEX idx_last_reminder_sent_at (last_reminder_sent_at),
+    INDEX idx_azure_oid (azure_oid)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
