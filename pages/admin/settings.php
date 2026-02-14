@@ -16,16 +16,11 @@ $db = Database::getContentDB();
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        if (isset($_POST['update_system_settings'])) {
-            // For now, we'll store settings in a simple key-value table
-            // In a production system, you'd want a more robust configuration system
-            
-            $siteName = $_POST['site_name'] ?? 'IBC Intranet';
-            $siteDescription = $_POST['site_description'] ?? '';
-            $maintenanceMode = isset($_POST['maintenance_mode']) ? 1 : 0;
-            $allowRegistration = isset($_POST['allow_registration']) ? 1 : 0;
-            
-            // Create settings table if it doesn't exist
+        // Ensure system_settings table exists (one-time check)
+        try {
+            $db->query("SELECT 1 FROM system_settings LIMIT 1");
+        } catch (Exception $e) {
+            // Table doesn't exist, create it
             $db->exec("
                 CREATE TABLE IF NOT EXISTS system_settings (
                     setting_key VARCHAR(100) PRIMARY KEY,
@@ -34,6 +29,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     updated_by INT
                 )
             ");
+        }
+        
+        if (isset($_POST['update_system_settings'])) {
+            // For now, we'll store settings in a simple key-value table
+            // In a production system, you'd want a more robust configuration system
+            
+            $siteName = $_POST['site_name'] ?? 'IBC Intranet';
+            $siteDescription = $_POST['site_description'] ?? '';
+            $maintenanceMode = isset($_POST['maintenance_mode']) ? 1 : 0;
+            $allowRegistration = isset($_POST['allow_registration']) ? 1 : 0;
             
             // Update or insert settings
             $stmt = $db->prepare("

@@ -67,12 +67,13 @@ try {
     ");
     $metrics['recent_logs'] = $stmt->fetch()['count'] ?? 0;
     
-    // Database size
-    $stmt = $userDb->query("
+    // Database size - using parameterized query for safety
+    $stmt = $userDb->prepare("
         SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) as size 
         FROM information_schema.TABLES 
-        WHERE table_schema IN ('" . DB_USER_NAME . "', '" . DB_CONTENT_NAME . "')
+        WHERE table_schema IN (?, ?)
     ");
+    $stmt->execute([DB_USER_NAME, DB_CONTENT_NAME]);
     $metrics['db_size_mb'] = $stmt->fetch()['size'] ?? 0;
     
     // Recent system actions

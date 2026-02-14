@@ -211,12 +211,14 @@ function getSystemHealth() {
         $health['error_count_24h'] = $errorCount;
         $health['error_status'] = $errorCount > 10 ? 'warning' : 'healthy';
         
-        // Check disk usage (database size)
-        $health['disk_usage_mb'] = $userDb->query("
+        // Check disk usage (database size) - using parameterized query
+        $stmt = $userDb->prepare("
             SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) as size 
             FROM information_schema.TABLES 
-            WHERE table_schema IN ('" . DB_USER_NAME . "', '" . DB_CONTENT_NAME . "')
-        ")->fetch()['size'] ?? 0;
+            WHERE table_schema IN (?, ?)
+        ");
+        $stmt->execute([DB_USER_NAME, DB_CONTENT_NAME]);
+        $health['disk_usage_mb'] = $stmt->fetch()['size'] ?? 0;
         
         // System uptime (based on oldest active session)
         $stmt = $userDb->query("
