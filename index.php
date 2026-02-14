@@ -47,7 +47,12 @@ try {
     // 7. Routing-Logik
     $target = '';
     if (class_exists('Auth') && Auth::check()) {
-        $target = BASE_URL . '/pages/dashboard/index.php';
+        // Check if profile is incomplete and redirect to profile page
+        if (isset($_SESSION['profile_incomplete']) && $_SESSION['profile_incomplete'] === true) {
+            $target = BASE_URL . '/pages/auth/profile.php';
+        } else {
+            $target = BASE_URL . '/pages/dashboard/index.php';
+        }
     } else {
         $target = BASE_URL . '/pages/auth/login.php';
     }
