@@ -41,6 +41,23 @@ require_once __DIR__ . '/../helpers.php';
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Text shadow utilities for glassmorphism */
+        .text-shadow-strong {
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5), 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .text-shadow-medium {
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+        }
+        
+        .text-shadow-light {
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .text-shadow-footer {
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8), 0 4px 24px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 1);
+        }
+        
         /* Advanced Animated Gradient Background */
         body {
             background: linear-gradient(135deg, 
@@ -198,9 +215,15 @@ require_once __DIR__ . '/../helpers.php';
         }
         
         .auth-card .bg-white {
-            background: rgba(255, 255, 255, 0.98) !important;
+            background: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(20px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
             border-radius: 24px !important;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                0 2px 8px rgba(255, 255, 255, 0.1) inset,
+                0 -2px 8px rgba(0, 0, 0, 0.1) inset !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
         }
         
         /* Enhanced Floating Elements with 3D Effect */
@@ -321,6 +344,28 @@ require_once __DIR__ . '/../helpers.php';
             }
         }
         
+        /* iPhone SE and small devices - 375px */
+        @media (max-width: 375px) {
+            .auth-card {
+                border-radius: 12px;
+                padding: 0.5rem !important;
+                margin: 0 0.5rem;
+            }
+            
+            .auth-card .bg-white {
+                padding: 1rem !important;
+                border-radius: 12px !important;
+            }
+            
+            .logo-container img {
+                height: 3rem !important;
+            }
+            
+            .logo-container {
+                margin-bottom: 1.5rem;
+            }
+        }
+        
         @media (min-width: 641px) and (max-width: 768px) {
             .auth-card {
                 padding: 1rem !important;
@@ -347,10 +392,37 @@ require_once __DIR__ . '/../helpers.php';
             }
         }
         
-        /* Ultra-wide screens */
+        /* Ultra-wide screens and 4K displays */
         @media (min-width: 1920px) {
             .auth-card {
-                max-width: 32rem;
+                max-width: 34rem;
+            }
+            
+            .auth-card .bg-white {
+                padding: 3rem !important;
+            }
+            
+            .logo-container img {
+                height: 8rem !important;
+            }
+            
+            .floating-dot {
+                width: 160px !important;
+                height: 160px !important;
+            }
+        }
+        
+        @media (min-width: 2560px) {
+            .auth-card {
+                max-width: 40rem;
+            }
+            
+            .auth-card .bg-white {
+                padding: 3.5rem !important;
+            }
+            
+            .logo-container img {
+                height: 10rem !important;
             }
         }
         
@@ -381,6 +453,17 @@ require_once __DIR__ . '/../helpers.php';
             
             .auth-card .bg-white {
                 padding: 1rem !important;
+            }
+        }
+        
+        /* Tablet landscape optimization */
+        @media (min-width: 641px) and (max-width: 1024px) and (orientation: landscape) {
+            .logo-container {
+                margin-bottom: 2rem;
+            }
+            
+            .auth-card .bg-white {
+                padding: 1.5rem !important;
             }
         }
 
@@ -415,15 +498,15 @@ require_once __DIR__ . '/../helpers.php';
             <?php echo $content ?? ''; ?>
         </div>
         
-        <!-- Footer text with proper contrast -->
+        <!-- Footer text with enhanced contrast and text shadow -->
         <div class="mt-10 text-center">
-            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">
+            <p class="text-white text-sm font-semibold tracking-wide text-shadow-footer">
                 © <?php echo date('Y'); ?> IBC · Intranet Platform
             </p>
             <div class="mt-2 flex justify-center space-x-1">
-                <div class="w-1 h-1 rounded-full bg-gray-400/30 dark:bg-gray-500/30"></div>
-                <div class="w-1 h-1 rounded-full bg-gray-400/40 dark:bg-gray-500/40"></div>
-                <div class="w-1 h-1 rounded-full bg-gray-400/30 dark:bg-gray-500/30"></div>
+                <div class="w-1 h-1 rounded-full bg-white/40" style="box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);"></div>
+                <div class="w-1 h-1 rounded-full bg-white/50" style="box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);"></div>
+                <div class="w-1 h-1 rounded-full bg-white/40" style="box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);"></div>
             </div>
         </div>
     </div>
