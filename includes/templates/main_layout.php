@@ -462,9 +462,30 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
             overflow-wrap: break-word;
             word-break: break-word;
         }
+        
+        /* Skip link accessibility styles */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #00a651;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            z-index: 100;
+            border-radius: 0 0 4px 0;
+            font-weight: 600;
+        }
+        
+        .skip-link:focus {
+            top: 0;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-slate-800 dark:bg-slate-900 dark:text-slate-200" data-user-theme="<?php echo htmlspecialchars($currentUser['theme_preference'] ?? 'auto'); ?>">
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">Zum Hauptinhalt springen</a>
+    
     <script>
         // Apply theme immediately to prevent flash of unstyled content (FOUC)
         (function() {
@@ -517,7 +538,7 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                 <p class="text-[11px] font-semibold uppercase tracking-widest text-white/50">Navigation</p>
             </div>
             
-            <nav>
+            <nav role="navigation" aria-label="Hauptnavigation">
                 <!-- Dashboard (All) -->
                 <a href="<?php echo asset('pages/dashboard/index.php'); ?>" 
                    class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/dashboard/') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
@@ -789,7 +810,7 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
             </a>
             
             <!-- Dark/Light Mode Toggle -->
-            <button id="theme-toggle" class='flex items-center justify-center w-full px-4 py-2 text-xs font-medium text-white/90 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm'>
+            <button id="theme-toggle" class='flex items-center justify-center w-full px-4 py-2 text-xs font-medium text-white/90 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm' aria-label="Zwischen hellem und dunklem Modus wechseln">
                 <i id="theme-icon" class='fas fa-moon text-xs mr-2'></i>
                 <span id="theme-text">Darkmode</span>
             </button>
@@ -804,7 +825,7 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
     </aside>
 
     <!-- Main Content -->
-    <main class="lg:ml-72 min-h-screen p-6 lg:p-10">
+    <main id="main-content" role="main" class="lg:ml-72 min-h-screen p-6 lg:p-10">
         <?php if (isset($_SESSION['show_2fa_nudge']) && $_SESSION['show_2fa_nudge']): ?>
         <!-- 2FA Nudge Modal -->
         <div id="tfa-nudge-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
