@@ -403,6 +403,20 @@ class Inventory {
     }
 
     /**
+     * Get ALL locations from database (not just those in use)
+     * Used for dropdown population in Add/Edit forms
+     */
+    public static function getAllLocations() {
+        $db = Database::getContentDB();
+        $stmt = $db->query("
+            SELECT * 
+            FROM locations 
+            ORDER BY name ASC
+        ");
+        return $stmt->fetchAll();
+    }
+
+    /**
      * Create category
      */
     public static function createCategory($name, $description = null, $color = '#3B82F6') {
