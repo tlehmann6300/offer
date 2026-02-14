@@ -698,8 +698,8 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
 
                 <!-- Einstellungen (All board members) -->
                 <?php if (Auth::isAdmin()): ?>
-                <a href="<?php echo asset('pages/auth/settings.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/auth/settings.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
+                <a href="<?php echo asset('pages/admin/settings.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/admin/settings.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
                     <i class="fas fa-cog w-5 mr-3"></i>
                     <span>Einstellungen</span>
                 </a>

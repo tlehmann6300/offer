@@ -1,24 +1,347 @@
 <?php
 require_once __DIR__ . '/../../src/Auth.php';
+require_once __DIR__ . '/../../src/Database.php';
 
 if (!Auth::isBoard()) {
     header('Location: /index.php');
     exit;
 }
 
+$message = '';
+$error = '';
+
+// Get current settings from database or config
+$db = Database::getContentDB();
+
+// Handle form submissions
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        if (isset($_POST['update_system_settings'])) {
+            // For now, we'll store settings in a simple key-value table
+            // In a production system, you'd want a more robust configuration system
+            
+            $siteName = $_POST['site_name'] ?? 'IBC Intranet';
+            $siteDescription = $_POST['site_description'] ?? '';
+            $maintenanceMode = isset($_POST['maintenance_mode']) ? 1 : 0;
+            $allowRegistration = isset($_POST['allow_registration']) ? 1 : 0;
+            
+            // Create settings table if it doesn't exist
+            $db->exec("
+                CREATE TABLE IF NOT EXISTS system_settings (
+                    setting_key VARCHAR(100) PRIMARY KEY,
+                    setting_value TEXT,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    updated_by INT
+                )
+            ");
+            
+            // Update or insert settings
+            $stmt = $db->prepare("
+                INSERT INTO system_settings (setting_key, setting_value, updated_by) 
+                VALUES (?, ?, ?)
+                ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_by = VALUES(updated_by)
+            ");
+            
+            $stmt->execute(['site_name', $siteName, $_SESSION['user_id']]);
+            $stmt->execute(['site_description', $siteDescription, $_SESSION['user_id']]);
+            $stmt->execute(['maintenance_mode', $maintenanceMode, $_SESSION['user_id']]);
+            $stmt->execute(['allow_registration', $allowRegistration, $_SESSION['user_id']]);
+            
+            // Log the action
+            $stmt = $db->prepare("INSERT INTO system_logs (user_id, action, entity_type, details, ip_address) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $_SESSION['user_id'],
+                'update_system_settings',
+                'settings',
+                'System-Einstellungen aktualisiert',
+                $_SERVER['REMOTE_ADDR'] ?? null
+            ]);
+            
+            $message = 'Einstellungen erfolgreich gespeichert';
+        } else if (isset($_POST['update_email_settings'])) {
+            $notifyOnNewUser = isset($_POST['notify_on_new_user']) ? 1 : 0;
+            $notifyOnNewEvent = isset($_POST['notify_on_new_event']) ? 1 : 0;
+            $adminEmail = $_POST['admin_email'] ?? '';
+            
+            $stmt = $db->prepare("
+                INSERT INTO system_settings (setting_key, setting_value, updated_by) 
+                VALUES (?, ?, ?)
+                ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_by = VALUES(updated_by)
+            ");
+            
+            $stmt->execute(['notify_on_new_user', $notifyOnNewUser, $_SESSION['user_id']]);
+            $stmt->execute(['notify_on_new_event', $notifyOnNewEvent, $_SESSION['user_id']]);
+            $stmt->execute(['admin_email', $adminEmail, $_SESSION['user_id']]);
+            
+            $message = 'E-Mail-Einstellungen erfolgreich gespeichert';
+        } else if (isset($_POST['update_security_settings'])) {
+            $sessionTimeout = intval($_POST['session_timeout'] ?? 3600);
+            $maxLoginAttempts = intval($_POST['max_login_attempts'] ?? 5);
+            $logRetentionDays = intval($_POST['log_retention_days'] ?? 365);
+            
+            $stmt = $db->prepare("
+                INSERT INTO system_settings (setting_key, setting_value, updated_by) 
+                VALUES (?, ?, ?)
+                ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_by = VALUES(updated_by)
+            ");
+            
+            $stmt->execute(['session_timeout', $sessionTimeout, $_SESSION['user_id']]);
+            $stmt->execute(['max_login_attempts', $maxLoginAttempts, $_SESSION['user_id']]);
+            $stmt->execute(['log_retention_days', $logRetentionDays, $_SESSION['user_id']]);
+            
+            $message = 'Sicherheitseinstellungen erfolgreich gespeichert';
+        }
+    } catch (Exception $e) {
+        $error = 'Fehler beim Speichern: ' . $e->getMessage();
+    }
+}
+
+// Load current settings
+function getSetting($db, $key, $default = '') {
+    try {
+        $stmt = $db->prepare("SELECT setting_value FROM system_settings WHERE setting_key = ?");
+        $stmt->execute([$key]);
+        $result = $stmt->fetch();
+        return $result ? $result['setting_value'] : $default;
+    } catch (Exception $e) {
+        return $default;
+    }
+}
+
+$siteName = getSetting($db, 'site_name', 'IBC Intranet');
+$siteDescription = getSetting($db, 'site_description', '');
+$maintenanceMode = getSetting($db, 'maintenance_mode', '0');
+$allowRegistration = getSetting($db, 'allow_registration', '1');
+$notifyOnNewUser = getSetting($db, 'notify_on_new_user', '1');
+$notifyOnNewEvent = getSetting($db, 'notify_on_new_event', '1');
+$adminEmail = getSetting($db, 'admin_email', '');
+$sessionTimeout = getSetting($db, 'session_timeout', '3600');
+$maxLoginAttempts = getSetting($db, 'max_login_attempts', '5');
+$logRetentionDays = getSetting($db, 'log_retention_days', '365');
+
 $title = 'System Einstellungen - IBC Intranet';
 ob_start();
 ?>
 
 <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-2">
+    <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
         <i class="fas fa-cog text-purple-600 mr-2"></i>
         System Einstellungen
     </h1>
+    <p class="text-gray-600 dark:text-gray-300">Konfiguriere allgemeine Systemeinstellungen und Parameter</p>
 </div>
 
-<div class="card p-6">
-    <p class="text-gray-600">Einstellungen sind aktuell deaktiviert.</p>
+<!-- Success/Error Messages -->
+<?php if ($message): ?>
+    <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-start">
+        <i class="fas fa-check-circle mt-0.5 mr-3"></i>
+        <span><?php echo htmlspecialchars($message); ?></span>
+    </div>
+<?php endif; ?>
+
+<?php if ($error): ?>
+    <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-start">
+        <i class="fas fa-exclamation-circle mt-0.5 mr-3"></i>
+        <span><?php echo htmlspecialchars($error); ?></span>
+    </div>
+<?php endif; ?>
+
+<!-- General Settings -->
+<div class="card p-6 mb-6">
+    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+        <i class="fas fa-sliders-h text-blue-600 mr-2"></i>
+        Allgemeine Einstellungen
+    </h2>
+    
+    <form method="POST" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Website-Name
+            </label>
+            <input 
+                type="text" 
+                name="site_name" 
+                value="<?php echo htmlspecialchars($siteName); ?>"
+                class="w-full px-4 py-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                required
+            >
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Website-Beschreibung
+            </label>
+            <textarea 
+                name="site_description" 
+                rows="3"
+                class="w-full px-4 py-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            ><?php echo htmlspecialchars($siteDescription); ?></textarea>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <label class="flex items-center space-x-2 cursor-pointer">
+                <input 
+                    type="checkbox" 
+                    name="maintenance_mode" 
+                    <?php echo $maintenanceMode == '1' ? 'checked' : ''; ?>
+                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                >
+                <span class="text-sm text-gray-700 dark:text-gray-300">Wartungsmodus aktivieren</span>
+            </label>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <label class="flex items-center space-x-2 cursor-pointer">
+                <input 
+                    type="checkbox" 
+                    name="allow_registration" 
+                    <?php echo $allowRegistration == '1' ? 'checked' : ''; ?>
+                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                >
+                <span class="text-sm text-gray-700 dark:text-gray-300">Registrierung erlauben</span>
+            </label>
+        </div>
+        
+        <div class="pt-4">
+            <button type="submit" name="update_system_settings" class="btn-primary">
+                <i class="fas fa-save mr-2"></i>
+                Einstellungen speichern
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Email Settings -->
+<div class="card p-6 mb-6">
+    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+        <i class="fas fa-envelope text-green-600 mr-2"></i>
+        E-Mail Benachrichtigungen
+    </h2>
+    
+    <form method="POST" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Admin E-Mail Adresse
+            </label>
+            <input 
+                type="email" 
+                name="admin_email" 
+                value="<?php echo htmlspecialchars($adminEmail); ?>"
+                placeholder="admin@ibc-mannheim.de"
+                class="w-full px-4 py-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            >
+        </div>
+        
+        <div class="space-y-2">
+            <label class="flex items-center space-x-2 cursor-pointer">
+                <input 
+                    type="checkbox" 
+                    name="notify_on_new_user" 
+                    <?php echo $notifyOnNewUser == '1' ? 'checked' : ''; ?>
+                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                >
+                <span class="text-sm text-gray-700 dark:text-gray-300">Bei neuen Benutzern benachrichtigen</span>
+            </label>
+            
+            <label class="flex items-center space-x-2 cursor-pointer">
+                <input 
+                    type="checkbox" 
+                    name="notify_on_new_event" 
+                    <?php echo $notifyOnNewEvent == '1' ? 'checked' : ''; ?>
+                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                >
+                <span class="text-sm text-gray-700 dark:text-gray-300">Bei neuen Events benachrichtigen</span>
+            </label>
+        </div>
+        
+        <div class="pt-4">
+            <button type="submit" name="update_email_settings" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+                <i class="fas fa-save mr-2"></i>
+                E-Mail Einstellungen speichern
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Security Settings -->
+<div class="card p-6 mb-6">
+    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+        <i class="fas fa-shield-alt text-red-600 mr-2"></i>
+        Sicherheitseinstellungen
+    </h2>
+    
+    <form method="POST" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Session Timeout (Sekunden)
+            </label>
+            <input 
+                type="number" 
+                name="session_timeout" 
+                value="<?php echo htmlspecialchars($sessionTimeout); ?>"
+                min="300"
+                max="86400"
+                class="w-full px-4 py-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            >
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Standard: 3600 Sekunden (1 Stunde)
+            </p>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Max. Login-Versuche
+            </label>
+            <input 
+                type="number" 
+                name="max_login_attempts" 
+                value="<?php echo htmlspecialchars($maxLoginAttempts); ?>"
+                min="3"
+                max="10"
+                class="w-full px-4 py-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            >
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Log-Aufbewahrung (Tage)
+            </label>
+            <input 
+                type="number" 
+                name="log_retention_days" 
+                value="<?php echo htmlspecialchars($logRetentionDays); ?>"
+                min="30"
+                max="730"
+                class="w-full px-4 py-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            >
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Legt fest, wie lange Logs in der Datenbank gespeichert werden
+            </p>
+        </div>
+        
+        <div class="pt-4">
+            <button type="submit" name="update_security_settings" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+                <i class="fas fa-save mr-2"></i>
+                Sicherheitseinstellungen speichern
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Information Box -->
+<div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+    <div class="flex items-start">
+        <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 text-xl mr-3 mt-1"></i>
+        <div>
+            <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                Hinweis zu Systemeinstellungen
+            </h3>
+            <p class="text-sm text-blue-800 dark:text-blue-200">
+                Einige Einstellungen erfordern möglicherweise einen Server-Neustart oder eine Cache-Löschung, um wirksam zu werden. 
+                Änderungen an Sicherheitseinstellungen sollten mit Vorsicht vorgenommen werden.
+            </p>
+        </div>
+    </div>
 </div>
 
 <?php
