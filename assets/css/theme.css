@@ -183,10 +183,24 @@ body {
     color: rgba(255, 255, 255, 0.95) !important;
 }
 
+/* Light Mode: Force sidebar links to be white with high specificity */
+body:not(.dark-mode) .sidebar a,
+body:not(.dark-mode) .sidebar span,
+body:not(.dark-mode) .sidebar i,
+body:not(.dark-mode) .sidebar label {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
 .sidebar a:hover {
     color: #ffffff !important;
     background-color: rgba(255, 255, 255, 0.1) !important;
     transition: all 0.2s ease;
+}
+
+/* Light Mode: Force sidebar hover to be white */
+body:not(.dark-mode) .sidebar a:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Sidebar Active State - White Background with IBC Green Border */
@@ -593,11 +607,11 @@ body:not(.dark-mode) a:not(.btn-primary):not(.no-underline) {
 }
 
 /* Light Mode: Animated underline on hover */
-body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a) {
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline) {
     display: inline-block;
 }
 
-body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a)::after {
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline)::after {
     content: '';
     position: absolute;
     bottom: -2px;
@@ -608,8 +622,19 @@ body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a)::aft
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a):hover::after {
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):hover::after {
     width: 100%;
+}
+
+/* Disable underline animation for sidebar links */
+body:not(.dark-mode) .sidebar a::after {
+    content: none !important;
+}
+
+/* Ensure sidebar links don't get position relative from general link rules */
+body:not(.dark-mode) .sidebar a {
+    position: static !important;
+    display: block !important;
 }
 
 body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):hover {

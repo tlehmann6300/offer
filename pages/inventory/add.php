@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $categories = Inventory::getCategories();
-$locations = Inventory::getLocations();
+$locations = Inventory::getAllLocations();
 
 $title = 'Neuer Artikel - Inventar';
 ob_start();

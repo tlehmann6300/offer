@@ -115,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $categories = Inventory::getCategories();
-$locations = Inventory::getLocations();
+$locations = Inventory::getAllLocations();
 
 $title = 'Artikel bearbeiten - Inventar';
 ob_start();
