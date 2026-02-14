@@ -315,4 +315,103 @@ class MicrosoftGraphService {
             throw new Exception('Failed to get user photo: ' . $e->getMessage());
         }
     }
+    
+    /**
+     * Get current app role assignment ID for a user
+     * Retrieves the assignment ID (not the role ID!) of the user's current role
+     * that matches one of the roles in ROLE_MAPPING
+     * 
+     * @param string $userId User ID (Object ID from Azure AD)
+     * @return string|null Assignment ID if found, null otherwise
+     * @throws Exception If API request fails
+     */
+    public function getCurrentAppRoleAssignmentId(string $userId): ?string {
+        $assignmentsUrl = "https://graph.microsoft.com/v1.0/users/{$userId}/appRoleAssignments";
+        
+        try {
+            $response = $this->httpClient->get($assignmentsUrl, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->accessToken,
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+            
+            $body = json_decode($response->getBody()->getContents(), true);
+            
+            if (!isset($body['value']) || !is_array($body['value'])) {
+                return null;
+            }
+            
+            // Get all role IDs from ROLE_MAPPING
+            $mappedRoleIds = array_values(self::ROLE_MAPPING);
+            
+            // Loop through assignments to find one that matches our ROLE_MAPPING
+            foreach ($body['value'] as $assignment) {
+                $appRoleId = $assignment['appRoleId'] ?? null;
+                
+                // Check if this assignment's appRoleId is in our ROLE_MAPPING
+                if ($appRoleId && in_array($appRoleId, $mappedRoleIds)) {
+                    // Return the assignment ID (this is the ID of the assignment, not the role!)
+                    return $assignment['id'] ?? null;
+                }
+            }
+            
+            return null;
+            
+        } catch (GuzzleException $e) {
+            throw new Exception('Failed to get current app role assignment: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Remove a role assignment from a user
+     * 
+     * @param string $userId User ID (Object ID from Azure AD)
+     * @param string $assignmentId Assignment ID to remove
+     * @return bool True if removal succeeded
+     * @throws Exception If role removal fails
+     */
+    public function removeRole(string $userId, string $assignmentId): bool {
+        $deleteUrl = "https://graph.microsoft.com/v1.0/users/{$userId}/appRoleAssignments/{$assignmentId}";
+        
+        try {
+            $response = $this->httpClient->delete($deleteUrl, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->accessToken,
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+            
+            // DELETE returns 204 No Content on success
+            return $response->getStatusCode() === 204;
+            
+        } catch (GuzzleException $e) {
+            throw new Exception('Failed to remove role: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Update user role - complete role change workflow
+     * This method manages the complete role change process:
+     * 1. Get current role assignment ID
+     * 2. Remove current role if exists
+     * 3. Assign new role
+     * 
+     * @param string $userId User ID (Object ID from Azure AD)
+     * @param string $newRoleValue New role value (e.g., 'member', 'board_finance')
+     * @return bool True if role update succeeded
+     * @throws Exception If role update fails
+     */
+    public function updateUserRole(string $userId, string $newRoleValue): bool {
+        // Step 1: Get current assignment ID
+        $currentAssignmentId = $this->getCurrentAppRoleAssignmentId($userId);
+        
+        // Step 2: Remove current role if it exists
+        if ($currentAssignmentId !== null) {
+            $this->removeRole($userId, $currentAssignmentId);
+        }
+        
+        // Step 3: Assign new role
+        return $this->assignRole($userId, $newRoleValue);
+    }
 }
