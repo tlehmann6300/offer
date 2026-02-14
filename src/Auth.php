@@ -133,15 +133,31 @@ class Auth {
             $lockedUntil = null;
             $isPermanentlyLocked = 0;
             
-            // Lock account for 30 minutes after 5 failed attempts
-            if ($failedAttempts == 5) {
-                $lockedUntil = date('Y-m-d H:i:s', time() + (30 * 60)); // Lock for 30 minutes
-            }
-            
-            // Permanently lock account after 8 failed attempts
-            if ($failedAttempts >= 8) {
-                $isPermanentlyLocked = 1;
-                $lockedUntil = null; // Clear temporary lock when applying permanent lock
+            // Implement exponential backoff rate limiting
+            // After 3 failed attempts: exponential backoff starts
+            // 3 attempts: 1 minute (60 seconds)
+            // 4 attempts: 2 minutes (120 seconds)
+            // 5 attempts: 5 minutes (300 seconds)
+            // 6 attempts: 15 minutes (900 seconds)
+            // 7 attempts: 30 minutes (1800 seconds)
+            // 8+ attempts: Permanently locked
+            if ($failedAttempts >= 3) {
+                if ($failedAttempts >= 8) {
+                    // Permanently lock account after 8 failed attempts
+                    $isPermanentlyLocked = 1;
+                    $lockedUntil = null;
+                } else {
+                    // Exponential backoff for attempts 3-7
+                    $lockoutTimes = [
+                        3 => 60,      // 1 minute
+                        4 => 120,     // 2 minutes
+                        5 => 300,     // 5 minutes
+                        6 => 900,     // 15 minutes
+                        7 => 1800,    // 30 minutes
+                    ];
+                    $lockoutDuration = $lockoutTimes[$failedAttempts];
+                    $lockedUntil = date('Y-m-d H:i:s', time() + $lockoutDuration);
+                }
             }
             
             $stmt = $db->prepare("UPDATE users SET failed_login_attempts = ?, locked_until = ?, is_locked_permanently = ? WHERE id = ?");

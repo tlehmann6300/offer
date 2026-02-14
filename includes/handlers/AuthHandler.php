@@ -77,7 +77,10 @@ class AuthHandler {
         $user = $stmt->fetch();
         
         if (!$user) {
-            self::logSystemAction(null, 'login_failed', 'user', null, 'User not found: ' . $email);
+            // Log failed login attempt with IP address and User Agent
+            $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+            $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+            self::logSystemAction(null, 'login_failed', 'user', null, "User not found: {$email} - IP: {$ipAddress} - User Agent: {$userAgent}");
             return ['success' => false, 'message' => 'Ungültige Anmeldedaten'];
         }
         
@@ -93,14 +96,34 @@ class AuthHandler {
             $failedAttempts = $user['failed_login_attempts'] + 1;
             $lockedUntil = null;
             
-            if ($failedAttempts >= MAX_LOGIN_ATTEMPTS) {
-                $lockedUntil = date('Y-m-d H:i:s', time() + LOGIN_LOCKOUT_TIME);
+            // Implement exponential backoff rate limiting
+            // After 3 failed attempts: exponential backoff starts
+            // 3 attempts: 1 minute (60 seconds)
+            // 4 attempts: 2 minutes (120 seconds)
+            // 5 attempts: 5 minutes (300 seconds)
+            // 6 attempts: 15 minutes (900 seconds)
+            // 7 attempts: 30 minutes (1800 seconds)
+            // 8+ attempts: 60 minutes (3600 seconds)
+            if ($failedAttempts >= 3) {
+                $lockoutTimes = [
+                    3 => 60,      // 1 minute
+                    4 => 120,     // 2 minutes
+                    5 => 300,     // 5 minutes
+                    6 => 900,     // 15 minutes
+                    7 => 1800,    // 30 minutes
+                ];
+                $lockoutDuration = $lockoutTimes[$failedAttempts] ?? 3600; // Default to 60 minutes for 8+
+                $lockedUntil = date('Y-m-d H:i:s', time() + $lockoutDuration);
             }
             
             $stmt = $db->prepare("UPDATE users SET failed_login_attempts = ?, locked_until = ? WHERE id = ?");
             $stmt->execute([$failedAttempts, $lockedUntil, $user['id']]);
             
-            self::logSystemAction($user['id'], 'login_failed', 'user', $user['id'], 'Invalid password');
+            // Log failed login attempt with IP address and User Agent
+            $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+            $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+            self::logSystemAction($user['id'], 'login_failed', 'user', $user['id'], "Invalid password - Attempt {$failedAttempts} - IP: {$ipAddress} - User Agent: {$userAgent}");
+            
             return ['success' => false, 'message' => 'Ungültige Anmeldedaten'];
         }
         
@@ -114,7 +137,10 @@ class AuthHandler {
             $ga = new PHPGangsta_GoogleAuthenticator();
             
             if (!$ga->verifyCode($user['tfa_secret'], $tfaCode, 2)) {
-                self::logSystemAction($user['id'], 'login_2fa_failed', 'user', $user['id'], 'Invalid 2FA code');
+                // Log failed 2FA attempt with IP address and User Agent
+                $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+                $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+                self::logSystemAction($user['id'], 'login_2fa_failed', 'user', $user['id'], "Invalid 2FA code - IP: {$ipAddress} - User Agent: {$userAgent}");
                 return ['success' => false, 'message' => 'Ungültiger 2FA-Code'];
             }
         }
@@ -125,6 +151,10 @@ class AuthHandler {
         
         // Set session variables
         self::startSession();
+        
+        // Regenerate session ID to prevent session fixation attacks
+        session_regenerate_id(true);
+        
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_role'] = $user['role'];
