@@ -599,7 +599,7 @@ body.dark-mode a:not(.btn-primary) {
 }
 
 /* Light Mode Links - Use IBC Blue for interactive elements */
-body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a) {
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline) {
     color: var(--ibc-blue);
     position: relative;
     text-decoration: none;
@@ -607,11 +607,11 @@ body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a) {
 }
 
 /* Light Mode: Animated underline on hover */
-body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a) {
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline) {
     display: inline-block;
 }
 
-body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a)::after {
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline)::after {
     content: '';
     position: absolute;
     bottom: -2px;
@@ -622,8 +622,13 @@ body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a)::aft
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a):hover::after {
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):hover::after {
     width: 100%;
+}
+
+/* Disable underline animation for sidebar links */
+body:not(.dark-mode) .sidebar a::after {
+    content: none !important;
 }
 
 body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):hover {
