@@ -4,7 +4,7 @@
  * Apply sellers_data column to event_documentation table
  */
 
-require_once __DIR__ . '/../src/Database.php';
+require_once __DIR__ . '/../includes/database.php';
 
 try {
     $db = Database::getContentDB();

@@ -41,7 +41,678 @@ require_once __DIR__ . '/../helpers.php';
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Text shadow utilities for glassmorphism */
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+            background: #0a0f1e;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ULTRA ANIMATED BACKGROUND */
+        .background-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        /* Gradient Animation */
+        .gradient-bg {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(108, 183, 62, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(30, 76, 156, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0f1e 0%, #1a1f3e 100%);
+            animation: gradientShift 25s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { 
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            25% { 
+                transform: translate(-3%, 3%) scale(1.05);
+                opacity: 0.95;
+            }
+            50% { 
+                transform: translate(0, 5%) scale(1.1);
+                opacity: 0.9;
+            }
+            75% { 
+                transform: translate(3%, 3%) scale(1.05);
+                opacity: 0.95;
+            }
+            100% { 
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Floating Orbs */
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .floating-orb:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(108, 183, 62, 0.4) 0%, transparent 70%);
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-orb:nth-child(3) {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(30, 76, 156, 0.4) 0%, transparent 70%);
+            bottom: 15%;
+            right: 15%;
+            animation-delay: 7s;
+        }
+
+        .floating-orb:nth-child(4) {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(118, 75, 162, 0.3) 0%, transparent 70%);
+            top: 60%;
+            left: 50%;
+            animation-delay: 14s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+            50% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+            75% {
+                transform: translate(20px, 30px) scale(1.05);
+            }
+        }
+
+        /* Gradient Wave */
+        .gradient-wave {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 30%, rgba(108, 183, 62, 0.05) 50%, transparent 70%);
+            animation: wave 15s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% {
+                transform: translateX(-100%) translateY(-50%) rotate(0deg);
+            }
+            50% {
+                transform: translateX(100%) translateY(50%) rotate(180deg);
+            }
+        }
+
+        /* Animated Grid */
+        .animated-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(108, 183, 62, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(108, 183, 62, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        /* Light Beams */
+        .light-beam {
+            position: absolute;
+            width: 2px;
+            height: 200px;
+            background: linear-gradient(to bottom, transparent, rgba(108, 183, 62, 0.3), transparent);
+            animation: beam 8s ease-in-out infinite;
+        }
+
+        .light-beam:nth-child(6) {
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .light-beam:nth-child(7) {
+            left: 50%;
+            animation-delay: 2.5s;
+        }
+
+        .light-beam:nth-child(8) {
+            left: 80%;
+            animation-delay: 5s;
+        }
+
+        @keyframes beam {
+            0%, 100% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        /* Smooth Particles */
+        .smooth-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: particleFloat 15s linear infinite;
+            bottom: -10px;
+        }
+
+        /* Staggered delays for particles */
+        .smooth-particle:nth-child(n+9) {
+            animation-delay: calc((var(--particle-index, 0) * 0.6s));
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+
+        /* LOGIN CONTAINER */
+        .login-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(15, 20, 40, 0.75);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 60px 50px;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: containerEntrance 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes containerEntrance {
+            0% {
+                opacity: 0;
+                transform: scale(0.9) translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* LOGO SECTION */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .logo-wrapper {
+            position: relative;
+            display: inline-block;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            16.6% {
+                transform: translateY(-8px) rotate(1deg);
+            }
+            33.3% {
+                transform: translateY(-14px) rotate(-0.5deg);
+            }
+            50% {
+                transform: translateY(-12px) rotate(0deg);
+            }
+            66.6% {
+                transform: translateY(-10px) rotate(-1deg);
+            }
+            83.3% {
+                transform: translateY(-6px) rotate(-0.5deg);
+            }
+        }
+
+        .logo-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(108, 183, 62, 0.3) 0%, transparent 70%);
+            animation: glowPulse 6s ease-in-out infinite;
+            border-radius: 50%;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.7;
+            }
+            75% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+        }
+
+        .ibc-logo {
+            width: 150px;
+            height: auto;
+            position: relative;
+            z-index: 2;
+            filter: drop-shadow(0 10px 30px rgba(108, 183, 62, 0.5));
+            animation: logoEntrance 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes logoEntrance {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(-360deg);
+                filter: drop-shadow(0 0 80px rgba(108, 183, 62, 1)) blur(20px);
+            }
+            40% {
+                opacity: 0.5;
+                transform: scale(0.5) rotate(-180deg);
+                filter: drop-shadow(0 0 60px rgba(108, 183, 62, 0.8)) blur(10px);
+            }
+            70% {
+                transform: scale(1.15) rotate(15deg);
+                filter: drop-shadow(0 15px 40px rgba(108, 183, 62, 0.7));
+            }
+            85% {
+                transform: scale(0.95) rotate(-5deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+                filter: drop-shadow(0 10px 30px rgba(108, 183, 62, 0.5));
+            }
+        }
+
+        /* WELCOME TEXT */
+        .welcome-text {
+            text-align: center;
+            margin-bottom: 45px;
+            animation: textSlideUp 1s ease-out 0.5s both;
+        }
+
+        @keyframes textSlideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .welcome-title {
+            font-size: 32px;
+            color: #ffffff;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .welcome-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        /* MICROSOFT BUTTON - MEGA IMPRESSIVE */
+        .microsoft-button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            border: 2px solid rgba(108, 183, 62, 0.2);
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            color: #2d2d2d;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            animation: buttonSlideUp 1s ease-out 0.8s both;
+            text-decoration: none;
+        }
+
+        @keyframes buttonSlideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Shimmer Effect */
+        .microsoft-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(108, 183, 62, 0.3) 50%,
+                transparent 70%
+            );
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .microsoft-button:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 
+                0 15px 40px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            border-color: rgba(108, 183, 62, 0.4);
+        }
+
+        .microsoft-button:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        /* Microsoft Logo Grid */
+        .microsoft-logo {
+            display: grid;
+            grid-template-columns: repeat(2, 12px);
+            grid-template-rows: repeat(2, 12px);
+            gap: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        .microsoft-button:hover .microsoft-logo {
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .microsoft-logo div {
+            width: 12px;
+            height: 12px;
+        }
+
+        .microsoft-logo div:nth-child(1) { background: #f25022; }
+        .microsoft-logo div:nth-child(2) { background: #7fba00; }
+        .microsoft-logo div:nth-child(3) { background: #00a4ef; }
+        .microsoft-logo div:nth-child(4) { background: #ffb900; }
+
+        /* Loading State */
+        .microsoft-button.loading {
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top-color: #6cb73e;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .microsoft-button.loading .loading-spinner {
+            display: block;
+        }
+
+        .microsoft-button.loading .microsoft-logo,
+        .microsoft-button.loading span {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success State */
+        .success-checkmark {
+            display: none;
+            width: 24px;
+            height: 24px;
+            position: relative;
+        }
+
+        .microsoft-button.success {
+            background: linear-gradient(135deg, #6cb73e 0%, #5a9933 100%);
+            color: white;
+        }
+
+        .microsoft-button.success .success-checkmark {
+            display: block;
+        }
+
+        .microsoft-button.success .microsoft-logo,
+        .microsoft-button.success span {
+            display: none;
+        }
+
+        .success-checkmark::before {
+            content: '✓';
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Ripple Effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(0);
+            animation: ripple-animation 0.6s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Footer */
+        .login-footer {
+            text-align: center;
+            margin-top: 35px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            animation: textSlideUp 1s ease-out 1s both;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 45px 30px;
+                width: 92%;
+                border-radius: 22px;
+            }
+
+            .ibc-logo {
+                width: 110px;
+            }
+
+            .logo-glow {
+                width: 160px;
+                height: 160px;
+            }
+
+            .welcome-text {
+                margin-bottom: 40px;
+            }
+
+            .welcome-title {
+                font-size: 26px;
+                margin-bottom: 10px;
+            }
+
+            .welcome-subtitle {
+                font-size: 15px;
+            }
+
+            .microsoft-button {
+                padding: 17px;
+                font-size: 15px;
+                gap: 12px;
+            }
+
+            .microsoft-logo {
+                grid-template-columns: repeat(2, 10px);
+                grid-template-rows: repeat(2, 10px);
+            }
+
+            .microsoft-logo div {
+                width: 10px;
+                height: 10px;
+            }
+
+            .login-footer {
+                font-size: 12px;
+                margin-top: 32px;
+            }
+
+            .floating-orb {
+                opacity: 0.15;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 35px 22px;
+                width: 94%;
+                border-radius: 20px;
+            }
+
+            .ibc-logo {
+                width: 95px;
+            }
+
+            .logo-glow {
+                width: 140px;
+                height: 140px;
+            }
+
+            .welcome-text {
+                margin-bottom: 35px;
+            }
+
+            .welcome-title {
+                font-size: 23px;
+                margin-bottom: 8px;
+            }
+
+            .welcome-subtitle {
+                font-size: 13px;
+            }
+
+            .microsoft-button {
+                padding: 15px;
+                font-size: 14px;
+                gap: 10px;
+            }
+
+            .microsoft-logo {
+                grid-template-columns: repeat(2, 9px);
+                grid-template-rows: repeat(2, 9px);
+            }
+
+            .microsoft-logo div {
+                width: 9px;
+                height: 9px;
+            }
+
+            .login-footer {
+                font-size: 11px;
+                margin-top: 30px;
+            }
+        }
+
+        /* Text shadow utilities */
         .text-shadow-strong {
             text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5), 0 4px 20px rgba(0, 0, 0, 0.3);
         }
@@ -57,45 +728,9 @@ require_once __DIR__ . '/../helpers.php';
         .text-shadow-footer {
             text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8), 0 4px 24px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 1);
         }
-        
-        /* Advanced Animated Gradient Background */
-        body {
-            background: linear-gradient(135deg, 
-                #0a1628 0%, 
-                #0d2137 20%,
-                #0f172a 40%, 
-                #162033 60%,
-                #1a1f3a 80%,
-                #0d1b2a 100%
-            );
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
-            animation: gradientShift 25s ease infinite;
-            background-size: 400% 400%;
-        }
-        
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            25% { background-position: 50% 25%; }
-            50% { background-position: 100% 50%; }
-            75% { background-position: 50% 75%; }
-        }
-        
-        /* Enhanced Glowing Orbs with Pulsing */
-        body::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -30%;
-            width: 80%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(0, 166, 81, 0.18) 0%, rgba(0, 166, 81, 0.08) 40%, transparent 70%);
-            pointer-events: none;
-            animation: pulse 10s ease-in-out infinite, drift 30s ease-in-out infinite;
-        }
-        
-        body::after {
+
+        /* Old styles for compatibility - hidden/overridden */
+        body::before, body::after {
             content: '';
             position: absolute;
             bottom: -30%;
@@ -470,45 +1105,56 @@ require_once __DIR__ . '/../helpers.php';
     </style>
 </head>
 <body class="min-h-screen">
-    <!-- Enhanced Decorative floating elements with 3D effect -->
-    <div class="floating-dot w-80 h-80 top-20 -left-32 bg-gradient-to-br from-green-400 to-emerald-600 delay-0" aria-hidden="true"></div>
-    <div class="floating-dot w-64 h-64 top-40 right-10 bg-gradient-to-br from-blue-400 to-cyan-600 delay-7" aria-hidden="true"></div>
-    <div class="floating-dot w-48 h-48 bottom-20 left-1/4 bg-gradient-to-br from-blue-300 to-blue-500 delay-14" aria-hidden="true"></div>
-    <div class="floating-dot w-56 h-56 bottom-40 right-1/3 bg-gradient-to-br from-emerald-400 to-green-600 delay-3" aria-hidden="true"></div>
-    
-    <!-- Particle System -->
-    <div class="particle particle-1"></div>
-    <div class="particle particle-2"></div>
-    <div class="particle particle-3"></div>
-    <div class="particle particle-4"></div>
-    <div class="particle particle-5"></div>
-    <div class="particle particle-6"></div>
-    <div class="particle particle-7"></div>
-    <div class="particle particle-8"></div>
-    <div class="particle particle-9"></div>
-
-    <div class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
-        <!-- IBC Logo above content with enhanced animation -->
-        <div class="mb-10 logo-container">
-            <img src="<?php echo asset('assets/img/ibc_logo_original.webp'); ?>" alt="IBC Logo" class="mx-auto h-24 w-auto" style="filter: brightness(1.15) drop-shadow(0 8px 30px rgba(0, 166, 81, 0.5)) drop-shadow(0 4px 20px rgba(0, 166, 81, 0.3));">
-        </div>
+    <!-- ANIMATED BACKGROUND -->
+    <div class="background-wrapper">
+        <!-- Base Gradient -->
+        <div class="gradient-bg"></div>
         
-        <!-- Content area wrapped in auth-card -->
-        <div class="auth-card p-1.5 w-full max-w-md">
-            <?php echo $content ?? ''; ?>
-        </div>
+        <!-- Gradient Wave -->
+        <div class="gradient-wave"></div>
         
-        <!-- Footer text with enhanced contrast and text shadow -->
-        <div class="mt-10 text-center">
-            <p class="text-white text-sm font-semibold tracking-wide text-shadow-footer">
-                © <?php echo date('Y'); ?> IBC · Intranet Platform
-            </p>
-            <div class="mt-2 flex justify-center space-x-1">
-                <div class="w-1 h-1 rounded-full bg-white/40" style="box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);"></div>
-                <div class="w-1 h-1 rounded-full bg-white/50" style="box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);"></div>
-                <div class="w-1 h-1 rounded-full bg-white/40" style="box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);"></div>
-            </div>
-        </div>
+        <!-- Floating Orbs (3) -->
+        <div class="floating-orb"></div>
+        <div class="floating-orb"></div>
+        <div class="floating-orb"></div>
+        
+        <!-- Animated Grid -->
+        <div class="animated-grid"></div>
+        
+        <!-- Light Beams (3) -->
+        <div class="light-beam"></div>
+        <div class="light-beam"></div>
+        <div class="light-beam"></div>
+        
+        <!-- Smooth Particles (25) -->
+        <div class="smooth-particle" style="--particle-index: 0; left: 4%;"></div>
+        <div class="smooth-particle" style="--particle-index: 1; left: 8%;"></div>
+        <div class="smooth-particle" style="--particle-index: 2; left: 12%;"></div>
+        <div class="smooth-particle" style="--particle-index: 3; left: 16%;"></div>
+        <div class="smooth-particle" style="--particle-index: 4; left: 20%;"></div>
+        <div class="smooth-particle" style="--particle-index: 5; left: 24%;"></div>
+        <div class="smooth-particle" style="--particle-index: 6; left: 28%;"></div>
+        <div class="smooth-particle" style="--particle-index: 7; left: 32%;"></div>
+        <div class="smooth-particle" style="--particle-index: 8; left: 36%;"></div>
+        <div class="smooth-particle" style="--particle-index: 9; left: 40%;"></div>
+        <div class="smooth-particle" style="--particle-index: 10; left: 44%;"></div>
+        <div class="smooth-particle" style="--particle-index: 11; left: 48%;"></div>
+        <div class="smooth-particle" style="--particle-index: 12; left: 52%;"></div>
+        <div class="smooth-particle" style="--particle-index: 13; left: 56%;"></div>
+        <div class="smooth-particle" style="--particle-index: 14; left: 60%;"></div>
+        <div class="smooth-particle" style="--particle-index: 15; left: 64%;"></div>
+        <div class="smooth-particle" style="--particle-index: 16; left: 68%;"></div>
+        <div class="smooth-particle" style="--particle-index: 17; left: 72%;"></div>
+        <div class="smooth-particle" style="--particle-index: 18; left: 76%;"></div>
+        <div class="smooth-particle" style="--particle-index: 19; left: 80%;"></div>
+        <div class="smooth-particle" style="--particle-index: 20; left: 84%;"></div>
+        <div class="smooth-particle" style="--particle-index: 21; left: 88%;"></div>
+        <div class="smooth-particle" style="--particle-index: 22; left: 92%;"></div>
+        <div class="smooth-particle" style="--particle-index: 23; left: 96%;"></div>
+        <div class="smooth-particle" style="--particle-index: 24; left: 100%;"></div>
     </div>
+
+    <!-- Content area -->
+    <?php echo $content ?? ''; ?>
 </body>
 </html>

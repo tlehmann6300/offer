@@ -54,27 +54,26 @@ $title = 'Login - IBC Intranet';
 ob_start();
 ?>
 
-<div class="w-full max-w-md p-6 sm:p-8 md:p-10 bg-white rounded-2xl shadow-2xl transition-all duration-500 hover:shadow-3xl">
-    <!-- Enhanced Header with Gradient Icon -->
-    <div class="text-center mb-8 sm:mb-10">
-        <div class="relative inline-flex items-center justify-center mb-5 sm:mb-6">
-            <!-- Animated Glow Ring -->
-            <div class="absolute inset-0 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-400 via-blue-500 to-emerald-400 rounded-2xl opacity-30 animate-pulse blur-xl"></div>
-            
-            <!-- Icon Container with 3D Effect -->
-            <div class="relative inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 via-blue-600 to-emerald-500 rounded-2xl shadow-2xl shadow-blue-500/50 hover:shadow-emerald-500/50 hover:scale-110 transition-all duration-500 hover:rotate-6">
-                <i class="fas fa-building text-3xl sm:text-4xl text-white drop-shadow-lg"></i>
-                
-                <!-- Sparkle Effects -->
-                <div class="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full animate-ping opacity-75"></div>
-                <div class="absolute -bottom-1 -left-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-300 rounded-full animate-ping opacity-75" style="animation-delay: 0.5s;"></div>
-            </div>
+<div class="login-container">
+    <!-- LOGO ANIMATION -->
+    <div class="logo-container">
+        <div class="logo-glow"></div>
+        <div class="logo-wrapper">
+            <svg class="ibc-logo" viewBox="0 0 5016 2287" xmlns="http://www.w3.org/2000/svg">
+                <rect x="1234.9" y="30.021" width="240.167" height="1839.458" fill="#6cb73e"/>
+                <path d="M2069.658,1864.021c79.146,10.917 204.688,21.833 368.438,21.833c300.208,0 507.625,-54.583 633.167,-171.938c95.521,-87.333 158.292,-210.146 158.292,-368.438c0,-272.917 -204.688,-417.563 -379.354,-458.5l0,-8.188c191.042,-68.229 311.125,-223.792 311.125,-403.917c0,-144.646 -60.042,-253.812 -155.562,-324.771c-111.896,-92.792 -264.729,-133.729 -502.167,-133.729c-163.75,0 -330.229,16.375 -433.938,40.938l0,1806.708Zm237.438,-1648.417c38.208,-8.187 100.979,-16.375 210.146,-16.375c240.167,0 401.188,87.333 401.188,300.208c0,177.396 -147.375,311.125 -395.729,311.125l-215.604,0l0,-594.958Zm0,772.354l196.5,0c259.271,0 474.875,106.438 474.875,354.792c0,267.458 -226.521,357.521 -472.146,357.521c-84.604,0 -150.104,-2.729 -199.229,-10.917l0,-701.396Z" fill="#6cb73e"/>
+                <path d="M4963.756,1621.125c-95.521,46.396 -242.896,76.417 -390.271,76.417c-444.854,0 -704.125,-286.563 -704.125,-739.604c0,-483.062 286.562,-758.708 717.771,-758.708c152.833,0 281.104,32.75 368.438,76.417l60.042,-193.771c-62.771,-32.75 -210.146,-81.875 -436.667,-81.875c-570.396,0 -960.667,387.542 -960.667,966.125c0,605.875 387.542,933.375 906.083,933.375c223.792,0 401.188,-43.667 485.792,-87.333l-46.396,-191.042Z" fill="#6cb73e"/>
+                <path d="M1018.765,844.401l-1018.765,1018.773l1018.765,0l0,-1018.773Z" fill="#1e4c9c"/>
+                <path d="M1018.765,347.539l-836.007,836.009l237.49,237.492l598.517,-598.525" fill="#6cb73e"/>
+                <path d="M1018.765,53.816l-562.483,562.485l135.722,136.093l426.761,-426.767" fill="#646464"/>
+            </svg>
         </div>
-        
-        <h1 class="text-3xl sm:text-4xl font-black text-white mb-2 sm:mb-3 tracking-tight animate-fade-in text-shadow-strong">
-            Willkommen zurück
-        </h1>
-        <p class="text-white/90 font-semibold text-base sm:text-lg text-shadow-medium">Melde dich mit deinem Konto an</p>
+    </div>
+
+    <!-- Welcome Text -->
+    <div class="welcome-text">
+        <h1 class="welcome-title">Willkommen zurück</h1>
+        <p class="welcome-subtitle">Melde dich mit deinem Microsoft-Konto an</p>
     </div>
 
     <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 1): ?>
@@ -104,102 +103,70 @@ ob_start();
     </div>
     <?php endif; ?>
 
-    <!-- Divider with "Oder" text -->
-    <div class="relative flex items-center justify-center my-6 sm:my-8">
-        <div class="flex-grow border-t border-white/30"></div>
-        <span class="px-3 sm:px-4 text-xs sm:text-sm text-white/80 font-medium text-shadow-light">Anmelden mit</span>
-        <div class="flex-grow border-t border-white/30"></div>
-    </div>
-
-    <!-- Ultra-Premium Microsoft Login Button with 3D Glass Effect -->
-    <div class="relative group">
-        <!-- Animated Background Glow -->
-        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 rounded-2xl blur-lg opacity-30 group-hover:opacity-60 transition-all duration-500 animate-pulse"></div>
-        
-        <!-- Main Button -->
-        <a href="<?php echo BASE_URL; ?>/auth/login_start.php" 
-           class="relative flex items-center justify-center gap-3 sm:gap-4 w-full py-4 sm:py-5 px-6 sm:px-8 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-white rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base transition-all duration-500 shadow-2xl hover:shadow-blue-500/50 hover:scale-[1.03] transform group overflow-hidden"
-           aria-label="Mit deinem Microsoft-Konto anmelden">
-            
-            <!-- Shimmer Effect -->
-            <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-            
-            <!-- Microsoft logo - Enhanced with Animation -->
-            <div class="relative flex-shrink-0 transition-all duration-500 group-hover:rotate-[360deg] group-hover:scale-110">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" class="drop-shadow-lg" aria-hidden="true">
-                    <rect x="1" y="1" width="10" height="10" fill="#f25022"/>
-                    <rect x="1" y="13" width="10" height="10" fill="#00a4ef"/>
-                    <rect x="13" y="1" width="10" height="10" fill="#7fba00"/>
-                    <rect x="13" y="13" width="10" height="10" fill="#ffb900"/>
-                </svg>
-            </div>
-            
-            <!-- Button text with Letter Spacing -->
-            <span class="relative font-black tracking-wider text-shadow-lg flex-1 text-center">Mit Microsoft anmelden</span>
-            
-            <!-- Enhanced Arrow with Bounce Animation -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0 transition-all duration-500 group-hover:translate-x-2 group-hover:scale-125" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-            
-            <!-- Floating Sparkles on Hover -->
-            <div class="absolute top-1/4 left-1/4 w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping"></div>
-            <div class="absolute top-1/3 right-1/3 w-1.5 h-1.5 bg-cyan-200 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" style="animation-delay: 0.2s;"></div>
-            <div class="absolute bottom-1/4 right-1/4 w-1 h-1 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" style="animation-delay: 0.4s;"></div>
-        </a>
-    </div>
-    
-    <!-- Enhanced Info Section with Icons -->
-    <div class="mt-5 sm:mt-6 text-center space-y-2 sm:space-y-3">
-        <p class="text-white/80 text-xs sm:text-sm font-medium text-shadow-light">Verwende dein Microsoft-Konto zum Anmelden</p>
-        <div class="flex items-center justify-center space-x-4 sm:space-x-6 text-white/70 text-xs text-shadow-light">
-            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-blue-300">
-                <i class="fas fa-shield-alt text-sm sm:text-base"></i>
-                <span class="hidden sm:inline">Sicher</span>
-            </div>
-            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-green-300">
-                <i class="fas fa-lock text-sm sm:text-base"></i>
-                <span class="hidden sm:inline">Verschlüsselt</span>
-            </div>
-            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-emerald-300">
-                <i class="fas fa-check-circle text-sm sm:text-base"></i>
-                <span class="hidden sm:inline">Vertraut</span>
-            </div>
+    <!-- Microsoft Login Button -->
+    <a href="<?php echo BASE_URL; ?>/auth/login_start.php" class="microsoft-button" id="loginButton" onclick="return handleLogin(event)">
+        <div class="microsoft-logo">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
         </div>
+        <span>Mit Microsoft anmelden</span>
+        <div class="loading-spinner"></div>
+        <div class="success-checkmark"></div>
+    </a>
+
+    <!-- Footer -->
+    <div class="login-footer">
+        <p>&copy; <?php echo date('Y'); ?> IBC Business Consulting. Alle Rechte vorbehalten.</p>
     </div>
-    
-    <!-- Additional Style Tags for Animations -->
-    <style>
-        @keyframes fade-in {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes slide-in {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        .animate-fade-in {
-            animation: fade-in 0.8s ease-out;
-        }
-        
-        .animate-slide-in {
-            animation: slide-in 0.6s ease-out;
-        }
-        
-        .text-shadow-lg {
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* Enhanced responsive styles */
-        @media (max-width: 640px) {
-            .w-full.max-w-md {
-                max-width: calc(100vw - 2rem);
-            }
-        }
-    </style>
 </div>
+
+<script>
+    // Ripple Effect on Button Click
+    function createRipple(event) {
+        const button = event.currentTarget;
+        const ripple = document.createElement('span');
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = event.clientX - rect.left - size / 2;
+        const y = event.clientY - rect.top - size / 2;
+
+        ripple.className = 'ripple';
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+
+        button.appendChild(ripple);
+
+        setTimeout(() => ripple.remove(), 600);
+    }
+
+    // Microsoft Login Handler with proper animation timing
+    function handleLogin(event) {
+        event.preventDefault();
+        createRipple(event);
+        
+        const button = document.getElementById('loginButton');
+        if (button.classList.contains('loading') || button.classList.contains('success')) {
+            return false;
+        }
+        
+        button.classList.add('loading');
+        
+        // Show loading, then success, then navigate
+        setTimeout(() => {
+            button.classList.remove('loading');
+            button.classList.add('success');
+            
+            setTimeout(() => {
+                window.location.href = button.href;
+            }, 800);
+        }, 1500);
+        
+        return false;
+    }
+</script>
 
 <?php
 $content = ob_get_clean();
