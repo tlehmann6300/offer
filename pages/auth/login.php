@@ -59,7 +59,7 @@ ob_start();
     <div class="text-center mb-8 sm:mb-10">
         <div class="relative inline-flex items-center justify-center mb-5 sm:mb-6">
             <!-- Animated Glow Ring -->
-            <div class="absolute inset-0 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-400 via-blue-500 to-emerald-400 rounded-2xl opacity-20 animate-pulse blur-xl"></div>
+            <div class="absolute inset-0 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-400 via-blue-500 to-emerald-400 rounded-2xl opacity-30 animate-pulse blur-xl"></div>
             
             <!-- Icon Container with 3D Effect -->
             <div class="relative inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 via-blue-600 to-emerald-500 rounded-2xl shadow-2xl shadow-blue-500/50 hover:shadow-emerald-500/50 hover:scale-110 transition-all duration-500 hover:rotate-6">
@@ -71,34 +71,34 @@ ob_start();
             </div>
         </div>
         
-        <h1 class="text-3xl sm:text-4xl font-black bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 bg-clip-text text-transparent mb-2 sm:mb-3 tracking-tight animate-fade-in">
+        <h1 class="text-3xl sm:text-4xl font-black text-white mb-2 sm:mb-3 tracking-tight animate-fade-in" style="text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5), 0 4px 20px rgba(0, 0, 0, 0.3);">
             Willkommen zurück
         </h1>
-        <p class="text-gray-600 font-semibold text-base sm:text-lg">Melde dich mit deinem Konto an</p>
+        <p class="text-white/90 font-semibold text-base sm:text-lg" style="text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);">Melde dich mit deinem Konto an</p>
     </div>
 
     <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 1): ?>
-    <div class="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 border-l-4 border-yellow-400 rounded-lg text-yellow-800 shadow-md animate-slide-in">
+    <div class="mb-6 p-4 bg-gradient-to-r from-yellow-500/20 to-amber-500/20 backdrop-blur-md border border-yellow-400/40 rounded-lg text-white shadow-lg animate-slide-in" style="text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);">
         <div class="flex items-center">
-            <i class="fas fa-clock mr-3 text-xl"></i>
+            <i class="fas fa-clock mr-3 text-xl text-yellow-300"></i>
             <span class="font-medium">Aus Sicherheitsgründen wurdest du automatisch ausgeloggt.</span>
         </div>
     </div>
     <?php endif; ?>
 
     <?php if (isset($_GET['logout']) && $_GET['logout'] == 1): ?>
-    <div class="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-400 rounded-lg text-green-800 shadow-md animate-slide-in">
+    <div class="mb-6 p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-md border border-green-400/40 rounded-lg text-white shadow-lg animate-slide-in" style="text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);">
         <div class="flex items-center">
-            <i class="fas fa-check-circle mr-3 text-xl"></i>
+            <i class="fas fa-check-circle mr-3 text-xl text-green-300"></i>
             <span class="font-medium">Erfolgreich abgemeldet.</span>
         </div>
     </div>
     <?php endif; ?>
 
     <?php if ($error): ?>
-    <div class="mb-6 p-4 bg-gradient-to-r from-red-50 to-rose-50 border-l-4 border-red-400 rounded-lg text-red-800 shadow-md animate-slide-in">
+    <div class="mb-6 p-4 bg-gradient-to-r from-red-500/20 to-rose-500/20 backdrop-blur-md border border-red-400/40 rounded-lg text-white shadow-lg animate-slide-in" style="text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);">
         <div class="flex items-center">
-            <i class="fas fa-exclamation-circle mr-3 text-xl"></i>
+            <i class="fas fa-exclamation-circle mr-3 text-xl text-red-300"></i>
             <span class="font-medium"><?php echo htmlspecialchars($error); ?></span>
         </div>
     </div>
@@ -106,9 +106,9 @@ ob_start();
 
     <!-- Divider with "Oder" text -->
     <div class="relative flex items-center justify-center my-6 sm:my-8">
-        <div class="flex-grow border-t border-gray-300"></div>
-        <span class="px-3 sm:px-4 text-xs sm:text-sm text-gray-500 font-medium bg-white">Anmelden mit</span>
-        <div class="flex-grow border-t border-gray-300"></div>
+        <div class="flex-grow border-t border-white/30"></div>
+        <span class="px-3 sm:px-4 text-xs sm:text-sm text-white/80 font-medium" style="text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);">Anmelden mit</span>
+        <div class="flex-grow border-t border-white/30"></div>
     </div>
 
     <!-- Ultra-Premium Microsoft Login Button with 3D Glass Effect -->
@@ -151,17 +151,17 @@ ob_start();
     
     <!-- Enhanced Info Section with Icons -->
     <div class="mt-5 sm:mt-6 text-center space-y-2 sm:space-y-3">
-        <p class="text-gray-600 text-xs sm:text-sm font-medium">Verwende dein Microsoft-Konto zum Anmelden</p>
-        <div class="flex items-center justify-center space-x-4 sm:space-x-6 text-gray-500 text-xs">
-            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-blue-600">
+        <p class="text-white/80 text-xs sm:text-sm font-medium" style="text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);">Verwende dein Microsoft-Konto zum Anmelden</p>
+        <div class="flex items-center justify-center space-x-4 sm:space-x-6 text-white/70 text-xs">
+            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-blue-300" style="text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);">
                 <i class="fas fa-shield-alt text-sm sm:text-base"></i>
                 <span class="hidden sm:inline">Sicher</span>
             </div>
-            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-green-600">
+            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-green-300" style="text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);">
                 <i class="fas fa-lock text-sm sm:text-base"></i>
                 <span class="hidden sm:inline">Verschlüsselt</span>
             </div>
-            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-emerald-600">
+            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-emerald-300" style="text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);">
                 <i class="fas fa-check-circle text-sm sm:text-base"></i>
                 <span class="hidden sm:inline">Vertraut</span>
             </div>
