@@ -77,7 +77,10 @@ class AuthHandler {
         $user = $stmt->fetch();
         
         if (!$user) {
-            self::logSystemAction(null, 'login_failed', 'user', null, 'User not found: ' . $email);
+            // Log failed login attempt with IP address and User Agent
+            $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+            $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+            self::logSystemAction(null, 'login_failed', 'user', null, "User not found: {$email} - IP: {$ipAddress} - User Agent: {$userAgent}");
             return ['success' => false, 'message' => 'Ungültige Anmeldedaten'];
         }
         
@@ -93,14 +96,30 @@ class AuthHandler {
             $failedAttempts = $user['failed_login_attempts'] + 1;
             $lockedUntil = null;
             
-            if ($failedAttempts >= MAX_LOGIN_ATTEMPTS) {
-                $lockedUntil = date('Y-m-d H:i:s', time() + LOGIN_LOCKOUT_TIME);
+            // Implement exponential backoff rate limiting using shared configuration
+            // Lockout durations defined in config.php: RATE_LIMIT_BACKOFF
+            if ($failedAttempts >= 3) {
+                if (!defined('RATE_LIMIT_BACKOFF') || !defined('RATE_LIMIT_MAX_BACKOFF')) {
+                    error_log('CRITICAL: Rate limiting constants not defined in config.php');
+                    // Use secure fallback values
+                    $lockoutTimes = [3 => 60, 4 => 120, 5 => 300, 6 => 900, 7 => 1800];
+                    $maxBackoff = 3600;
+                } else {
+                    $lockoutTimes = RATE_LIMIT_BACKOFF;
+                    $maxBackoff = RATE_LIMIT_MAX_BACKOFF;
+                }
+                $lockoutDuration = $lockoutTimes[$failedAttempts] ?? $maxBackoff;
+                $lockedUntil = date('Y-m-d H:i:s', time() + $lockoutDuration);
             }
             
             $stmt = $db->prepare("UPDATE users SET failed_login_attempts = ?, locked_until = ? WHERE id = ?");
             $stmt->execute([$failedAttempts, $lockedUntil, $user['id']]);
             
-            self::logSystemAction($user['id'], 'login_failed', 'user', $user['id'], 'Invalid password');
+            // Log failed login attempt with IP address and User Agent
+            $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+            $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+            self::logSystemAction($user['id'], 'login_failed', 'user', $user['id'], "Invalid password - Attempt {$failedAttempts} - IP: {$ipAddress} - User Agent: {$userAgent}");
+            
             return ['success' => false, 'message' => 'Ungültige Anmeldedaten'];
         }
         
@@ -114,7 +133,10 @@ class AuthHandler {
             $ga = new PHPGangsta_GoogleAuthenticator();
             
             if (!$ga->verifyCode($user['tfa_secret'], $tfaCode, 2)) {
-                self::logSystemAction($user['id'], 'login_2fa_failed', 'user', $user['id'], 'Invalid 2FA code');
+                // Log failed 2FA attempt with IP address and User Agent
+                $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+                $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+                self::logSystemAction($user['id'], 'login_2fa_failed', 'user', $user['id'], "Invalid 2FA code - IP: {$ipAddress} - User Agent: {$userAgent}");
                 return ['success' => false, 'message' => 'Ungültiger 2FA-Code'];
             }
         }
@@ -123,8 +145,13 @@ class AuthHandler {
         $stmt = $db->prepare("UPDATE users SET failed_login_attempts = 0, locked_until = NULL, last_login = NOW() WHERE id = ?");
         $stmt->execute([$user['id']]);
         
-        // Set session variables
+        // Initialize session
         self::startSession();
+        
+        // Regenerate session ID to prevent session fixation attacks
+        // This must be called after session is started but before setting user-specific session data
+        session_regenerate_id(true);
+        
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_role'] = $user['role'];

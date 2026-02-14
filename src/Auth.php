@@ -133,15 +133,27 @@ class Auth {
             $lockedUntil = null;
             $isPermanentlyLocked = 0;
             
-            // Lock account for 30 minutes after 5 failed attempts
-            if ($failedAttempts == 5) {
-                $lockedUntil = date('Y-m-d H:i:s', time() + (30 * 60)); // Lock for 30 minutes
-            }
-            
-            // Permanently lock account after 8 failed attempts
-            if ($failedAttempts >= 8) {
-                $isPermanentlyLocked = 1;
-                $lockedUntil = null; // Clear temporary lock when applying permanent lock
+            // Implement exponential backoff rate limiting using shared configuration
+            // Lockout durations defined in config.php: RATE_LIMIT_BACKOFF
+            // After 8 failed attempts: Account is permanently locked
+            if ($failedAttempts >= 3) {
+                if ($failedAttempts >= 8) {
+                    // Permanently lock account after 8 failed attempts
+                    $isPermanentlyLocked = 1;
+                    $lockedUntil = null;
+                } else {
+                    // Exponential backoff for attempts 3-7 using shared configuration
+                    if (!defined('RATE_LIMIT_BACKOFF')) {
+                        error_log('CRITICAL: RATE_LIMIT_BACKOFF constant not defined in config.php');
+                        // Use secure fallback values
+                        $lockoutTimes = [3 => 60, 4 => 120, 5 => 300, 6 => 900, 7 => 1800];
+                    } else {
+                        $lockoutTimes = RATE_LIMIT_BACKOFF;
+                    }
+                    // Use null coalescing to safely handle missing keys
+                    $lockoutDuration = $lockoutTimes[$failedAttempts] ?? end($lockoutTimes);
+                    $lockedUntil = date('Y-m-d H:i:s', time() + $lockoutDuration);
+                }
             }
             
             $stmt = $db->prepare("UPDATE users SET failed_login_attempts = ?, locked_until = ?, is_locked_permanently = ? WHERE id = ?");
