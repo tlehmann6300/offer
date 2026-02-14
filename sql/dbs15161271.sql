@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS alumni_profiles (
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
+    secondary_email VARCHAR(255) DEFAULT NULL COMMENT 'Optional secondary email address for profile display only',
     mobile_phone VARCHAR(50) DEFAULT NULL,
     linkedin_url VARCHAR(255) DEFAULT NULL,
     xing_url VARCHAR(255) DEFAULT NULL,
@@ -559,6 +560,7 @@ CREATE TABLE IF NOT EXISTS polls (
     start_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     end_date DATETIME NOT NULL,
     target_groups JSON NOT NULL COMMENT 'Array of roles allowed to vote, e.g. ["member", "alumni", "board_finance", "board_internal", "board_external", "alumni_board", "alumni_auditor"]',
+    microsoft_forms_url TEXT DEFAULT NULL COMMENT 'Microsoft Forms embed URL or direct link for external survey integration',
     is_active BOOLEAN NOT NULL DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
@@ -619,6 +621,7 @@ CREATE TABLE IF NOT EXISTS event_documentation (
     calculations TEXT DEFAULT NULL,
     notes TEXT DEFAULT NULL,
     sales_data JSON DEFAULT NULL COMMENT 'JSON array of sales entries with label, amount, and date',
+    sellers_data JSON DEFAULT NULL COMMENT 'JSON array of seller entries with name, items, quantity, and revenue',
     created_by INT UNSIGNED NOT NULL,
     updated_by INT UNSIGNED DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -634,3 +637,30 @@ CREATE TABLE IF NOT EXISTS event_documentation (
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
   COMMENT='Event documentation for calculations, notes, and sales tracking';
+
+-- ============================================
+-- EVENT FINANCIAL STATS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS event_financial_stats (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id INT UNSIGNED NOT NULL,
+    category ENUM('Verkauf', 'Kalkulation') NOT NULL COMMENT 'Category: Sales or Calculation',
+    item_name VARCHAR(255) NOT NULL COMMENT 'Item name, e.g., Brezeln, Äpfel, Grillstand',
+    quantity INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Quantity sold or calculated',
+    revenue DECIMAL(10, 2) DEFAULT NULL COMMENT 'Revenue in EUR (optional for calculations)',
+    record_year YEAR NOT NULL COMMENT 'Year of record for historical comparison',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by INT UNSIGNED NOT NULL COMMENT 'User who created the record',
+    
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    
+    INDEX idx_event_id (event_id),
+    INDEX idx_category (category),
+    INDEX idx_record_year (record_year),
+    INDEX idx_event_year (event_id, record_year),
+    INDEX idx_created_by (created_by)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Financial statistics for events - tracks sales and calculations with yearly comparison';
