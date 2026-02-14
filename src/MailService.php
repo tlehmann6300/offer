@@ -443,6 +443,7 @@ class MailService {
         }
         
         // Build the birthday content with festive styling
+        // NOTE: Image URLs are placeholders - replace with own hosted images for production
         $content = '
             <div style="text-align: center; margin-bottom: 30px;">
                 <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&h=300&fit=crop" alt="Birthday Celebration" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px; display: block; margin: 0 auto;" />
@@ -450,7 +451,7 @@ class MailService {
             
             <div style="background-image: url(\'https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif\'); background-size: cover; background-position: center; background-repeat: no-repeat; padding: 40px 20px; border-radius: 12px; position: relative;">
                 <div style="background-color: rgba(255, 255, 255, 0.95); padding: 30px; border-radius: 8px;">
-                    <p style="font-size: 48px; font-weight: bold; text-align: center; margin: 0 0 20px 0; background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF6347 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2;">
+                    <p style="font-size: 48px; font-weight: bold; text-align: center; margin: 0 0 20px 0; color: #FFA500; line-height: 1.2;">
                         🎉 Alles Gute zum Geburtstag! 🎂
                     </p>
                     
