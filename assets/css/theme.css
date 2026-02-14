@@ -3217,13 +3217,16 @@ body:not(.dark-mode) .hero-gradient .hero-date {
    RESPONSIVE & TOUCH-FRIENDLY ENHANCEMENTS
    ============================================ */
 
-/* Touch-friendly buttons - minimum 44px touch target */
+/* Touch-friendly buttons - minimum 44px touch target 
+   Note: !important is used to ensure accessibility requirements 
+   are met regardless of other styling */
 .touch-target {
     min-height: 44px !important;
     min-width: 44px !important;
 }
 
-/* Ensure all buttons are touch-friendly on mobile */
+/* Ensure all buttons are touch-friendly on mobile 
+   Note: !important ensures accessibility standards are enforced */
 @media (max-width: 768px) {
     button,
     .btn,
@@ -3236,7 +3239,8 @@ body:not(.dark-mode) .hero-gradient .hero-date {
     }
 }
 
-/* Horizontal overflow prevention */
+/* Horizontal overflow prevention
+   Note: !important ensures no horizontal scrolling on mobile */
 .no-horizontal-scroll {
     overflow-x: hidden !important;
     max-width: 100vw !important;

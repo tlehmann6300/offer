@@ -47,11 +47,11 @@ if (!in_array($userRole, $targetGroups)) {
 }
 
 // Check if this poll uses Microsoft Forms
-$usesMicrosoftForms = !empty($poll['microsoft_forms_url']);
+$hasMicrosoftFormsUrl = !empty($poll['microsoft_forms_url']);
 
 // For backward compatibility, check if user has already voted (old system)
 $userVote = null;
-if (!$usesMicrosoftForms) {
+if (!$hasMicrosoftFormsUrl) {
     $stmt = $db->prepare("SELECT * FROM poll_votes WHERE poll_id = ? AND user_id = ?");
     $stmt->execute([$pollId, $user['id']]);
     $userVote = $stmt->fetch();
@@ -61,7 +61,7 @@ $successMessage = '';
 $errorMessage = '';
 
 // Handle vote submission (backward compatibility for old polls)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_vote']) && !$userVote && !$usesMicrosoftForms) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_vote']) && !$userVote && !$hasMicrosoftFormsUrl) {
     $optionId = $_POST['option_id'] ?? null;
     
     if (!$optionId) {
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_vote']) && !$u
 // Fetch poll options with vote counts (for backward compatibility)
 $options = [];
 $totalVotes = 0;
-if (!$usesMicrosoftForms) {
+if (!$hasMicrosoftFormsUrl) {
     $stmt = $db->prepare("
         SELECT po.*, COUNT(pv.id) as vote_count
         FROM poll_options po
@@ -146,7 +146,7 @@ ob_start();
                     Dauerhaft verfügbar
                 <?php endif; ?>
             </div>
-            <?php if (!$usesMicrosoftForms): ?>
+            <?php if (!$hasMicrosoftFormsUrl): ?>
             <div>
                 <i class="fas fa-users mr-1"></i>
                 <?php echo $totalVotes; ?> Stimme(n)
@@ -170,7 +170,7 @@ ob_start();
 
     <!-- Poll Content -->
     <div class="card p-8">
-        <?php if ($usesMicrosoftForms): ?>
+        <?php if ($hasMicrosoftFormsUrl): ?>
         <!-- Microsoft Forms Iframe -->
         <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
             <i class="fas fa-poll mr-2 text-blue-500"></i>

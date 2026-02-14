@@ -214,16 +214,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reject_application'])
 }
 
 // Get all applications for this project with user information
-$applications = Project::getApplications($projectId);
+$allApplications = Project::getApplications($projectId);
+
+// Calculate counts for filters
+$allCount = count($allApplications);
+$pendingCount = count(array_filter($allApplications, function($a) { return $a['status'] === 'pending'; }));
+$acceptedCount = count(array_filter($allApplications, function($a) { return $a['status'] === 'accepted'; }));
+$rejectedCount = count(array_filter($allApplications, function($a) { return $a['status'] === 'rejected'; }));
 
 // Get filter from query parameter
 $statusFilter = isset($_GET['status']) ? $_GET['status'] : 'all';
 
 // Filter applications based on status
 if ($statusFilter !== 'all') {
-    $applications = array_filter($applications, function($app) use ($statusFilter) {
+    $applications = array_filter($allApplications, function($app) use ($statusFilter) {
         return $app['status'] === $statusFilter;
     });
+} else {
+    $applications = $allApplications;
 }
 
 // Enrich applications with user details
@@ -255,19 +263,19 @@ ob_start();
     <div class="flex flex-wrap gap-2 mt-4">
         <a href="?project_id=<?php echo $projectId; ?>&status=all" 
            class="px-4 py-2 rounded-lg font-medium transition <?php echo $statusFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'; ?>">
-            <i class="fas fa-list mr-2"></i>Alle (<?php echo count(Project::getApplications($projectId)); ?>)
+            <i class="fas fa-list mr-2"></i>Alle (<?php echo $allCount; ?>)
         </a>
         <a href="?project_id=<?php echo $projectId; ?>&status=pending" 
            class="px-4 py-2 rounded-lg font-medium transition <?php echo $statusFilter === 'pending' ? 'bg-yellow-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'; ?>">
-            <i class="fas fa-clock mr-2"></i>Offen (<?php echo count(array_filter(Project::getApplications($projectId), function($a) { return $a['status'] === 'pending'; })); ?>)
+            <i class="fas fa-clock mr-2"></i>Offen (<?php echo $pendingCount; ?>)
         </a>
         <a href="?project_id=<?php echo $projectId; ?>&status=accepted" 
            class="px-4 py-2 rounded-lg font-medium transition <?php echo $statusFilter === 'accepted' ? 'bg-green-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'; ?>">
-            <i class="fas fa-check mr-2"></i>Angenommen (<?php echo count(array_filter(Project::getApplications($projectId), function($a) { return $a['status'] === 'accepted'; })); ?>)
+            <i class="fas fa-check mr-2"></i>Angenommen (<?php echo $acceptedCount; ?>)
         </a>
         <a href="?project_id=<?php echo $projectId; ?>&status=rejected" 
            class="px-4 py-2 rounded-lg font-medium transition <?php echo $statusFilter === 'rejected' ? 'bg-red-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'; ?>">
-            <i class="fas fa-times mr-2"></i>Abgelehnt (<?php echo count(array_filter(Project::getApplications($projectId), function($a) { return $a['status'] === 'rejected'; })); ?>)
+            <i class="fas fa-times mr-2"></i>Abgelehnt (<?php echo $rejectedCount; ?>)
         </a>
     </div>
 </div>
