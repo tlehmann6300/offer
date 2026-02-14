@@ -189,8 +189,10 @@ define('RATE_LIMIT_BACKOFF', [
     7 => 1800,    // 30 minutes after 7 failed attempts
 ]);
 // Maximum backoff duration for 8+ failed attempts
-// Note: AuthHandler.php uses this value for temporary locks (60 minutes)
-//       src/Auth.php permanently locks accounts after 8 attempts
+// Note: Different behaviors exist for security policy flexibility:
+//       - AuthHandler.php: Uses temporary 60-minute lock (allows recovery)
+//       - src/Auth.php: Permanently locks accounts (requires admin intervention)
+//       This allows different security policies for different authentication flows.
 define('RATE_LIMIT_MAX_BACKOFF', 3600);  // 60 minutes
 
 // Set error display for production (0) or debugging (1)

@@ -150,7 +150,8 @@ class Auth {
                     } else {
                         $lockoutTimes = RATE_LIMIT_BACKOFF;
                     }
-                    $lockoutDuration = $lockoutTimes[$failedAttempts];
+                    // Use null coalescing to safely handle missing keys
+                    $lockoutDuration = $lockoutTimes[$failedAttempts] ?? end($lockoutTimes);
                     $lockedUntil = date('Y-m-d H:i:s', time() + $lockoutDuration);
                 }
             }

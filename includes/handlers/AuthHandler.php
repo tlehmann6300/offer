@@ -145,8 +145,7 @@ class AuthHandler {
         $stmt = $db->prepare("UPDATE users SET failed_login_attempts = 0, locked_until = NULL, last_login = NOW() WHERE id = ?");
         $stmt->execute([$user['id']]);
         
-        // Set session variables
-        // Note: startSession() initializes the session via init_session() but doesn't set user data yet
+        // Initialize session
         self::startSession();
         
         // Regenerate session ID to prevent session fixation attacks
