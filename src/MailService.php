@@ -166,6 +166,266 @@ class MailService {
     }
     
     /**
+     * Get a beautiful, modern HTML email template with Apple/Stripe-inspired design
+     * 
+     * Features:
+     * - Clean, modern design similar to Apple and Stripe emails
+     * - Centered container with subtle shadow
+     * - IBC logo with nice header background
+     * - Readable sans-serif fonts with optimal line height
+     * - Fully responsive design
+     * - Compatible with Outlook, Gmail, and mobile devices
+     * - Table-based layout for maximum email client compatibility
+     * 
+     * @param string $title Email title/subject
+     * @param string $content Main content body (HTML). IMPORTANT: Must be pre-sanitized trusted HTML. 
+     *                        This content is inserted directly into the template without further sanitization.
+     * @param string|null $ctaLink Optional call-to-action link URL
+     * @param string|null $ctaText Optional call-to-action button text
+     * @return string Complete HTML email template
+     */
+    public static function getBeautifulEmailTemplate(string $title, string $content, ?string $ctaLink = null, ?string $ctaText = null): string {
+        // Build CTA button if both link and text are provided
+        $ctaButton = '';
+        if ($ctaLink && $ctaText) {
+            $ctaButton = '
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 30px auto;">
+                    <tr>
+                        <td style="border-radius: 8px; background: linear-gradient(135deg, #6D9744 0%, #5d8038 100%); text-align: center;">
+                            <a href="' . htmlspecialchars($ctaLink) . '" target="_blank" style="background: transparent; border: none; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 8px; padding: 16px 40px; display: inline-block; mso-padding-alt: 0; text-transform: none;">
+                                <!--[if mso]>
+                                <i style="letter-spacing: 25px; mso-font-width: -100%; mso-text-raise: 30pt;">&nbsp;</i>
+                                <![endif]-->
+                                <span style="mso-text-raise: 15pt;">' . htmlspecialchars($ctaText) . '</span>
+                                <!--[if mso]>
+                                <i style="letter-spacing: 25px; mso-font-width: -100%;">&nbsp;</i>
+                                <![endif]-->
+                            </a>
+                        </td>
+                    </tr>
+                </table>';
+        }
+        
+        $html = '<!DOCTYPE html>
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="x-apple-disable-message-reformatting">
+    <title>' . htmlspecialchars($title) . '</title>
+    <!--[if mso]>
+    <style type="text/css">
+        body, table, td {font-family: Arial, Helvetica, sans-serif !important;}
+    </style>
+    <![endif]-->
+    <style type="text/css">
+        /* Reset styles */
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        table {
+            border-spacing: 0;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        table td {
+            border-collapse: collapse;
+        }
+        img {
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+            -ms-interpolation-mode: bicubic;
+        }
+        
+        /* Main styles */
+        body {
+            background-color: #f5f5f7;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #1d1d1f;
+        }
+        
+        .email-wrapper {
+            width: 100%;
+            background-color: #f5f5f7;
+            padding: 40px 0;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+        
+        .email-header {
+            background: linear-gradient(135deg, #20234A 0%, #2a2e5c 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .email-header img {
+            max-width: 180px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .email-body {
+            padding: 40px 30px;
+        }
+        
+        .email-title {
+            color: #1d1d1f;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 24px 0;
+            line-height: 1.3;
+            letter-spacing: -0.02em;
+        }
+        
+        .email-content {
+            color: #1d1d1f;
+            font-size: 16px;
+            line-height: 1.7;
+            margin: 0 0 20px 0;
+        }
+        
+        .email-content p {
+            margin: 0 0 16px 0;
+        }
+        
+        .email-content p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, #6D9744 0%, #5d8038 100%);
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 8px;
+            padding: 16px 40px;
+            display: inline-block;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(109, 151, 68, 0.3);
+        }
+        
+        .email-footer {
+            background-color: #f5f5f7;
+            padding: 30px;
+            text-align: center;
+            font-size: 13px;
+            color: #86868b;
+            line-height: 1.5;
+        }
+        
+        .email-footer p {
+            margin: 8px 0;
+        }
+        
+        .email-footer a {
+            color: #6D9744;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        /* Responsive styles */
+        @media screen and (max-width: 600px) {
+            .email-wrapper {
+                padding: 20px 0 !important;
+            }
+            .email-container {
+                width: 100% !important;
+                border-radius: 0 !important;
+            }
+            .email-header {
+                padding: 30px 20px !important;
+            }
+            .email-body {
+                padding: 30px 20px !important;
+            }
+            .email-title {
+                font-size: 24px !important;
+            }
+            .email-content {
+                font-size: 15px !important;
+            }
+            .email-footer {
+                padding: 25px 20px !important;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .email-content {
+                color: #1d1d1f;
+            }
+            .email-title {
+                color: #1d1d1f;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f5f7;">
+    <!-- Email wrapper table for Outlook -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f7;">
+        <tr>
+            <td style="padding: 40px 0;">
+                <!-- Main container table -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" align="center" style="margin: 0 auto; max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #20234A 0%, #2a2e5c 100%); padding: 40px 30px; text-align: center; border-radius: 12px 12px 0 0;">
+                            <img src="cid:ibc_logo" alt="IBC Logo" style="max-width: 180px; height: auto; display: block; margin: 0 auto;" />
+                        </td>
+                    </tr>
+                    
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 40px 30px;">
+                            <h1 style="color: #1d1d1f; font-size: 28px; font-weight: 700; margin: 0 0 24px 0; line-height: 1.3; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif;">' . htmlspecialchars($title) . '</h1>
+                            <div style="color: #1d1d1f; font-size: 16px; line-height: 1.7; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif;">
+                                ' . $content . '
+                            </div>
+                            ' . $ctaButton . '
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f5f5f7; padding: 30px; text-align: center; font-size: 13px; color: #86868b; border-radius: 0 0 12px 12px;">
+                            <p style="margin: 8px 0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif;">Diese E-Mail wurde automatisch vom IBC Intranet generiert.</p>
+                            <p style="margin: 8px 0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif;">
+                                <a href="' . BASE_URL . '" style="color: #6D9744; text-decoration: none; font-weight: 500;">IBC Intranet</a> | 
+                                <a href="' . BASE_URL . '/pages/impressum.php" style="color: #6D9744; text-decoration: none; font-weight: 500;">Impressum</a>
+                            </p>
+                            <p style="margin: 8px 0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif;">&copy; ' . date('Y') . ' IBC - Alle Rechte vorbehalten.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>';
+        
+        return $html;
+    }
+    
+    /**
      * Create and configure PHPMailer instance with SMTP settings
      * SMTPDebug is hard-coded to 0 (disabled) by default for security.
      * Debug mode is only enabled when ENVIRONMENT === 'development'.
