@@ -12,9 +12,37 @@ ini_set('display_errors', 0);
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../src/Database.php';
 require_once __DIR__ . '/../../includes/models/User.php';
+require_once __DIR__ . '/../../includes/services/MicrosoftGraphService.php';
 
 // Redirect path after successful role change
 define('REDIRECT_AFTER_ROLE_CHANGE', '/pages/dashboard/index.php');
+
+/**
+ * Convert internal role name to Azure role value
+ * This mapping is the reverse of the roleMapping in AuthHandler::handleMicrosoftCallback()
+ * 
+ * IMPORTANT: This mapping must be kept in sync with the roleMapping in AuthHandler.
+ * Any changes to role names in AuthHandler must be reflected here.
+ * 
+ * @param string $internalRole Internal role name (e.g., 'member', 'board_finance')
+ * @return string Azure role value (e.g., 'mitglied', 'vorstand_finanzen')
+ */
+function internalRoleToAzureRole($internalRole) {
+    $reverseMapping = [
+        'candidate' => 'anwaerter',
+        'member' => 'mitglied',
+        'head' => 'ressortleiter',
+        'board_finance' => 'vorstand_finanzen',
+        'board_internal' => 'vorstand_intern',
+        'board_external' => 'vorstand_extern',
+        'alumni' => 'alumni',
+        'alumni_board' => 'alumni_vorstand',
+        'alumni_auditor' => 'alumni_finanz',
+        'honorary_member' => 'ehrenmitglied'
+    ];
+    
+    return $reverseMapping[$internalRole] ?? $internalRole;
+}
 
 try {
     // Check authentication
@@ -104,9 +132,51 @@ try {
             exit;
         }
         
-        // Perform atomic role swap using transaction
+        // Get Azure OIDs for both users
         $db = Database::getUserDB();
         
+        $stmt = $db->prepare("SELECT azure_oid FROM users WHERE id = ?");
+        $stmt->execute([$currentUserId]);
+        $currentUserData = $stmt->fetch();
+        $currentUserOid = $currentUserData['azure_oid'] ?? null;
+        
+        $stmt->execute([$successorId]);
+        $successorData = $stmt->fetch();
+        $successorOid = $successorData['azure_oid'] ?? null;
+        
+        // Check if both users have Azure OIDs
+        if (!$currentUserOid || !$successorOid) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Azure-Synchronisierung nicht möglich: Fehlende Azure-Daten. Bitte melden Sie sich erneut an.'
+            ]);
+            exit;
+        }
+        
+        // Perform role swap in Azure first
+        try {
+            $graphService = new MicrosoftGraphService();
+            
+            // Convert internal role names to Azure role values
+            $azureNewRole = internalRoleToAzureRole($newRole);
+            $azureCurrentRole = internalRoleToAzureRole($currentRole);
+            
+            // Update current user role in Azure (demotion)
+            $graphService->updateUserRole($currentUserOid, $azureNewRole);
+            
+            // Update successor role in Azure (promotion)
+            $graphService->updateUserRole($successorOid, $azureCurrentRole);
+            
+        } catch (Exception $e) {
+            error_log('Azure role sync failed in ajax_role_succession.php: ' . $e->getMessage());
+            echo json_encode([
+                'success' => false,
+                'message' => 'Fehler bei der Azure-Synchronisierung: ' . $e->getMessage()
+            ]);
+            exit;
+        }
+        
+        // Perform atomic role swap in database only after Azure succeeds
         try {
             $db->beginTransaction();
             
@@ -141,6 +211,35 @@ try {
         
     } else {
         // Not a demotion, just update the role normally
+        // Get Azure OID for current user
+        $db = Database::getUserDB();
+        $stmt = $db->prepare("SELECT azure_oid FROM users WHERE id = ?");
+        $stmt->execute([$currentUserId]);
+        $userData = $stmt->fetch();
+        $userOid = $userData['azure_oid'] ?? null;
+        
+        // Sync with Azure if OID is available
+        if ($userOid) {
+            try {
+                $graphService = new MicrosoftGraphService();
+                
+                // Convert internal role name to Azure role value
+                $azureNewRole = internalRoleToAzureRole($newRole);
+                
+                // Update user role in Azure
+                $graphService->updateUserRole($userOid, $azureNewRole);
+                
+            } catch (Exception $e) {
+                error_log('Azure role sync failed in ajax_role_succession.php: ' . $e->getMessage());
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Fehler bei der Azure-Synchronisierung: ' . $e->getMessage()
+                ]);
+                exit;
+            }
+        }
+        
+        // Update database only after Azure succeeds (or if no OID available)
         if (User::update($currentUserId, ['role' => $newRole, 'prompt_profile_review' => 1])) {
             $_SESSION['user_role'] = $newRole;
             
