@@ -398,15 +398,17 @@ class MicrosoftGraphService {
      * 3. Assign new role
      * 
      * @param string $userId User ID (Object ID from Azure AD)
-     * @param string $newRoleValue New role value (e.g., 'member', 'board_finance')
+     * @param string $newRoleValue New role value from ROLE_MAPPING (e.g., 'anwaerter', 'mitglied', 'vorstand_finanzen')
      * @return bool True if role update succeeded
-     * @throws Exception If role update fails
+     * @throws Exception If role update fails (including if role removal fails, leaving user without role)
      */
     public function updateUserRole(string $userId, string $newRoleValue): bool {
         // Step 1: Get current assignment ID
         $currentAssignmentId = $this->getCurrentAppRoleAssignmentId($userId);
         
         // Step 2: Remove current role if it exists
+        // Note: If removal fails, an exception is thrown and user may be left without a role assignment
+        // This is intentional to prevent inconsistent states between Azure and local database
         if ($currentAssignmentId !== null) {
             $this->removeRole($userId, $currentAssignmentId);
         }

@@ -19,7 +19,10 @@ define('REDIRECT_AFTER_ROLE_CHANGE', '/pages/dashboard/index.php');
 
 /**
  * Convert internal role name to Azure role value
- * This mapping is the reverse of the roleMapping in AuthHandler
+ * This mapping is the reverse of the roleMapping in AuthHandler::handleMicrosoftCallback()
+ * 
+ * IMPORTANT: This mapping must be kept in sync with the roleMapping in AuthHandler.
+ * Any changes to role names in AuthHandler must be reflected here.
  * 
  * @param string $internalRole Internal role name (e.g., 'member', 'board_finance')
  * @return string Azure role value (e.g., 'mitglied', 'vorstand_finanzen')
