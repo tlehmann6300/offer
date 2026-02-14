@@ -3212,3 +3212,140 @@ body:not(.dark-mode) .hero-gradient .hero-date {
 /* ============================================
    END OF PERFECT DARK MODE ENHANCEMENTS
    ============================================ */
+
+/* ============================================
+   RESPONSIVE & TOUCH-FRIENDLY ENHANCEMENTS
+   ============================================ */
+
+/* Touch-friendly buttons - minimum 44px touch target 
+   Note: !important is used to ensure accessibility requirements 
+   are met regardless of other styling */
+.touch-target {
+    min-height: 44px !important;
+    min-width: 44px !important;
+}
+
+/* Ensure all buttons are touch-friendly on mobile 
+   Note: !important ensures accessibility standards are enforced */
+@media (max-width: 768px) {
+    button,
+    .btn,
+    a.btn,
+    input[type="submit"],
+    input[type="button"] {
+        min-height: 44px !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 1rem !important;
+    }
+}
+
+/* Horizontal overflow prevention
+   Note: !important ensures no horizontal scrolling on mobile */
+.no-horizontal-scroll {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+}
+
+/* Table responsive wrapper */
+.table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive table {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Ensure tables don't cause horizontal scroll on mobile */
+@media (max-width: 768px) {
+    table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
+    
+    table thead {
+        display: table-header-group;
+    }
+    
+    table tbody {
+        display: table-row-group;
+    }
+}
+
+/* Responsive iframe container (for embedded content like Microsoft Forms) */
+.iframe-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+}
+
+.iframe-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* Mobile-friendly form inputs */
+@media (max-width: 768px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="url"],
+    input[type="date"],
+    input[type="datetime-local"],
+    input[type="number"],
+    textarea,
+    select {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+}
+
+/* Better card stacking on mobile */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Improved filter button layout */
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+    .filter-buttons a,
+    .filter-buttons button {
+        flex: 1 1 calc(50% - 0.25rem);
+        min-width: 140px;
+        text-align: center;
+    }
+}
+
+/* Status badges responsive */
+@media (max-width: 768px) {
+    .badge,
+    [class*="badge"],
+    .status-badge {
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+}
+
+/* ============================================
+   END OF RESPONSIVE ENHANCEMENTS
+   ============================================ */

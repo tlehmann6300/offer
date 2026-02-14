@@ -214,7 +214,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reject_application'])
 }
 
 // Get all applications for this project with user information
-$applications = Project::getApplications($projectId);
+$allApplications = Project::getApplications($projectId);
+
+// Calculate counts for filters
+$allCount = count($allApplications);
+$pendingCount = count(array_filter($allApplications, function($a) { return $a['status'] === 'pending'; }));
+$acceptedCount = count(array_filter($allApplications, function($a) { return $a['status'] === 'accepted'; }));
+$rejectedCount = count(array_filter($allApplications, function($a) { return $a['status'] === 'rejected'; }));
+
+// Get filter from query parameter
+$statusFilter = isset($_GET['status']) ? $_GET['status'] : 'all';
+
+// Filter applications based on status
+if ($statusFilter !== 'all') {
+    $applications = array_filter($allApplications, function($app) use ($statusFilter) {
+        return $app['status'] === $statusFilter;
+    });
+} else {
+    $applications = $allApplications;
+}
 
 // Enrich applications with user details
 foreach ($applications as &$application) {
@@ -228,16 +246,36 @@ ob_start();
 ?>
 
 <div class="mb-8">
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                 <i class="fas fa-users text-purple-600 mr-2"></i>
                 Bewerbungen verwalten
             </h1>
-            <p class="text-gray-600">Projekt: <?php echo htmlspecialchars($project['title']); ?></p>
+            <p class="text-gray-600 dark:text-gray-400">Projekt: <?php echo htmlspecialchars($project['title']); ?></p>
         </div>
-        <a href="manage.php" class="btn-primary">
+        <a href="manage.php" class="btn-primary w-full md:w-auto text-center">
             <i class="fas fa-arrow-left mr-2"></i>Zurück zur Übersicht
+        </a>
+    </div>
+    
+    <!-- Filter Buttons -->
+    <div class="flex flex-wrap gap-2 mt-4">
+        <a href="?project_id=<?php echo $projectId; ?>&status=all" 
+           class="px-4 py-2 rounded-lg font-medium transition <?php echo $statusFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'; ?>">
+            <i class="fas fa-list mr-2"></i>Alle (<?php echo $allCount; ?>)
+        </a>
+        <a href="?project_id=<?php echo $projectId; ?>&status=pending" 
+           class="px-4 py-2 rounded-lg font-medium transition <?php echo $statusFilter === 'pending' ? 'bg-yellow-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'; ?>">
+            <i class="fas fa-clock mr-2"></i>Offen (<?php echo $pendingCount; ?>)
+        </a>
+        <a href="?project_id=<?php echo $projectId; ?>&status=accepted" 
+           class="px-4 py-2 rounded-lg font-medium transition <?php echo $statusFilter === 'accepted' ? 'bg-green-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'; ?>">
+            <i class="fas fa-check mr-2"></i>Angenommen (<?php echo $acceptedCount; ?>)
+        </a>
+        <a href="?project_id=<?php echo $projectId; ?>&status=rejected" 
+           class="px-4 py-2 rounded-lg font-medium transition <?php echo $statusFilter === 'rejected' ? 'bg-red-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'; ?>">
+            <i class="fas fa-times mr-2"></i>Abgelehnt (<?php echo $rejectedCount; ?>)
         </a>
     </div>
 </div>
@@ -353,8 +391,8 @@ ob_start();
 </div>
 
 <!-- Applications List -->
-<div class="card p-6">
-    <h2 class="text-xl font-bold text-gray-800 mb-4">
+<div class="card p-4 md:p-6">
+    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
         <i class="fas fa-file-alt text-purple-600 mr-2"></i>
         Bewerbungen (<?php echo count($applications); ?>)
     </h2>
@@ -362,22 +400,29 @@ ob_start();
     <?php if (empty($applications)): ?>
     <div class="text-center py-12">
         <i class="fas fa-inbox text-gray-400 text-6xl mb-4"></i>
-        <h3 class="text-xl font-semibold text-gray-600 mb-2">Keine Bewerbungen</h3>
-        <p class="text-gray-500">Für dieses Projekt sind noch keine Bewerbungen eingegangen.</p>
+        <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">Keine Bewerbungen</h3>
+        <p class="text-gray-500 dark:text-gray-400">
+            <?php if ($statusFilter !== 'all'): ?>
+                Für diesen Filter sind keine Bewerbungen vorhanden.
+            <?php else: ?>
+                Für dieses Projekt sind noch keine Bewerbungen eingegangen.
+            <?php endif; ?>
+        </p>
     </div>
     <?php else: ?>
+    <!-- Mobile: Card View, Desktop: Can show more compact -->
     <div class="space-y-4">
         <?php foreach ($applications as $application): ?>
-        <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition">
-            <div class="flex items-start justify-between mb-4">
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 md:p-6 hover:shadow-md transition bg-white dark:bg-gray-800">
+            <div class="flex flex-col md:flex-row md:items-start justify-between mb-4 gap-3">
                 <div class="flex-1">
                     <div class="flex items-center mb-2">
                         <i class="fas fa-user text-purple-600 mr-2"></i>
-                        <h3 class="text-lg font-bold text-gray-800">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">
                             <?php echo htmlspecialchars($application['user_email']); ?>
                         </h3>
                     </div>
-                    <div class="flex items-center space-x-4 text-sm text-gray-600">
+                    <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-sm text-gray-600 dark:text-gray-400">
                         <span>
                             <i class="fas fa-calendar mr-1"></i>
                             <?php echo date('d.m.Y H:i', strtotime($application['created_at'])); ?>
@@ -388,13 +433,13 @@ ob_start();
                         </span>
                     </div>
                 </div>
-                <span class="px-3 py-1 text-sm font-semibold rounded-full
+                <span class="px-3 py-1 text-sm font-semibold rounded-full text-center w-full md:w-auto
                     <?php 
                     switch($application['status']) {
-                        case 'pending': echo 'bg-yellow-100 text-yellow-800'; break;
-                        case 'reviewing': echo 'bg-blue-100 text-blue-800'; break;
-                        case 'accepted': echo 'bg-green-100 text-green-800'; break;
-                        case 'rejected': echo 'bg-red-100 text-red-800'; break;
+                        case 'pending': echo 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'; break;
+                        case 'reviewing': echo 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'; break;
+                        case 'accepted': echo 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'; break;
+                        case 'rejected': echo 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'; break;
                     }
                     ?>">
                     <?php 
@@ -410,22 +455,22 @@ ob_start();
             
             <?php if (!empty($application['motivation'])): ?>
             <div class="mb-4">
-                <span class="text-sm font-medium text-gray-600">Motivation:</span>
-                <p class="text-gray-800 mt-1"><?php echo nl2br(htmlspecialchars($application['motivation'])); ?></p>
+                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Motivation:</span>
+                <p class="text-gray-800 dark:text-gray-200 mt-1"><?php echo nl2br(htmlspecialchars($application['motivation'])); ?></p>
             </div>
             <?php endif; ?>
             
             <?php if ($application['status'] === 'pending' || $application['status'] === 'reviewing'): ?>
-            <div class="flex space-x-3 pt-4 border-t border-gray-200">
+            <div class="flex flex-col md:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button 
-                    class="accept-application-btn flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                    class="accept-application-btn flex-1 px-4 py-2 md:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition touch-target"
                     data-application-id="<?php echo $application['id']; ?>"
                     data-user-email="<?php echo htmlspecialchars($application['user_email']); ?>"
                 >
                     <i class="fas fa-check mr-2"></i>Akzeptieren
                 </button>
                 <button 
-                    class="reject-application-btn flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                    class="reject-application-btn flex-1 px-4 py-2 md:py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition touch-target"
                     data-application-id="<?php echo $application['id']; ?>"
                     data-user-email="<?php echo htmlspecialchars($application['user_email']); ?>"
                 >
