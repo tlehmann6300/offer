@@ -175,6 +175,7 @@ CREATE TABLE IF NOT EXISTS events (
         NOT NULL DEFAULT 'planned',
     is_external TINYINT NOT NULL DEFAULT 0,
     external_link VARCHAR(500) DEFAULT NULL,
+    registration_link TEXT DEFAULT NULL COMMENT 'External registration link (e.g., Microsoft Forms URL) for event registration',
     needs_helpers TINYINT NOT NULL DEFAULT 0,
     helpers_needed TEXT DEFAULT NULL,
     helper_slots INT DEFAULT NULL,
