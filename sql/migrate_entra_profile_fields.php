@@ -48,21 +48,14 @@ try {
         echo "✓ entra_roles column already exists\n";
     }
     
-    // Verify is_profile_complete column exists
-    $stmt = $db->query("SHOW COLUMNS FROM users LIKE 'is_profile_complete'");
+    // Verify profile_complete column exists
+    $stmt = $db->query("SHOW COLUMNS FROM users LIKE 'profile_complete'");
     if ($stmt->rowCount() === 0) {
-        // Note: The column name in the schema is 'profile_complete', not 'is_profile_complete'
-        // Check for the correct column name
-        $stmt = $db->query("SHOW COLUMNS FROM users LIKE 'profile_complete'");
-        if ($stmt->rowCount() > 0) {
-            echo "✓ profile_complete column already exists\n";
-        } else {
-            echo "Adding profile_complete column...\n";
-            $db->exec("ALTER TABLE users ADD COLUMN profile_complete BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Flag to track if user has completed initial profile setup'");
-            echo "✓ profile_complete column added successfully\n";
-        }
+        echo "Adding profile_complete column...\n";
+        $db->exec("ALTER TABLE users ADD COLUMN profile_complete BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Flag to track if user has completed initial profile setup'");
+        echo "✓ profile_complete column added successfully\n";
     } else {
-        echo "✓ is_profile_complete column already exists\n";
+        echo "✓ profile_complete column already exists\n";
     }
     
     echo "\n=========================================================\n";

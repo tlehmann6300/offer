@@ -282,7 +282,7 @@ ob_start();
                 Zentral verwaltetes Profil
             </h3>
             <p class="text-blue-800 dark:text-blue-200">
-                Ihr Profil wird zentral über Microsoft Entra verwaltet. Für Änderungen wenden sie sich bitte an IT@business-consulting.com. Vielen Dank.
+                Ihr Profil wird zentral über Microsoft Entra verwaltet. Für Änderungen wenden Sie sich bitte an IT@business-consulting.com. Vielen Dank.
             </p>
         </div>
     </div>
