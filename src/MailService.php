@@ -184,7 +184,7 @@ class MailService {
      * @param string|null $ctaText Optional call-to-action button text
      * @return string Complete HTML email template
      */
-    public static function getBeautifulEmailTemplate(string $title, string $content, ?string $ctaLink = null, ?string $ctaText = null) {
+    public static function getBeautifulEmailTemplate(string $title, string $content, ?string $ctaLink = null, ?string $ctaText = null): string {
         // Build CTA button if both link and text are provided
         $ctaButton = '';
         if ($ctaLink && $ctaText) {
