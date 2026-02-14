@@ -32,7 +32,14 @@ if (empty($token)) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $invitation) {
     CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
     
-    $email = $invitation['email'];
+    // Sanitize email input using filter_var before processing
+    $email = filter_var($invitation['email'], FILTER_SANITIZE_EMAIL);
+    
+    // Validate sanitized email
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Ungültige E-Mail-Adresse';
+    }
+    
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
     
@@ -40,6 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $invitation) {
         $error = 'Passwörter stimmen nicht überein';
     } else if (strlen($password) < 8) {
         $error = 'Passwort muss mindestens 8 Zeichen lang sein';
+    } else if (!empty($error)) {
+        // Email validation failed, error already set
     } else {
         // Check if user already exists
         $existing = User::getByEmail($email);
@@ -124,6 +133,7 @@ ob_start();
                 name="password" 
                 required 
                 minlength="8"
+                autocomplete="new-password"
                 class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition"
                 placeholder="Mindestens 8 Zeichen"
             >
@@ -138,6 +148,7 @@ ob_start();
                 name="confirm_password" 
                 required 
                 minlength="8"
+                autocomplete="new-password"
                 class="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition"
                 placeholder="Passwort wiederholen"
             >

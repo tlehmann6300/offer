@@ -69,9 +69,13 @@ if (!headers_sent()) {
             "script-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdnjs.cloudflare.com",
             "style-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdnjs.cloudflare.com fonts.googleapis.com",
             "font-src 'self' cdnjs.cloudflare.com fonts.gstatic.com",
-            "img-src 'self' data:",
+            "img-src 'self' data: blob:",
             "connect-src 'self'",
-            "frame-ancestors 'self'"
+            "frame-ancestors 'self'",
+            "base-uri 'self'",
+            "form-action 'self'",
+            "object-src 'none'",
+            "upgrade-insecure-requests"
         ];
         
         $csp_header = implode('; ', $csp_directives);
