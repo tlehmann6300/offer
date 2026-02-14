@@ -118,7 +118,7 @@ ob_start();
 
     <!-- Footer -->
     <div class="login-footer">
-        <p>&copy; <span id="currentYear"><?php echo date('Y'); ?></span> IBC Business Consulting. Alle Rechte vorbehalten.</p>
+        <p>&copy; <?php echo date('Y'); ?> IBC Business Consulting. Alle Rechte vorbehalten.</p>
     </div>
 </div>
 
@@ -142,40 +142,30 @@ ob_start();
         setTimeout(() => ripple.remove(), 600);
     }
 
-    // Microsoft Login Handler
+    // Microsoft Login Handler with proper animation timing
     function handleLogin(event) {
+        event.preventDefault();
         createRipple(event);
         
         const button = document.getElementById('loginButton');
         if (button.classList.contains('loading') || button.classList.contains('success')) {
-            event.preventDefault();
             return false;
         }
         
         button.classList.add('loading');
         
-        // Simulate brief loading then redirect
+        // Show loading, then success, then navigate
         setTimeout(() => {
             button.classList.remove('loading');
             button.classList.add('success');
             
             setTimeout(() => {
-                // Let the browser follow the link
-                return true;
-            }, 500);
-        }, 1000);
+                window.location.href = button.href;
+            }, 800);
+        }, 1500);
         
-        return true;
+        return false;
     }
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set current year for copyright
-        const yearElement = document.getElementById('currentYear');
-        if (yearElement && !yearElement.textContent) {
-            yearElement.textContent = new Date().getFullYear();
-        }
-    });
 </script>
 
 <?php

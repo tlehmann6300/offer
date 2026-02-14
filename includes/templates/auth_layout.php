@@ -247,6 +247,11 @@ require_once __DIR__ . '/../helpers.php';
             bottom: -10px;
         }
 
+        /* Staggered delays for particles */
+        .smooth-particle:nth-child(n+9) {
+            animation-delay: calc((var(--particle-index, 0) * 0.6s));
+        }
+
         @keyframes particleFloat {
             0% {
                 transform: translateY(0) translateX(0);
