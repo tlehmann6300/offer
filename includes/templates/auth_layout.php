@@ -41,6 +41,23 @@ require_once __DIR__ . '/../helpers.php';
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Text shadow utilities for glassmorphism */
+        .text-shadow-strong {
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5), 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .text-shadow-medium {
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+        }
+        
+        .text-shadow-light {
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .text-shadow-footer {
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8), 0 4px 24px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 1);
+        }
+        
         /* Advanced Animated Gradient Background */
         body {
             background: linear-gradient(135deg, 
@@ -331,8 +348,8 @@ require_once __DIR__ . '/../helpers.php';
         @media (max-width: 375px) {
             .auth-card {
                 border-radius: 12px;
-                padding: 0.375rem !important;
-                margin: 0 0.375rem;
+                padding: 0.5rem !important;
+                margin: 0 0.5rem;
             }
             
             .auth-card .bg-white {
@@ -483,7 +500,7 @@ require_once __DIR__ . '/../helpers.php';
         
         <!-- Footer text with enhanced contrast and text shadow -->
         <div class="mt-10 text-center">
-            <p class="text-white text-sm font-semibold tracking-wide" style="text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8), 0 4px 24px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 1);">
+            <p class="text-white text-sm font-semibold tracking-wide text-shadow-footer">
                 © <?php echo date('Y'); ?> IBC · Intranet Platform
             </p>
             <div class="mt-2 flex justify-center space-x-1">

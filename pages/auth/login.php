@@ -71,14 +71,14 @@ ob_start();
             </div>
         </div>
         
-        <h1 class="text-3xl sm:text-4xl font-black text-white mb-2 sm:mb-3 tracking-tight animate-fade-in" style="text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5), 0 4px 20px rgba(0, 0, 0, 0.3);">
+        <h1 class="text-3xl sm:text-4xl font-black text-white mb-2 sm:mb-3 tracking-tight animate-fade-in text-shadow-strong">
             Willkommen zurück
         </h1>
-        <p class="text-white/90 font-semibold text-base sm:text-lg" style="text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);">Melde dich mit deinem Konto an</p>
+        <p class="text-white/90 font-semibold text-base sm:text-lg text-shadow-medium">Melde dich mit deinem Konto an</p>
     </div>
 
     <?php if (isset($_GET['timeout']) && $_GET['timeout'] == 1): ?>
-    <div class="mb-6 p-4 bg-gradient-to-r from-yellow-500/20 to-amber-500/20 backdrop-blur-md border border-yellow-400/40 rounded-lg text-white shadow-lg animate-slide-in" style="text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);">
+    <div class="mb-6 p-4 bg-gradient-to-r from-yellow-500/20 to-amber-500/20 backdrop-blur-md border border-yellow-400/40 rounded-lg text-white shadow-lg animate-slide-in text-shadow-light">
         <div class="flex items-center">
             <i class="fas fa-clock mr-3 text-xl text-yellow-300"></i>
             <span class="font-medium">Aus Sicherheitsgründen wurdest du automatisch ausgeloggt.</span>
@@ -87,7 +87,7 @@ ob_start();
     <?php endif; ?>
 
     <?php if (isset($_GET['logout']) && $_GET['logout'] == 1): ?>
-    <div class="mb-6 p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-md border border-green-400/40 rounded-lg text-white shadow-lg animate-slide-in" style="text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);">
+    <div class="mb-6 p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-md border border-green-400/40 rounded-lg text-white shadow-lg animate-slide-in text-shadow-light">
         <div class="flex items-center">
             <i class="fas fa-check-circle mr-3 text-xl text-green-300"></i>
             <span class="font-medium">Erfolgreich abgemeldet.</span>
@@ -96,7 +96,7 @@ ob_start();
     <?php endif; ?>
 
     <?php if ($error): ?>
-    <div class="mb-6 p-4 bg-gradient-to-r from-red-500/20 to-rose-500/20 backdrop-blur-md border border-red-400/40 rounded-lg text-white shadow-lg animate-slide-in" style="text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);">
+    <div class="mb-6 p-4 bg-gradient-to-r from-red-500/20 to-rose-500/20 backdrop-blur-md border border-red-400/40 rounded-lg text-white shadow-lg animate-slide-in text-shadow-light">
         <div class="flex items-center">
             <i class="fas fa-exclamation-circle mr-3 text-xl text-red-300"></i>
             <span class="font-medium"><?php echo htmlspecialchars($error); ?></span>
@@ -107,7 +107,7 @@ ob_start();
     <!-- Divider with "Oder" text -->
     <div class="relative flex items-center justify-center my-6 sm:my-8">
         <div class="flex-grow border-t border-white/30"></div>
-        <span class="px-3 sm:px-4 text-xs sm:text-sm text-white/80 font-medium" style="text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);">Anmelden mit</span>
+        <span class="px-3 sm:px-4 text-xs sm:text-sm text-white/80 font-medium text-shadow-light">Anmelden mit</span>
         <div class="flex-grow border-t border-white/30"></div>
     </div>
 
@@ -151,17 +151,17 @@ ob_start();
     
     <!-- Enhanced Info Section with Icons -->
     <div class="mt-5 sm:mt-6 text-center space-y-2 sm:space-y-3">
-        <p class="text-white/80 text-xs sm:text-sm font-medium" style="text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);">Verwende dein Microsoft-Konto zum Anmelden</p>
-        <div class="flex items-center justify-center space-x-4 sm:space-x-6 text-white/70 text-xs">
-            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-blue-300" style="text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);">
+        <p class="text-white/80 text-xs sm:text-sm font-medium text-shadow-light">Verwende dein Microsoft-Konto zum Anmelden</p>
+        <div class="flex items-center justify-center space-x-4 sm:space-x-6 text-white/70 text-xs text-shadow-light">
+            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-blue-300">
                 <i class="fas fa-shield-alt text-sm sm:text-base"></i>
                 <span class="hidden sm:inline">Sicher</span>
             </div>
-            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-green-300" style="text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);">
+            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-green-300">
                 <i class="fas fa-lock text-sm sm:text-base"></i>
                 <span class="hidden sm:inline">Verschlüsselt</span>
             </div>
-            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-emerald-300" style="text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);">
+            <div class="flex items-center space-x-1.5 transition-colors duration-300 hover:text-emerald-300">
                 <i class="fas fa-check-circle text-sm sm:text-base"></i>
                 <span class="hidden sm:inline">Vertraut</span>
             </div>
