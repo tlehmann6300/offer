@@ -22,23 +22,29 @@ CREATE TABLE IF NOT EXISTS users (
     is_locked_permanently BOOLEAN NOT NULL DEFAULT 0,
     tfa_enabled BOOLEAN NOT NULL DEFAULT 0,
     tfa_secret VARCHAR(255) DEFAULT NULL COMMENT 'Two-factor authentication secret for Google Authenticator',
+    azure_roles JSON DEFAULT NULL COMMENT 'Original Microsoft Entra ID roles from Azure AD authentication',
     pending_email_update_request BOOLEAN NOT NULL DEFAULT 0,
     prompt_profile_review BOOLEAN NOT NULL DEFAULT 0,
     theme_preference VARCHAR(10) DEFAULT 'auto',
     birthday DATE DEFAULT NULL COMMENT 'User birthday for birthday wishes',
+    show_birthday BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Whether to display birthday publicly on profile',
     gender ENUM('m', 'f', 'd') DEFAULT NULL COMMENT 'User gender: m=male, f=female, d=diverse',
     about_me VARCHAR(400) DEFAULT NULL,
     study_level ENUM('bachelor', 'master') DEFAULT NULL,
     study_program VARCHAR(255) DEFAULT NULL,
     study_status ENUM('current', 'completed') DEFAULT 'current',
     profile_complete BOOLEAN NOT NULL DEFAULT 1 COMMENT 'Flag to track if user has completed initial profile setup (first_name + last_name). Default 1 for existing users to avoid disruption; new OAuth users should be set to 0.',
+    deleted_at DATETIME DEFAULT NULL COMMENT 'Timestamp when the user was soft deleted (NULL = active)',
+    last_reminder_sent_at DATETIME DEFAULT NULL COMMENT 'Timestamp when the last profile reminder email was sent to the user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     INDEX idx_email (email),
     INDEX idx_role (role),
     INDEX idx_birthday (birthday),
-    INDEX idx_profile_complete (profile_complete)
+    INDEX idx_profile_complete (profile_complete),
+    INDEX idx_deleted_at (deleted_at),
+    INDEX idx_last_reminder_sent_at (last_reminder_sent_at)
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
