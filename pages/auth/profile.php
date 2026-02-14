@@ -194,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $stmt = $userDb->prepare("UPDATE users SET profile_complete = 1 WHERE id = ?");
                         $stmt->execute([$user['id']]);
                         // Clear the profile_incomplete session flag
-                        $_SESSION['profile_incomplete'] = false;
+                        unset($_SESSION['profile_incomplete']);
                     } catch (Exception $e) {
                         error_log("Failed to mark profile as complete: " . $e->getMessage());
                     }

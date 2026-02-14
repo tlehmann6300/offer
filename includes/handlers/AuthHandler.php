@@ -130,7 +130,7 @@ class AuthHandler {
         $_SESSION['user_role'] = $user['role'];
         $_SESSION['authenticated'] = true;
         $_SESSION['last_activity'] = time(); // Initialize activity timestamp
-        $_SESSION['profile_incomplete'] = ($user['profile_complete'] == 0 || $user['profile_complete'] === false);
+        $_SESSION['profile_incomplete'] = !$user['profile_complete'];
         
         self::logSystemAction($user['id'], 'login_success', 'user', $user['id'], 'Successful login');
         
@@ -677,7 +677,7 @@ class AuthHandler {
             $stmt = $db->prepare("SELECT profile_complete FROM users WHERE id = ?");
             $stmt->execute([$userId]);
             $userCheck = $stmt->fetch();
-            $_SESSION['profile_incomplete'] = ($userCheck && ($userCheck['profile_complete'] == 0 || $userCheck['profile_complete'] === false));
+            $_SESSION['profile_incomplete'] = ($userCheck && !$userCheck['profile_complete']);
             
             // Log successful login
             self::logSystemAction($userId, 'login_success_microsoft', 'user', $userId, 'Successful Microsoft Entra ID login');
