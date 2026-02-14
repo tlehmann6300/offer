@@ -45,21 +45,24 @@ require_once __DIR__ . '/../helpers.php';
         body {
             background: linear-gradient(135deg, 
                 #0a1628 0%, 
-                #0d2137 25%, 
-                #0f172a 50%, 
-                #162033 75%,
-                #1a1f3a 100%
+                #0d2137 20%,
+                #0f172a 40%, 
+                #162033 60%,
+                #1a1f3a 80%,
+                #0d1b2a 100%
             );
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
-            animation: gradientShift 20s ease infinite;
-            background-size: 200% 200%;
+            animation: gradientShift 25s ease infinite;
+            background-size: 400% 400%;
         }
         
         @keyframes gradientShift {
             0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 50% 25%; }
             50% { background-position: 100% 50%; }
+            75% { background-position: 50% 75%; }
         }
         
         /* Enhanced Glowing Orbs with Pulsing */
@@ -70,9 +73,9 @@ require_once __DIR__ . '/../helpers.php';
             right: -30%;
             width: 80%;
             height: 100%;
-            background: radial-gradient(circle, rgba(0, 166, 81, 0.15) 0%, rgba(0, 166, 81, 0.05) 40%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 166, 81, 0.18) 0%, rgba(0, 166, 81, 0.08) 40%, transparent 70%);
             pointer-events: none;
-            animation: pulse 8s ease-in-out infinite;
+            animation: pulse 10s ease-in-out infinite, drift 30s ease-in-out infinite;
         }
         
         body::after {
@@ -82,10 +85,10 @@ require_once __DIR__ . '/../helpers.php';
             left: -20%;
             width: 60%;
             height: 80%;
-            background: radial-gradient(circle, rgba(0, 102, 179, 0.15) 0%, rgba(0, 102, 179, 0.05) 40%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 102, 179, 0.18) 0%, rgba(0, 102, 179, 0.08) 40%, transparent 70%);
             pointer-events: none;
-            animation: pulse 8s ease-in-out infinite;
-            animation-delay: -4s;
+            animation: pulse 10s ease-in-out infinite, drift 30s ease-in-out infinite;
+            animation-delay: -5s, -15s;
         }
         
         @keyframes pulse {
@@ -99,25 +102,65 @@ require_once __DIR__ . '/../helpers.php';
             }
         }
         
+        @keyframes drift {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(20px, -20px) scale(1.05);
+            }
+            66% {
+                transform: translate(-20px, 20px) scale(0.95);
+            }
+        }
+        
         /* Premium Glassmorphism Card */
         .auth-card {
             background: linear-gradient(145deg, 
-                rgba(255, 255, 255, 0.08) 0%, 
-                rgba(255, 255, 255, 0.04) 50%,
-                rgba(255, 255, 255, 0.06) 100%
+                rgba(255, 255, 255, 0.09) 0%, 
+                rgba(255, 255, 255, 0.05) 50%,
+                rgba(255, 255, 255, 0.07) 100%
             );
             backdrop-filter: blur(30px) saturate(180%);
             -webkit-backdrop-filter: blur(30px) saturate(180%);
-            border: 2px solid rgba(255, 255, 255, 0.12);
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            position: relative;
             border-radius: 28px;
             box-shadow: 
                 0 8px 32px rgba(0, 0, 0, 0.4),
                 0 30px 60px rgba(0, 0, 0, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1),
                 inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-            position: relative;
             overflow: hidden;
             animation: cardEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        /* Animated gradient border */
+        .auth-card::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(
+                60deg,
+                #00a651,
+                #0066b3,
+                #00a651,
+                #0066b3
+            );
+            background-size: 300% 300%;
+            border-radius: 28px;
+            z-index: -1;
+            animation: gradientRotate 8s ease infinite;
+            opacity: 0.6;
+        }
+        
+        @keyframes gradientRotate {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
         
         @keyframes cardEntrance {
@@ -230,43 +273,114 @@ require_once __DIR__ . '/../helpers.php';
         .logo-container {
             animation: logoFloat 3s ease-in-out infinite;
             filter: drop-shadow(0 8px 30px rgba(0, 166, 81, 0.4));
+            transition: filter 0.3s ease, transform 0.3s ease;
+        }
+        
+        .logo-container:hover {
+            filter: drop-shadow(0 12px 40px rgba(0, 166, 81, 0.6));
+            transform: scale(1.05);
         }
         
         @keyframes logoFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
         }
         
         /* Perfect Responsive Auth Layout */
         @media (max-width: 640px) {
             body::before,
             body::after {
-                opacity: 0.5;
+                opacity: 0.4;
+                width: 100%;
+                height: 100%;
             }
             
             .floating-dot {
-                width: 80px !important;
-                height: 80px !important;
+                width: 60px !important;
+                height: 60px !important;
+                filter: blur(30px);
             }
             
             .auth-card {
-                border-radius: 20px;
-                padding: 0.75rem !important;
+                border-radius: 16px;
+                padding: 0.5rem !important;
+                margin: 0 0.5rem;
             }
             
             .auth-card .bg-white {
-                padding: 1.5rem !important;
-                border-radius: 16px !important;
+                padding: 1.25rem !important;
+                border-radius: 14px !important;
             }
             
             .particle {
                 display: none;
             }
+            
+            .logo-container img {
+                height: 4rem !important;
+            }
         }
         
         @media (min-width: 641px) and (max-width: 768px) {
+            .auth-card {
+                padding: 1rem !important;
+            }
+            
             .auth-card .bg-white {
-                padding: 2rem !important;
+                padding: 1.75rem !important;
+                border-radius: 18px !important;
+            }
+            
+            .floating-dot {
+                width: 100px !important;
+                height: 100px !important;
+            }
+            
+            .logo-container img {
+                height: 5rem !important;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .auth-card .bg-white {
+                padding: 2.25rem !important;
+            }
+        }
+        
+        /* Ultra-wide screens */
+        @media (min-width: 1920px) {
+            .auth-card {
+                max-width: 32rem;
+            }
+        }
+        
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .auth-card:hover {
+                transform: none;
+            }
+            
+            .floating-dot {
+                animation-duration: 30s;
+            }
+        }
+        
+        /* Landscape mobile optimization */
+        @media (max-width: 640px) and (orientation: landscape) {
+            .logo-container {
+                margin-bottom: 1rem;
+            }
+            
+            .logo-container img {
+                height: 2.5rem !important;
+            }
+            
+            .relative.z-10 {
+                padding: 1rem;
+            }
+            
+            .auth-card .bg-white {
+                padding: 1rem !important;
             }
         }
 
