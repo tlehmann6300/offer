@@ -301,15 +301,15 @@ require_once __DIR__ . '/../helpers.php';
             <?php echo $content ?? ''; ?>
         </div>
         
-        <!-- Enhanced Footer text with gradient -->
+        <!-- Footer text with proper contrast -->
         <div class="mt-10 text-center">
-            <p class="text-sm font-semibold tracking-wide" style="color: rgba(255, 255, 255, 0.35); background: linear-gradient(to right, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.4)); -webkit-background-clip: text; background-clip: text; animation: pulse 2s ease-in-out infinite;">
+            <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">
                 © <?php echo date('Y'); ?> IBC · Intranet Platform
             </p>
             <div class="mt-2 flex justify-center space-x-1">
-                <div class="w-1 h-1 rounded-full bg-white/20"></div>
-                <div class="w-1 h-1 rounded-full bg-white/30"></div>
-                <div class="w-1 h-1 rounded-full bg-white/20"></div>
+                <div class="w-1 h-1 rounded-full bg-gray-400/30 dark:bg-gray-500/30"></div>
+                <div class="w-1 h-1 rounded-full bg-gray-400/40 dark:bg-gray-500/40"></div>
+                <div class="w-1 h-1 rounded-full bg-gray-400/30 dark:bg-gray-500/30"></div>
             </div>
         </div>
     </div>
