@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             
-            // Update user fields (about_me, gender, birthday, show_birthday) in users table
+            // Update user fields (about_me, gender, birthday, show_birthday, job_title, company) in users table
             $userUpdateData = [];
             if (isset($profileData['gender'])) {
                 $userUpdateData['gender'] = $profileData['gender'];
@@ -123,6 +123,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             if (isset($profileData['about_me'])) {
                 $userUpdateData['about_me'] = $profileData['about_me'];
+            }
+            // Add job_title and company from POST data
+            if (isset($_POST['job_title'])) {
+                $userUpdateData['job_title'] = trim($_POST['job_title']);
+            }
+            if (isset($_POST['company'])) {
+                $userUpdateData['company'] = trim($_POST['company']);
             }
             
             if (!empty($userUpdateData)) {
@@ -266,6 +273,21 @@ ob_start();
 </div>
 <?php endif; ?>
 
+<!-- Microsoft Entra Notice -->
+<div class="mb-6 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+    <div class="flex items-start">
+        <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 text-2xl mr-4 mt-1"></i>
+        <div>
+            <h3 class="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                Zentral verwaltetes Profil
+            </h3>
+            <p class="text-blue-800 dark:text-blue-200">
+                Ihr Profil wird zentral über Microsoft Entra verwaltet. Für Änderungen wenden sie sich bitte an IT@business-consulting.com. Vielen Dank.
+            </p>
+        </div>
+    </div>
+</div>
+
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Account Info -->
     <div class="card p-6">
@@ -278,16 +300,31 @@ ob_start();
                 <label class="text-sm text-gray-500 dark:text-gray-400">E-Mail</label>
                 <p class="text-lg font-semibold text-gray-800 dark:text-gray-100"><?php echo htmlspecialchars($user['email']); ?></p>
             </div>
-            <div>
-                <label class="text-sm text-gray-500 dark:text-gray-400">Rolle</label>
-                <p class="text-lg">
-                    <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full">
-                        <?php echo translateRole($user['role']); ?>
-                    </span>
-                </p>
-            </div>
             <?php 
             // Display Microsoft Entra roles if available
+            if (!empty($user['entra_roles'])):
+                // entra_roles is stored as comma-separated string
+                $entraRolesList = array_map('trim', explode(',', $user['entra_roles']));
+                if (count($entraRolesList) > 0):
+            ?>
+            <div>
+                <label class="text-sm text-gray-500 dark:text-gray-400">Microsoft Entra Rolle<?php echo count($entraRolesList) > 1 ? 'n' : ''; ?></label>
+                <div class="flex flex-wrap gap-2">
+                    <?php foreach ($entraRolesList as $role): ?>
+                        <?php if (!empty($role)): ?>
+                        <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-full">
+                            <?php echo htmlspecialchars($role); ?>
+                        </span>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php 
+                endif;
+            endif; 
+            ?>
+            <?php 
+            // Also display Azure roles if available (legacy support)
             if (!empty($user['azure_roles'])):
                 $azureRoles = json_decode($user['azure_roles'], true);
                 
@@ -300,10 +337,10 @@ ob_start();
                 if (is_array($azureRoles) && count($azureRoles) > 0):
             ?>
             <div>
-                <label class="text-sm text-gray-500 dark:text-gray-400">Microsoft Entra Rolle<?php echo count($azureRoles) > 1 ? 'n' : ''; ?></label>
+                <label class="text-sm text-gray-500 dark:text-gray-400">Azure Rolle<?php echo count($azureRoles) > 1 ? 'n' : ''; ?></label>
                 <div class="flex flex-wrap gap-2">
                     <?php foreach ($azureRoles as $azureRole): ?>
-                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
+                        <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-200 rounded-full">
                             <?php echo translateAzureRole($azureRole); ?>
                         </span>
                     <?php endforeach; ?>
@@ -415,6 +452,28 @@ ob_start();
                             value="<?php echo htmlspecialchars($profile['xing_url'] ?? ''); ?>"
                             class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                             placeholder="https://xing.com/profile/..."
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Position (optional)</label>
+                        <input 
+                            type="text" 
+                            name="job_title" 
+                            value="<?php echo htmlspecialchars($user['job_title'] ?? ''); ?>"
+                            class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
+                            placeholder="z.B. Senior Consultant"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Unternehmen (optional)</label>
+                        <input 
+                            type="text" 
+                            name="company" 
+                            value="<?php echo htmlspecialchars($user['company'] ?? ''); ?>"
+                            class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
+                            placeholder="z.B. Acme Corporation"
                         >
                     </div>
                     
