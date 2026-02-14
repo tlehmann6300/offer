@@ -29,63 +29,35 @@ $errorMessage = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_poll'])) {
     $title = trim($_POST['title'] ?? '');
     $description = trim($_POST['description'] ?? '');
-    $endDate = trim($_POST['end_date'] ?? '');
-    $options = $_POST['options'] ?? [];
+    $microsoftFormsUrl = trim($_POST['microsoft_forms_url'] ?? '');
     $targetGroups = $_POST['target_groups'] ?? [];
     
     // Validation
     if (empty($title)) {
         $errorMessage = 'Bitte geben Sie einen Titel ein.';
-    } elseif (empty($endDate)) {
-        $errorMessage = 'Bitte geben Sie ein Enddatum an.';
-    } elseif (strtotime($endDate) <= time()) {
-        $errorMessage = 'Das Enddatum muss in der Zukunft liegen.';
-    } elseif (count($options) < 2) {
-        $errorMessage = 'Bitte geben Sie mindestens 2 Antwortmöglichkeiten an.';
+    } elseif (empty($microsoftFormsUrl)) {
+        $errorMessage = 'Bitte geben Sie die Microsoft Forms URL ein.';
     } elseif (empty($targetGroups)) {
         $errorMessage = 'Bitte wählen Sie mindestens eine Zielgruppe aus.';
     } else {
-        // Filter out empty options
-        $options = array_filter($options, function($option) {
-            return !empty(trim($option));
-        });
-        
-        if (count($options) < 2) {
-            $errorMessage = 'Bitte geben Sie mindestens 2 nicht-leere Antwortmöglichkeiten an.';
-        } else {
-            try {
-                $db = Database::getContentDB();
-                $db->beginTransaction();
-                
-                // Insert poll
-                $stmt = $db->prepare("
-                    INSERT INTO polls (title, description, created_by, end_date, target_groups, is_active)
-                    VALUES (?, ?, ?, ?, ?, 1)
-                ");
-                $targetGroupsJson = json_encode($targetGroups);
-                $stmt->execute([$title, $description, $user['id'], $endDate, $targetGroupsJson]);
-                $pollId = $db->lastInsertId();
-                
-                // Insert poll options
-                $stmt = $db->prepare("INSERT INTO poll_options (poll_id, option_text) VALUES (?, ?)");
-                foreach ($options as $option) {
-                    $optionText = trim($option);
-                    if (!empty($optionText)) {
-                        $stmt->execute([$pollId, $optionText]);
-                    }
-                }
-                
-                $db->commit();
-                
-                // Redirect to polls list
-                header('Location: ' . asset('pages/polls/index.php'));
-                exit;
-                
-            } catch (Exception $e) {
-                $db->rollBack();
-                error_log('Error creating poll: ' . $e->getMessage());
-                $errorMessage = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
-            }
+        try {
+            $db = Database::getContentDB();
+            
+            // Insert poll with Microsoft Forms URL
+            $stmt = $db->prepare("
+                INSERT INTO polls (title, description, created_by, microsoft_forms_url, target_groups, is_active, end_date)
+                VALUES (?, ?, ?, ?, ?, 1, DATE_ADD(NOW(), INTERVAL 30 DAY))
+            ");
+            $targetGroupsJson = json_encode($targetGroups);
+            $stmt->execute([$title, $description, $user['id'], $microsoftFormsUrl, $targetGroupsJson]);
+            
+            // Redirect to polls list
+            header('Location: ' . asset('pages/polls/index.php'));
+            exit;
+            
+        } catch (Exception $e) {
+            error_log('Error creating poll: ' . $e->getMessage());
+            $errorMessage = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
         }
     }
 }
@@ -145,19 +117,24 @@ ob_start();
                 ><?php echo htmlspecialchars($_POST['description'] ?? ''); ?></textarea>
             </div>
 
-            <!-- End Date -->
+            <!-- Microsoft Forms URL -->
             <div>
-                <label for="end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Enddatum <span class="text-red-500 dark:text-red-400">*</span>
+                <label for="microsoft_forms_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Microsoft Forms URL <span class="text-red-500 dark:text-red-400">*</span>
                 </label>
                 <input 
-                    type="datetime-local" 
-                    id="end_date" 
-                    name="end_date" 
+                    type="url" 
+                    id="microsoft_forms_url" 
+                    name="microsoft_forms_url" 
                     required
-                    value="<?php echo htmlspecialchars($_POST['end_date'] ?? ''); ?>"
-                    class="w-full px-4 py-3 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                    value="<?php echo htmlspecialchars($_POST['microsoft_forms_url'] ?? ''); ?>"
+                    class="w-full px-4 py-3 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    placeholder="https://forms.office.com/Pages/ResponsePage.aspx?id=..."
                 >
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Fügen Sie die Embed-URL oder die direkte URL zu Ihrem Microsoft Forms ein.
+                </p>
             </div>
 
             <!-- Target Groups -->
@@ -219,52 +196,13 @@ ob_start();
                 </div>
             </div>
 
-            <!-- Poll Options -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Antwortmöglichkeiten <span class="text-red-500 dark:text-red-400">*</span>
-                </label>
-                <div id="optionsContainer" class="space-y-3">
-                    <!-- Initial 2 options -->
-                    <div class="flex gap-2">
-                        <input 
-                            type="text" 
-                            name="options[]" 
-                            required
-                            maxlength="255"
-                            value="<?php echo htmlspecialchars($_POST['options'][0] ?? ''); ?>"
-                            class="flex-1 px-4 py-3 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                            placeholder="Option 1"
-                        >
-                    </div>
-                    <div class="flex gap-2">
-                        <input 
-                            type="text" 
-                            name="options[]" 
-                            required
-                            maxlength="255"
-                            value="<?php echo htmlspecialchars($_POST['options'][1] ?? ''); ?>"
-                            class="flex-1 px-4 py-3 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                            placeholder="Option 2"
-                        >
-                    </div>
-                </div>
-                <button 
-                    type="button"
-                    id="addOptionBtn"
-                    class="mt-3 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                >
-                    <i class="fas fa-plus mr-2"></i>Weitere Option hinzufügen
-                </button>
-            </div>
-
             <!-- Info Box -->
             <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div class="flex items-start">
                     <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-1 mr-3"></i>
                     <div class="text-sm text-blue-800 dark:text-blue-300">
                         <p class="font-semibold mb-1">Hinweis:</p>
-                        <p>Die Umfrage wird automatisch aktiv und die ausgewählten Zielgruppen können abstimmen.</p>
+                        <p>Die Umfrage wird automatisch aktiv und die ausgewählten Zielgruppen können über Microsoft Forms teilnehmen. Die Umfrage läuft standardmäßig 30 Tage.</p>
                     </div>
                 </div>
             </div>
@@ -289,55 +227,6 @@ ob_start();
         </form>
     </div>
 </div>
-
-<script>
-// Set minimum datetime to current time
-document.addEventListener('DOMContentLoaded', function() {
-    const endDateInput = document.getElementById('end_date');
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    endDateInput.min = now.toISOString().slice(0, 16);
-});
-
-// Dynamic option adding
-document.getElementById('addOptionBtn').addEventListener('click', function() {
-    const container = document.getElementById('optionsContainer');
-    const optionCount = container.children.length + 1;
-    
-    const div = document.createElement('div');
-    div.className = 'flex gap-2';
-    div.innerHTML = `
-        <input 
-            type="text" 
-            name="options[]" 
-            maxlength="255"
-            class="flex-1 px-4 py-3 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-            placeholder="Option ${optionCount}"
-        >
-        <button 
-            type="button"
-            class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors remove-option-btn"
-        >
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    container.appendChild(div);
-    
-    // Add remove functionality
-    div.querySelector('.remove-option-btn').addEventListener('click', function() {
-        div.remove();
-    });
-});
-
-// Add remove functionality to dynamically added options
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('remove-option-btn') || e.target.closest('.remove-option-btn')) {
-        const btn = e.target.classList.contains('remove-option-btn') ? e.target : e.target.closest('.remove-option-btn');
-        btn.parentElement.remove();
-    }
-});
-</script>
 
 <?php
 $content = ob_get_clean();

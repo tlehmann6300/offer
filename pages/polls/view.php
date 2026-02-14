@@ -46,16 +46,22 @@ if (!in_array($userRole, $targetGroups)) {
     exit;
 }
 
-// Check if user has already voted
-$stmt = $db->prepare("SELECT * FROM poll_votes WHERE poll_id = ? AND user_id = ?");
-$stmt->execute([$pollId, $user['id']]);
-$userVote = $stmt->fetch();
+// Check if this poll uses Microsoft Forms
+$usesMicrosoftForms = !empty($poll['microsoft_forms_url']);
+
+// For backward compatibility, check if user has already voted (old system)
+$userVote = null;
+if (!$usesMicrosoftForms) {
+    $stmt = $db->prepare("SELECT * FROM poll_votes WHERE poll_id = ? AND user_id = ?");
+    $stmt->execute([$pollId, $user['id']]);
+    $userVote = $stmt->fetch();
+}
 
 $successMessage = '';
 $errorMessage = '';
 
-// Handle vote submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_vote']) && !$userVote) {
+// Handle vote submission (backward compatibility for old polls)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_vote']) && !$userVote && !$usesMicrosoftForms) {
     $optionId = $_POST['option_id'] ?? null;
     
     if (!$optionId) {
@@ -88,20 +94,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_vote']) && !$u
     }
 }
 
-// Fetch poll options with vote counts
-$stmt = $db->prepare("
-    SELECT po.*, COUNT(pv.id) as vote_count
-    FROM poll_options po
-    LEFT JOIN poll_votes pv ON po.id = pv.option_id
-    WHERE po.poll_id = ?
-    GROUP BY po.id
-    ORDER BY po.id ASC
-");
-$stmt->execute([$pollId]);
-$options = $stmt->fetchAll();
-
-// Calculate total votes
-$totalVotes = array_sum(array_column($options, 'vote_count'));
+// Fetch poll options with vote counts (for backward compatibility)
+$options = [];
+$totalVotes = 0;
+if (!$usesMicrosoftForms) {
+    $stmt = $db->prepare("
+        SELECT po.*, COUNT(pv.id) as vote_count
+        FROM poll_options po
+        LEFT JOIN poll_votes pv ON po.id = pv.option_id
+        WHERE po.poll_id = ?
+        GROUP BY po.id
+        ORDER BY po.id ASC
+    ");
+    $stmt->execute([$pollId]);
+    $options = $stmt->fetchAll();
+    
+    // Calculate total votes
+    $totalVotes = array_sum(array_column($options, 'vote_count'));
+}
 
 $title = htmlspecialchars($poll['title']) . ' - Umfragen - IBC Intranet';
 ob_start();
@@ -130,12 +140,18 @@ ob_start();
         <div class="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
             <div>
                 <i class="fas fa-calendar-alt mr-1"></i>
-                Endet am <?php echo formatDateTime($poll['end_date'], 'd.m.Y H:i'); ?> Uhr
+                <?php if (!empty($poll['end_date'])): ?>
+                    Endet am <?php echo formatDateTime($poll['end_date'], 'd.m.Y H:i'); ?> Uhr
+                <?php else: ?>
+                    Dauerhaft verfügbar
+                <?php endif; ?>
             </div>
+            <?php if (!$usesMicrosoftForms): ?>
             <div>
                 <i class="fas fa-users mr-1"></i>
                 <?php echo $totalVotes; ?> Stimme(n)
             </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -154,7 +170,37 @@ ob_start();
 
     <!-- Poll Content -->
     <div class="card p-8">
-        <?php if (!$userVote): ?>
+        <?php if ($usesMicrosoftForms): ?>
+        <!-- Microsoft Forms Iframe -->
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
+            <i class="fas fa-poll mr-2 text-blue-500"></i>
+            Umfrage
+        </h2>
+        
+        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+            <div class="flex items-center text-blue-800 dark:text-blue-300">
+                <i class="fas fa-info-circle mr-2"></i>
+                <span>
+                    Diese Umfrage wird über Microsoft Forms durchgeführt. Bitte füllen Sie das Formular unten aus.
+                </span>
+            </div>
+        </div>
+        
+        <div class="w-full" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+            <iframe 
+                src="<?php echo htmlspecialchars($poll['microsoft_forms_url']); ?>" 
+                frameborder="0" 
+                marginwidth="0" 
+                marginheight="0" 
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; min-height: 600px;"
+                allowfullscreen
+                webkitallowfullscreen
+                mozallowfullscreen
+                msallowfullscreen
+            ></iframe>
+        </div>
+        
+        <?php elseif (!$userVote): ?>
         <!-- Voting Form -->
         <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
             <i class="fas fa-vote-yea mr-2 text-blue-500"></i>
