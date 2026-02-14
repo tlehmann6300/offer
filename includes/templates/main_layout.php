@@ -746,21 +746,8 @@ require_once __DIR__ . '/../handlers/AuthHandler.php';
                     </p>
                     <span class='inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-white/10 text-white dark:text-slate-200 border border-white/20'>
                         <?php 
-                        // Translate role to German
-                        $roleTranslations = [
-                            'candidate' => 'Anwärter',
-                            'member' => 'Mitglied',
-                            'head' => 'Ressortleiter',
-                            'board' => 'Vorstand',
-                            'vorstand_intern' => 'Vorstand Intern',
-                            'vorstand_extern' => 'Vorstand Extern',
-                            'vorstand_finanzen_recht' => 'Vorstand Finanzen & Recht',
-                            'alumni' => 'Alumni',
-                            'alumni_board' => 'Alumni Vorstand',
-                            'honorary_member' => 'Ehrenmitglied'
-                        ];
-                        $roleDisplay = $roleTranslations[$role] ?? ucfirst($role);
-                        echo htmlspecialchars($roleDisplay); 
+                        // Translate role to German using helper function
+                        echo htmlspecialchars(translateRole($role)); 
                         ?>
                     </span>
                 </div>

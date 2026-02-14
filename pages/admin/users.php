@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/models/User.php';
+require_once __DIR__ . '/../../includes/helpers.php';
 
 if (!Auth::check() || !Auth::canManageUsers()) {
     header('Location: ../auth/login.php');

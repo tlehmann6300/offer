@@ -107,6 +107,7 @@ function asset($path) {
  */
 function translateRole($role) {
     $roleTranslations = [
+        'admin' => 'Administrator',
         'board_finance' => 'Vorstand Finanzen & Recht',
         'board_internal' => 'Vorstand Intern',
         'board_external' => 'Vorstand Extern',
