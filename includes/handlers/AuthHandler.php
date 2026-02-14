@@ -99,10 +99,15 @@ class AuthHandler {
             // Implement exponential backoff rate limiting using shared configuration
             // Lockout durations defined in config.php: RATE_LIMIT_BACKOFF
             if ($failedAttempts >= 3) {
-                $lockoutTimes = defined('RATE_LIMIT_BACKOFF') ? RATE_LIMIT_BACKOFF : [
-                    3 => 60, 4 => 120, 5 => 300, 6 => 900, 7 => 1800
-                ];
-                $maxBackoff = defined('RATE_LIMIT_MAX_BACKOFF') ? RATE_LIMIT_MAX_BACKOFF : 3600;
+                if (!defined('RATE_LIMIT_BACKOFF') || !defined('RATE_LIMIT_MAX_BACKOFF')) {
+                    error_log('CRITICAL: Rate limiting constants not defined in config.php');
+                    // Use secure fallback values
+                    $lockoutTimes = [3 => 60, 4 => 120, 5 => 300, 6 => 900, 7 => 1800];
+                    $maxBackoff = 3600;
+                } else {
+                    $lockoutTimes = RATE_LIMIT_BACKOFF;
+                    $maxBackoff = RATE_LIMIT_MAX_BACKOFF;
+                }
                 $lockoutDuration = $lockoutTimes[$failedAttempts] ?? $maxBackoff;
                 $lockedUntil = date('Y-m-d H:i:s', time() + $lockoutDuration);
             }
@@ -141,9 +146,11 @@ class AuthHandler {
         $stmt->execute([$user['id']]);
         
         // Set session variables
+        // Note: startSession() initializes the session via init_session() but doesn't set user data yet
         self::startSession();
         
         // Regenerate session ID to prevent session fixation attacks
+        // This must be called after session is started but before setting user-specific session data
         session_regenerate_id(true);
         
         $_SESSION['user_id'] = $user['id'];

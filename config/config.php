@@ -188,7 +188,10 @@ define('RATE_LIMIT_BACKOFF', [
     6 => 900,     // 15 minutes after 6 failed attempts
     7 => 1800,    // 30 minutes after 7 failed attempts
 ]);
-define('RATE_LIMIT_MAX_BACKOFF', 3600);  // 60 minutes for 8+ attempts (or permanent lock depending on implementation)
+// Maximum backoff duration for 8+ failed attempts
+// Note: AuthHandler.php uses this value for temporary locks (60 minutes)
+//       src/Auth.php permanently locks accounts after 8 attempts
+define('RATE_LIMIT_MAX_BACKOFF', 3600);  // 60 minutes
 
 // Set error display for production (0) or debugging (1)
 $isProduction = ($env['ENVIRONMENT'] ?? '') === 'production';

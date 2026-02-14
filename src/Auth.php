@@ -143,9 +143,13 @@ class Auth {
                     $lockedUntil = null;
                 } else {
                     // Exponential backoff for attempts 3-7 using shared configuration
-                    $lockoutTimes = defined('RATE_LIMIT_BACKOFF') ? RATE_LIMIT_BACKOFF : [
-                        3 => 60, 4 => 120, 5 => 300, 6 => 900, 7 => 1800
-                    ];
+                    if (!defined('RATE_LIMIT_BACKOFF')) {
+                        error_log('CRITICAL: RATE_LIMIT_BACKOFF constant not defined in config.php');
+                        // Use secure fallback values
+                        $lockoutTimes = [3 => 60, 4 => 120, 5 => 300, 6 => 900, 7 => 1800];
+                    } else {
+                        $lockoutTimes = RATE_LIMIT_BACKOFF;
+                    }
                     $lockoutDuration = $lockoutTimes[$failedAttempts];
                     $lockedUntil = date('Y-m-d H:i:s', time() + $lockoutDuration);
                 }
