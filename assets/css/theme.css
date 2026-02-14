@@ -1930,7 +1930,9 @@ body:not(.dark-mode) .btn-primary:active::after {
     overflow: hidden;
     
     /* Transitions - Smooth animations */
-    transition: all 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out, 
+                background-position 0.3s ease-in-out, 
+                box-shadow 0.3s ease-in-out;
     
     /* Initial shadow */
     box-shadow: 0 4px 15px rgba(107, 70, 193, 0.3);
@@ -1961,7 +1963,8 @@ body:not(.dark-mode) .btn-primary:active::after {
     box-shadow: 
         0 2px 8px rgba(107, 70, 193, 0.4),
         inset 0 2px 4px rgba(0, 0, 0, 0.2);
-    transition: all 0.1s ease-in-out;
+    transition: transform 0.1s ease-in-out, 
+                box-shadow 0.1s ease-in-out;
 }
 
 /* Microsoft Login Button - Official Branding */
