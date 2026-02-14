@@ -584,6 +584,30 @@ class AuthHandler {
                 $objectId = $claims['oid'] ?? null;
                 
                 if ($objectId) {
+                    // Get user profile data (job title, company, groups)
+                    try {
+                        $profileData = $graphService->getUserProfile($objectId);
+                        
+                        // Store job title and company in users table
+                        $jobTitle = $profileData['jobTitle'] ?? null;
+                        $companyName = $profileData['companyName'] ?? null;
+                        $groups = $profileData['groups'] ?? [];
+                        
+                        // Convert groups array to comma-separated string for entra_roles
+                        $entraRoles = !empty($groups) ? implode(', ', $groups) : null;
+                        
+                        // Update user record with profile data
+                        $stmt = $db->prepare("UPDATE users SET job_title = ?, company = ?, entra_roles = ? WHERE id = ?");
+                        $stmt->execute([$jobTitle, $companyName, $entraRoles, $userId]);
+                        
+                        // Store Entra roles in session for display
+                        $_SESSION['entra_roles'] = $groups;
+                        
+                    } catch (Exception $e) {
+                        error_log("Failed to fetch user profile from Microsoft Graph: " . $e->getMessage());
+                        // Don't throw - allow login to proceed even if profile fetch fails
+                    }
+                    
                     // Get user photo from Microsoft Graph
                     $photoData = $graphService->getUserPhoto($objectId);
                     

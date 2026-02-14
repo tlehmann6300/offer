@@ -221,6 +221,68 @@ class MicrosoftGraphService {
     }
     
     /**
+     * Get user profile from Microsoft Entra ID
+     * Fetches user's jobTitle, companyName, and transitiveMemberOf (Groups/Roles)
+     * 
+     * @param string $userId User ID (Object ID from Azure AD)
+     * @return array User profile data with keys: jobTitle, companyName, groups
+     * @throws Exception If profile retrieval fails
+     */
+    public function getUserProfile(string $userId): array {
+        // Request user profile with jobTitle and companyName
+        $profileUrl = "https://graph.microsoft.com/v1.0/users/{$userId}?\$select=jobTitle,companyName";
+        
+        try {
+            $response = $this->httpClient->get($profileUrl, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->accessToken,
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+            
+            $profileData = json_decode($response->getBody()->getContents(), true);
+            
+            // Extract job title and company name
+            $result = [
+                'jobTitle' => $profileData['jobTitle'] ?? null,
+                'companyName' => $profileData['companyName'] ?? null,
+                'groups' => []
+            ];
+            
+            // Get transitive group memberships (includes nested groups)
+            $groupsUrl = "https://graph.microsoft.com/v1.0/users/{$userId}/transitiveMemberOf";
+            
+            try {
+                $groupsResponse = $this->httpClient->get($groupsUrl, [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->accessToken,
+                        'Content-Type' => 'application/json'
+                    ]
+                ]);
+                
+                $groupsData = json_decode($groupsResponse->getBody()->getContents(), true);
+                
+                // Extract group display names from the response
+                if (isset($groupsData['value']) && is_array($groupsData['value'])) {
+                    foreach ($groupsData['value'] as $group) {
+                        if (isset($group['displayName'])) {
+                            $result['groups'][] = $group['displayName'];
+                        }
+                    }
+                }
+            } catch (GuzzleException $e) {
+                // Log error but don't fail the entire request if groups fetch fails
+                error_log("Failed to fetch user groups: " . $e->getMessage());
+            }
+            
+            return $result;
+            
+        } catch (GuzzleException $e) {
+            throw new Exception('Failed to get user profile: ' . $e->getMessage());
+        }
+    }
+    
+    /**
      * Get user profile photo from Microsoft Entra ID
      * 
      * @param string $userId User ID (Object ID from Azure AD)
