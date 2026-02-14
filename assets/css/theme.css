@@ -1883,6 +1883,39 @@ body:not(.dark-mode) .btn-primary:active::after {
     100% { background-position: 0% 50%; }
 }
 
+/* Microsoft Login Button - Official Branding */
+.microsoft-btn {
+    background-color: #2F2F2F !important;
+    color: white !important;
+    border: none !important;
+    transition: all 0.3s ease !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.microsoft-btn:hover {
+    background-color: #1a1a1a !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+.microsoft-btn:active {
+    transform: translateY(0) !important;
+}
+
+/* Override any global button/anchor styles that might conflict */
+a.microsoft-btn {
+    text-decoration: none !important;
+}
+
+body.dark-mode .microsoft-btn {
+    background-color: #2F2F2F !important;
+}
+
+body.dark-mode .microsoft-btn:hover {
+    background-color: #1a1a1a !important;
+}
+
 /* Enhanced Form Inputs */
 input:not([type="checkbox"]):not([type="radio"]),
 select,

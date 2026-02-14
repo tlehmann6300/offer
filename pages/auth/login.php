@@ -104,38 +104,25 @@ ob_start();
     </div>
     <?php endif; ?>
 
-    <!-- Enhanced Microsoft Login Button with Premium Effects -->
-    <a href="<?php echo BASE_URL; ?>/auth/login_start.php" class="group relative flex items-center justify-center w-full py-5 px-8 bg-gradient-to-r from-white via-gray-50 to-white hover:from-blue-50 hover:via-blue-100 hover:to-blue-50 text-gray-900 rounded-2xl font-bold text-lg transition-all duration-500 transform hover:scale-[1.03] hover:-translate-y-1 shadow-xl hover:shadow-2xl tracking-wide border-2 border-gray-200 hover:border-blue-400 overflow-hidden">
-        <!-- Animated Background Gradient -->
-        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-emerald-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:via-emerald-500/10 group-hover:to-blue-500/10 transition-all duration-700"></div>
+    <!-- Microsoft Login Button - Official Branding -->
+    <a href="<?php echo BASE_URL; ?>/auth/login_start.php" class="microsoft-btn group relative flex items-center justify-center w-full py-4 px-6 bg-[#2F2F2F] hover:bg-[#1a1a1a] text-white rounded-lg font-semibold text-base transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl overflow-hidden">
+        <!-- Microsoft logo -->
+        <img src="<?php echo asset('assets/img/microsoft-logo.svg'); ?>" alt="Microsoft" class="relative z-10 w-5 h-5 transition-transform duration-300 group-hover:scale-110">
         
-        <!-- Glow Effect on Hover -->
-        <div class="absolute inset-0 opacity-0 group-hover:opacity-100 blur-xl bg-gradient-to-r from-blue-400 to-emerald-400 transition-opacity duration-500"></div>
+        <!-- Vertical Separator -->
+        <div class="relative z-10 w-px h-6 bg-white/20 mx-4"></div>
         
-        <!-- Microsoft logo with enhanced animation -->
-        <img src="<?php echo asset('assets/img/microsoft-logo.svg'); ?>" alt="Microsoft" class="relative z-10 w-7 h-7 mr-4 transition-all duration-500 group-hover:scale-125 group-hover:rotate-12 drop-shadow-lg">
-        
-        <!-- Button text with gradient on hover -->
-        <span class="relative z-10 group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-emerald-600 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-500">
-            Mit Microsoft anmelden
+        <!-- Button text -->
+        <span class="relative z-10 font-bold">
+            Sign in with Microsoft
         </span>
-        
-        <!-- Animated Arrow -->
-        <i class="fas fa-arrow-right relative z-10 ml-3 opacity-0 group-hover:opacity-100 transform translate-x-0 group-hover:translate-x-2 transition-all duration-500"></i>
-        
-        <!-- Premium Shine effect -->
-        <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
-        
-        <!-- Corner Accents -->
-        <div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-blue-400 rounded-tl-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-        <div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-emerald-400 rounded-br-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
     </a>
     
-    <div class="mt-8 text-center space-y-2">
-        <p class="text-gray-600 text-base font-semibold">Verwende dein Microsoft-Konto zum Anmelden.</p>
-        <div class="flex items-center justify-center space-x-2 text-gray-400 text-sm">
+    <div class="mt-6 text-center">
+        <p class="text-gray-600 text-sm">Verwende dein Microsoft-Konto zum Anmelden.</p>
+        <div class="flex items-center justify-center space-x-2 text-gray-400 text-xs mt-2">
             <i class="fas fa-shield-alt"></i>
-            <span class="font-medium">Sichere Anmeldung über Microsoft</span>
+            <span>Sichere Anmeldung über Microsoft</span>
         </div>
     </div>
     
