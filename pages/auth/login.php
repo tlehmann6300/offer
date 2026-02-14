@@ -105,7 +105,7 @@ ob_start();
     <?php endif; ?>
 
     <!-- Microsoft Login Button - Official Branding -->
-    <a href="<?php echo BASE_URL; ?>/auth/login_start.php" class="microsoft-btn group relative flex items-center justify-center w-full py-4 px-6 bg-[#2F2F2F] hover:bg-[#1a1a1a] text-white rounded-lg font-semibold text-base transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl overflow-hidden">
+    <a href="<?php echo BASE_URL; ?>/auth/login_start.php" class="microsoft-btn group relative flex items-center justify-center w-full py-4 px-6 text-white rounded-lg font-semibold text-base transition-all duration-300 shadow-lg hover:shadow-xl overflow-hidden">
         <!-- Microsoft logo -->
         <img src="<?php echo asset('assets/img/microsoft-logo.svg'); ?>" alt="Microsoft" class="relative z-10 w-5 h-5 transition-transform duration-300 group-hover:scale-110">
         

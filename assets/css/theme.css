@@ -1908,14 +1908,6 @@ a.microsoft-btn {
     text-decoration: none !important;
 }
 
-body.dark-mode .microsoft-btn {
-    background-color: #2F2F2F !important;
-}
-
-body.dark-mode .microsoft-btn:hover {
-    background-color: #1a1a1a !important;
-}
-
 /* Enhanced Form Inputs */
 input:not([type="checkbox"]):not([type="radio"]),
 select,
