@@ -32,10 +32,10 @@ if (empty($token)) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $invitation) {
     CSRFHandler::verifyToken($_POST['csrf_token'] ?? '');
     
-    // Sanitize email input using filter_var before processing
-    $email = filter_var($invitation['email'], FILTER_SANITIZE_EMAIL);
+    // Sanitize and validate email input using filter_var before processing
+    // Note: Using only FILTER_VALIDATE_EMAIL as FILTER_SANITIZE_EMAIL is deprecated in PHP 8.1+
+    $email = trim($invitation['email']);
     
-    // Validate sanitized email
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Ungültige E-Mail-Adresse';
     }
@@ -43,12 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $invitation) {
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
     
-    if ($password !== $confirmPassword) {
+    if (!empty($error)) {
+        // Email validation failed, skip other validations
+    } else if ($password !== $confirmPassword) {
         $error = 'Passwörter stimmen nicht überein';
     } else if (strlen($password) < 8) {
         $error = 'Passwort muss mindestens 8 Zeichen lang sein';
-    } else if (!empty($error)) {
-        // Email validation failed, error already set
     } else {
         // Check if user already exists
         $existing = User::getByEmail($email);
