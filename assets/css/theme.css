@@ -183,10 +183,24 @@ body {
     color: rgba(255, 255, 255, 0.95) !important;
 }
 
+/* Light Mode: Force sidebar links to be white with high specificity */
+body:not(.dark-mode) .sidebar a,
+body:not(.dark-mode) .sidebar span,
+body:not(.dark-mode) .sidebar i,
+body:not(.dark-mode) .sidebar label {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
 .sidebar a:hover {
     color: #ffffff !important;
     background-color: rgba(255, 255, 255, 0.1) !important;
     transition: all 0.2s ease;
+}
+
+/* Light Mode: Force sidebar hover to be white */
+body:not(.dark-mode) .sidebar a:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Sidebar Active State - White Background with IBC Green Border */
@@ -585,7 +599,7 @@ body.dark-mode a:not(.btn-primary) {
 }
 
 /* Light Mode Links - Use IBC Blue for interactive elements */
-body:not(.dark-mode) a:not(.btn-primary):not(.no-underline) {
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a) {
     color: var(--ibc-blue);
     position: relative;
     text-decoration: none;
