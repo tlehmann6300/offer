@@ -92,26 +92,12 @@ if (!headers_sent()) {
         }
     }
     
-    // Enhanced Content-Security-Policy with restricted image sources
-    // Note: Only allows images from self, data URIs, and blob URIs for maximum security
-    // If external images are needed (e.g., for email previews), add specific trusted domains
+    // Strict Content-Security-Policy
+    // Allows scripts from 'self' and 'unsafe-inline' (needed for the ripple effect script)
+    // Allows images from 'self' and data: schemes (for SVGs)
+    // Allows styles from 'self' and 'unsafe-inline'
     if (!header_sent_check('Content-Security-Policy')) {
-        $csp_directives = [
-            "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdnjs.cloudflare.com",
-            "style-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdnjs.cloudflare.com fonts.googleapis.com",
-            "font-src 'self' cdnjs.cloudflare.com fonts.gstatic.com",
-            "img-src 'self' data: blob:",  // Restricted to self, data, and blob only
-            "connect-src 'self'",
-            "frame-ancestors 'self'",
-            "base-uri 'self'",
-            "form-action 'self'",
-            "object-src 'none'",
-            "upgrade-insecure-requests"
-        ];
-        
-        $csp_header = implode('; ', $csp_directives);
-        header("Content-Security-Policy: $csp_header");
+        header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");
     }
     
     // X-Permitted-Cross-Domain-Policies: Restricts Adobe Flash and PDF cross-domain policies
