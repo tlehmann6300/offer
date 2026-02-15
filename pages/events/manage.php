@@ -60,7 +60,7 @@ ob_start();
             </h1>
             <p class="text-gray-600 dark:text-gray-300"><?php echo count($events); ?> Event(s) gefunden</p>
         </div>
-        <a href="edit.php" class="btn-primary">
+        <a href="edit.php?new=1" class="btn-primary">
             <i class="fas fa-plus mr-2"></i>Neues Event
         </a>
     </div>
@@ -128,7 +128,7 @@ ob_start();
     <i class="fas fa-calendar-times text-gray-400 text-6xl mb-4"></i>
     <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">Keine Events gefunden</h3>
     <p class="text-gray-500 dark:text-gray-400 mb-6">Es wurden keine Events mit den ausgewählten Filtern gefunden.</p>
-    <a href="edit.php" class="btn-primary inline-block">
+    <a href="edit.php?new=1" class="btn-primary inline-block">
         <i class="fas fa-plus mr-2"></i>Erstes Event erstellen
     </a>
 </div>
