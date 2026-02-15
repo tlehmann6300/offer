@@ -72,6 +72,13 @@ try {
         "Add azure_roles column to users table"
     );
     
+    // Add azure_oid column to users table
+    executeSql(
+        $user_db,
+        "ALTER TABLE users ADD COLUMN azure_oid VARCHAR(255) DEFAULT NULL COMMENT 'Azure Object Identifier (OID) from Microsoft Entra ID authentication' AFTER azure_roles",
+        "Add azure_oid column to users table"
+    );
+    
     // Add deleted_at column to users table
     executeSql(
         $user_db,
