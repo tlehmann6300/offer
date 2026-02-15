@@ -114,6 +114,38 @@ try {
         "Add show_birthday column to users table"
     );
     
+    // Create invitation_tokens table
+    $create_invitation_tokens_table = "
+    CREATE TABLE IF NOT EXISTS invitation_tokens (
+        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        token VARCHAR(255) NOT NULL UNIQUE,
+        email VARCHAR(255) NOT NULL,
+        role ENUM('board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor', 'alumni', 'honorary_member', 'head', 'member', 'candidate') NOT NULL DEFAULT 'member',
+        created_by INT UNSIGNED NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        used_at TIMESTAMP NULL DEFAULT NULL,
+        used_by INT UNSIGNED DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        
+        FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (used_by) REFERENCES users(id) ON DELETE SET NULL,
+        
+        INDEX idx_token (token),
+        INDEX idx_email (email),
+        INDEX idx_created_by (created_by),
+        INDEX idx_expires_at (expires_at)
+    ) ENGINE=InnoDB
+      DEFAULT CHARSET=utf8mb4
+      COLLATE=utf8mb4_unicode_ci
+      COMMENT='Invitation tokens for user registration'
+    ";
+    
+    executeSql(
+        $user_db,
+        $create_invitation_tokens_table,
+        "Create invitation_tokens table"
+    );
+    
     // ============================================
     // CONTENT DATABASE UPDATES (dbs15161271)
     // ============================================
@@ -217,6 +249,118 @@ try {
         $content_db,
         $create_financial_stats_table,
         "Create event_financial_stats table"
+    );
+    
+    // Create poll_options table
+    $create_poll_options_table = "
+    CREATE TABLE IF NOT EXISTS poll_options (
+        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        poll_id INT UNSIGNED NOT NULL,
+        option_text VARCHAR(500) NOT NULL COMMENT 'Text of the poll option',
+        display_order INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Order in which options are displayed',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        
+        FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE,
+        
+        INDEX idx_poll_id (poll_id),
+        INDEX idx_display_order (display_order)
+    ) ENGINE=InnoDB
+      DEFAULT CHARSET=utf8mb4
+      COLLATE=utf8mb4_unicode_ci
+      COMMENT='Options/choices for internal polls (not used for Microsoft Forms)'
+    ";
+    
+    executeSql(
+        $content_db,
+        $create_poll_options_table,
+        "Create poll_options table"
+    );
+    
+    // Create poll_votes table
+    $create_poll_votes_table = "
+    CREATE TABLE IF NOT EXISTS poll_votes (
+        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        poll_id INT UNSIGNED NOT NULL,
+        option_id INT UNSIGNED NOT NULL,
+        user_id INT UNSIGNED NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        
+        FOREIGN KEY (poll_id) REFERENCES polls(id) ON DELETE CASCADE,
+        FOREIGN KEY (option_id) REFERENCES poll_options(id) ON DELETE CASCADE,
+        
+        UNIQUE KEY unique_poll_user_vote (poll_id, user_id),
+        INDEX idx_poll_id (poll_id),
+        INDEX idx_option_id (option_id),
+        INDEX idx_user_id (user_id)
+    ) ENGINE=InnoDB
+      DEFAULT CHARSET=utf8mb4
+      COLLATE=utf8mb4_unicode_ci
+      COMMENT='User votes on poll options (not used for Microsoft Forms)'
+    ";
+    
+    executeSql(
+        $content_db,
+        $create_poll_votes_table,
+        "Create poll_votes table"
+    );
+    
+    // Create event_registrations table
+    $create_event_registrations_table = "
+    CREATE TABLE IF NOT EXISTS event_registrations (
+        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        event_id INT UNSIGNED NOT NULL,
+        user_id INT UNSIGNED NOT NULL,
+        status ENUM('confirmed', 'cancelled') NOT NULL DEFAULT 'confirmed',
+        registered_at DATETIME NOT NULL,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        
+        FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+        
+        UNIQUE KEY unique_event_user_registration (event_id, user_id),
+        INDEX idx_event_id (event_id),
+        INDEX idx_user_id (user_id),
+        INDEX idx_status (status)
+    ) ENGINE=InnoDB
+      DEFAULT CHARSET=utf8mb4
+      COLLATE=utf8mb4_unicode_ci
+      COMMENT='Simple event registrations (alternative to event_signups with slots)'
+    ";
+    
+    executeSql(
+        $content_db,
+        $create_event_registrations_table,
+        "Create event_registrations table"
+    );
+    
+    // Create system_logs table
+    $create_system_logs_table = "
+    CREATE TABLE IF NOT EXISTS system_logs (
+        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        user_id INT UNSIGNED NOT NULL COMMENT 'User who performed the action (0 for system/cron)',
+        action VARCHAR(100) NOT NULL COMMENT 'Action type (e.g., login_success, invitation_created)',
+        entity_type VARCHAR(100) DEFAULT NULL COMMENT 'Type of entity affected (e.g., user, event, cron)',
+        entity_id INT UNSIGNED DEFAULT NULL COMMENT 'ID of affected entity',
+        details TEXT DEFAULT NULL COMMENT 'Additional details in text or JSON format',
+        ip_address VARCHAR(45) DEFAULT NULL COMMENT 'IP address of the user',
+        user_agent TEXT DEFAULT NULL COMMENT 'User agent string',
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        
+        INDEX idx_user_id (user_id),
+        INDEX idx_action (action),
+        INDEX idx_entity_type (entity_type),
+        INDEX idx_entity_id (entity_id),
+        INDEX idx_timestamp (timestamp)
+    ) ENGINE=InnoDB
+      DEFAULT CHARSET=utf8mb4
+      COLLATE=utf8mb4_unicode_ci
+      COMMENT='System-wide audit log for tracking all user and system actions'
+    ";
+    
+    executeSql(
+        $content_db,
+        $create_system_logs_table,
+        "Create system_logs table"
     );
     
     // ============================================
