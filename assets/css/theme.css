@@ -3245,10 +3245,6 @@ body.dark-mode .text-blue-600 {
     color: #60a5fa !important; /* blue-400 */
 }
 
-body.dark-mode .card .text-blue-600 {
-    color: #60a5fa !important; /* Lighter blue for better contrast inside dark mode cards */
-}
-
 body.dark-mode .text-ibc-blue {
     color: #60a5fa !important; /* Light blue for better contrast on dark backgrounds */
 }
