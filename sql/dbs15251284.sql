@@ -13,39 +13,21 @@ SET time_zone = "+00:00";
 -- ================================================
 CREATE TABLE IF NOT EXISTS `invoices` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `invoice_number` VARCHAR(50) NOT NULL UNIQUE,
-  `customer_name` VARCHAR(255) NOT NULL,
-  `customer_email` VARCHAR(255),
-  `amount` DECIMAL(10, 2) NOT NULL,
-  `status` ENUM('draft', 'sent', 'paid', 'cancelled') NOT NULL DEFAULT 'draft',
-  `issue_date` DATE NOT NULL,
-  `due_date` DATE,
-  `paid_date` DATE DEFAULT NULL,
-  `notes` TEXT,
+  `user_id` INT UNSIGNED NOT NULL COMMENT 'User who submitted the invoice',
+  `description` TEXT NOT NULL COMMENT 'Invoice description',
+  `amount` DECIMAL(10, 2) NOT NULL COMMENT 'Invoice amount in EUR',
+  `file_path` VARCHAR(500) NOT NULL COMMENT 'Path to uploaded invoice file',
+  `status` ENUM('pending', 'approved', 'rejected', 'paid') NOT NULL DEFAULT 'pending' COMMENT 'Invoice processing status',
+  `rejection_reason` TEXT DEFAULT NULL COMMENT 'Reason for rejection if status is rejected',
+  `paid_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Timestamp when invoice was marked as paid',
+  `paid_by_user_id` INT UNSIGNED DEFAULT NULL COMMENT 'User ID who marked invoice as paid',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `created_by` INT UNSIGNED NOT NULL,
-  INDEX `idx_invoice_number` (`invoice_number`),
+  INDEX `idx_user_id` (`user_id`),
   INDEX `idx_status` (`status`),
-  INDEX `idx_issue_date` (`issue_date`),
-  INDEX `idx_created_by` (`created_by`)
+  INDEX `idx_created_at` (`created_at`),
+  INDEX `idx_paid_by_user_id` (`paid_by_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Invoice management table';
-
--- ================================================
--- TABLE: invoice_items
--- ================================================
-CREATE TABLE IF NOT EXISTS `invoice_items` (
-  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  `invoice_id` INT UNSIGNED NOT NULL,
-  `description` VARCHAR(255) NOT NULL,
-  `quantity` INT UNSIGNED NOT NULL DEFAULT 1,
-  `unit_price` DECIMAL(10, 2) NOT NULL,
-  `total` DECIMAL(10, 2) NOT NULL,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (`invoice_id`) REFERENCES `invoices`(`id`) ON DELETE CASCADE,
-  INDEX `idx_invoice_id` (`invoice_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Invoice line items';
+COMMENT='Invoice management table for expense reimbursement tracking';
 
 COMMIT;
