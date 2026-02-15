@@ -742,10 +742,10 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                 // Check for Entra roles - priority: entra_roles from user table, then session azure_roles, then fallback to internal role
                 $displayRoles = [];
                 if (!empty($currentUser['entra_roles'])) {
-                    // Parse JSON string from database
+                    // Parse JSON string from database - groups from Microsoft Graph are already human-readable
                     $rolesArray = json_decode($currentUser['entra_roles'], true);
                     if (json_last_error() === JSON_ERROR_NONE && is_array($rolesArray)) {
-                        $displayRoles = array_filter(array_map('translateAzureRole', $rolesArray));
+                        $displayRoles = array_filter($rolesArray);
                     } else {
                         error_log("Failed to decode entra_roles in main_layout for user ID " . intval($currentUser['id']) . ": " . json_last_error_msg());
                     }
