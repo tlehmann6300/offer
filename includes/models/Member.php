@@ -106,6 +106,8 @@ class Member {
                 u.id,
                 u.email,
                 u.role,
+                u.entra_roles,
+                u.job_title,
                 u.created_at
             FROM users u
             WHERE " . $userWhereSQL . "
@@ -133,6 +135,8 @@ class Member {
                 // Merge user data into profile
                 $profile['email'] = $user['email'];
                 $profile['role'] = $user['role'];
+                $profile['entra_roles'] = $user['entra_roles'] ?? null;
+                $profile['job_title'] = $user['job_title'] ?? null;
                 $profile['user_created_at'] = $user['created_at'];
                 
                 $result[] = $profile;
