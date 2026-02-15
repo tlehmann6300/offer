@@ -290,7 +290,7 @@ require_once __DIR__ . '/../helpers.php';
         }
 
         @-webkit-keyframes beam {
-            0%, 100% {
+            0% {
                 transform: translateY(-100%);
                 opacity: 0;
             }
@@ -304,7 +304,7 @@ require_once __DIR__ . '/../helpers.php';
         }
 
         @keyframes beam {
-            0%, 100% {
+            0% {
                 transform: translateY(-100%);
                 opacity: 0;
             }
@@ -1437,11 +1437,11 @@ require_once __DIR__ . '/../helpers.php';
             *,
             *::before,
             *::after {
-                -webkit-animation-duration: 0.01ms !important;
-                animation-duration: 0.01ms !important;
+                -webkit-animation-duration: 1ms !important;
+                animation-duration: 1ms !important;
                 -webkit-animation-iteration-count: 1 !important;
                 animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
+                transition-duration: 1ms !important;
                 scroll-behavior: auto !important;
             }
             
@@ -1451,6 +1451,7 @@ require_once __DIR__ . '/../helpers.php';
             .animated-grid,
             .light-beam,
             .smooth-particle {
+                -webkit-animation: none !important;
                 animation: none !important;
             }
         }
