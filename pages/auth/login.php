@@ -2,6 +2,11 @@
 // 1. Konfiguration laden
 require_once __DIR__ . '/../../config/config.php';
 
+// Security Headers (CSP) für maximale Sicherheit
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self';");
+header("X-Frame-Options: DENY");
+header("X-Content-Type-Options: nosniff");
+
 // 2. Error reporting is configured in config.php based on ENVIRONMENT constant
 // Detailed error display is only enabled in non-production environments
 // This prevents information leakage (file paths, stack traces) in production
