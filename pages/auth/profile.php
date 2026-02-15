@@ -326,19 +326,19 @@ ob_start();
             elseif (!empty($user['azure_roles'])):
                 $azureRoles = json_decode($user['azure_roles'], true);
                 if (json_last_error() === JSON_ERROR_NONE && is_array($azureRoles)) {
-                    $displayRoles = array_map('translateAzureRole', $azureRoles);
+                    $displayRoles = array_filter(array_map('translateAzureRole', $azureRoles));
                 } else {
                     error_log("Failed to decode azure_roles for user ID {$user['id']}: " . json_last_error_msg());
                 }
             elseif (!empty($_SESSION['azure_roles'])):
                 // Check session variable as alternative
                 if (is_array($_SESSION['azure_roles'])) {
-                    $displayRoles = array_map('translateAzureRole', $_SESSION['azure_roles']);
+                    $displayRoles = array_filter(array_map('translateAzureRole', $_SESSION['azure_roles']));
                 } else {
                     // Try to decode if it's JSON string
                     $sessionRoles = json_decode($_SESSION['azure_roles'], true);
                     if (json_last_error() === JSON_ERROR_NONE && is_array($sessionRoles)) {
-                        $displayRoles = array_map('translateAzureRole', $sessionRoles);
+                        $displayRoles = array_filter(array_map('translateAzureRole', $sessionRoles));
                     } else {
                         error_log("Failed to decode session azure_roles for user ID {$user['id']}: " . json_last_error_msg());
                     }
