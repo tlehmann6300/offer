@@ -30,19 +30,25 @@ function filterPollsForUser($polls, $userRole, $userAzureRoles = []) {
         
         // Check allowed_roles (Entra roles) if set
         $allowedRoles = !empty($poll['allowed_roles']) ? json_decode($poll['allowed_roles'], true) : null;
-        if ($allowedRoles && is_array($allowedRoles)) {
-            // Check if any of user's azure_roles match allowed_roles
-            $hasMatchingRole = false;
-            if (is_array($userAzureRoles)) {
-                foreach ($userAzureRoles as $userAzureRole) {
-                    if (in_array($userAzureRole, $allowedRoles)) {
-                        $hasMatchingRole = true;
-                        break;
+        if ($allowedRoles !== null) {
+            // Validate that decoded value is an array
+            if (!is_array($allowedRoles)) {
+                // Invalid JSON or not an array, skip role check
+                $allowedRoles = null;
+            } else {
+                // Check if any of user's azure_roles match allowed_roles
+                $hasMatchingRole = false;
+                if (is_array($userAzureRoles)) {
+                    foreach ($userAzureRoles as $userAzureRole) {
+                        if (in_array($userAzureRole, $allowedRoles)) {
+                            $hasMatchingRole = true;
+                            break;
+                        }
                     }
                 }
-            }
-            if (!$hasMatchingRole) {
-                return false;
+                if (!$hasMatchingRole) {
+                    return false;
+                }
             }
         }
         

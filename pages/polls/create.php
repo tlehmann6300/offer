@@ -251,7 +251,7 @@ ob_start();
                         type="checkbox" 
                         name="is_internal" 
                         value="1"
-                        <?php echo (!isset($_POST['create_poll']) || isset($_POST['is_internal'])) ? 'checked' : ''; ?>
+                        <?php echo (!isset($_POST['create_poll']) || (isset($_POST['create_poll']) && isset($_POST['is_internal']))) ? 'checked' : ''; ?>
                         class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 mt-0.5"
                     >
                     <div class="ml-3">
