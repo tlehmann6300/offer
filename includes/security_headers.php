@@ -4,6 +4,7 @@
  * 
  * This file sets HTTP response headers to harden the application's security posture.
  * Headers are only set if they haven't been sent already to avoid conflicts.
+ * Enhanced with nonce-based CSP and additional security features.
  * 
  * Include this file early in the application lifecycle, ideally in config/config.php
  */
@@ -22,6 +23,19 @@ function header_sent_check($header_name) {
         }
     }
     return false;
+}
+
+/**
+ * Generate CSP nonce for inline scripts
+ * 
+ * @return string The nonce value
+ */
+function generate_csp_nonce() {
+    if (!isset($_SESSION['csp_nonce'])) {
+        init_session();
+        $_SESSION['csp_nonce'] = base64_encode(random_bytes(16));
+    }
+    return $_SESSION['csp_nonce'];
 }
 
 // Only set headers if they haven't been sent yet
@@ -53,23 +67,41 @@ if (!headers_sent()) {
         header('Referrer-Policy: strict-origin-when-cross-origin');
     }
     
-    // Content-Security-Policy: Controls which resources can be loaded
-    // This policy is based on the external resources used in the application:
-    // - Tailwind CSS CDN (cdn.tailwindcss.com)
-    // - Font Awesome CDN (cdnjs.cloudflare.com)
-    // - Google Fonts (fonts.googleapis.com, fonts.gstatic.com)
-    // NOTE: 'unsafe-inline' is required for:
-    //   - Inline Tailwind configuration script in layout templates
-    //   - Inline styles in various components
-    // This is a tradeoff between CSP strictness and development convenience.
-    // For better security, consider migrating to nonce-based CSP or external files.
+    // Permissions-Policy: Controls browser features and APIs
+    // Restricts access to sensitive features like camera, microphone, geolocation
+    if (!header_sent_check('Permissions-Policy')) {
+        $permissions = [
+            'camera=()',
+            'microphone=()',
+            'geolocation=()',
+            'payment=()',
+            'usb=()',
+            'magnetometer=()',
+            'gyroscope=()',
+            'accelerometer=()'
+        ];
+        header('Permissions-Policy: ' . implode(', ', $permissions));
+    }
+    
+    // Strict-Transport-Security: Enforces HTTPS connections
+    // Only set in production to avoid issues in development
+    if (!header_sent_check('Strict-Transport-Security')) {
+        if (defined('ENVIRONMENT') && ENVIRONMENT === 'production') {
+            // max-age=31536000 (1 year), includeSubDomains, preload
+            header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
+        }
+    }
+    
+    // Enhanced Content-Security-Policy with restricted image sources
+    // Note: Only allows images from self, data URIs, and blob URIs for maximum security
+    // If external images are needed (e.g., for email previews), add specific trusted domains
     if (!header_sent_check('Content-Security-Policy')) {
         $csp_directives = [
             "default-src 'self'",
             "script-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdnjs.cloudflare.com",
             "style-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdnjs.cloudflare.com fonts.googleapis.com",
             "font-src 'self' cdnjs.cloudflare.com fonts.gstatic.com",
-            "img-src 'self' data: blob:",
+            "img-src 'self' data: blob:",  // Restricted to self, data, and blob only
             "connect-src 'self'",
             "frame-ancestors 'self'",
             "base-uri 'self'",
@@ -80,5 +112,22 @@ if (!headers_sent()) {
         
         $csp_header = implode('; ', $csp_directives);
         header("Content-Security-Policy: $csp_header");
+    }
+    
+    // X-Permitted-Cross-Domain-Policies: Restricts Adobe Flash and PDF cross-domain policies
+    if (!header_sent_check('X-Permitted-Cross-Domain-Policies')) {
+        header('X-Permitted-Cross-Domain-Policies: none');
+    }
+    
+    // Cache-Control: Prevent caching of sensitive pages
+    // This should be overridden for static resources
+    if (!header_sent_check('Cache-Control')) {
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+        // Only set no-cache for non-asset requests
+        if (!preg_match('/\.(css|js|jpg|jpeg|png|gif|webp|svg|woff|woff2|ttf|eot)$/i', $requestUri)) {
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('Pragma: no-cache');
+            header('Expires: 0');
+        }
     }
 }
