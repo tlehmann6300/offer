@@ -652,7 +652,7 @@ ob_start();
             <a href="manage.php" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 ease-premium text-center">
                 Abbrechen
             </a>
-            <button type="submit" class="flex-1 px-6 py-3 bg-ibc-green text-white rounded-xl hover:shadow-glow-green ease-premium inline-flex items-center justify-center">
+            <button type="submit" class="flex-1 btn-primary inline-flex items-center justify-center">
                 <i class="fas fa-save mr-2"></i><?php echo $isEdit ? 'Speichern' : 'Erstellen'; ?>
             </button>
         </div>
