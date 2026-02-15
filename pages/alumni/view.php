@@ -116,41 +116,40 @@ ob_start();
                 
                 <!-- Role Badge -->
                 <?php
-                // Check if Entra roles exist and are not empty
-                $displayRole = '';
-                $badgeClass = 'bg-purple-100 text-purple-800 border-purple-300'; // Default to purple for Entra roles
+                // Define role badge colors and names
+                $roleBadgeColors = [
+                    'board' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'vorstand_intern' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'vorstand_extern' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'vorstand_finanzen_recht' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'head' => 'bg-blue-100 text-blue-800 border-blue-300',
+                    'member' => 'bg-green-100 text-green-800 border-green-300',
+                    'candidate' => 'bg-yellow-100 text-yellow-800 border-yellow-300',
+                    'alumni' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'alumni_board' => 'bg-indigo-100 text-indigo-800 border-indigo-300',
+                    'honorary_member' => 'bg-amber-100 text-amber-800 border-amber-300'
+                ];
                 
+                $roleNames = [
+                    'board' => 'Vorstand',
+                    'vorstand_intern' => 'Vorstand',
+                    'vorstand_extern' => 'Vorstand',
+                    'vorstand_finanzen_recht' => 'Vorstand',
+                    'head' => 'Ressortleiter',
+                    'member' => 'Mitglied',
+                    'candidate' => 'Anwärter',
+                    'alumni' => 'Alumni',
+                    'alumni_board' => 'Alumni Vorstand',
+                    'honorary_member' => 'Ehrenmitglied'
+                ];
+                
+                // Check if Entra roles exist and are not empty
                 if (!empty($profileUserEntraRoles)) {
                     // Entra roles exist - display them as comma-separated string
                     $displayRole = $profileUserEntraRoles;
+                    $badgeClass = 'bg-purple-100 text-purple-800 border-purple-300';
                 } else {
                     // Fall back to internal role
-                    $roleBadgeColors = [
-                        'board' => 'bg-purple-100 text-purple-800 border-purple-300',
-                        'vorstand_intern' => 'bg-purple-100 text-purple-800 border-purple-300',
-                        'vorstand_extern' => 'bg-purple-100 text-purple-800 border-purple-300',
-                        'vorstand_finanzen_recht' => 'bg-purple-100 text-purple-800 border-purple-300',
-                        'head' => 'bg-blue-100 text-blue-800 border-blue-300',
-                        'member' => 'bg-green-100 text-green-800 border-green-300',
-                        'candidate' => 'bg-yellow-100 text-yellow-800 border-yellow-300',
-                        'alumni' => 'bg-purple-100 text-purple-800 border-purple-300',
-                        'alumni_board' => 'bg-indigo-100 text-indigo-800 border-indigo-300',
-                        'honorary_member' => 'bg-amber-100 text-amber-800 border-amber-300'
-                    ];
-                    
-                    $roleNames = [
-                        'board' => 'Vorstand',
-                        'vorstand_intern' => 'Vorstand',
-                        'vorstand_extern' => 'Vorstand',
-                        'vorstand_finanzen_recht' => 'Vorstand',
-                        'head' => 'Ressortleiter',
-                        'member' => 'Mitglied',
-                        'candidate' => 'Anwärter',
-                        'alumni' => 'Alumni',
-                        'alumni_board' => 'Alumni Vorstand',
-                        'honorary_member' => 'Ehrenmitglied'
-                    ];
-                    
                     $badgeClass = $roleBadgeColors[$profileUserRole] ?? 'bg-gray-100 text-gray-800 border-gray-300';
                     $displayRole = $roleNames[$profileUserRole] ?? ucfirst($profileUserRole);
                 }
