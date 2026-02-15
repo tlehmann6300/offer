@@ -2035,7 +2035,13 @@ a.microsoft-btn {
     justify-content: center;
     align-items: center;
     margin-bottom: 2rem;
-    animation: float 3s ease-in-out infinite;
+}
+
+/* Apply floating animation only when user has no motion preference */
+@media (prefers-reduced-motion: no-preference) {
+    .logo-container {
+        animation: float 3s ease-in-out infinite;
+    }
 }
 
 /* Floating animation for logo */
