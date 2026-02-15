@@ -363,101 +363,29 @@ require_once __DIR__ . '/../helpers.php';
             }
         }
 
-        /* LOGIN CONTAINER - ENHANCED GLASSMORPHISM */
+        /* LOGIN CONTAINER */
         .login-container {
+            background: rgba(15, 20, 35, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 60px;
+            border-radius: 30px;
+            box-shadow: 
+                0 30px 90px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(108, 183, 62, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            width: min(500px, 90%);
             position: relative;
             z-index: 10;
-            background: linear-gradient(145deg, 
-                rgba(15, 20, 40, 0.85) 0%, 
-                rgba(20, 25, 50, 0.75) 50%,
-                rgba(15, 20, 40, 0.80) 100%
-            );
-            backdrop-filter: blur(30px) saturate(150%);
-            -webkit-backdrop-filter: blur(30px) saturate(150%);
-            border-radius: 28px;
-            padding: 60px 50px;
-            width: 90%;
-            max-width: 480px;
-            box-shadow: 
-                0 25px 70px rgba(0, 0, 0, 0.6),
-                0 10px 30px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            -webkit-animation: containerEntrance 1s cubic-bezier(0.34, 1.56, 0.64, 1);
-            animation: containerEntrance 1s cubic-bezier(0.34, 1.56, 0.64, 1);
-            overflow: visible;
-        }
-        
-        /* Animated gradient border effect */
-        .login-container::before {
-            content: '';
-            position: absolute;
-            top: -3px;
-            left: -3px;
-            right: -3px;
-            bottom: -3px;
-            background: linear-gradient(
-                60deg,
-                rgba(108, 183, 62, 0.4),
-                rgba(30, 76, 156, 0.4),
-                rgba(108, 183, 62, 0.4),
-                rgba(30, 76, 156, 0.4)
-            );
-            background-size: 300% 300%;
-            border-radius: 28px;
-            z-index: -1;
-            -webkit-animation: gradientRotate 8s ease infinite;
-            animation: gradientRotate 8s ease infinite;
-            opacity: 0.5;
-            filter: blur(8px);
-            -webkit-filter: blur(8px);
-        }
-        
-        @-webkit-keyframes gradientRotate {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-        
-        @keyframes gradientRotate {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-        
-        /* Subtle shimmer effect on container */
-        .login-container::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent 30%,
-                rgba(255, 255, 255, 0.04) 50%,
-                transparent 70%
-            );
-            animation: shimmerSlow 8s ease-in-out infinite;
-            -webkit-animation: shimmerSlow 8s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        @-webkit-keyframes shimmerSlow {
-            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-        }
-        
-        @keyframes shimmerSlow {
-            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+            -webkit-animation: containerAppear 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: containerAppear 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid rgba(108, 183, 62, 0.1);
         }
 
-        @-webkit-keyframes containerEntrance {
+        @-webkit-keyframes containerAppear {
             0% {
                 opacity: 0;
-                transform: scale(0.85) translateY(40px);
+                transform: scale(0.8) translateY(50px);
             }
             100% {
                 opacity: 1;
@@ -465,10 +393,10 @@ require_once __DIR__ . '/../helpers.php';
             }
         }
 
-        @keyframes containerEntrance {
+        @keyframes containerAppear {
             0% {
                 opacity: 0;
-                transform: scale(0.9) translateY(30px);
+                transform: scale(0.8) translateY(50px);
             }
             100% {
                 opacity: 1;
@@ -486,21 +414,22 @@ require_once __DIR__ . '/../helpers.php';
         .logo-wrapper {
             position: relative;
             display: inline-block;
-            -webkit-animation: logoFloat 3s ease-in-out infinite;
-            animation: logoFloat 3s ease-in-out infinite;
+            -webkit-animation: logoFloat 6s ease-in-out infinite;
+            animation: logoFloat 6s ease-in-out infinite;
+            will-change: transform;
         }
 
         @-webkit-keyframes logoFloat {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg);
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg);
             }
             16.6% {
-                transform: translateY(-8px) rotate(1deg);
+                transform: translateY(-6px) rotate(0.5deg);
             }
             33.3% {
-                transform: translateY(-14px) rotate(-0.5deg);
+                transform: translateY(-10px) rotate(1deg);
             }
-            50% {
+            50% { 
                 transform: translateY(-12px) rotate(0deg);
             }
             66.6% {
@@ -512,16 +441,16 @@ require_once __DIR__ . '/../helpers.php';
         }
 
         @keyframes logoFloat {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg);
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg);
             }
             16.6% {
-                transform: translateY(-8px) rotate(1deg);
+                transform: translateY(-6px) rotate(0.5deg);
             }
             33.3% {
-                transform: translateY(-14px) rotate(-0.5deg);
+                transform: translateY(-10px) rotate(1deg);
             }
-            50% {
+            50% { 
                 transform: translateY(-12px) rotate(0deg);
             }
             66.6% {
@@ -543,6 +472,7 @@ require_once __DIR__ . '/../helpers.php';
             -webkit-animation: glowPulse 6s ease-in-out infinite;
             animation: glowPulse 6s ease-in-out infinite;
             border-radius: 50%;
+            will-change: transform, opacity;
         }
 
         @-webkit-keyframes glowPulse {
@@ -651,7 +581,7 @@ require_once __DIR__ . '/../helpers.php';
         /* WELCOME TEXT */
         .welcome-text {
             text-align: center;
-            margin-bottom: 45px;
+            margin-bottom: 40px;
             -webkit-animation: textSlideUp 1s ease-out 0.5s both;
             animation: textSlideUp 1s ease-out 0.5s both;
         }
@@ -692,14 +622,14 @@ require_once __DIR__ . '/../helpers.php';
             font-weight: 400;
         }
 
-        /* MICROSOFT BUTTON - AWARD-WINNING DESIGN */
+        /* MICROSOFT BUTTON - MEGA IMPRESSIVE */
         .microsoft-button,
         .microsoft-btn {
             width: 100%;
             padding: 20px;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #f5f5f5 100%);
-            border: 2px solid rgba(108, 183, 62, 0.3);
-            border-radius: 18px;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            border: 2px solid rgba(108, 183, 62, 0.2);
+            border-radius: 16px;
             font-size: 17px;
             font-weight: 600;
             color: #2d2d2d;
@@ -708,19 +638,15 @@ require_once __DIR__ . '/../helpers.php';
             align-items: center;
             justify-content: center;
             gap: 15px;
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
             overflow: hidden;
             box-shadow: 
-                0 12px 35px rgba(0, 0, 0, 0.35),
-                0 5px 15px rgba(108, 183, 62, 0.15),
-                inset 0 1px 2px rgba(255, 255, 255, 0.9),
-                inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+                0 10px 30px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
             -webkit-animation: buttonSlideUp 1s ease-out 0.8s both;
             animation: buttonSlideUp 1s ease-out 0.8s both;
             text-decoration: none;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
         }
 
         @-webkit-keyframes buttonSlideUp {
@@ -777,38 +703,52 @@ require_once __DIR__ . '/../helpers.php';
 
         .microsoft-button:hover,
         .microsoft-btn:hover {
-            transform: translateY(-5px) scale(1.03);
+            transform: translateY(-5px) scale(1.02);
+            border-color: rgba(108, 183, 62, 0.6);
             box-shadow: 
-                0 20px 50px rgba(0, 0, 0, 0.45),
-                0 8px 20px rgba(108, 183, 62, 0.25),
-                inset 0 1px 2px rgba(255, 255, 255, 1),
-                inset 0 -1px 2px rgba(0, 0, 0, 0.05);
-            border-color: rgba(108, 183, 62, 0.5);
+                0 20px 50px rgba(108, 183, 62, 0.3),
+                0 0 0 1px rgba(108, 183, 62, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
         }
 
         .microsoft-button:active,
         .microsoft-btn:active {
-            transform: translateY(-3px) scale(1.01);
-            transition: all 0.1s ease;
+            transform: translateY(-2px) scale(0.98);
         }
 
-        /* Microsoft Logo Grid */
+        /* Microsoft Logo */
         .microsoft-logo {
+            width: 24px;
+            height: 24px;
             display: grid;
-            grid-template-columns: repeat(2, 12px);
-            grid-template-rows: repeat(2, 12px);
+            grid-template-columns: repeat(2, 11px);
+            grid-template-rows: repeat(2, 11px);
             gap: 2px;
-            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 2;
+            -webkit-animation: logoSpin 1s ease-out 1s;
+            animation: logoSpin 1s ease-out 1s;
         }
 
-        .microsoft-button:hover .microsoft-logo,
-        .microsoft-btn:hover .microsoft-logo {
-            transform: rotate(90deg) scale(1.1);
+        @-webkit-keyframes logoSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes logoSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .microsoft-button:hover .microsoft-logo div,
+        .microsoft-btn:hover .microsoft-logo div {
+            transform: scale(1.1);
         }
 
         .microsoft-logo div {
-            width: 12px;
-            height: 12px;
+            width: 11px;
+            height: 11px;
+            transition: all 0.3s ease;
         }
 
         .microsoft-logo div:nth-child(1) { background: #f25022; }
@@ -816,33 +756,21 @@ require_once __DIR__ . '/../helpers.php';
         .microsoft-logo div:nth-child(3) { background: #00a4ef; }
         .microsoft-logo div:nth-child(4) { background: #ffb900; }
 
-        /* Loading State */
-        .microsoft-button.loading,
-        .microsoft-btn.loading {
-            pointer-events: none;
+        .microsoft-button span {
+            position: relative;
+            z-index: 2;
         }
 
+        /* Loading Animation */
         .loading-spinner {
             display: none;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(0, 0, 0, 0.1);
-            border-top-color: #6cb73e;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(45, 45, 45, 0.2);
             border-radius: 50%;
+            border-top-color: #2d2d2d;
             -webkit-animation: spin 0.8s linear infinite;
             animation: spin 0.8s linear infinite;
-        }
-
-        .microsoft-button.loading .loading-spinner,
-        .microsoft-btn.loading .loading-spinner {
-            display: block;
-        }
-
-        .microsoft-button.loading .microsoft-logo,
-        .microsoft-button.loading span,
-        .microsoft-btn.loading .microsoft-logo,
-        .microsoft-btn.loading span {
-            display: none;
         }
 
         @-webkit-keyframes spin {
@@ -853,50 +781,83 @@ require_once __DIR__ . '/../helpers.php';
             to { transform: rotate(360deg); }
         }
 
-        /* Success State */
+        .microsoft-button.loading .loading-spinner,
+        .microsoft-btn.loading .loading-spinner {
+            display: inline-block;
+        }
+
+        .microsoft-button.loading span,
+        .microsoft-button.loading .microsoft-logo,
+        .microsoft-btn.loading span,
+        .microsoft-btn.loading .microsoft-logo {
+            display: none;
+        }
+
+        /* Success Animation */
         .success-checkmark {
             display: none;
             width: 24px;
             height: 24px;
+            border-radius: 50%;
+            background: #6cb73e;
             position: relative;
         }
 
-        .microsoft-button.success,
-        .microsoft-btn.success {
-            background: linear-gradient(135deg, #6cb73e 0%, #5a9933 100%);
-            color: white;
+        .success-checkmark::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 9px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
         }
 
         .microsoft-button.success .success-checkmark,
         .microsoft-btn.success .success-checkmark {
             display: block;
+            -webkit-animation: successPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: successPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .microsoft-button.success .microsoft-logo,
+        @-webkit-keyframes successPop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes successPop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
         .microsoft-button.success span,
-        .microsoft-btn.success .microsoft-logo,
-        .microsoft-btn.success span {
+        .microsoft-button.success .microsoft-logo,
+        .microsoft-btn.success span,
+        .microsoft-btn.success .microsoft-logo {
             display: none;
-        }
-
-        .success-checkmark::before {
-            content: '✓';
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
         }
 
         /* Ripple Effect */
         .ripple {
             position: absolute;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(108, 183, 62, 0.4);
             transform: scale(0);
-            animation: ripple-animation 0.6s ease-out;
+            -webkit-animation: rippleEffect 0.6s ease-out;
+            animation: rippleEffect 0.6s ease-out;
             pointer-events: none;
         }
 
-        @keyframes ripple-animation {
+        @-webkit-keyframes rippleEffect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        @keyframes rippleEffect {
             to {
                 transform: scale(4);
                 opacity: 0;
@@ -906,16 +867,96 @@ require_once __DIR__ . '/../helpers.php';
         /* Footer */
         .login-footer {
             text-align: center;
-            margin-top: 35px;
+            margin-top: 40px;
             color: rgba(255, 255, 255, 0.4);
             font-size: 13px;
-            animation: textSlideUp 1s ease-out 1s both;
+            -webkit-animation: textSlideUp 1s ease-out 1.1s both;
+            animation: textSlideUp 1s ease-out 1.1s both;
         }
 
         /* Responsive Design */
-        @media (max-width: 768px) {
+        
+        /* Large Desktop */
+        @media (min-width: 1600px) {
             .login-container {
-                padding: 45px 30px;
+                padding: 70px;
+                width: 550px;
+            }
+
+            .ibc-logo {
+                width: 170px;
+            }
+
+            .logo-glow {
+                width: 230px;
+                height: 230px;
+            }
+
+            .welcome-title {
+                font-size: 36px;
+            }
+
+            .microsoft-button,
+            .microsoft-btn {
+                padding: 22px;
+                font-size: 18px;
+            }
+        }
+
+        /* Tablets & Medium screens (768px - 1024px) */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .login-container {
+                padding: 50px 40px;
+                width: 480px;
+            }
+
+            .ibc-logo {
+                width: 140px;
+            }
+
+            .logo-glow {
+                width: 190px;
+                height: 190px;
+            }
+        }
+
+        /* Tablets Portrait & Large Phones (481px - 768px) */
+        @media (max-width: 768px) and (min-width: 481px) {
+            .login-container {
+                padding: 45px 35px;
+                width: 90%;
+                max-width: 450px;
+                border-radius: 25px;
+            }
+
+            .ibc-logo {
+                width: 130px;
+            }
+
+            .logo-glow {
+                width: 180px;
+                height: 180px;
+            }
+
+            .welcome-title {
+                font-size: 28px;
+            }
+
+            .welcome-subtitle {
+                font-size: 15px;
+            }
+
+            .microsoft-button,
+            .microsoft-btn {
+                padding: 18px;
+                font-size: 16px;
+            }
+        }
+
+        /* Smartphones (361px - 480px) */
+        @media (max-width: 480px) and (min-width: 361px) {
+            .login-container {
+                padding: 40px 28px;
                 width: 92%;
                 border-radius: 22px;
             }
@@ -929,26 +970,25 @@ require_once __DIR__ . '/../helpers.php';
                 height: 160px;
             }
 
-            .welcome-text {
-                margin-bottom: 40px;
-            }
-
             .welcome-title {
                 font-size: 26px;
                 margin-bottom: 10px;
             }
 
             .welcome-subtitle {
-                font-size: 15px;
+                font-size: 14px;
             }
 
-            .microsoft-button {
+            .microsoft-button,
+            .microsoft-btn {
                 padding: 17px;
                 font-size: 15px;
                 gap: 12px;
             }
 
             .microsoft-logo {
+                width: 22px;
+                height: 22px;
                 grid-template-columns: repeat(2, 10px);
                 grid-template-rows: repeat(2, 10px);
             }
@@ -960,15 +1000,12 @@ require_once __DIR__ . '/../helpers.php';
 
             .login-footer {
                 font-size: 12px;
-                margin-top: 32px;
-            }
-
-            .floating-orb {
-                opacity: 0.15;
+                margin-top: 35px;
             }
         }
 
-        @media (max-width: 480px) {
+        /* Small Smartphones (280px - 360px) */
+        @media (max-width: 360px) {
             .login-container {
                 padding: 35px 22px;
                 width: 94%;
@@ -997,13 +1034,16 @@ require_once __DIR__ . '/../helpers.php';
                 font-size: 13px;
             }
 
-            .microsoft-button {
+            .microsoft-button,
+            .microsoft-btn {
                 padding: 15px;
                 font-size: 14px;
                 gap: 10px;
             }
 
             .microsoft-logo {
+                width: 20px;
+                height: 20px;
                 grid-template-columns: repeat(2, 9px);
                 grid-template-rows: repeat(2, 9px);
             }
@@ -1016,6 +1056,49 @@ require_once __DIR__ . '/../helpers.php';
             .login-footer {
                 font-size: 11px;
                 margin-top: 30px;
+            }
+        }
+
+        /* Extra Small Devices (< 280px) */
+        @media (max-width: 280px) {
+            .login-container {
+                padding: 30px 18px;
+                width: 96%;
+            }
+
+            .ibc-logo {
+                width: 85px;
+            }
+
+            .logo-glow {
+                width: 120px;
+                height: 120px;
+            }
+
+            .welcome-title {
+                font-size: 20px;
+            }
+
+            .welcome-subtitle {
+                font-size: 12px;
+            }
+
+            .microsoft-button,
+            .microsoft-btn {
+                padding: 13px;
+                font-size: 13px;
+            }
+
+            .microsoft-logo {
+                width: 18px;
+                height: 18px;
+                grid-template-columns: repeat(2, 8px);
+                grid-template-rows: repeat(2, 8px);
+            }
+
+            .microsoft-logo div {
+                width: 8px;
+                height: 8px;
             }
         }
 
