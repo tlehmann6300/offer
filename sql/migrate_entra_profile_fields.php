@@ -5,7 +5,7 @@
  * Adds optional fields to users table:
  * - job_title (VARCHAR) - User's position/job title from Entra
  * - company (VARCHAR) - User's company name from Entra
- * - entra_roles (TEXT) - Comma-separated Entra role names for display
+ * - entra_roles (TEXT) - JSON array of Entra role names for display
  * 
  * Also verifies is_profile_complete exists with proper default.
  */
@@ -42,7 +42,7 @@ try {
     $stmt = $db->query("SHOW COLUMNS FROM users LIKE 'entra_roles'");
     if ($stmt->rowCount() === 0) {
         echo "Adding entra_roles column...\n";
-        $db->exec("ALTER TABLE users ADD COLUMN entra_roles TEXT DEFAULT NULL COMMENT 'Comma-separated Microsoft Entra role names for display'");
+        $db->exec("ALTER TABLE users ADD COLUMN entra_roles TEXT DEFAULT NULL COMMENT 'JSON array of Microsoft Entra role names for display'");
         echo "✓ entra_roles column added successfully\n";
     } else {
         echo "✓ entra_roles column already exists\n";
