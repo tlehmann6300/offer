@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `gender` VARCHAR(50) DEFAULT NULL COMMENT 'User gender',
   `role` ENUM('user', 'admin', 'moderator') NOT NULL DEFAULT 'user',
   `azure_roles` JSON DEFAULT NULL COMMENT 'Original Microsoft Entra ID roles from Azure AD authentication',
+  `azure_oid` VARCHAR(255) DEFAULT NULL COMMENT 'Azure Object Identifier (OID) from Microsoft Entra ID authentication',
   `job_title` VARCHAR(255) DEFAULT NULL COMMENT 'Job title from Microsoft Entra ID',
   `company` VARCHAR(255) DEFAULT NULL COMMENT 'Company name from Microsoft Entra ID',
   `entra_roles` TEXT DEFAULT NULL COMMENT 'JSON array of Microsoft Entra role names for display',
