@@ -25,6 +25,9 @@ if (!(Auth::isBoard() || Auth::hasRole('head'))) {
 $successMessage = '';
 $errorMessage = '';
 
+// Default roles as fallback
+const DEFAULT_ROLES = ['Board', 'Ressortleiter', 'Mitglied', 'Alumni'];
+
 // Load available roles dynamically from database
 $availableRoles = [];
 try {
@@ -52,12 +55,12 @@ try {
 } catch (Exception $e) {
     error_log('Error loading roles from database: ' . $e->getMessage());
     // Fallback to default roles if database query fails
-    $availableRoles = ['Board', 'Ressortleiter', 'Mitglied', 'Alumni'];
+    $availableRoles = DEFAULT_ROLES;
 }
 
 // If no roles found in database, use defaults
 if (empty($availableRoles)) {
-    $availableRoles = ['Board', 'Ressortleiter', 'Mitglied', 'Alumni'];
+    $availableRoles = DEFAULT_ROLES;
 }
 
 // Handle form submission
@@ -74,7 +77,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_poll'])) {
     // Merge custom roles with selected roles
     if (!empty($customRoles)) {
         $customRolesArray = array_map('trim', explode(',', $customRoles));
-        $allowedRoles = array_merge($allowedRoles, $customRolesArray);
+        // Validate each custom role name
+        $validatedCustomRoles = [];
+        foreach ($customRolesArray as $role) {
+            // Allow only alphanumeric characters, spaces, hyphens, underscores, and umlauts
+            if (preg_match('/^[a-zA-Z0-9\s\-_äöüÄÖÜß]+$/', $role) && !empty($role)) {
+                $validatedCustomRoles[] = $role;
+            } else if (!empty($role)) {
+                error_log('Invalid custom role name rejected: ' . $role);
+            }
+        }
+        $allowedRoles = array_merge($allowedRoles, $validatedCustomRoles);
         $allowedRoles = array_unique(array_filter($allowedRoles));
     }
     
