@@ -7,6 +7,7 @@
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/database.php';
 require_once __DIR__ . '/../../includes/helpers.php';
+require_once __DIR__ . '/../../includes/poll_helpers.php';
 
 // Check authentication
 if (!Auth::check()) {
@@ -34,53 +35,8 @@ $stmt = $db->prepare("
 $stmt->execute([$user['id'], $user['id']]);
 $polls = $stmt->fetchAll();
 
-// Filter polls based on new logic
-$filteredPolls = array_filter($polls, function($poll) use ($userRole, $userAzureRoles) {
-    // Skip if user has manually hidden this poll
-    if ($poll['user_has_hidden'] > 0) {
-        return false;
-    }
-    
-    // If visible_to_all is set, always show
-    if (!empty($poll['visible_to_all'])) {
-        // For internal polls, hide if user has already voted
-        if (!empty($poll['is_internal']) && $poll['user_has_voted'] > 0) {
-            return false;
-        }
-        return true;
-    }
-    
-    // Check allowed_roles (Entra roles) if set
-    $allowedRoles = !empty($poll['allowed_roles']) ? json_decode($poll['allowed_roles'], true) : null;
-    if ($allowedRoles && is_array($allowedRoles)) {
-        // Check if any of user's azure_roles match allowed_roles
-        $hasMatchingRole = false;
-        if (is_array($userAzureRoles)) {
-            foreach ($userAzureRoles as $userAzureRole) {
-                if (in_array($userAzureRole, $allowedRoles)) {
-                    $hasMatchingRole = true;
-                    break;
-                }
-            }
-        }
-        if (!$hasMatchingRole) {
-            return false;
-        }
-    }
-    
-    // Check target_groups (backward compatibility with old role system)
-    $targetGroups = json_decode($poll['target_groups'], true);
-    if (!in_array($userRole, $targetGroups)) {
-        return false;
-    }
-    
-    // For internal polls, hide if user has already voted
-    if (!empty($poll['is_internal']) && $poll['user_has_voted'] > 0) {
-        return false;
-    }
-    
-    return true;
-});
+// Filter polls using shared helper function
+$filteredPolls = filterPollsForUser($polls, $userRole, $userAzureRoles);
 
 $title = 'Umfragen - IBC Intranet';
 ob_start();

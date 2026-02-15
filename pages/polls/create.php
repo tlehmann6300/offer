@@ -251,7 +251,7 @@ ob_start();
                         type="checkbox" 
                         name="is_internal" 
                         value="1"
-                        <?php echo (!isset($_POST['is_internal']) || isset($_POST['is_internal'])) ? 'checked' : ''; ?>
+                        <?php echo (!isset($_POST['create_poll']) || isset($_POST['is_internal'])) ? 'checked' : ''; ?>
                         class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 mt-0.5"
                     >
                     <div class="ml-3">
@@ -279,7 +279,6 @@ ob_start();
                     <i class="fas fa-info-circle mr-1"></i>
                     Geben Sie die erlaubten Microsoft Entra-Rollen als JSON-Array ein. Leer lassen, um nur die Standard-Zielgruppen zu verwenden.
                 </p>
-                <input type="hidden" name="allowed_roles[]" id="allowed_roles_hidden">
             </div>
 
             <!-- Info Box -->
