@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../includes/models/User.php';
 require_once __DIR__ . '/../../includes/models/Alumni.php';
 require_once __DIR__ . '/../../includes/models/Member.php';
 require_once __DIR__ . '/../../includes/utils/SecureImageUpload.php';
+require_once __DIR__ . '/../../src/MailService.php';
 
 if (!Auth::check()) {
     header('Location: login.php');
@@ -256,6 +257,84 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $error = 'Fehler beim Deaktivieren von 2FA';
         }
+    } else if (isset($_POST['submit_change_request'])) {
+        // Handle change request submission
+        try {
+            $requestType = trim($_POST['request_type'] ?? '');
+            $requestReason = trim($_POST['request_reason'] ?? '');
+            
+            // Validate request type
+            $allowedTypes = ['Rollenänderung', 'E-Mail-Adresse ändern'];
+            if (!in_array($requestType, $allowedTypes, true)) {
+                throw new Exception('Ungültiger Änderungstyp. Bitte wählen Sie eine gültige Option.');
+            }
+            
+            // Validate request reason (minimum 10 characters, maximum 1000)
+            if (strlen($requestReason) < 10) {
+                throw new Exception('Bitte geben Sie eine ausführlichere Begründung an (mindestens 10 Zeichen).');
+            }
+            if (strlen($requestReason) > 1000) {
+                throw new Exception('Die Begründung ist zu lang (maximal 1000 Zeichen).');
+            }
+            
+            // Get user's name
+            $userName = trim(($profile['first_name'] ?? '') . ' ' . ($profile['last_name'] ?? ''));
+            if (empty($userName) || $userName === ' ') {
+                $userName = $user['email'];
+            }
+            
+            // Get current role
+            $currentRole = '';
+            if (!empty($user['entra_roles'])) {
+                $currentRole = $user['entra_roles'];
+            } elseif (!empty($user['role'])) {
+                $currentRole = translateRole($user['role']);
+            }
+            
+            // Prepare email body
+            $emailBody = MailService::getTemplate(
+                'Änderungsantrag',
+                '<p>Ein Benutzer hat einen Änderungsantrag gestellt:</p>
+                <table class="info-table">
+                    <tr>
+                        <td class="info-label">Name:</td>
+                        <td class="info-value">' . htmlspecialchars($userName) . '</td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">Aktuelle E-Mail:</td>
+                        <td class="info-value">' . htmlspecialchars($user['email']) . '</td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">Aktuelle Rolle:</td>
+                        <td class="info-value">' . htmlspecialchars($currentRole) . '</td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">Art der Änderung:</td>
+                        <td class="info-value">' . htmlspecialchars($requestType) . '</td>
+                    </tr>
+                    <tr>
+                        <td class="info-label">Begründung / Neuer Wert:</td>
+                        <td class="info-value">' . nl2br(htmlspecialchars($requestReason)) . '</td>
+                    </tr>
+                </table>'
+            );
+            
+            // Send email to IT
+            $emailSent = MailService::sendEmail(
+                'it@business-consulting.de',
+                'Änderungsantrag von ' . $userName,
+                $emailBody
+            );
+            
+            if ($emailSent) {
+                $message = 'Ihr Änderungsantrag wurde erfolgreich eingereicht!';
+            } else {
+                $error = 'Fehler beim Senden der E-Mail. Bitte versuchen Sie es später erneut.';
+            }
+        } catch (Exception $e) {
+            error_log('Error submitting change request: ' . $e->getMessage());
+            $error = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
+        }
     }
 }
 
@@ -373,6 +452,55 @@ ob_start();
                 <p class="text-lg text-gray-800 dark:text-gray-100"><?php echo date('d.m.Y', strtotime($user['created_at'])); ?></p>
             </div>
         </div>
+    </div>
+
+    <!-- Change Request Section -->
+    <div class="card p-6">
+        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+            <i class="fas fa-edit text-green-600 mr-2"></i>
+            Änderungsantrag
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300 mb-6">
+            Beantragen Sie Änderungen an Ihrer Rolle oder E-Mail-Adresse
+        </p>
+        
+        <form method="POST" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Art der Änderung *</label>
+                <select 
+                    name="request_type" 
+                    required 
+                    class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
+                >
+                    <option value="">Bitte wählen...</option>
+                    <option value="Rollenänderung">Rollenänderung</option>
+                    <option value="E-Mail-Adresse ändern">E-Mail-Adresse ändern</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Begründung / Neuer Wert *</label>
+                <textarea 
+                    name="request_reason" 
+                    required 
+                    minlength="10"
+                    maxlength="1000"
+                    rows="4"
+                    placeholder="Bitte geben Sie eine Begründung oder den neuen gewünschten Wert an..."
+                    class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
+                ></textarea>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mindestens 10, maximal 1000 Zeichen</p>
+            </div>
+            
+            <button 
+                type="submit" 
+                name="submit_change_request"
+                class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+            >
+                <i class="fas fa-paper-plane mr-2"></i>
+                Beantragen
+            </button>
+        </form>
     </div>
 
     <!-- Profile Information -->
