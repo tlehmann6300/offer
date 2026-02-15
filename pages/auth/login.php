@@ -1200,7 +1200,6 @@ try {
             }
 
             .microsoft-button {
-            text-decoration: none;
                 padding: 22px;
                 font-size: 18px;
             }
@@ -1250,7 +1249,6 @@ try {
             }
 
             .microsoft-button {
-            text-decoration: none;
                 padding: 18px;
                 font-size: 16px;
             }
@@ -1287,7 +1285,6 @@ try {
             }
 
             .microsoft-button {
-            text-decoration: none;
                 padding: 17px;
                 font-size: 15px;
                 gap: 12px;
@@ -1346,7 +1343,6 @@ try {
             }
 
             .microsoft-button {
-            text-decoration: none;
                 padding: 15px;
                 font-size: 14px;
                 gap: 10px;
@@ -1404,7 +1400,6 @@ try {
             }
 
             .microsoft-button {
-            text-decoration: none;
                 padding: 13px;
                 font-size: 13px;
             }
@@ -1429,7 +1424,6 @@ try {
             }
 
             .microsoft-button {
-            text-decoration: none;
                 border: 2px solid #2d2d2d;
             }
         }
