@@ -27,7 +27,11 @@ if (isset($_GET['return_to'])) {
 // Check referrer URL if return_to parameter is not set
 elseif (isset($_SERVER['HTTP_REFERER'])) {
     $referer = $_SERVER['HTTP_REFERER'];
-    if (strpos($referer, 'members') !== false) {
+    $parsedUrl = parse_url($referer);
+    // Check if the path contains '/pages/members/' or '/members/' to ensure it's specifically the members page
+    if (isset($parsedUrl['path']) && 
+        (strpos($parsedUrl['path'], '/pages/members/') !== false || 
+         strpos($parsedUrl['path'], '/members/') !== false)) {
         $returnTo = 'members';
     }
 }
