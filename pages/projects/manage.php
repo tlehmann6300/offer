@@ -5,8 +5,17 @@ require_once __DIR__ . '/../../includes/models/Project.php';
 require_once __DIR__ . '/../../includes/utils/SecureImageUpload.php';
 require_once __DIR__ . '/../../src/Database.php';
 
-// Only board and manager can access
-Auth::requireRole('manager');
+// Access control: Only board, head, alumni_board, and those with manage_projects permission can access
+if (!Auth::check()) {
+    header('Location: ../auth/login.php');
+    exit;
+}
+
+$canManageProjects = Auth::hasPermission('manage_projects') || Auth::isBoard() || Auth::hasRole(['head', 'alumni_board']);
+if (!$canManageProjects) {
+    header('Location: ../dashboard/index.php');
+    exit;
+}
 
 $message = '';
 $error = '';

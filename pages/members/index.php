@@ -153,6 +153,9 @@ ob_start();
                 // Determine role badge color
                 $roleBadgeColors = [
                     'board' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'board_finance' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'board_internal' => 'bg-purple-100 text-purple-800 border-purple-300',
+                    'board_external' => 'bg-purple-100 text-purple-800 border-purple-300',
                     'vorstand_intern' => 'bg-purple-100 text-purple-800 border-purple-300',
                     'vorstand_extern' => 'bg-purple-100 text-purple-800 border-purple-300',
                     'vorstand_finanzen_recht' => 'bg-purple-100 text-purple-800 border-purple-300',
@@ -163,16 +166,45 @@ ob_start();
                 
                 $roleNames = [
                     'board' => 'Vorstand',
-                    'vorstand_intern' => 'Vorstand',
-                    'vorstand_extern' => 'Vorstand',
-                    'vorstand_finanzen_recht' => 'Vorstand',
+                    'board_finance' => 'Vorstand Finanzen',
+                    'board_internal' => 'Vorstand Intern',
+                    'board_external' => 'Vorstand Extern',
+                    'vorstand_intern' => 'Vorstand Intern',
+                    'vorstand_extern' => 'Vorstand Extern',
+                    'vorstand_finanzen_recht' => 'Vorstand Finanzen & Recht',
                     'head' => 'Ressortleiter',
                     'member' => 'Mitglied',
                     'candidate' => 'Anwärter'
                 ];
                 
-                $badgeClass = $roleBadgeColors[$member['role']] ?? 'bg-gray-100 text-gray-800 border-gray-300';
-                $roleName = $roleNames[$member['role']] ?? ucfirst($member['role']);
+                // Display Entra role if available, otherwise use internal role mapping
+                $displayRole = '';
+                $badgeClass = '';
+                
+                if (!empty($member['entra_roles'])) {
+                    // Entra roles are stored as JSON array, decode and display
+                    $entraRolesArray = json_decode($member['entra_roles'], true);
+                    if (is_array($entraRolesArray) && !empty($entraRolesArray)) {
+                        // Sanitize each role before joining to prevent XSS
+                        $sanitizedRoles = array_map('htmlspecialchars', $entraRolesArray);
+                        $displayRole = implode(', ', $sanitizedRoles);
+                    } else {
+                        // If JSON decode failed or empty, log error and use as-is (might be a string)
+                        if (json_last_error() !== JSON_ERROR_NONE) {
+                            error_log("Failed to decode entra_roles for member: " . json_last_error_msg());
+                        }
+                        $displayRole = htmlspecialchars($member['entra_roles']);
+                    }
+                    $badgeClass = 'bg-purple-100 text-purple-800 border-purple-300';
+                } elseif (!empty($member['job_title'])) {
+                    // Use job title from Microsoft Entra if available
+                    $displayRole = $member['job_title'];
+                    $badgeClass = 'bg-blue-100 text-blue-800 border-blue-300';
+                } else {
+                    // Fall back to internal role mapping
+                    $badgeClass = $roleBadgeColors[$member['role']] ?? 'bg-gray-100 text-gray-800 border-gray-300';
+                    $displayRole = $roleNames[$member['role']] ?? ucfirst($member['role']);
+                }
                 
                 // Generate initials for fallback
                 $initials = strtoupper(substr($member['first_name'], 0, 1) . substr($member['last_name'], 0, 1));
@@ -226,7 +258,7 @@ ob_start();
                     <!-- Role Badge: Different colors for each role - Top Right Corner -->
                     <div class="absolute top-4 right-4">
                         <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full border <?php echo $badgeClass; ?>">
-                            <?php echo htmlspecialchars($roleName); ?>
+                            <?php echo $displayRole; ?>
                         </span>
                     </div>
                     
