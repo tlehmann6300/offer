@@ -3135,11 +3135,10 @@ body.dark-mode .btn-primary:hover {
 
 body.dark-mode .btn,
 body.dark-mode button:not(.bg-transparent) {
+    border-color: rgba(255, 255, 255, 0.1) !important;
     color: #ffffff !important;
 }
 
-body.dark-mode button,
-body.dark-mode .btn,
 body.dark-mode .btn-primary,
 body.dark-mode .btn-secondary,
 body.dark-mode .btn-login-premium {
