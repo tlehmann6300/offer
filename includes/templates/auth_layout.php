@@ -374,8 +374,7 @@ require_once __DIR__ . '/../helpers.php';
                 0 30px 90px rgba(0, 0, 0, 0.5),
                 0 0 0 1px rgba(108, 183, 62, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            width: 500px;
-            max-width: 90%;
+            width: min(500px, 90%);
             position: relative;
             z-index: 10;
             -webkit-animation: containerAppear 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
