@@ -180,7 +180,7 @@ body {
 .sidebar span,
 .sidebar i,
 .sidebar label {
-    color: rgba(255, 255, 255, 0.95) !important;
+    color: #ffffff !important;
 }
 
 /* Light Mode: Force sidebar links to be white with high specificity */
@@ -188,7 +188,7 @@ body:not(.dark-mode) .sidebar a,
 body:not(.dark-mode) .sidebar span,
 body:not(.dark-mode) .sidebar i,
 body:not(.dark-mode) .sidebar label {
-    color: rgba(255, 255, 255, 0.95) !important;
+    color: #ffffff !important;
 }
 
 .sidebar a:hover {
@@ -595,7 +595,7 @@ body.dark-mode .glass-card {
 }
 
 body.dark-mode a:not(.btn-primary) {
-    color: var(--ibc-blue-light);
+    color: #60a5fa;
 }
 
 /* Light Mode Links - Use IBC Blue for interactive elements */
@@ -1296,7 +1296,7 @@ body.dark-mode a:not(.btn):not(.btn-primary):not(.nav-link) {
 
 /* Sidebar links override - keep white */
 body.dark-mode .sidebar a {
-    color: rgba(255, 255, 255, 0.95) !important;
+    color: #ffffff !important;
 }
 
 /* Dark Mode: Button and Interactive Element Support */
@@ -1861,7 +1861,7 @@ body:not(.dark-mode) .card:hover::after {
     background: linear-gradient(135deg, var(--ibc-green) 0%, var(--ibc-green-mid) 50%, var(--ibc-blue) 100%);
     background-size: 200% 200%;
     animation: gradientShift 6s ease infinite;
-    color: white;
+    color: #ffffff !important;
     padding: 0.75rem 2rem;
     border-radius: var(--radius-md);
     font-weight: 600;
@@ -1912,7 +1912,7 @@ body:not(.dark-mode) .btn-primary:active::after {
 .btn-login-premium {
     /* Typography */
     font-weight: bold;
-    color: #FFFFFF;
+    color: #ffffff !important;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     
@@ -3125,6 +3125,7 @@ body.dark-mode [class*="from-green-"]:not(.from-green-50) {
 body.dark-mode .btn-primary {
     background: linear-gradient(135deg, var(--ibc-green-dark) 0%, var(--ibc-green) 50%, var(--ibc-blue-dark) 100%);
     box-shadow: 0 4px 20px rgba(0, 166, 81, 0.4), 0 2px 8px rgba(0, 166, 81, 0.3);
+    color: #ffffff !important;
 }
 
 body.dark-mode .btn-primary:hover {
@@ -3133,8 +3134,12 @@ body.dark-mode .btn-primary:hover {
 }
 
 body.dark-mode button,
-body.dark-mode .btn {
+body.dark-mode .btn,
+body.dark-mode .btn-primary,
+body.dark-mode .btn-secondary,
+body.dark-mode .btn-login-premium {
     border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
 }
 
 /* Dark Mode: Enhanced borders for better structure */
@@ -3234,6 +3239,10 @@ body.dark-mode .tag {
 /* Dark Mode: Perfect text colors for specific elements */
 body.dark-mode .text-blue-600 {
     color: #60a5fa !important; /* blue-400 */
+}
+
+body.dark-mode .text-ibc-blue {
+    color: #60a5fa !important; /* Light blue for better contrast on dark backgrounds */
 }
 
 body.dark-mode .text-green-600 {
