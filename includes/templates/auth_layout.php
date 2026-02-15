@@ -82,7 +82,31 @@ require_once __DIR__ . '/../helpers.php';
                 radial-gradient(circle at 80% 80%, rgba(30, 76, 156, 0.2) 0%, transparent 50%),
                 radial-gradient(circle at 40% 20%, rgba(118, 75, 162, 0.15) 0%, transparent 50%),
                 linear-gradient(135deg, #0a0f1e 0%, #1a1f3e 100%);
+            -webkit-animation: gradientShift 25s ease-in-out infinite;
             animation: gradientShift 25s ease-in-out infinite;
+        }
+
+        @-webkit-keyframes gradientShift {
+            0% { 
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            25% { 
+                transform: translate(-3%, 3%) scale(1.05);
+                opacity: 0.95;
+            }
+            50% { 
+                transform: translate(0, 5%) scale(1.1);
+                opacity: 0.9;
+            }
+            75% { 
+                transform: translate(3%, 3%) scale(1.05);
+                opacity: 0.95;
+            }
+            100% { 
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
         }
 
         @keyframes gradientShift {
@@ -113,7 +137,9 @@ require_once __DIR__ . '/../helpers.php';
             position: absolute;
             border-radius: 50%;
             filter: blur(80px);
+            -webkit-filter: blur(80px);
             opacity: 0.3;
+            -webkit-animation: float 20s ease-in-out infinite;
             animation: float 20s ease-in-out infinite;
         }
 
@@ -132,6 +158,7 @@ require_once __DIR__ . '/../helpers.php';
             background: radial-gradient(circle, rgba(30, 76, 156, 0.4) 0%, transparent 70%);
             bottom: 15%;
             right: 15%;
+            -webkit-animation-delay: 7s;
             animation-delay: 7s;
         }
 
@@ -141,7 +168,23 @@ require_once __DIR__ . '/../helpers.php';
             background: radial-gradient(circle, rgba(118, 75, 162, 0.3) 0%, transparent 70%);
             top: 60%;
             left: 50%;
+            -webkit-animation-delay: 14s;
             animation-delay: 14s;
+        }
+
+        @-webkit-keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+            50% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+            75% {
+                transform: translate(20px, 10px) scale(1.05);
+            }
         }
 
         @keyframes float {
@@ -165,7 +208,17 @@ require_once __DIR__ . '/../helpers.php';
             width: 100%;
             height: 100%;
             background: linear-gradient(45deg, transparent 30%, rgba(108, 183, 62, 0.05) 50%, transparent 70%);
+            -webkit-animation: wave 15s ease-in-out infinite;
             animation: wave 15s ease-in-out infinite;
+        }
+
+        @-webkit-keyframes wave {
+            0%, 100% {
+                transform: translateX(-100%) translateY(-50%) rotate(0deg);
+            }
+            50% {
+                transform: translateX(100%) translateY(50%) rotate(180deg);
+            }
         }
 
         @keyframes wave {
@@ -186,7 +239,17 @@ require_once __DIR__ . '/../helpers.php';
                 linear-gradient(rgba(108, 183, 62, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(108, 183, 62, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
+            -webkit-animation: gridMove 20s linear infinite;
             animation: gridMove 20s linear infinite;
+        }
+
+        @-webkit-keyframes gridMove {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(50px, 50px);
+            }
         }
 
         @keyframes gridMove {
@@ -204,22 +267,40 @@ require_once __DIR__ . '/../helpers.php';
             width: 2px;
             height: 200px;
             background: linear-gradient(to bottom, transparent, rgba(108, 183, 62, 0.3), transparent);
+            -webkit-animation: beam 8s ease-in-out infinite;
             animation: beam 8s ease-in-out infinite;
         }
 
         .light-beam:nth-child(6) {
             left: 20%;
+            -webkit-animation-delay: 0s;
             animation-delay: 0s;
         }
 
         .light-beam:nth-child(7) {
             left: 50%;
+            -webkit-animation-delay: 2.5s;
             animation-delay: 2.5s;
         }
 
         .light-beam:nth-child(8) {
             left: 80%;
+            -webkit-animation-delay: 5s;
             animation-delay: 5s;
+        }
+
+        @-webkit-keyframes beam {
+            0%, 100% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
         }
 
         @keyframes beam {
@@ -243,13 +324,32 @@ require_once __DIR__ . '/../helpers.php';
             height: 4px;
             background: rgba(255, 255, 255, 0.6);
             border-radius: 50%;
+            -webkit-animation: particleFloat 15s linear infinite;
             animation: particleFloat 15s linear infinite;
             bottom: -10px;
         }
 
         /* Staggered delays for particles */
         .smooth-particle:nth-child(n+9) {
+            -webkit-animation-delay: calc((var(--particle-index, 0) * 0.6s));
             animation-delay: calc((var(--particle-index, 0) * 0.6s));
+        }
+
+        @-webkit-keyframes particleFloat {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(50px);
+                opacity: 0;
+            }
         }
 
         @keyframes particleFloat {
@@ -290,6 +390,7 @@ require_once __DIR__ . '/../helpers.php';
                 inset 0 1px 0 rgba(255, 255, 255, 0.15),
                 inset 0 -1px 0 rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.15);
+            -webkit-animation: containerEntrance 1s cubic-bezier(0.34, 1.56, 0.64, 1);
             animation: containerEntrance 1s cubic-bezier(0.34, 1.56, 0.64, 1);
             overflow: visible;
         }
@@ -312,9 +413,16 @@ require_once __DIR__ . '/../helpers.php';
             background-size: 300% 300%;
             border-radius: 28px;
             z-index: -1;
+            -webkit-animation: gradientRotate 8s ease infinite;
             animation: gradientRotate 8s ease infinite;
             opacity: 0.5;
             filter: blur(8px);
+            -webkit-filter: blur(8px);
+        }
+        
+        @-webkit-keyframes gradientRotate {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
         
         @keyframes gradientRotate {
@@ -337,13 +445,30 @@ require_once __DIR__ . '/../helpers.php';
                 transparent 70%
             );
             animation: shimmerSlow 8s ease-in-out infinite;
+            -webkit-animation: shimmerSlow 8s ease-in-out infinite;
             pointer-events: none;
             z-index: 1;
+        }
+        
+        @-webkit-keyframes shimmerSlow {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
         
         @keyframes shimmerSlow {
             0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
             50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        @-webkit-keyframes containerEntrance {
+            0% {
+                opacity: 0;
+                transform: scale(0.85) translateY(40px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
         @keyframes containerEntrance {
@@ -367,7 +492,29 @@ require_once __DIR__ . '/../helpers.php';
         .logo-wrapper {
             position: relative;
             display: inline-block;
+            -webkit-animation: logoFloat 3s ease-in-out infinite;
             animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @-webkit-keyframes logoFloat {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            16.6% {
+                transform: translateY(-8px) rotate(1deg);
+            }
+            33.3% {
+                transform: translateY(-14px) rotate(-0.5deg);
+            }
+            50% {
+                transform: translateY(-12px) rotate(0deg);
+            }
+            66.6% {
+                transform: translateY(-10px) rotate(-1deg);
+            }
+            83.3% {
+                transform: translateY(-6px) rotate(-0.5deg);
+            }
         }
 
         @keyframes logoFloat {
@@ -399,8 +546,28 @@ require_once __DIR__ . '/../helpers.php';
             width: 200px;
             height: 200px;
             background: radial-gradient(circle, rgba(108, 183, 62, 0.3) 0%, transparent 70%);
+            -webkit-animation: glowPulse 6s ease-in-out infinite;
             animation: glowPulse 6s ease-in-out infinite;
             border-radius: 50%;
+        }
+
+        @-webkit-keyframes glowPulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.7;
+            }
+            75% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
         }
 
         @keyframes glowPulse {
@@ -428,7 +595,38 @@ require_once __DIR__ . '/../helpers.php';
             position: relative;
             z-index: 2;
             filter: drop-shadow(0 10px 30px rgba(108, 183, 62, 0.5));
+            -webkit-filter: drop-shadow(0 10px 30px rgba(108, 183, 62, 0.5));
+            -webkit-animation: logoEntrance 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             animation: logoEntrance 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @-webkit-keyframes logoEntrance {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(-360deg);
+                filter: drop-shadow(0 0 80px rgba(108, 183, 62, 1)) blur(20px);
+                -webkit-filter: drop-shadow(0 0 80px rgba(108, 183, 62, 1)) blur(20px);
+            }
+            40% {
+                opacity: 0.5;
+                transform: scale(0.5) rotate(-180deg);
+                filter: drop-shadow(0 0 60px rgba(108, 183, 62, 0.8)) blur(10px);
+                -webkit-filter: drop-shadow(0 0 60px rgba(108, 183, 62, 0.8)) blur(10px);
+            }
+            70% {
+                transform: scale(1.15) rotate(15deg);
+                filter: drop-shadow(0 15px 40px rgba(108, 183, 62, 0.7));
+                -webkit-filter: drop-shadow(0 15px 40px rgba(108, 183, 62, 0.7));
+            }
+            85% {
+                transform: scale(0.95) rotate(-5deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+                filter: drop-shadow(0 10px 30px rgba(108, 183, 62, 0.5));
+                -webkit-filter: drop-shadow(0 10px 30px rgba(108, 183, 62, 0.5));
+            }
         }
 
         @keyframes logoEntrance {
@@ -460,7 +658,19 @@ require_once __DIR__ . '/../helpers.php';
         .welcome-text {
             text-align: center;
             margin-bottom: 45px;
+            -webkit-animation: textSlideUp 1s ease-out 0.5s both;
             animation: textSlideUp 1s ease-out 0.5s both;
+        }
+
+        @-webkit-keyframes textSlideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes textSlideUp {
@@ -489,7 +699,8 @@ require_once __DIR__ . '/../helpers.php';
         }
 
         /* MICROSOFT BUTTON - AWARD-WINNING DESIGN */
-        .microsoft-button {
+        .microsoft-button,
+        .microsoft-btn {
             width: 100%;
             padding: 20px;
             background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #f5f5f5 100%);
@@ -511,10 +722,22 @@ require_once __DIR__ . '/../helpers.php';
                 0 5px 15px rgba(108, 183, 62, 0.15),
                 inset 0 1px 2px rgba(255, 255, 255, 0.9),
                 inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+            -webkit-animation: buttonSlideUp 1s ease-out 0.8s both;
             animation: buttonSlideUp 1s ease-out 0.8s both;
             text-decoration: none;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+        }
+
+        @-webkit-keyframes buttonSlideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes buttonSlideUp {
@@ -529,7 +752,8 @@ require_once __DIR__ . '/../helpers.php';
         }
 
         /* Shimmer Effect */
-        .microsoft-button::before {
+        .microsoft-button::before,
+        .microsoft-btn::before {
             content: '';
             position: absolute;
             top: -50%;
@@ -543,7 +767,13 @@ require_once __DIR__ . '/../helpers.php';
                 transparent 70%
             );
             transform: rotate(45deg);
+            -webkit-animation: shimmer 3s infinite;
             animation: shimmer 3s infinite;
+        }
+
+        @-webkit-keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
         }
 
         @keyframes shimmer {
@@ -551,7 +781,8 @@ require_once __DIR__ . '/../helpers.php';
             100% { transform: translateX(100%) rotate(45deg); }
         }
 
-        .microsoft-button:hover {
+        .microsoft-button:hover,
+        .microsoft-btn:hover {
             transform: translateY(-5px) scale(1.03);
             box-shadow: 
                 0 20px 50px rgba(0, 0, 0, 0.45),
@@ -561,7 +792,8 @@ require_once __DIR__ . '/../helpers.php';
             border-color: rgba(108, 183, 62, 0.5);
         }
 
-        .microsoft-button:active {
+        .microsoft-button:active,
+        .microsoft-btn:active {
             transform: translateY(-3px) scale(1.01);
             transition: all 0.1s ease;
         }
@@ -575,7 +807,8 @@ require_once __DIR__ . '/../helpers.php';
             transition: transform 0.3s ease;
         }
 
-        .microsoft-button:hover .microsoft-logo {
+        .microsoft-button:hover .microsoft-logo,
+        .microsoft-btn:hover .microsoft-logo {
             transform: rotate(90deg) scale(1.1);
         }
 
@@ -590,7 +823,8 @@ require_once __DIR__ . '/../helpers.php';
         .microsoft-logo div:nth-child(4) { background: #ffb900; }
 
         /* Loading State */
-        .microsoft-button.loading {
+        .microsoft-button.loading,
+        .microsoft-btn.loading {
             pointer-events: none;
         }
 
@@ -601,16 +835,24 @@ require_once __DIR__ . '/../helpers.php';
             border: 3px solid rgba(0, 0, 0, 0.1);
             border-top-color: #6cb73e;
             border-radius: 50%;
+            -webkit-animation: spin 0.8s linear infinite;
             animation: spin 0.8s linear infinite;
         }
 
-        .microsoft-button.loading .loading-spinner {
+        .microsoft-button.loading .loading-spinner,
+        .microsoft-btn.loading .loading-spinner {
             display: block;
         }
 
         .microsoft-button.loading .microsoft-logo,
-        .microsoft-button.loading span {
+        .microsoft-button.loading span,
+        .microsoft-btn.loading .microsoft-logo,
+        .microsoft-btn.loading span {
             display: none;
+        }
+
+        @-webkit-keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         @keyframes spin {
@@ -625,17 +867,21 @@ require_once __DIR__ . '/../helpers.php';
             position: relative;
         }
 
-        .microsoft-button.success {
+        .microsoft-button.success,
+        .microsoft-btn.success {
             background: linear-gradient(135deg, #6cb73e 0%, #5a9933 100%);
             color: white;
         }
 
-        .microsoft-button.success .success-checkmark {
+        .microsoft-button.success .success-checkmark,
+        .microsoft-btn.success .success-checkmark {
             display: block;
         }
 
         .microsoft-button.success .microsoft-logo,
-        .microsoft-button.success span {
+        .microsoft-button.success span,
+        .microsoft-btn.success .microsoft-logo,
+        .microsoft-btn.success span {
             display: none;
         }
 
@@ -1166,6 +1412,46 @@ require_once __DIR__ . '/../helpers.php';
             
             .auth-card .bg-white {
                 padding: 1.5rem !important;
+            }
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            body {
+                background: #000000;
+            }
+            
+            .login-container,
+            .auth-card {
+                border: 2px solid #6cb73e;
+                background: rgba(0, 0, 0, 0.95);
+            }
+
+            .microsoft-button {
+                border: 2px solid #2d2d2d;
+            }
+        }
+
+        /* Reduced motion support for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                -webkit-animation-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+                -webkit-animation-iteration-count: 1 !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+            
+            .gradient-bg,
+            .floating-orb,
+            .gradient-wave,
+            .animated-grid,
+            .light-beam,
+            .smooth-particle {
+                animation: none !important;
             }
         }
 
