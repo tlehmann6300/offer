@@ -650,7 +650,7 @@ body.dark-mode .text-gray-700 {
 }
 
 body.dark-mode .text-gray-800 {
-    color: #f3f4f6 !important;
+    color: #ffffff !important;
 }
 
 body.dark-mode .text-gray-900 {
@@ -856,7 +856,7 @@ body.dark-mode .text-purple-800 {
 body.dark-mode .text-blue-600,
 body.dark-mode .text-blue-700,
 body.dark-mode .text-blue-800 {
-    color: #f3f4f6 !important; /* Almost white for better readability in dark mode */
+    color: #60a5fa !important; /* Lighter blue for better readability in dark mode */
 }
 
 body.dark-mode .text-green-600,
