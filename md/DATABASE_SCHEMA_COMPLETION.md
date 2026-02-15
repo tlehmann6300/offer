@@ -249,10 +249,10 @@ The 3-database architecture is optimally organized:
 **Polls (4 tables):**
 - `polls`, `poll_options`, `poll_votes`, `poll_hidden_by_user`
 
-**Inventory (4 tables):**
+**Inventory (5 tables):**
 - `inventory_items`, `categories`, `locations`, `rentals`, `inventory_history`
 
-**Other (4 tables):**
+**Other (3 tables):**
 - `alumni_profiles`, `system_settings`, `system_logs`
 
 ### Invoice Database (dbs15251284) - 1 table
