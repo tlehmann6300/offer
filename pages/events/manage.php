@@ -4,8 +4,8 @@ require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/models/Event.php';
 require_once __DIR__ . '/../../includes/models/User.php';
 
-// Only board, alumni_board, and manager can access
-if (!Auth::check() || !Auth::hasPermission('manager')) {
+// Only board, alumni_board, head, and those with manage_projects permission can access
+if (!Auth::check() || !(Auth::hasPermission('manage_projects') || Auth::isBoard() || Auth::hasRole(['head', 'alumni_board']))) {
     header('Location: ../auth/login.php');
     exit;
 }
