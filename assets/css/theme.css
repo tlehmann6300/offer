@@ -865,9 +865,13 @@ body.dark-mode .text-purple-800 {
     color: #e9d5ff !important; /* purple-200 - light purple for dark backgrounds */
 }
 
+body.dark-mode .text-blue-100,
+body.dark-mode .text-blue-200,
+body.dark-mode .text-blue-300,
 body.dark-mode .text-blue-600,
 body.dark-mode .text-blue-700,
-body.dark-mode .text-blue-800 {
+body.dark-mode .text-blue-800,
+body.dark-mode .text-blue-900 {
     color: #ffffff !important; /* White instead of blue for dark mode */
 }
 
@@ -1272,6 +1276,23 @@ body:not(.dark-mode) td {
 .sidebar i,
 .sidebar i.fas {
     color: inherit !important;
+}
+
+/* Light Mode: Replace blue text with readable dark text */
+body:not(.dark-mode) .text-blue-100,
+body:not(.dark-mode) .text-blue-200,
+body:not(.dark-mode) .text-blue-300,
+body:not(.dark-mode) .text-blue-400,
+body:not(.dark-mode) .text-blue-500,
+body:not(.dark-mode) .text-blue-600,
+body:not(.dark-mode) .text-blue-700,
+body:not(.dark-mode) .text-blue-800,
+body:not(.dark-mode) .text-blue-900 {
+    color: var(--text-main) !important; /* Dark text instead of blue for light mode */
+}
+
+body:not(.dark-mode) .text-ibc-blue {
+    color: var(--text-main) !important; /* Dark text instead of blue for light mode */
 }
 
 /* Light Mode: Kartenhintergrund sicherstellen */
@@ -3256,10 +3277,6 @@ body.dark-mode .tag {
 }
 
 /* Dark Mode: Perfect text colors for specific elements */
-body.dark-mode .text-blue-600 {
-    color: #ffffff !important; /* White instead of blue */
-}
-
 body.dark-mode .text-ibc-blue {
     color: #ffffff !important; /* White instead of blue for better contrast on dark backgrounds */
 }
