@@ -2004,6 +2004,92 @@ a.microsoft-btn {
     text-decoration: none !important;
 }
 
+/* ============================================
+   LOGIN PAGE LAYOUT STYLES
+   ============================================ */
+
+/* Login Container - Centered with fixed width */
+.login-container {
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 3rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Login Footer - High contrast and centered */
+.login-footer {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.85rem;
+    opacity: 0.8;
+    color: #ffffff;
+}
+
+/* Dark mode high contrast color for footer */
+body.dark-mode .login-footer {
+    color: #f8fafc;
+}
+
+/* Logo Container - Centered with floating animation */
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Floating animation for logo */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Welcome Text - Centered with styled heading and subtitle */
+.welcome-text {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.welcome-text h1,
+.welcome-text .welcome-title {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+}
+
+.welcome-text p,
+.welcome-text .welcome-subtitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 640px) {
+    .login-container {
+        padding: 2rem 1.5rem;
+    }
+    
+    .welcome-text h1,
+    .welcome-text .welcome-title {
+        font-size: 1.75rem;
+    }
+}
+
+/* ============================================
+   END LOGIN PAGE LAYOUT STYLES
+   ============================================ */
+
 /* Enhanced Form Inputs */
 input:not([type="checkbox"]):not([type="radio"]),
 select,
