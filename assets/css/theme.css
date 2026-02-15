@@ -3286,9 +3286,9 @@ body.dark-mode .text-yellow-600 {
 
 /* Dark Mode: Enhanced hover states */
 body.dark-mode a:hover:not(.btn):not(.no-hover) {
-    color: var(--ibc-blue-light) !important;
+    color: #ffffff !important; /* White instead of blue on hover */
     text-decoration: underline;
-    text-decoration-color: rgba(51, 133, 196, 0.5);
+    text-decoration-color: rgba(255, 255, 255, 0.5);
 }
 
 body.dark-mode .hover\:shadow-2xl:hover {
