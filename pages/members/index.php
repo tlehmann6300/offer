@@ -185,11 +185,15 @@ ob_start();
                     // Entra roles are stored as JSON array, decode and display
                     $entraRolesArray = json_decode($member['entra_roles'], true);
                     if (is_array($entraRolesArray) && !empty($entraRolesArray)) {
-                        // Join multiple roles with comma
-                        $displayRole = implode(', ', $entraRolesArray);
+                        // Sanitize each role before joining to prevent XSS
+                        $sanitizedRoles = array_map('htmlspecialchars', $entraRolesArray);
+                        $displayRole = implode(', ', $sanitizedRoles);
                     } else {
-                        // If JSON decode failed or empty, use as-is (might be a string)
-                        $displayRole = $member['entra_roles'];
+                        // If JSON decode failed or empty, log error and use as-is (might be a string)
+                        if (json_last_error() !== JSON_ERROR_NONE) {
+                            error_log("Failed to decode entra_roles for member: " . json_last_error_msg());
+                        }
+                        $displayRole = htmlspecialchars($member['entra_roles']);
                     }
                     $badgeClass = 'bg-purple-100 text-purple-800 border-purple-300';
                 } elseif (!empty($member['job_title'])) {
@@ -254,7 +258,7 @@ ob_start();
                     <!-- Role Badge: Different colors for each role - Top Right Corner -->
                     <div class="absolute top-4 right-4">
                         <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full border <?php echo $badgeClass; ?>">
-                            <?php echo htmlspecialchars($displayRole); ?>
+                            <?php echo $displayRole; ?>
                         </span>
                     </div>
                     
