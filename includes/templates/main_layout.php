@@ -747,7 +747,7 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                     if (json_last_error() === JSON_ERROR_NONE && is_array($rolesArray)) {
                         $displayRoles = array_filter(array_map('translateAzureRole', $rolesArray));
                     } else {
-                        error_log("Failed to decode entra_roles in main_layout for user ID {$currentUser['id']}: " . json_last_error_msg());
+                        error_log("Failed to decode entra_roles in main_layout for user ID " . intval($currentUser['id']) . ": " . json_last_error_msg());
                     }
                 } elseif (!empty($_SESSION['azure_roles'])) {
                     // Check session variable as alternative
