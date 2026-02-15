@@ -264,7 +264,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $requestReason = trim($_POST['request_reason'] ?? '');
             
             // Validate request type
-            $allowedTypes = ['Rollenänderung', 'E-Mail-Adresse ändern'];
+            $allowedTypes = ['Rollenänderung', 'E-Mail-Adressenänderung'];
             if (!in_array($requestType, $allowedTypes, true)) {
                 throw new Exception('Ungültiger Änderungstyp. Bitte wählen Sie eine gültige Option.');
             }
@@ -919,7 +919,7 @@ ob_start();
             >
                 <option value="">Bitte wählen...</option>
                 <option value="Rollenänderung">Rollenänderung</option>
-                <option value="E-Mail-Adresse ändern">E-Mail-Adresse ändern</option>
+                <option value="E-Mail-Adressenänderung">E-Mail-Adressenänderung</option>
             </select>
         </div>
         
