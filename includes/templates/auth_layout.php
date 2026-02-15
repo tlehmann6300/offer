@@ -1437,11 +1437,10 @@ require_once __DIR__ . '/../helpers.php';
             *,
             *::before,
             *::after {
-                -webkit-animation-duration: 1ms !important;
-                animation-duration: 1ms !important;
-                -webkit-animation-iteration-count: 1 !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 1ms !important;
+                -webkit-animation: none !important;
+                animation: none !important;
+                -webkit-transition: none !important;
+                transition: none !important;
                 scroll-behavior: auto !important;
             }
             
@@ -1450,7 +1449,14 @@ require_once __DIR__ . '/../helpers.php';
             .gradient-wave,
             .animated-grid,
             .light-beam,
-            .smooth-particle {
+            .smooth-particle,
+            .logo-wrapper,
+            .logo-glow,
+            .ibc-logo,
+            .welcome-text,
+            .microsoft-button,
+            .microsoft-btn,
+            .login-container {
                 -webkit-animation: none !important;
                 animation: none !important;
             }
