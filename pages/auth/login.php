@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../../config/config.php';
 
 // Security Headers (CSP) für maximale Sicherheit
-header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self';");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; form-action 'self';");
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 
