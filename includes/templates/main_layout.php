@@ -569,12 +569,25 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                     <span>Projekte</span>
                 </a>
 
-                <!-- Events (All) -->
-                <a href="<?php echo asset('pages/events/index.php'); ?>" 
-                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/events/') && !isActivePath('/events/helpers.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
-                    <i class="fas fa-calendar w-5 mr-3"></i>
-                    <span>Events</span>
-                </a>
+                <!-- Events (All) - Parent with submenu -->
+                <div class="menu-item-with-submenu">
+                    <a href="<?php echo asset('pages/events/index.php'); ?>" 
+                       class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/events/') && !isActivePath('/events/helpers.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
+                        <i class="fas fa-calendar w-5 mr-3"></i>
+                        <span class="flex-1">Events</span>
+                        <i class="fas fa-chevron-down text-xs transition-transform duration-200 submenu-chevron"></i>
+                    </a>
+
+                    <!-- Submenu -->
+                    <div class="submenu">
+                        <!-- Event-Statistiken (All) - Indented -->
+                        <a href="<?php echo asset('pages/events/statistics.php'); ?>" 
+                           class="flex items-center px-6 pr-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 submenu-item <?php echo isActivePath('/events/statistics.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
+                            <i class="fas fa-chart-bar w-5 mr-3"></i>
+                            <span>Event-Statistiken</span>
+                        </a>
+                    </div>
+                </div>
 
                 <!-- Helfersystem (All) -->
                 <a href="<?php echo asset('pages/events/helpers.php'); ?>" 
