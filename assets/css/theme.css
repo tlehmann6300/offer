@@ -3133,6 +3133,11 @@ body.dark-mode .btn-primary:hover {
     transform: translateY(-2px);
 }
 
+body.dark-mode .btn,
+body.dark-mode button:not(.bg-transparent) {
+    color: #ffffff !important;
+}
+
 body.dark-mode button,
 body.dark-mode .btn,
 body.dark-mode .btn-primary,
@@ -3239,6 +3244,10 @@ body.dark-mode .tag {
 /* Dark Mode: Perfect text colors for specific elements */
 body.dark-mode .text-blue-600 {
     color: #60a5fa !important; /* blue-400 */
+}
+
+body.dark-mode .card .text-blue-600 {
+    color: #60a5fa !important; /* Lighter blue for better contrast inside dark mode cards */
 }
 
 body.dark-mode .text-ibc-blue {
