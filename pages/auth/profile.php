@@ -322,7 +322,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Send email to IT
             $emailSent = MailService::sendEmail(
                 'it@business-consulting.de',
-                'Änderungsantrag von ' . $userName,
+                'Änderungsantrag: ' . $requestType . ' von ' . $userName,
                 $emailBody
             );
             
@@ -434,9 +434,13 @@ ob_start();
             ?>
             <div>
                 <label class="text-sm text-gray-500 dark:text-gray-400"><?php echo count($displayRoles) === 1 ? 'Rolle' : 'Rollen'; ?></label>
-                <p class="text-lg text-gray-800 dark:text-gray-100">
-                    <?php echo htmlspecialchars(implode(', ', $displayRoles)); ?>
-                </p>
+                <div class="flex flex-wrap gap-2 mt-2">
+                    <?php foreach ($displayRoles as $role): ?>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 rounded-full font-semibold text-sm">
+                            <?php echo htmlspecialchars($role); ?>
+                        </span>
+                    <?php endforeach; ?>
+                </div>
             </div>
             <?php 
             endif; 
