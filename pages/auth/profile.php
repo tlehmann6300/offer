@@ -315,53 +315,51 @@ ob_start();
                 <p class="text-lg font-semibold text-gray-800 dark:text-gray-100"><?php echo htmlspecialchars($user['email']); ?></p>
             </div>
             <?php 
-            // Display Microsoft Entra roles if available
+            // Display role: Priority order is entra_roles > azure_roles > internal role
+            $displayRoles = [];
+            
+            // 1. Check for entra_roles (comma-separated string)
             if (!empty($user['entra_roles'])):
-                // entra_roles is stored as comma-separated string
-                $entraRolesList = array_map('trim', explode(',', $user['entra_roles']));
-                if (count($entraRolesList) > 0):
-            ?>
-            <div>
-                <label class="text-sm text-gray-500 dark:text-gray-400">Microsoft Entra Rolle<?php echo count($entraRolesList) > 1 ? 'n' : ''; ?></label>
-                <div class="flex flex-wrap gap-2">
-                    <?php foreach ($entraRolesList as $role): ?>
-                        <?php if (!empty($role)): ?>
-                        <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-full">
-                            <?php echo htmlspecialchars($role); ?>
-                        </span>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            <?php 
-                endif;
-            endif; 
-            ?>
-            <?php 
-            // Also display Azure roles if available (legacy support)
-            if (!empty($user['azure_roles'])):
+                $displayRoles = array_filter(array_map('trim', explode(',', $user['entra_roles'])));
+            
+            // 2. If no entra_roles, check azure_roles (JSON) or session azure_roles
+            elseif (!empty($user['azure_roles'])):
                 $azureRoles = json_decode($user['azure_roles'], true);
-                
-                // Check for JSON decode errors
-                if (json_last_error() !== JSON_ERROR_NONE) {
+                if (json_last_error() === JSON_ERROR_NONE && is_array($azureRoles)) {
+                    $displayRoles = array_filter(array_map('translateAzureRole', $azureRoles));
+                } else {
                     error_log("Failed to decode azure_roles for user ID {$user['id']}: " . json_last_error_msg());
-                    $azureRoles = null;
                 }
-                
-                if (is_array($azureRoles) && count($azureRoles) > 0):
+            elseif (!empty($_SESSION['azure_roles'])):
+                // Check session variable as alternative
+                if (is_array($_SESSION['azure_roles'])) {
+                    $displayRoles = array_filter(array_map('translateAzureRole', $_SESSION['azure_roles']));
+                } else {
+                    // Try to decode if it's JSON string
+                    $sessionRoles = json_decode($_SESSION['azure_roles'], true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($sessionRoles)) {
+                        $displayRoles = array_filter(array_map('translateAzureRole', $sessionRoles));
+                    } else {
+                        error_log("Failed to decode session azure_roles for user ID {$user['id']}: " . json_last_error_msg());
+                    }
+                }
+            endif;
+            
+            // 3. If still no roles, use internal role as fallback
+            if (empty($displayRoles) && !empty($user['role'])):
+                $displayRoles = [translateRole($user['role'])];
+            endif;
+            
+            // Display roles if we have any
+            if (!empty($displayRoles)):
             ?>
             <div>
-                <label class="text-sm text-gray-500 dark:text-gray-400">Azure Rolle<?php echo count($azureRoles) > 1 ? 'n' : ''; ?></label>
-                <div class="flex flex-wrap gap-2">
-                    <?php foreach ($azureRoles as $azureRole): ?>
-                        <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-200 rounded-full">
-                            <?php echo translateAzureRole($azureRole); ?>
-                        </span>
-                    <?php endforeach; ?>
-                </div>
+                <label class="text-sm text-gray-500 dark:text-gray-400"><?php echo count($displayRoles) === 1 ? 'Rolle' : 'Rollen'; ?></label>
+                <p class="text-lg text-gray-800 dark:text-gray-100">
+                    <?php echo htmlspecialchars(implode(', ', $displayRoles)); ?>
+                </p>
             </div>
             <?php 
-                endif;
             endif; 
             ?>
             <div>
