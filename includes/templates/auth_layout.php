@@ -290,30 +290,24 @@ require_once __DIR__ . '/../helpers.php';
         }
 
         @-webkit-keyframes beam {
-            0% {
+            0%, 100% {
                 transform: translateY(-100%);
                 opacity: 0;
             }
             50% {
-                opacity: 1;
-            }
-            100% {
                 transform: translateY(100vh);
-                opacity: 0;
+                opacity: 1;
             }
         }
 
         @keyframes beam {
-            0% {
+            0%, 100% {
                 transform: translateY(-100%);
                 opacity: 0;
             }
             50% {
-                opacity: 1;
-            }
-            100% {
                 transform: translateY(100vh);
-                opacity: 0;
+                opacity: 1;
             }
         }
 
@@ -1427,7 +1421,8 @@ require_once __DIR__ . '/../helpers.php';
                 background: rgba(0, 0, 0, 0.95);
             }
 
-            .microsoft-button {
+            .microsoft-button,
+            .microsoft-btn {
                 border: 2px solid #2d2d2d;
             }
         }
