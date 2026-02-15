@@ -25,6 +25,41 @@ if (!(Auth::isBoard() || Auth::hasRole('head'))) {
 $successMessage = '';
 $errorMessage = '';
 
+// Load available roles dynamically from database
+$availableRoles = [];
+try {
+    $userDb = Database::getUserDB();
+    
+    // Get all non-null entra_roles from users table
+    $stmt = $userDb->query("SELECT DISTINCT entra_roles FROM users WHERE entra_roles IS NOT NULL AND entra_roles != ''");
+    $rolesSet = [];
+    
+    while ($row = $stmt->fetch()) {
+        $roles = json_decode($row['entra_roles'], true);
+        if (is_array($roles)) {
+            foreach ($roles as $role) {
+                if (!empty($role) && is_string($role)) {
+                    $rolesSet[$role] = true;
+                }
+            }
+        }
+    }
+    
+    // Convert to sorted array
+    $availableRoles = array_keys($rolesSet);
+    sort($availableRoles);
+    
+} catch (Exception $e) {
+    error_log('Error loading roles from database: ' . $e->getMessage());
+    // Fallback to default roles if database query fails
+    $availableRoles = ['Board', 'Ressortleiter', 'Mitglied', 'Alumni'];
+}
+
+// If no roles found in database, use defaults
+if (empty($availableRoles)) {
+    $availableRoles = ['Board', 'Ressortleiter', 'Mitglied', 'Alumni'];
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_poll'])) {
     $title = trim($_POST['title'] ?? '');
@@ -32,8 +67,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_poll'])) {
     $microsoftFormsUrl = trim($_POST['microsoft_forms_url'] ?? '');
     $targetGroups = $_POST['target_groups'] ?? [];
     $allowedRoles = $_POST['allowed_roles'] ?? [];
+    $customRoles = trim($_POST['custom_roles'] ?? '');
     $visibleToAll = isset($_POST['visible_to_all']) ? 1 : 0;
     $isInternal = isset($_POST['is_internal']) ? 1 : 0;
+    
+    // Merge custom roles with selected roles
+    if (!empty($customRoles)) {
+        $customRolesArray = array_map('trim', explode(',', $customRoles));
+        $allowedRoles = array_merge($allowedRoles, $customRolesArray);
+        $allowedRoles = array_unique(array_filter($allowedRoles));
+    }
     
     // Validation
     if (empty($title)) {
@@ -239,10 +282,8 @@ ob_start();
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Sichtbar für Rollen (optional)
                 </label>
-                <div class="space-y-2">
+                <div class="space-y-2 mb-4">
                     <?php
-                    // Hardcoded Entra roles as per requirements (use DB table in future if available)
-                    $availableRoles = ['Board', 'Ressortleiter', 'Mitglied', 'Alumni'];
                     $selectedRoles = $_POST['allowed_roles'] ?? [];
                     foreach ($availableRoles as $role):
                     ?>
@@ -258,7 +299,40 @@ ob_start();
                     </label>
                     <?php endforeach; ?>
                 </div>
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                
+                <!-- Custom Roles Field -->
+                <div class="mt-4">
+                    <label for="custom_roles" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Zusätzliche Rollen (optional)
+                    </label>
+                    <input 
+                        type="text" 
+                        id="custom_roles" 
+                        name="custom_roles" 
+                        value="<?php echo htmlspecialchars($_POST['custom_roles'] ?? ''); ?>"
+                        class="w-full px-4 py-3 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                        placeholder="z.B. Projektleiter, IT-Team"
+                    >
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Geben Sie weitere Rollen durch Komma getrennt ein, falls diese nicht in der Liste oben erscheinen.
+                    </p>
+                </div>
+                
+                <!-- Important Notice about Entra Roles -->
+                <div class="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400 mt-1 mr-3"></i>
+                        <div class="text-sm text-yellow-800 dark:text-yellow-300">
+                            <p class="font-semibold mb-1">Wichtig:</p>
+                            <p>Die Rollennamen müssen <strong>exakt</strong> mit den Rollen in Microsoft Entra ID übereinstimmen. 
+                            Groß-/Kleinschreibung und Leerzeichen müssen identisch sein. Bei Unsicherheit überprüfen Sie die 
+                            Rollennamen in Entra ID oder im Benutzerprofil.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">
                     <i class="fas fa-info-circle mr-1"></i>
                     Wählen Sie die Entra-Rollen aus, die diese Umfrage sehen dürfen. Leer lassen, um nur die Standard-Zielgruppen zu verwenden.
                 </p>
