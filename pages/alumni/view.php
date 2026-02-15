@@ -28,10 +28,9 @@ if (isset($_GET['return_to'])) {
 elseif (isset($_SERVER['HTTP_REFERER'])) {
     $referer = $_SERVER['HTTP_REFERER'];
     $parsedUrl = parse_url($referer);
-    // Check if the path contains '/pages/members/' or '/members/' to ensure it's specifically the members page
-    if (isset($parsedUrl['path']) && 
-        (strpos($parsedUrl['path'], '/pages/members/') !== false || 
-         strpos($parsedUrl['path'], '/members/') !== false)) {
+    // Check if parse_url succeeded and the path contains '/pages/members/' to ensure it's specifically the members page
+    if ($parsedUrl !== false && isset($parsedUrl['path']) && 
+        strpos($parsedUrl['path'], '/pages/members/') !== false) {
         $returnTo = 'members';
     }
 }
