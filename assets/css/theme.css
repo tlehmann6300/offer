@@ -2128,7 +2128,6 @@ a.microsoft-btn {
     text-align: center;
     margin-top: 2rem;
     font-size: 0.85rem;
-    opacity: 0.9;
     color: rgba(255, 255, 255, 0.9);
     /* Color is set inline in login.php for proper contrast on dark background */
 }
