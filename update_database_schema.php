@@ -128,6 +128,50 @@ try {
         "Add microsoft_forms_url column to polls table"
     );
     
+    // Add visible_to_all column to polls table
+    executeSql(
+        $content_db,
+        "ALTER TABLE polls ADD COLUMN visible_to_all BOOLEAN NOT NULL DEFAULT 0 COMMENT 'If true, show poll to all users regardless of roles'",
+        "Add visible_to_all column to polls table"
+    );
+    
+    // Add is_internal column to polls table
+    executeSql(
+        $content_db,
+        "ALTER TABLE polls ADD COLUMN is_internal BOOLEAN NOT NULL DEFAULT 1 COMMENT 'If true, hide poll after user votes. If false (external Forms), show hide button'",
+        "Add is_internal column to polls table"
+    );
+    
+    // Add allowed_roles column to polls table
+    executeSql(
+        $content_db,
+        "ALTER TABLE polls ADD COLUMN allowed_roles JSON DEFAULT NULL COMMENT 'JSON array of Entra roles that can see this poll (filters against user azure_roles)'",
+        "Add allowed_roles column to polls table"
+    );
+    
+    // Create poll_hidden_by_user table
+    $create_poll_hidden_table = "
+    CREATE TABLE IF NOT EXISTS poll_hidden_by_user (
+        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        poll_id INT UNSIGNED NOT NULL,
+        user_id INT UNSIGNED NOT NULL,
+        hidden_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        
+        UNIQUE KEY unique_poll_user (poll_id, user_id),
+        INDEX idx_poll_id (poll_id),
+        INDEX idx_user_id (user_id)
+    ) ENGINE=InnoDB
+      DEFAULT CHARSET=utf8mb4
+      COLLATE=utf8mb4_unicode_ci
+      COMMENT='Tracks which users have manually hidden which polls'
+    ";
+    
+    executeSql(
+        $content_db,
+        $create_poll_hidden_table,
+        "Create poll_hidden_by_user table"
+    );
+    
     // Add sellers_data column to event_documentation table
     executeSql(
         $content_db,

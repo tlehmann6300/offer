@@ -31,6 +31,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_poll'])) {
     $description = trim($_POST['description'] ?? '');
     $microsoftFormsUrl = trim($_POST['microsoft_forms_url'] ?? '');
     $targetGroups = $_POST['target_groups'] ?? [];
+    $allowedRolesText = trim($_POST['allowed_roles_text'] ?? '');
+    $visibleToAll = isset($_POST['visible_to_all']) ? 1 : 0;
+    $isInternal = isset($_POST['is_internal']) ? 1 : 0;
+    
+    // Parse allowed roles from text input
+    $allowedRoles = null;
+    if (!empty($allowedRolesText)) {
+        $decoded = json_decode($allowedRolesText, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            $allowedRoles = $decoded;
+        }
+    }
     
     // Validation
     if (empty($title)) {
@@ -39,17 +51,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_poll'])) {
         $errorMessage = 'Bitte geben Sie die Microsoft Forms URL ein.';
     } elseif (empty($targetGroups)) {
         $errorMessage = 'Bitte wählen Sie mindestens eine Zielgruppe aus.';
+    } elseif (!empty($allowedRolesText) && $allowedRoles === null) {
+        $errorMessage = 'Die erlaubten Entra-Rollen müssen ein gültiges JSON-Array sein.';
     } else {
         try {
             $db = Database::getContentDB();
             
-            // Insert poll with Microsoft Forms URL
+            // Insert poll with Microsoft Forms URL and new fields
             $stmt = $db->prepare("
-                INSERT INTO polls (title, description, created_by, microsoft_forms_url, target_groups, is_active, end_date)
-                VALUES (?, ?, ?, ?, ?, 1, DATE_ADD(NOW(), INTERVAL 30 DAY))
+                INSERT INTO polls (title, description, created_by, microsoft_forms_url, target_groups, 
+                                   allowed_roles, visible_to_all, is_internal, is_active, end_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, DATE_ADD(NOW(), INTERVAL 30 DAY))
             ");
             $targetGroupsJson = json_encode($targetGroups);
-            $stmt->execute([$title, $description, $user['id'], $microsoftFormsUrl, $targetGroupsJson]);
+            $allowedRolesJson = $allowedRoles ? json_encode($allowedRoles) : null;
+            $stmt->execute([
+                $title, 
+                $description, 
+                $user['id'], 
+                $microsoftFormsUrl, 
+                $targetGroupsJson,
+                $allowedRolesJson,
+                $visibleToAll,
+                $isInternal
+            ]);
             
             // Redirect to polls list
             header('Location: ' . asset('pages/polls/index.php'));
@@ -198,6 +223,62 @@ ob_start();
                         <span class="ml-3 text-gray-700 dark:text-gray-300">Head</span>
                     </label>
                 </div>
+            </div>
+
+            <!-- Visible to All Option -->
+            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <label class="flex items-start cursor-pointer">
+                    <input 
+                        type="checkbox" 
+                        name="visible_to_all" 
+                        value="1"
+                        <?php echo (isset($_POST['visible_to_all'])) ? 'checked' : ''; ?>
+                        class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 mt-0.5"
+                    >
+                    <div class="ml-3">
+                        <span class="font-medium text-gray-700 dark:text-gray-300">Für alle sichtbar</span>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            Wenn aktiviert, wird die Umfrage für alle Benutzer angezeigt, unabhängig von ihren Rollen.
+                        </p>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Is Internal Option -->
+            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <label class="flex items-start cursor-pointer">
+                    <input 
+                        type="checkbox" 
+                        name="is_internal" 
+                        value="1"
+                        <?php echo (!isset($_POST['create_poll']) || (isset($_POST['create_poll']) && isset($_POST['is_internal']))) ? 'checked' : ''; ?>
+                        class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 mt-0.5"
+                    >
+                    <div class="ml-3">
+                        <span class="font-medium text-gray-700 dark:text-gray-300">Interne Umfrage</span>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            Wenn aktiviert, wird die Umfrage automatisch ausgeblendet, nachdem der Benutzer abgestimmt hat. 
+                            Deaktivieren Sie diese Option für externe Microsoft Forms-Umfragen, um den "Erledigt / Ausblenden"-Button anzuzeigen.
+                        </p>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Allowed Roles (Entra Roles) -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Erlaubte Entra-Rollen (optional)
+                </label>
+                <textarea 
+                    name="allowed_roles_text" 
+                    rows="3"
+                    class="w-full px-4 py-3 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    placeholder='z.B.: ["IBC.Vorstand", "IBC.Mitglied"]'
+                ><?php echo htmlspecialchars($_POST['allowed_roles_text'] ?? ''); ?></textarea>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Geben Sie die erlaubten Microsoft Entra-Rollen als JSON-Array ein. Leer lassen, um nur die Standard-Zielgruppen zu verwenden.
+                </p>
             </div>
 
             <!-- Info Box -->

@@ -7,6 +7,7 @@
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/database.php';
 require_once __DIR__ . '/../../includes/helpers.php';
+require_once __DIR__ . '/../../includes/poll_helpers.php';
 
 // Check authentication
 if (!Auth::check()) {
@@ -16,27 +17,26 @@ if (!Auth::check()) {
 
 $user = Auth::user();
 $userRole = $user['role'] ?? '';
+$userAzureRoles = isset($user['azure_roles']) ? json_decode($user['azure_roles'], true) : [];
 
 // Get database connection
 $db = Database::getContentDB();
 
-// Fetch all active polls
+// Fetch all active polls with hidden status
 $stmt = $db->prepare("
     SELECT p.*, 
            (SELECT COUNT(*) FROM poll_votes WHERE poll_id = p.id AND user_id = ?) as user_has_voted,
-           (SELECT COUNT(*) FROM poll_votes WHERE poll_id = p.id) as total_votes
+           (SELECT COUNT(*) FROM poll_votes WHERE poll_id = p.id) as total_votes,
+           (SELECT COUNT(*) FROM poll_hidden_by_user WHERE poll_id = p.id AND user_id = ?) as user_has_hidden
     FROM polls p
     WHERE p.is_active = 1 AND p.end_date > NOW()
     ORDER BY p.created_at DESC
 ");
-$stmt->execute([$user['id']]);
+$stmt->execute([$user['id'], $user['id']]);
 $polls = $stmt->fetchAll();
 
-// Filter polls by target_groups (user role must be in the JSON array)
-$filteredPolls = array_filter($polls, function($poll) use ($userRole) {
-    $targetGroups = json_decode($poll['target_groups'], true);
-    return in_array($userRole, $targetGroups);
-});
+// Filter polls using shared helper function
+$filteredPolls = filterPollsForUser($polls, $userRole, $userAzureRoles);
 
 $title = 'Umfragen - IBC Intranet';
 ob_start();
@@ -118,6 +118,26 @@ ob_start();
             </div>
             
             <!-- Action Button -->
+            <?php if (!empty($poll['microsoft_forms_url'])): ?>
+            <!-- Microsoft Forms Link - Show both buttons -->
+            <div class="flex gap-3">
+                <a 
+                    href="<?php echo htmlspecialchars($poll['microsoft_forms_url']); ?>"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-block px-6 py-2 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+                >
+                    <i class="fas fa-external-link-alt mr-2"></i>Zum Formular
+                </a>
+                <button 
+                    onclick="hidePoll(<?php echo $poll['id']; ?>)"
+                    class="inline-block px-6 py-2 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors"
+                >
+                    <i class="fas fa-eye-slash mr-2"></i>Erledigt / Ausblenden
+                </button>
+            </div>
+            <?php else: ?>
+            <!-- Internal Poll - Regular behavior -->
             <a 
                 href="<?php echo asset('pages/polls/view.php?id=' . $poll['id']); ?>"
                 class="inline-block px-6 py-2 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors"
@@ -128,11 +148,41 @@ ob_start();
                     <i class="fas fa-vote-yea mr-2"></i>Jetzt abstimmen
                 <?php endif; ?>
             </a>
+            <?php endif; ?>
         </div>
         <?php endforeach; ?>
     </div>
     <?php endif; ?>
 </div>
+
+<script>
+function hidePoll(pollId) {
+    if (!confirm('Möchten Sie diese Umfrage wirklich ausblenden?')) {
+        return;
+    }
+    
+    fetch('<?php echo asset('api/hide_poll.php'); ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ poll_id: pollId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload page to update the list
+            window.location.reload();
+        } else {
+            alert('Fehler: ' + (data.message || 'Unbekannter Fehler'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
+    });
+}
+</script>
 
 <?php
 $content = ob_get_clean();
