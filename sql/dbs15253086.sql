@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS `users` (
   `last_name` VARCHAR(100),
   `birthday` DATE DEFAULT NULL,
   `show_birthday` BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Whether to display birthday publicly on profile',
+  `about_me` TEXT DEFAULT NULL COMMENT 'User biography or about me section',
+  `gender` VARCHAR(50) DEFAULT NULL COMMENT 'User gender',
   `role` ENUM('user', 'admin', 'moderator') NOT NULL DEFAULT 'user',
   `azure_roles` JSON DEFAULT NULL COMMENT 'Original Microsoft Entra ID roles from Azure AD authentication',
   `job_title` VARCHAR(255) DEFAULT NULL COMMENT 'Job title from Microsoft Entra ID',
@@ -28,6 +30,11 @@ CREATE TABLE IF NOT EXISTS `users` (
   `entra_roles` TEXT DEFAULT NULL COMMENT 'JSON array of Microsoft Entra role names for display',
   `profile_complete` BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Flag to track if user has completed initial profile setup',
   `tfa_secret` VARCHAR(255) DEFAULT NULL COMMENT 'Two-factor authentication secret key',
+  `tfa_enabled` BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Whether two-factor authentication is enabled',
+  `is_alumni_validated` BOOLEAN NOT NULL DEFAULT 1 COMMENT 'Whether alumni user is validated by board (0=needs approval, 1=approved)',
+  `notify_new_projects` BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Receive email notifications for new projects',
+  `notify_new_events` BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Receive email notifications for new events',
+  `theme_preference` ENUM('auto', 'light', 'dark') DEFAULT 'auto' COMMENT 'User interface theme preference',
   `deleted_at` DATETIME DEFAULT NULL COMMENT 'Timestamp when the user was soft deleted (NULL = active)',
   `last_reminder_sent_at` DATETIME DEFAULT NULL COMMENT 'Timestamp when the last profile reminder email was sent to the user',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -90,5 +97,22 @@ CREATE TABLE IF NOT EXISTS `password_resets` (
   INDEX `idx_expires_at` (`expires_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Password reset token management';
+
+-- ================================================
+-- TABLE: email_change_requests
+-- ================================================
+CREATE TABLE IF NOT EXISTS `email_change_requests` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT UNSIGNED NOT NULL,
+  `new_email` VARCHAR(255) NOT NULL,
+  `token` VARCHAR(255) NOT NULL UNIQUE,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `expires_at` TIMESTAMP NOT NULL,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  INDEX `idx_user_id` (`user_id`),
+  INDEX `idx_token` (`token`),
+  INDEX `idx_expires_at` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Email change request token management';
 
 COMMIT;
