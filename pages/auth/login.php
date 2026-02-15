@@ -1083,13 +1083,13 @@ try {
         .success-checkmark::after {
             content: '';
             position: absolute;
-            top: 6px;
-            left: 9px;
+            top: 50%;
+            left: 50%;
             width: 6px;
             height: 12px;
             border: solid white;
             border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
+            transform: translate(-50%, -60%) rotate(45deg);
         }
 
         .microsoft-button.success .success-checkmark {
