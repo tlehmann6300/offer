@@ -57,7 +57,9 @@ if (!$profileUser) {
     exit;
 }
 
+// Get role information - prioritize Entra roles over internal role
 $profileUserRole = $profileUser['role'];
+$profileUserEntraRoles = $profileUser['entra_roles'] ?? null;
 
 $title = htmlspecialchars($profile['first_name'] . ' ' . $profile['last_name']) . ' - IBC Intranet';
 ob_start();
@@ -114,6 +116,7 @@ ob_start();
                 
                 <!-- Role Badge -->
                 <?php
+                // Define role badge colors and names
                 $roleBadgeColors = [
                     'board' => 'bg-purple-100 text-purple-800 border-purple-300',
                     'vorstand_intern' => 'bg-purple-100 text-purple-800 border-purple-300',
@@ -140,12 +143,20 @@ ob_start();
                     'honorary_member' => 'Ehrenmitglied'
                 ];
                 
-                $badgeClass = $roleBadgeColors[$profileUserRole] ?? 'bg-gray-100 text-gray-800 border-gray-300';
-                $roleName = $roleNames[$profileUserRole] ?? ucfirst($profileUserRole);
+                // Check if Entra roles exist and are not empty
+                if (!empty($profileUserEntraRoles)) {
+                    // Entra roles exist - display them as comma-separated string
+                    $displayRole = $profileUserEntraRoles;
+                    $badgeClass = 'bg-purple-100 text-purple-800 border-purple-300';
+                } else {
+                    // Fall back to internal role
+                    $badgeClass = $roleBadgeColors[$profileUserRole] ?? 'bg-gray-100 text-gray-800 border-gray-300';
+                    $displayRole = $roleNames[$profileUserRole] ?? ucfirst($profileUserRole);
+                }
                 ?>
                 <div class="mb-4">
                     <span class="inline-block px-4 py-2 text-sm font-semibold rounded-full border <?php echo $badgeClass; ?>">
-                        <?php echo htmlspecialchars($roleName); ?>
+                        <?php echo htmlspecialchars($displayRole); ?>
                     </span>
                 </div>
 
