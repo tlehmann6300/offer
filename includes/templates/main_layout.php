@@ -803,7 +803,6 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                     <p class='text-[11px] text-white/80 truncate leading-snug mb-1' title='<?php echo htmlspecialchars($email); ?>'>
                         <?php echo htmlspecialchars($email); ?>
                     </p>
-                    <?php if (!empty($displayRoles)): ?>
                     <div class='flex flex-wrap gap-1'>
                         <?php foreach ($displayRoles as $displayRole): ?>
                         <span class='inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-white/10 text-white dark:text-slate-200 border border-white/20'>
@@ -811,7 +810,6 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                         </span>
                         <?php endforeach; ?>
                     </div>
-                    <?php endif; ?>
                 </div>
             </div>
             
