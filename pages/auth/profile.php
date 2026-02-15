@@ -463,55 +463,6 @@ ob_start();
         </div>
     </div>
 
-    <!-- Change Request Section -->
-    <div class="card p-6">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-            <i class="fas fa-edit text-green-600 mr-2"></i>
-            Änderungsantrag
-        </h2>
-        <p class="text-gray-600 dark:text-gray-300 mb-6">
-            Beantragen Sie Änderungen an Ihrer Rolle oder E-Mail-Adresse
-        </p>
-        
-        <form method="POST" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Art der Änderung *</label>
-                <select 
-                    name="request_type" 
-                    required 
-                    class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
-                >
-                    <option value="">Bitte wählen...</option>
-                    <option value="Rollenänderung">Rollenänderung</option>
-                    <option value="E-Mail-Adresse ändern">E-Mail-Adresse ändern</option>
-                </select>
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Begründung / Neuer Wert *</label>
-                <textarea 
-                    name="request_reason" 
-                    required 
-                    minlength="10"
-                    maxlength="1000"
-                    rows="4"
-                    placeholder="Bitte geben Sie eine Begründung oder den neuen gewünschten Wert an..."
-                    class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
-                ></textarea>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mindestens 10, maximal 1000 Zeichen</p>
-            </div>
-            
-            <button 
-                type="submit" 
-                name="submit_change_request"
-                class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
-            >
-                <i class="fas fa-paper-plane mr-2"></i>
-                Beantragen
-            </button>
-        </form>
-    </div>
-
     <!-- Profile Information -->
     <div class="lg:col-span-2">
         <div class="card p-6">
@@ -945,6 +896,55 @@ ob_start();
         </div>
     </div>
 
+</div>
+
+<!-- Change Request Section -->
+<div class="card p-6 mt-6">
+    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+        <i class="fas fa-edit text-green-600 mr-2"></i>
+        Änderungsantrag
+    </h2>
+    <p class="text-gray-600 dark:text-gray-300 mb-6">
+        Beantragen Sie Änderungen an Ihrer Rolle oder E-Mail-Adresse
+    </p>
+    
+    <form method="POST" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Art der Änderung *</label>
+            <select 
+                name="request_type" 
+                required 
+                class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
+            >
+                <option value="">Bitte wählen...</option>
+                <option value="Rollenänderung">Rollenänderung</option>
+                <option value="E-Mail-Adresse ändern">E-Mail-Adresse ändern</option>
+            </select>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Begründung / Neuer Wert *</label>
+            <textarea 
+                name="request_reason" 
+                required 
+                minlength="10"
+                maxlength="1000"
+                rows="4"
+                placeholder="Bitte geben Sie eine Begründung oder den neuen gewünschten Wert an..."
+                class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
+            ></textarea>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mindestens 10, maximal 1000 Zeichen</p>
+        </div>
+        
+        <button 
+            type="submit" 
+            name="submit_change_request"
+            class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+        >
+            <i class="fas fa-paper-plane mr-2"></i>
+            Beantragen
+        </button>
+    </form>
 </div>
 
 <?php
