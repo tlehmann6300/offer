@@ -269,21 +269,81 @@ require_once __DIR__ . '/../helpers.php';
             }
         }
 
-        /* LOGIN CONTAINER */
+        /* LOGIN CONTAINER - ENHANCED GLASSMORPHISM */
         .login-container {
             position: relative;
             z-index: 10;
-            background: rgba(15, 20, 40, 0.75);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
+            background: linear-gradient(145deg, 
+                rgba(15, 20, 40, 0.85) 0%, 
+                rgba(20, 25, 50, 0.75) 50%,
+                rgba(15, 20, 40, 0.80) 100%
+            );
+            backdrop-filter: blur(30px) saturate(150%);
+            -webkit-backdrop-filter: blur(30px) saturate(150%);
+            border-radius: 28px;
             padding: 60px 50px;
             width: 90%;
             max-width: 480px;
             box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+                0 25px 70px rgba(0, 0, 0, 0.6),
+                0 10px 30px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             animation: containerEntrance 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: visible;
+        }
+        
+        /* Animated gradient border effect */
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(
+                60deg,
+                rgba(108, 183, 62, 0.4),
+                rgba(30, 76, 156, 0.4),
+                rgba(108, 183, 62, 0.4),
+                rgba(30, 76, 156, 0.4)
+            );
+            background-size: 300% 300%;
+            border-radius: 28px;
+            z-index: -1;
+            animation: gradientRotate 8s ease infinite;
+            opacity: 0.5;
+            filter: blur(8px);
+        }
+        
+        @keyframes gradientRotate {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        /* Subtle shimmer effect on container */
+        .login-container::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.04) 50%,
+                transparent 70%
+            );
+            animation: shimmerSlow 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        @keyframes shimmerSlow {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
 
         @keyframes containerEntrance {
@@ -428,13 +488,13 @@ require_once __DIR__ . '/../helpers.php';
             font-weight: 400;
         }
 
-        /* MICROSOFT BUTTON - MEGA IMPRESSIVE */
+        /* MICROSOFT BUTTON - AWARD-WINNING DESIGN */
         .microsoft-button {
             width: 100%;
             padding: 20px;
-            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-            border: 2px solid rgba(108, 183, 62, 0.2);
-            border-radius: 16px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #f5f5f5 100%);
+            border: 2px solid rgba(108, 183, 62, 0.3);
+            border-radius: 18px;
             font-size: 17px;
             font-weight: 600;
             color: #2d2d2d;
@@ -443,14 +503,18 @@ require_once __DIR__ . '/../helpers.php';
             align-items: center;
             justify-content: center;
             gap: 15px;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
             overflow: hidden;
             box-shadow: 
-                0 10px 30px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+                0 12px 35px rgba(0, 0, 0, 0.35),
+                0 5px 15px rgba(108, 183, 62, 0.15),
+                inset 0 1px 2px rgba(255, 255, 255, 0.9),
+                inset 0 -1px 2px rgba(0, 0, 0, 0.05);
             animation: buttonSlideUp 1s ease-out 0.8s both;
             text-decoration: none;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         @keyframes buttonSlideUp {
@@ -488,15 +552,18 @@ require_once __DIR__ . '/../helpers.php';
         }
 
         .microsoft-button:hover {
-            transform: translateY(-4px) scale(1.02);
+            transform: translateY(-5px) scale(1.03);
             box-shadow: 
-                0 15px 40px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.9);
-            border-color: rgba(108, 183, 62, 0.4);
+                0 20px 50px rgba(0, 0, 0, 0.45),
+                0 8px 20px rgba(108, 183, 62, 0.25),
+                inset 0 1px 2px rgba(255, 255, 255, 1),
+                inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+            border-color: rgba(108, 183, 62, 0.5);
         }
 
         .microsoft-button:active {
-            transform: translateY(-2px) scale(0.98);
+            transform: translateY(-3px) scale(1.01);
+            transition: all 0.1s ease;
         }
 
         /* Microsoft Logo Grid */
