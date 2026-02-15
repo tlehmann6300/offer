@@ -579,7 +579,7 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                 <!-- Helfersystem (All) -->
                 <a href="<?php echo asset('pages/events/helpers.php'); ?>" 
                    class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/events/helpers.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
-                    <i></i>
+                    <i class="fas fa-hands-helping w-5 mr-3"></i>
                     <span>Helfersystem</span>
                 </a>
 
