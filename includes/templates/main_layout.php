@@ -124,7 +124,7 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
         }
         
         body:not(.dark-mode) #mobile-menu-btn i {
-            color: var(--ibc-blue);
+            color: var(--text-main); /* Dark text for visibility on white background */
         }
         
         body.dark-mode #mobile-menu-btn {

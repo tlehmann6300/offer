@@ -595,12 +595,20 @@ body.dark-mode .glass-card {
 }
 
 body.dark-mode a:not(.btn-primary) {
-    color: #60a5fa;
+    color: #ffffff !important; /* White text instead of blue for better consistency */
 }
 
-/* Light Mode Links - Use IBC Blue for interactive elements */
-body:not(.dark-mode) a:not(.btn-primary):not(.no-underline) {
-    color: var(--ibc-blue);
+/* Light Mode Links - Keep visible on white backgrounds, use appropriate color */
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a) {
+    color: var(--text-main) !important; /* Dark text for visibility on white backgrounds */
+    position: relative;
+    text-decoration: none;
+    transition: color var(--transition-normal);
+}
+
+/* Sidebar links in light mode must be white */
+body:not(.dark-mode) .sidebar a:not(.no-underline) {
+    color: #ffffff !important;
     position: relative;
     text-decoration: none;
     transition: color var(--transition-normal);
@@ -611,14 +619,14 @@ body:not(.dark-mode) a:not(.btn-primary):not(.no-underline) {
     display: inline-block;
 }
 
-body:not(.dark-mode) a:not(.btn-primary):not(.no-underline)::after {
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a)::after {
     content: '';
     position: absolute;
     bottom: -2px;
     left: 0;
     width: 0;
     height: 2px;
-    background: linear-gradient(90deg, var(--ibc-blue), var(--ibc-green));
+    background: linear-gradient(90deg, var(--ibc-green), var(--ibc-green-light)); /* Green gradient instead of blue-green */
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -637,8 +645,12 @@ body:not(.dark-mode) .sidebar a {
     display: block !important;
 }
 
-body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):hover {
-    color: var(--ibc-blue-dark);
+body:not(.dark-mode) a:not(.btn-primary):not(.no-underline):not(.sidebar a):hover {
+    color: var(--text-main) !important; /* Keep dark on hover for visibility */
+}
+
+body:not(.dark-mode) .sidebar a:not(.no-underline):hover {
+    color: #ffffff !important; /* Keep white on hover in sidebar */
 }
 
 body.dark-mode .text-gray-600 {
@@ -853,10 +865,14 @@ body.dark-mode .text-purple-800 {
     color: #e9d5ff !important; /* purple-200 - light purple for dark backgrounds */
 }
 
+body.dark-mode .text-blue-100,
+body.dark-mode .text-blue-200,
+body.dark-mode .text-blue-300,
 body.dark-mode .text-blue-600,
 body.dark-mode .text-blue-700,
-body.dark-mode .text-blue-800 {
-    color: #60a5fa !important; /* Lighter blue for better readability in dark mode */
+body.dark-mode .text-blue-800,
+body.dark-mode .text-blue-900 {
+    color: #ffffff !important; /* White instead of blue for dark mode */
 }
 
 body.dark-mode .text-green-600,
@@ -897,7 +913,7 @@ body.dark-mode .text-purple-500 {
 
 body.dark-mode .text-blue-400,
 body.dark-mode .text-blue-500 {
-    color: #f3f4f6 !important; /* Almost white for better readability in dark mode */
+    color: #ffffff !important; /* White instead of blue for dark mode */
 }
 
 body.dark-mode .text-green-400,
@@ -1031,7 +1047,7 @@ body.dark-mode .from-teal-50 {
 }
 
 .text-ibc-blue {
-    color: var(--ibc-blue);
+    color: #ffffff !important; /* White instead of IBC blue */
 }
 
 .text-ibc-green {
@@ -1262,6 +1278,23 @@ body:not(.dark-mode) td {
     color: inherit !important;
 }
 
+/* Light Mode: Replace blue text with readable dark text */
+body:not(.dark-mode) .text-blue-100,
+body:not(.dark-mode) .text-blue-200,
+body:not(.dark-mode) .text-blue-300,
+body:not(.dark-mode) .text-blue-400,
+body:not(.dark-mode) .text-blue-500,
+body:not(.dark-mode) .text-blue-600,
+body:not(.dark-mode) .text-blue-700,
+body:not(.dark-mode) .text-blue-800,
+body:not(.dark-mode) .text-blue-900 {
+    color: var(--text-main) !important; /* Dark text instead of blue for light mode */
+}
+
+body:not(.dark-mode) .text-ibc-blue {
+    color: var(--text-main) !important; /* Dark text instead of blue for light mode */
+}
+
 /* Light Mode: Kartenhintergrund sicherstellen */
 body:not(.dark-mode) .card {
     background-color: #ffffff !important;
@@ -1291,7 +1324,7 @@ body.dark-mode textarea {
 
 /* Dark Mode Links (außer Buttons und Sidebar) */
 body.dark-mode a:not(.btn):not(.btn-primary):not(.nav-link) {
-    color: #60a5fa !important; /* Helles Blau für Links */
+    color: #ffffff !important; /* White instead of blue for links */
 }
 
 /* Sidebar links override - keep white */
@@ -1365,7 +1398,7 @@ body.dark-mode .hover\:border-green-500:hover {
 
 /* Dark Mode: Hover Text Colors */
 body.dark-mode .hover\:text-blue-700:hover {
-    color: #ffffff !important; /* white for hover in dark mode */
+    color: #ffffff !important; /* White instead of blue for hover in dark mode */
 }
 
 body.dark-mode .hover\:text-green-700:hover {
@@ -1388,7 +1421,7 @@ body.dark-mode .bg-purple-100.text-purple-800 {
 
 body.dark-mode .bg-blue-100.text-blue-800 {
     background-color: rgba(59, 130, 246, 0.25) !important;
-    color: #bfdbfe !important;
+    color: #ffffff !important; /* White instead of blue */
 }
 
 body.dark-mode .bg-green-100.text-green-800 {
@@ -1451,13 +1484,13 @@ body.dark-mode .bg-green-50.text-green-800 {
 
 body.dark-mode .bg-blue-100.text-blue-700 {
     background-color: rgba(59, 130, 246, 0.15) !important;
-    color: #93c5fd !important;
+    color: #ffffff !important; /* White instead of blue */
 }
 
 body.dark-mode .bg-blue-50.text-blue-700,
 body.dark-mode .bg-blue-50.text-blue-800 {
     background-color: rgba(59, 130, 246, 0.15) !important;
-    color: #bfdbfe !important;
+    color: #ffffff !important; /* White instead of blue */
 }
 
 body.dark-mode .bg-yellow-50.text-yellow-700,
@@ -1683,7 +1716,7 @@ body.dark-mode button {
 
 body.dark-mode button:not(.btn-primary):not(.btn-secondary) {
     background-color: var(--bg-card);
-    color: var(--text-main);
+    color: #ffffff !important; /* Ensure all buttons have white text in dark mode */
 }
 
 body.dark-mode button:hover:not(.btn-primary):not(.btn-secondary) {
@@ -1698,8 +1731,11 @@ body.dark-mode .fab {
     opacity: 0.95;
 }
 
-/* Dark Mode: Ensure colored icons remain visible */
-body.dark-mode i.text-blue-600,
+/* Dark Mode: Ensure colored icons remain visible - removed blue, replaced with white */
+body.dark-mode i.text-blue-600 {
+    color: #ffffff !important; /* White instead of blue for icons */
+}
+
 body.dark-mode i.text-green-600,
 body.dark-mode i.text-purple-600,
 body.dark-mode i.text-orange-600,
@@ -1721,11 +1757,11 @@ body.dark-mode [class*="badge"] {
 
 /* Dark Mode: Improve link contrast in cards */
 body.dark-mode .card a:not(.btn) {
-    color: #60a5fa;
+    color: #ffffff !important; /* White instead of blue */
 }
 
 body.dark-mode .card a:not(.btn):hover {
-    color: #93c5fd;
+    color: #f3f4f6 !important; /* Light gray on hover for subtle effect */
 }
 
 /* Dark Mode: Better table row separators */
@@ -3241,12 +3277,8 @@ body.dark-mode .tag {
 }
 
 /* Dark Mode: Perfect text colors for specific elements */
-body.dark-mode .text-blue-600 {
-    color: #60a5fa !important; /* blue-400 */
-}
-
 body.dark-mode .text-ibc-blue {
-    color: #60a5fa !important; /* Light blue for better contrast on dark backgrounds */
+    color: #ffffff !important; /* White instead of blue for better contrast on dark backgrounds */
 }
 
 body.dark-mode .text-green-600 {
@@ -3271,9 +3303,9 @@ body.dark-mode .text-yellow-600 {
 
 /* Dark Mode: Enhanced hover states */
 body.dark-mode a:hover:not(.btn):not(.no-hover) {
-    color: var(--ibc-blue-light) !important;
+    color: #ffffff !important; /* White instead of blue on hover */
     text-decoration: underline;
-    text-decoration-color: rgba(51, 133, 196, 0.5);
+    text-decoration-color: rgba(255, 255, 255, 0.5);
 }
 
 body.dark-mode .hover\:shadow-2xl:hover {
