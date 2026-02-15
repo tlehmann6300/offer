@@ -31,18 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_poll'])) {
     $description = trim($_POST['description'] ?? '');
     $microsoftFormsUrl = trim($_POST['microsoft_forms_url'] ?? '');
     $targetGroups = $_POST['target_groups'] ?? [];
-    $allowedRolesText = trim($_POST['allowed_roles_text'] ?? '');
+    $allowedRoles = $_POST['allowed_roles'] ?? [];
     $visibleToAll = isset($_POST['visible_to_all']) ? 1 : 0;
     $isInternal = isset($_POST['is_internal']) ? 1 : 0;
-    
-    // Parse allowed roles from text input
-    $allowedRoles = null;
-    if (!empty($allowedRolesText)) {
-        $decoded = json_decode($allowedRolesText, true);
-        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-            $allowedRoles = $decoded;
-        }
-    }
     
     // Validation
     if (empty($title)) {
@@ -51,8 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_poll'])) {
         $errorMessage = 'Bitte geben Sie die Microsoft Forms URL ein.';
     } elseif (empty($targetGroups)) {
         $errorMessage = 'Bitte wählen Sie mindestens eine Zielgruppe aus.';
-    } elseif (!empty($allowedRolesText) && $allowedRoles === null) {
-        $errorMessage = 'Die erlaubten Entra-Rollen müssen ein gültiges JSON-Array sein.';
     } else {
         try {
             $db = Database::getContentDB();
@@ -64,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_poll'])) {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, DATE_ADD(NOW(), INTERVAL 30 DAY))
             ");
             $targetGroupsJson = json_encode($targetGroups);
-            $allowedRolesJson = $allowedRoles ? json_encode($allowedRoles) : null;
+            $allowedRolesJson = !empty($allowedRoles) ? json_encode($allowedRoles) : null;
             $stmt->execute([
                 $title, 
                 $description, 
@@ -231,6 +220,7 @@ ob_start();
                     <input 
                         type="checkbox" 
                         name="visible_to_all" 
+                        id="visible_to_all"
                         value="1"
                         <?php echo (isset($_POST['visible_to_all'])) ? 'checked' : ''; ?>
                         class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 mt-0.5"
@@ -242,6 +232,35 @@ ob_start();
                         </p>
                     </div>
                 </label>
+            </div>
+
+            <!-- Allowed Roles (Entra Roles) - Multi-select -->
+            <div id="allowed_roles_section" class="<?php echo (isset($_POST['visible_to_all'])) ? 'hidden' : ''; ?>">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Sichtbar für Rollen (optional)
+                </label>
+                <div class="space-y-2">
+                    <?php
+                    $availableRoles = ['Board', 'Ressortleiter', 'Mitglied', 'Alumni'];
+                    $selectedRoles = $_POST['allowed_roles'] ?? [];
+                    foreach ($availableRoles as $role):
+                    ?>
+                    <label class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                        <input 
+                            type="checkbox" 
+                            name="allowed_roles[]" 
+                            value="<?php echo htmlspecialchars($role); ?>"
+                            <?php echo (in_array($role, $selectedRoles)) ? 'checked' : ''; ?>
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        >
+                        <span class="ml-3 text-gray-700 dark:text-gray-300"><?php echo htmlspecialchars($role); ?></span>
+                    </label>
+                    <?php endforeach; ?>
+                </div>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Wählen Sie die Entra-Rollen aus, die diese Umfrage sehen dürfen. Leer lassen, um nur die Standard-Zielgruppen zu verwenden.
+                </p>
             </div>
 
             <!-- Is Internal Option -->
@@ -262,23 +281,6 @@ ob_start();
                         </p>
                     </div>
                 </label>
-            </div>
-
-            <!-- Allowed Roles (Entra Roles) -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Erlaubte Entra-Rollen (optional)
-                </label>
-                <textarea 
-                    name="allowed_roles_text" 
-                    rows="3"
-                    class="w-full px-4 py-3 bg-white border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                    placeholder='z.B.: ["IBC.Vorstand", "IBC.Mitglied"]'
-                ><?php echo htmlspecialchars($_POST['allowed_roles_text'] ?? ''); ?></textarea>
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    Geben Sie die erlaubten Microsoft Entra-Rollen als JSON-Array ein. Leer lassen, um nur die Standard-Zielgruppen zu verwenden.
-                </p>
             </div>
 
             <!-- Info Box -->
@@ -312,6 +314,18 @@ ob_start();
         </form>
     </div>
 </div>
+
+<script>
+// Toggle visibility of the allowed_roles_section based on visible_to_all checkbox
+document.getElementById('visible_to_all').addEventListener('change', function() {
+    const allowedRolesSection = document.getElementById('allowed_roles_section');
+    if (this.checked) {
+        allowedRolesSection.classList.add('hidden');
+    } else {
+        allowedRolesSection.classList.remove('hidden');
+    }
+});
+</script>
 
 <?php
 $content = ob_get_clean();
