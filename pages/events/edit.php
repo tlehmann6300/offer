@@ -12,7 +12,7 @@ if (!Auth::check() || !(Auth::hasPermission('manage_projects') || Auth::isBoard(
 
 // Check if we're creating a new event or editing an existing one
 $eventId = intval($_GET['id'] ?? 0);
-$isNew = isset($_GET['new']) && $_GET['new'] == '1';
+$isNew = isset($_GET['new']) && $_GET['new'] === '1';
 $isEdit = $eventId > 0 && !$isNew;
 $readOnly = false;
 $lockWarning = '';
