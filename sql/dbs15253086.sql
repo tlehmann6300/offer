@@ -1,0 +1,94 @@
+-- ================================================
+-- User Database Setup Script (dbs15253086)
+-- ================================================
+-- This database handles: User authentication, profiles,
+-- logins, passwords, and alumni information
+-- ================================================
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+-- ================================================
+-- TABLE: users
+-- ================================================
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `username` VARCHAR(50) NOT NULL UNIQUE,
+  `email` VARCHAR(255) NOT NULL UNIQUE,
+  `password` VARCHAR(255) NOT NULL,
+  `first_name` VARCHAR(100),
+  `last_name` VARCHAR(100),
+  `birthday` DATE DEFAULT NULL,
+  `show_birthday` BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Whether to display birthday publicly on profile',
+  `role` ENUM('user', 'admin', 'moderator') NOT NULL DEFAULT 'user',
+  `azure_roles` JSON DEFAULT NULL COMMENT 'Original Microsoft Entra ID roles from Azure AD authentication',
+  `job_title` VARCHAR(255) DEFAULT NULL COMMENT 'Job title from Microsoft Entra ID',
+  `company` VARCHAR(255) DEFAULT NULL COMMENT 'Company name from Microsoft Entra ID',
+  `entra_roles` TEXT DEFAULT NULL COMMENT 'JSON array of Microsoft Entra role names for display',
+  `profile_complete` BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Flag to track if user has completed initial profile setup',
+  `tfa_secret` VARCHAR(255) DEFAULT NULL COMMENT 'Two-factor authentication secret key',
+  `deleted_at` DATETIME DEFAULT NULL COMMENT 'Timestamp when the user was soft deleted (NULL = active)',
+  `last_reminder_sent_at` DATETIME DEFAULT NULL COMMENT 'Timestamp when the last profile reminder email was sent to the user',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `last_login` TIMESTAMP NULL DEFAULT NULL,
+  INDEX `idx_username` (`username`),
+  INDEX `idx_email` (`email`),
+  INDEX `idx_role` (`role`),
+  INDEX `idx_deleted_at` (`deleted_at`),
+  INDEX `idx_last_reminder_sent_at` (`last_reminder_sent_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='User authentication and profile information';
+
+-- ================================================
+-- TABLE: user_sessions
+-- ================================================
+CREATE TABLE IF NOT EXISTS `user_sessions` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT UNSIGNED NOT NULL,
+  `session_token` VARCHAR(255) NOT NULL UNIQUE,
+  `ip_address` VARCHAR(45),
+  `user_agent` TEXT,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `expires_at` TIMESTAMP NOT NULL,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  INDEX `idx_user_id` (`user_id`),
+  INDEX `idx_session_token` (`session_token`),
+  INDEX `idx_expires_at` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='User session management';
+
+-- ================================================
+-- TABLE: login_attempts
+-- ================================================
+CREATE TABLE IF NOT EXISTS `login_attempts` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `username` VARCHAR(50) NOT NULL,
+  `ip_address` VARCHAR(45) NOT NULL,
+  `success` BOOLEAN NOT NULL DEFAULT 0,
+  `attempted_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_username` (`username`),
+  INDEX `idx_ip_address` (`ip_address`),
+  INDEX `idx_attempted_at` (`attempted_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Track login attempts for security';
+
+-- ================================================
+-- TABLE: password_resets
+-- ================================================
+CREATE TABLE IF NOT EXISTS `password_resets` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT UNSIGNED NOT NULL,
+  `reset_token` VARCHAR(255) NOT NULL UNIQUE,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `expires_at` TIMESTAMP NOT NULL,
+  `used` BOOLEAN NOT NULL DEFAULT 0,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  INDEX `idx_user_id` (`user_id`),
+  INDEX `idx_reset_token` (`reset_token`),
+  INDEX `idx_expires_at` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Password reset token management';
+
+COMMIT;
