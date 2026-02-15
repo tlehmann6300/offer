@@ -1425,6 +1425,14 @@ require_once __DIR__ . '/../helpers.php';
             .microsoft-btn {
                 border: 2px solid #2d2d2d;
             }
+            
+            .microsoft-button:hover,
+            .microsoft-btn:hover,
+            .microsoft-button:active,
+            .microsoft-btn:active {
+                border: 3px solid #2d2d2d;
+                background: #ffffff;
+            }
         }
 
         /* Reduced motion support for accessibility */
