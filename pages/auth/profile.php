@@ -397,7 +397,8 @@ ob_start();
             // Display role: Priority order is entra_roles > azure_roles > internal role
             $displayRoles = [];
             
-            // 1. Check for entra_roles (JSON string)
+            // 1. Check for entra_roles (JSON array from Microsoft Graph)
+            // Note: entra_roles contains displayName from Microsoft Graph groups, already human-readable
             if (!empty($user['entra_roles'])):
                 $entraRoles = json_decode($user['entra_roles'], true);
                 if (json_last_error() === JSON_ERROR_NONE && is_array($entraRoles)) {
@@ -406,7 +407,7 @@ ob_start();
                     error_log("Failed to decode entra_roles for user ID " . intval($user['id']) . ": " . json_last_error_msg());
                 }
             
-            // 2. If no entra_roles, check azure_roles (JSON) or session azure_roles
+            // 2. If no entra_roles, check azure_roles (legacy format, requires translation)
             elseif (!empty($user['azure_roles'])):
                 $azureRoles = json_decode($user['azure_roles'], true);
                 if (json_last_error() === JSON_ERROR_NONE && is_array($azureRoles)) {

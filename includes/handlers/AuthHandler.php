@@ -625,10 +625,11 @@ class AuthHandler {
                         $groups = $profileData['groups'] ?? [];
                         
                         // Convert groups array to JSON string for entra_roles
+                        // Groups are displayName from Microsoft Graph, already human-readable
                         try {
                             $entraRoles = !empty($groups) ? json_encode($groups, JSON_THROW_ON_ERROR) : null;
                         } catch (JsonException $e) {
-                            error_log("Failed to JSON encode groups for user ID " . intval($userId) . ": " . $e->getMessage());
+                            error_log("Failed to JSON encode groups during profile sync for user ID " . intval($userId) . ": " . $e->getMessage());
                             $entraRoles = null; // Fallback to null if encoding fails
                         }
                         
