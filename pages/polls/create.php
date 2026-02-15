@@ -241,6 +241,7 @@ ob_start();
                 </label>
                 <div class="space-y-2">
                     <?php
+                    // Hardcoded Entra roles as per requirements (use DB table in future if available)
                     $availableRoles = ['Board', 'Ressortleiter', 'Mitglied', 'Alumni'];
                     $selectedRoles = $_POST['allowed_roles'] ?? [];
                     foreach ($availableRoles as $role):
@@ -317,12 +318,18 @@ ob_start();
 
 <script>
 // Toggle visibility of the allowed_roles_section based on visible_to_all checkbox
-document.getElementById('visible_to_all').addEventListener('change', function() {
+document.addEventListener('DOMContentLoaded', function() {
+    const visibleToAllCheckbox = document.getElementById('visible_to_all');
     const allowedRolesSection = document.getElementById('allowed_roles_section');
-    if (this.checked) {
-        allowedRolesSection.classList.add('hidden');
-    } else {
-        allowedRolesSection.classList.remove('hidden');
+    
+    if (visibleToAllCheckbox && allowedRolesSection) {
+        visibleToAllCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                allowedRolesSection.classList.add('hidden');
+            } else {
+                allowedRolesSection.classList.remove('hidden');
+            }
+        });
     }
 });
 </script>
