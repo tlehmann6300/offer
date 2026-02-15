@@ -127,7 +127,7 @@ ob_start();
                     rel="noopener noreferrer"
                     class="inline-block px-6 py-2 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors"
                 >
-                    <i class="fas fa-external-link-alt mr-2"></i>Zum Formular
+                    <i class="fas fa-external-link-alt mr-2"></i>Zur Umfrage
                 </a>
                 <button 
                     onclick="hidePoll(<?php echo $poll['id']; ?>)"
