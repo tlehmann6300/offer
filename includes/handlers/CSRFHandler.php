@@ -119,6 +119,7 @@ class CSRFHandler {
     
     /**
      * Log CSRF validation failures for security monitoring
+     * Sanitizes all inputs to prevent log injection attacks
      * 
      * @param string $reason Reason for CSRF failure
      */
@@ -126,6 +127,12 @@ class CSRFHandler {
         $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
         $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
         $requestUri = $_SERVER['REQUEST_URI'] ?? 'unknown';
+        
+        // Sanitize inputs to prevent log injection
+        $reason = str_replace(["\r", "\n", "\t"], '', $reason);
+        $ipAddress = str_replace(["\r", "\n", "\t"], '', $ipAddress);
+        $userAgent = str_replace(["\r", "\n", "\t"], '', substr($userAgent, 0, 200)); // Limit length
+        $requestUri = str_replace(["\r", "\n", "\t"], '', substr($requestUri, 0, 200)); // Limit length
         
         error_log(sprintf(
             'CSRF validation failed: %s - IP: %s - User Agent: %s - URI: %s',

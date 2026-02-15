@@ -92,22 +92,16 @@ if (!headers_sent()) {
         }
     }
     
-    // Content-Security-Policy: Enhanced with stricter controls
-    // This policy is based on the external resources used in the application:
-    // - Tailwind CSS CDN (cdn.tailwindcss.com)
-    // - Font Awesome CDN (cdnjs.cloudflare.com)
-    // - Google Fonts (fonts.googleapis.com, fonts.gstatic.com)
-    // NOTE: 'unsafe-inline' is still required for:
-    //   - Inline Tailwind configuration script in layout templates
-    //   - Inline styles in various components
-    // For production, consider implementing nonce-based CSP for better security
+    // Enhanced Content-Security-Policy with restricted image sources
+    // Note: Only allows images from self, data URIs, and blob URIs for maximum security
+    // If external images are needed (e.g., for email previews), add specific trusted domains
     if (!header_sent_check('Content-Security-Policy')) {
         $csp_directives = [
             "default-src 'self'",
             "script-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdnjs.cloudflare.com",
             "style-src 'self' 'unsafe-inline' cdn.tailwindcss.com cdnjs.cloudflare.com fonts.googleapis.com",
             "font-src 'self' cdnjs.cloudflare.com fonts.gstatic.com",
-            "img-src 'self' data: blob: https:",
+            "img-src 'self' data: blob:",  // Restricted to self, data, and blob only
             "connect-src 'self'",
             "frame-ancestors 'self'",
             "base-uri 'self'",

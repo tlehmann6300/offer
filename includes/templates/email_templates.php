@@ -8,6 +8,15 @@
  * - Dark mode support
  * - Cross-client compatibility (Gmail, Outlook, Apple Mail, etc.)
  * - Accessibility features
+ * 
+ * IMPORTANT: Logo Image Attachment
+ * All templates reference 'cid:ibc_logo' for the IBC logo image.
+ * When sending emails, you MUST attach the logo image with Content-ID 'ibc_logo':
+ * 
+ * Example usage with PHPMailer:
+ *   $mail->addEmbeddedImage('/path/to/logo.png', 'ibc_logo', 'logo.png');
+ * 
+ * If the logo is not attached, email clients will show a broken image icon.
  */
 
 class EmailTemplates {
