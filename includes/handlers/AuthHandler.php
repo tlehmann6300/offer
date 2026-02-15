@@ -624,8 +624,8 @@ class AuthHandler {
                         $companyName = $profileData['companyName'] ?? null;
                         $groups = $profileData['groups'] ?? [];
                         
-                        // Convert groups array to comma-separated string for entra_roles
-                        $entraRoles = !empty($groups) ? implode(', ', $groups) : null;
+                        // Convert groups array to JSON string for entra_roles
+                        $entraRoles = !empty($groups) ? json_encode($groups) : null;
                         
                         // Update user record with profile data
                         $stmt = $db->prepare("UPDATE users SET job_title = ?, company = ?, entra_roles = ? WHERE id = ?");

@@ -397,9 +397,14 @@ ob_start();
             // Display role: Priority order is entra_roles > azure_roles > internal role
             $displayRoles = [];
             
-            // 1. Check for entra_roles (comma-separated string)
+            // 1. Check for entra_roles (JSON string)
             if (!empty($user['entra_roles'])):
-                $displayRoles = array_filter(array_map('trim', explode(',', $user['entra_roles'])));
+                $entraRoles = json_decode($user['entra_roles'], true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($entraRoles)) {
+                    $displayRoles = array_filter($entraRoles);
+                } else {
+                    error_log("Failed to decode entra_roles for user ID {$user['id']}: " . json_last_error_msg());
+                }
             
             // 2. If no entra_roles, check azure_roles (JSON) or session azure_roles
             elseif (!empty($user['azure_roles'])):
