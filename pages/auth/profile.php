@@ -339,6 +339,8 @@ ob_start();
                     $sessionRoles = json_decode($_SESSION['azure_roles'], true);
                     if (json_last_error() === JSON_ERROR_NONE && is_array($sessionRoles)) {
                         $displayRoles = array_map('translateAzureRole', $sessionRoles);
+                    } else {
+                        error_log("Failed to decode session azure_roles for user ID {$user['id']}: " . json_last_error_msg());
                     }
                 }
             endif;
@@ -352,7 +354,7 @@ ob_start();
             if (!empty($displayRoles)):
             ?>
             <div>
-                <label class="text-sm text-gray-500 dark:text-gray-400">Rolle<?php echo count($displayRoles) > 1 ? 'n' : ''; ?></label>
+                <label class="text-sm text-gray-500 dark:text-gray-400"><?php echo count($displayRoles) === 1 ? 'Rolle' : 'Rollen'; ?></label>
                 <p class="text-lg text-gray-800 dark:text-gray-100">
                     <?php echo htmlspecialchars(implode(', ', $displayRoles)); ?>
                 </p>
