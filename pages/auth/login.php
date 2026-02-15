@@ -54,7 +54,7 @@ $title = 'Login - IBC Intranet';
 ob_start();
 ?>
 
-<div class="login-container">
+<div class="login-container glass-card animated-entrance">
     <!-- LOGO ANIMATION -->
     <div class="logo-container">
         <div class="logo-glow"></div>
@@ -104,7 +104,7 @@ ob_start();
     <?php endif; ?>
 
     <!-- Microsoft Login Button -->
-    <a href="<?php echo BASE_URL; ?>/auth/login_start.php" class="microsoft-button" id="loginButton" onclick="return handleLogin(event)">
+    <a href="<?php echo BASE_URL; ?>/auth/login_start.php" class="microsoft-btn" id="loginButton" onclick="return handleLogin(event)">
         <div class="microsoft-logo">
             <div></div>
             <div></div>
@@ -117,7 +117,7 @@ ob_start();
     </a>
 
     <!-- Footer -->
-    <div class="login-footer">
+    <div class="login-footer" style="color: #ffffff; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
         <p>&copy; <?php echo date('Y'); ?> IBC Business Consulting. Alle Rechte vorbehalten.</p>
     </div>
 </div>
