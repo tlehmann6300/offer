@@ -338,6 +338,177 @@ function dismissProfileReviewPrompt() {
     <?php endif; ?>
 </div>
 
+<!-- Polls Widget Section -->
+<div class="max-w-6xl mx-auto mb-12">
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center mr-3 shadow-md">
+                <i class="fas fa-poll text-white text-sm"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800">Aktuelle Umfragen</h2>
+        </div>
+        <a href="../polls/index.php" class="text-orange-600 hover:text-orange-700 font-semibold text-sm">
+            Alle Umfragen <i class="fas fa-arrow-right ml-1"></i>
+        </a>
+    </div>
+    
+    <?php
+    // Fetch active polls for the user
+    $userAzureRoles = isset($user['azure_roles']) ? json_decode($user['azure_roles'], true) : [];
+    
+    $pollStmt = $contentDb->prepare("
+        SELECT p.*, 
+               (SELECT COUNT(*) FROM poll_votes WHERE poll_id = p.id AND user_id = ?) as user_has_voted,
+               (SELECT COUNT(*) FROM poll_hidden_by_user WHERE poll_id = p.id AND user_id = ?) as user_has_hidden
+        FROM polls p
+        WHERE p.is_active = 1 AND p.end_date > NOW()
+        ORDER BY p.created_at DESC
+        LIMIT 5
+    ");
+    $pollStmt->execute([$user['id'], $user['id']]);
+    $allPolls = $pollStmt->fetchAll();
+    
+    // Filter polls based on the new logic
+    $visiblePolls = array_filter($allPolls, function($poll) use ($userRole, $userAzureRoles) {
+        // Skip if user has manually hidden this poll
+        if ($poll['user_has_hidden'] > 0) {
+            return false;
+        }
+        
+        // If visible_to_all is set, always show
+        if (!empty($poll['visible_to_all'])) {
+            // For internal polls, hide if user has already voted
+            if (!empty($poll['is_internal']) && $poll['user_has_voted'] > 0) {
+                return false;
+            }
+            return true;
+        }
+        
+        // Check allowed_roles (Entra roles) if set
+        $allowedRoles = !empty($poll['allowed_roles']) ? json_decode($poll['allowed_roles'], true) : null;
+        if ($allowedRoles && is_array($allowedRoles)) {
+            // Check if any of user's azure_roles match allowed_roles
+            $hasMatchingRole = false;
+            if (is_array($userAzureRoles)) {
+                foreach ($userAzureRoles as $userAzureRole) {
+                    if (in_array($userAzureRole, $allowedRoles)) {
+                        $hasMatchingRole = true;
+                        break;
+                    }
+                }
+            }
+            if (!$hasMatchingRole) {
+                return false;
+            }
+        }
+        
+        // Check target_groups (backward compatibility with old role system)
+        $targetGroups = json_decode($poll['target_groups'], true);
+        if (!in_array($userRole, $targetGroups)) {
+            return false;
+        }
+        
+        // For internal polls, hide if user has already voted
+        if (!empty($poll['is_internal']) && $poll['user_has_voted'] > 0) {
+            return false;
+        }
+        
+        return true;
+    });
+    
+    if (!empty($visiblePolls)): 
+    ?>
+    <div class="grid grid-cols-1 gap-4">
+        <?php foreach ($visiblePolls as $poll): ?>
+        <div class="card p-5 rounded-xl shadow-md hover:shadow-lg transition-all bg-gradient-to-br from-white to-orange-50/30">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h3 class="font-bold text-gray-800 text-lg mb-2">
+                        <i class="fas fa-poll-h text-orange-500 mr-2"></i>
+                        <?php echo htmlspecialchars($poll['title']); ?>
+                    </h3>
+                    <?php if (!empty($poll['description'])): ?>
+                    <p class="text-sm text-gray-600 mb-3">
+                        <?php echo htmlspecialchars(substr($poll['description'], 0, 150)) . (strlen($poll['description']) > 150 ? '...' : ''); ?>
+                    </p>
+                    <?php endif; ?>
+                    <p class="text-xs text-gray-500">
+                        <i class="fas fa-clock mr-1"></i>
+                        Endet am <?php echo date('d.m.Y', strtotime($poll['end_date'])); ?>
+                    </p>
+                </div>
+                <div class="ml-4 flex flex-col gap-2">
+                    <?php if (!empty($poll['microsoft_forms_url'])): ?>
+                    <!-- Microsoft Forms Link -->
+                    <a 
+                        href="<?php echo htmlspecialchars($poll['microsoft_forms_url']); ?>"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all text-sm font-semibold whitespace-nowrap"
+                    >
+                        <i class="fas fa-external-link-alt mr-1"></i>Zum Formular
+                    </a>
+                    <button 
+                        onclick="hidePollFromDashboard(<?php echo $poll['id']; ?>)"
+                        class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition-all text-xs font-semibold whitespace-nowrap"
+                    >
+                        <i class="fas fa-eye-slash mr-1"></i>Erledigt / Ausblenden
+                    </button>
+                    <?php else: ?>
+                    <!-- Internal Poll -->
+                    <a 
+                        href="../polls/view.php?id=<?php echo $poll['id']; ?>"
+                        class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all text-sm font-semibold whitespace-nowrap"
+                    >
+                        <?php if ($poll['user_has_voted'] > 0): ?>
+                            <i class="fas fa-chart-bar mr-1"></i>Ergebnisse
+                        <?php else: ?>
+                            <i class="fas fa-vote-yea mr-1"></i>Abstimmen
+                        <?php endif; ?>
+                    </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <?php else: ?>
+    <div class="card p-6 rounded-xl shadow-md text-center bg-gradient-to-br from-white to-gray-50">
+        <i class="fas fa-poll text-3xl mb-2 text-gray-400"></i>
+        <p class="text-gray-600">Keine aktiven Umfragen für Sie verfügbar</p>
+    </div>
+    <?php endif; ?>
+</div>
+
+<script>
+function hidePollFromDashboard(pollId) {
+    if (!confirm('Möchten Sie diese Umfrage wirklich ausblenden?')) {
+        return;
+    }
+    
+    fetch('<?php echo asset('api/hide_poll.php'); ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ poll_id: pollId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload page to update the dashboard
+            window.location.reload();
+        } else {
+            alert('Fehler: ' + (data.message || 'Unbekannter Fehler'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
+    });
+}
+</script>
+
 <!-- Upcoming Events Section - Visible to All Users -->
 <div class="max-w-6xl mx-auto mb-12">
     <div class="flex items-center justify-center mb-6">

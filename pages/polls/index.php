@@ -16,26 +16,70 @@ if (!Auth::check()) {
 
 $user = Auth::user();
 $userRole = $user['role'] ?? '';
+$userAzureRoles = isset($user['azure_roles']) ? json_decode($user['azure_roles'], true) : [];
 
 // Get database connection
 $db = Database::getContentDB();
 
-// Fetch all active polls
+// Fetch all active polls with hidden status
 $stmt = $db->prepare("
     SELECT p.*, 
            (SELECT COUNT(*) FROM poll_votes WHERE poll_id = p.id AND user_id = ?) as user_has_voted,
-           (SELECT COUNT(*) FROM poll_votes WHERE poll_id = p.id) as total_votes
+           (SELECT COUNT(*) FROM poll_votes WHERE poll_id = p.id) as total_votes,
+           (SELECT COUNT(*) FROM poll_hidden_by_user WHERE poll_id = p.id AND user_id = ?) as user_has_hidden
     FROM polls p
     WHERE p.is_active = 1 AND p.end_date > NOW()
     ORDER BY p.created_at DESC
 ");
-$stmt->execute([$user['id']]);
+$stmt->execute([$user['id'], $user['id']]);
 $polls = $stmt->fetchAll();
 
-// Filter polls by target_groups (user role must be in the JSON array)
-$filteredPolls = array_filter($polls, function($poll) use ($userRole) {
+// Filter polls based on new logic
+$filteredPolls = array_filter($polls, function($poll) use ($userRole, $userAzureRoles) {
+    // Skip if user has manually hidden this poll
+    if ($poll['user_has_hidden'] > 0) {
+        return false;
+    }
+    
+    // If visible_to_all is set, always show
+    if (!empty($poll['visible_to_all'])) {
+        // For internal polls, hide if user has already voted
+        if (!empty($poll['is_internal']) && $poll['user_has_voted'] > 0) {
+            return false;
+        }
+        return true;
+    }
+    
+    // Check allowed_roles (Entra roles) if set
+    $allowedRoles = !empty($poll['allowed_roles']) ? json_decode($poll['allowed_roles'], true) : null;
+    if ($allowedRoles && is_array($allowedRoles)) {
+        // Check if any of user's azure_roles match allowed_roles
+        $hasMatchingRole = false;
+        if (is_array($userAzureRoles)) {
+            foreach ($userAzureRoles as $userAzureRole) {
+                if (in_array($userAzureRole, $allowedRoles)) {
+                    $hasMatchingRole = true;
+                    break;
+                }
+            }
+        }
+        if (!$hasMatchingRole) {
+            return false;
+        }
+    }
+    
+    // Check target_groups (backward compatibility with old role system)
     $targetGroups = json_decode($poll['target_groups'], true);
-    return in_array($userRole, $targetGroups);
+    if (!in_array($userRole, $targetGroups)) {
+        return false;
+    }
+    
+    // For internal polls, hide if user has already voted
+    if (!empty($poll['is_internal']) && $poll['user_has_voted'] > 0) {
+        return false;
+    }
+    
+    return true;
 });
 
 $title = 'Umfragen - IBC Intranet';
@@ -118,6 +162,26 @@ ob_start();
             </div>
             
             <!-- Action Button -->
+            <?php if (!empty($poll['microsoft_forms_url'])): ?>
+            <!-- Microsoft Forms Link - Show both buttons -->
+            <div class="flex gap-3">
+                <a 
+                    href="<?php echo htmlspecialchars($poll['microsoft_forms_url']); ?>"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-block px-6 py-2 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+                >
+                    <i class="fas fa-external-link-alt mr-2"></i>Zum Formular
+                </a>
+                <button 
+                    onclick="hidePoll(<?php echo $poll['id']; ?>)"
+                    class="inline-block px-6 py-2 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors"
+                >
+                    <i class="fas fa-eye-slash mr-2"></i>Erledigt / Ausblenden
+                </button>
+            </div>
+            <?php else: ?>
+            <!-- Internal Poll - Regular behavior -->
             <a 
                 href="<?php echo asset('pages/polls/view.php?id=' . $poll['id']); ?>"
                 class="inline-block px-6 py-2 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors"
@@ -128,11 +192,41 @@ ob_start();
                     <i class="fas fa-vote-yea mr-2"></i>Jetzt abstimmen
                 <?php endif; ?>
             </a>
+            <?php endif; ?>
         </div>
         <?php endforeach; ?>
     </div>
     <?php endif; ?>
 </div>
+
+<script>
+function hidePoll(pollId) {
+    if (!confirm('Möchten Sie diese Umfrage wirklich ausblenden?')) {
+        return;
+    }
+    
+    fetch('<?php echo asset('api/hide_poll.php'); ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ poll_id: pollId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload page to update the list
+            window.location.reload();
+        } else {
+            alert('Fehler: ' + (data.message || 'Unbekannter Fehler'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
+    });
+}
+</script>
 
 <?php
 $content = ob_get_clean();
