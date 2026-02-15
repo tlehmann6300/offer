@@ -625,7 +625,12 @@ class AuthHandler {
                         $groups = $profileData['groups'] ?? [];
                         
                         // Convert groups array to JSON string for entra_roles
-                        $entraRoles = !empty($groups) ? json_encode($groups, JSON_THROW_ON_ERROR) : null;
+                        try {
+                            $entraRoles = !empty($groups) ? json_encode($groups, JSON_THROW_ON_ERROR) : null;
+                        } catch (JsonException $e) {
+                            error_log("Failed to JSON encode groups for user ID " . intval($userId) . ": " . $e->getMessage());
+                            $entraRoles = null; // Fallback to null if encoding fails
+                        }
                         
                         // Update user record with profile data
                         $stmt = $db->prepare("UPDATE users SET job_title = ?, company = ?, entra_roles = ? WHERE id = ?");
