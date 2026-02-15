@@ -2075,8 +2075,13 @@ a.microsoft-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #0a1628 0%, #1a3a2e 25%, #0f1f1a 50%, #0a0f1e 100%);
-    background-size: 400% 400%;
+    background: 
+        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+        url('../img/login-bg.webp'),
+        linear-gradient(135deg, #0a1628 0%, #1a3a2e 25%, #0f1f1a 50%, #0a0f1e 100%);
+    background-size: cover, cover, 400% 400%;
+    background-position: center, center, 0% 50%;
+    background-repeat: no-repeat, no-repeat, no-repeat;
     animation: gradientShift 20s ease infinite;
     position: relative;
     overflow: hidden;
