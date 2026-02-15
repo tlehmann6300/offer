@@ -595,7 +595,7 @@ body.dark-mode .glass-card {
 }
 
 body.dark-mode a:not(.btn-primary) {
-    color: var(--ibc-blue-light);
+    color: #60a5fa;
 }
 
 /* Light Mode Links - Use IBC Blue for interactive elements */
@@ -3239,6 +3239,10 @@ body.dark-mode .tag {
 /* Dark Mode: Perfect text colors for specific elements */
 body.dark-mode .text-blue-600 {
     color: #60a5fa !important; /* blue-400 */
+}
+
+body.dark-mode .text-ibc-blue {
+    color: #60a5fa !important; /* Light blue for better contrast on dark backgrounds */
 }
 
 body.dark-mode .text-green-600 {
