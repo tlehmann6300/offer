@@ -2026,12 +2026,7 @@ a.microsoft-btn {
     margin-top: 2rem;
     font-size: 0.85rem;
     opacity: 0.8;
-    color: #ffffff;
-}
-
-/* Dark mode high contrast color for footer */
-body.dark-mode .login-footer {
-    color: #f8fafc;
+    /* Color is set inline in login.php for proper contrast on dark background */
 }
 
 /* Logo Container - Centered with floating animation */
