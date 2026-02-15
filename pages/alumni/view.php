@@ -15,13 +15,14 @@ $user = Auth::user();
 // Get profile ID from URL
 $profileId = $_GET['id'] ?? null;
 
-// Get return location (default to alumni index) and validate against allowlist
+// Get return location (default to alumni index)
 // Check GET parameter return_to first, then check referrer URL
 $returnTo = 'alumni'; // Default value
 
 // Check GET parameter return_to
-if (isset($_GET['return_to']) && $_GET['return_to'] === 'members') {
-    $returnTo = 'members';
+if (isset($_GET['return_to'])) {
+    // If return_to is explicitly set, use it (only 'members' is valid, anything else defaults to 'alumni')
+    $returnTo = ($_GET['return_to'] === 'members') ? 'members' : 'alumni';
 } 
 // Check referrer URL if return_to parameter is not set
 elseif (isset($_SERVER['HTTP_REFERER'])) {
