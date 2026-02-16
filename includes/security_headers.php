@@ -93,11 +93,26 @@ if (!headers_sent()) {
     }
     
     // Strict Content-Security-Policy
-    // Allows scripts from 'self' and 'unsafe-inline' (needed for the ripple effect script)
+    // Allows scripts from 'self', 'unsafe-inline', and trusted CDNs (Tailwind, Cloudflare)
     // Allows images from 'self' and data: schemes (for SVGs)
-    // Allows styles from 'self' and 'unsafe-inline'
+    // Allows styles from 'self', 'unsafe-inline', and trusted CDNs (Google Fonts, Font Awesome)
+    // Allows fonts from 'self', data:, and Google Fonts
+    // 
+    // NOTE: 'unsafe-inline' is used for backwards compatibility with inline scripts/styles
+    // throughout the application. For better security, consider:
+    // 1. Moving inline scripts to external files
+    // 2. Implementing CSP nonces for necessary inline scripts
+    // 3. Using hashes for specific inline scripts
     if (!header_sent_check('Content-Security-Policy')) {
-        header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;");
+        $csp_directives = [
+            "default-src 'self'",
+            "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com",
+            "img-src 'self' data:",
+            "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
+            "connect-src 'self'"
+        ];
+        header("Content-Security-Policy: " . implode("; ", $csp_directives));
     }
     
     // X-Permitted-Cross-Domain-Policies: Restricts Adobe Flash and PDF cross-domain policies

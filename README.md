@@ -2,28 +2,27 @@
 
 ## 🚨 Critical Issue: Dashboard Error Fix
 
-If you're seeing this error on the dashboard:
+If you're seeing errors on the dashboard such as:
 
-```
-SQLSTATE[42S22]: Column not found: 1054 Unknown column 'e.needs_helpers' in 'where clause'
-```
+- `SQLSTATE[42S22]: Column not found: 1054 Unknown column 'p.is_active'`
+- `SQLSTATE[42S22]: Column not found: 1054 Unknown column 'e.needs_helpers'`
+- `Uncaught SyntaxError: Unexpected token 'export'`
+- CSS styling issues
 
-### Quick Fix (2 steps required):
+### Quick Fix:
 
 1. **Deploy the latest code** (this repository contains the fix)
 2. **Run the database update:**
    ```bash
    php update_database_schema.php
    ```
-
-### Why both steps are needed:
-
-- **Step 1** updates the code with error handling so the dashboard won't crash
-- **Step 2** adds the missing `needs_helpers` column so the feature works properly
+3. **Clear browser cache** (Ctrl+Shift+Delete or Cmd+Shift+Delete)
 
 ### Detailed Instructions
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for complete deployment instructions.
+- **For database issues**: See [QUICKFIX.md](QUICKFIX.md)
+- **For all issues**: See [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+- **For deployment**: See [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ### Verification
 
