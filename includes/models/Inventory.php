@@ -854,15 +854,6 @@ class Inventory {
                 continue;
             }
             
-            // Get status with default
-            $status = $item['status'] ?? 'available';
-            $validStatuses = ['available', 'in_use', 'maintenance', 'retired'];
-            if (!in_array($status, $validStatuses)) {
-                $errors[] = "Item at index $index: Invalid status '$status'. Must be one of: " . implode(', ', $validStatuses);
-                $skipped++;
-                continue;
-            }
-            
             // Check if serial_number exists and is duplicate
             if (!empty($item['serial_number'])) {
                 $stmt = $db->prepare("SELECT id, name FROM inventory_items WHERE serial_number = ?");
@@ -903,19 +894,6 @@ class Inventory {
                         // Create new location
                         $locationId = self::createLocation($item['location']);
                     }
-                }
-                
-                // Validate and format purchase_date if provided
-                $purchaseDate = null;
-                if (!empty($item['purchase_date'])) {
-                    // Try to parse the date
-                    $timestamp = strtotime($item['purchase_date']);
-                    if ($timestamp === false) {
-                        $errors[] = "Item at index $index ('{$item['name']}'): Invalid purchase_date format '{$item['purchase_date']}'";
-                        $skipped++;
-                        continue;
-                    }
-                    $purchaseDate = date('Y-m-d', $timestamp);
                 }
                 
                 // Insert item
