@@ -81,16 +81,29 @@ $openTasksCount = count($userRentals);
 
 // Get events that need helpers (for all users)
 $contentDb = Database::getContentDB();
-$stmt = $contentDb->query("
-    SELECT e.id, e.title, e.description, e.start_time, e.end_time, e.location
-    FROM events e
-    WHERE e.needs_helpers = 1
-    AND e.status IN ('open', 'planned')
-    AND e.end_time >= NOW()
-    ORDER BY e.start_time ASC
-    LIMIT 5
-");
-$helperEvents = $stmt->fetchAll();
+$helperEvents = [];
+try {
+    $stmt = $contentDb->query("
+        SELECT e.id, e.title, e.description, e.start_time, e.end_time, e.location
+        FROM events e
+        WHERE e.needs_helpers = 1
+        AND e.status IN ('open', 'planned')
+        AND e.end_time >= NOW()
+        ORDER BY e.start_time ASC
+        LIMIT 5
+    ");
+    $helperEvents = $stmt->fetchAll();
+} catch (PDOException $e) {
+    // If needs_helpers column doesn't exist yet, gracefully skip this section
+    // This can happen if update_database_schema.php hasn't been run yet
+    if (strpos($e->getMessage(), 'Unknown column') === false && 
+        strpos($e->getMessage(), 'Column not found') === false) {
+        // If it's not a column error, re-throw it
+        throw $e;
+    }
+    // Otherwise, leave $helperEvents as empty array
+    error_log("Dashboard: needs_helpers column not found in events table. Run update_database_schema.php to add it.");
+}
 
 // Security Audit - nur für Board/Head
 $securityWarning = '';
