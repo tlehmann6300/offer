@@ -374,6 +374,7 @@ CREATE TABLE IF NOT EXISTS `inventory_items` (
   `notes` TEXT,
   `serial_number` VARCHAR(255) DEFAULT NULL,
   `easyverein_id` VARCHAR(255) DEFAULT NULL COMMENT 'ID from EasyVerein sync',
+  `is_archived_in_easyverein` BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Flag indicating if item is archived in EasyVerein',
   `last_synced_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Last sync timestamp from EasyVerein',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -381,7 +382,8 @@ CREATE TABLE IF NOT EXISTS `inventory_items` (
   FOREIGN KEY (`location_id`) REFERENCES `locations`(`id`) ON DELETE SET NULL,
   INDEX `idx_category_id` (`category_id`),
   INDEX `idx_location_id` (`location_id`),
-  INDEX `idx_easyverein_id` (`easyverein_id`)
+  INDEX `idx_easyverein_id` (`easyverein_id`),
+  INDEX `idx_is_archived_in_easyverein` (`is_archived_in_easyverein`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Inventory items';
 
