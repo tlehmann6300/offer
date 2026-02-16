@@ -218,6 +218,20 @@ try {
         "Add sellers_data column to event_documentation table"
     );
     
+    // Add needs_helpers column to events table
+    executeSql(
+        $content_db,
+        "ALTER TABLE events ADD COLUMN needs_helpers BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Flag indicating if the event needs helpers'",
+        "Add needs_helpers column to events table"
+    );
+    
+    // Add index for needs_helpers column
+    executeSql(
+        $content_db,
+        "ALTER TABLE events ADD INDEX idx_needs_helpers (needs_helpers)",
+        "Add index for needs_helpers column"
+    );
+    
     // Create event_financial_stats table
     $create_financial_stats_table = "
     CREATE TABLE IF NOT EXISTS event_financial_stats (
