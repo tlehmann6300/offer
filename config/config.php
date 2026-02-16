@@ -214,14 +214,9 @@ function init_session() {
         $lifetime = defined('SESSION_LIFETIME') ? SESSION_LIFETIME : 3600;
         
         // Get domain from BASE_URL
+        // Leave domain empty for single-domain deployments (most secure and reliable)
+        // Setting explicit domain can cause cookie issues with OAuth redirects
         $domain = '';
-        if (defined('BASE_URL') && BASE_URL) {
-            $parsed = parse_url(BASE_URL);
-            // Validate parse_url result before accessing
-            if ($parsed !== false && isset($parsed['host'])) {
-                $domain = $parsed['host'];
-            }
-        }
         
         // Set secure cookie parameters BEFORE starting session
         // Only require secure flag over HTTPS to prevent session issues over HTTP
