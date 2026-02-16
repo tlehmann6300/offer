@@ -426,6 +426,10 @@ class AuthHandler {
         // Store state in session for CSRF protection
         $_SESSION['oauth2state'] = $provider->getState();
         
+        // Ensure session is written to disk before redirect
+        // This is critical for OAuth flow to preserve the state parameter
+        session_write_close();
+        
         // Redirect to authorization URL
         header('Location: ' . $authorizationUrl);
         exit;
