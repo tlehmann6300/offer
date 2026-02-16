@@ -22,9 +22,12 @@ class AuthHandler {
         init_session();
         
         // Regenerate session ID periodically to prevent session fixation
+        // BUT skip regeneration during OAuth flow to preserve state parameter
+        $isOAuthFlow = isset($_SESSION['oauth2state']);
+        
         if (!isset($_SESSION['created'])) {
             $_SESSION['created'] = time();
-        } else if (time() - $_SESSION['created'] > 1800) {
+        } else if (time() - $_SESSION['created'] > 1800 && !$isOAuthFlow) {
             session_regenerate_id(true);
             $_SESSION['created'] = time();
         }
@@ -426,6 +429,10 @@ class AuthHandler {
         // Store state in session for CSRF protection
         $_SESSION['oauth2state'] = $provider->getState();
         
+        // Log state storage for debugging
+        error_log("OAuth state stored in session: " . $_SESSION['oauth2state']);
+        error_log("Session ID: " . session_id());
+        
         // Ensure session is written to disk before redirect
         // This is critical for OAuth flow to preserve the state parameter
         session_write_close();
@@ -447,6 +454,11 @@ class AuthHandler {
         
         // Validate state for CSRF protection
         if (!isset($_GET['state']) || !isset($_SESSION['oauth2state']) || $_GET['state'] !== $_SESSION['oauth2state']) {
+            // Log detailed error information for debugging
+            error_log("OAuth state validation failed:");
+            error_log("  - GET state: " . (isset($_GET['state']) ? $_GET['state'] : 'NOT SET'));
+            error_log("  - SESSION oauth2state: " . (isset($_SESSION['oauth2state']) ? $_SESSION['oauth2state'] : 'NOT SET'));
+            error_log("  - Session ID: " . session_id());
             unset($_SESSION['oauth2state']);
             throw new Exception('Invalid state parameter');
         }
