@@ -155,8 +155,8 @@ class Inventory {
                 LEFT JOIN rentals r ON i.id = r.item_id AND r.actual_return IS NULL" 
                 . $whereSQL . "
                 GROUP BY i.id, i.easyverein_id, i.name, i.description, i.serial_number, i.category_id, i.location_id, 
-                         i.status, i.quantity, i.min_stock, i.unit, i.unit_price, i.purchase_date, 
-                         i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at, i.is_archived_in_easyverein,
+                         i.quantity, i.min_stock, i.unit, i.unit_price, 
+                         i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at,
                          c.name, c.color, l.name
                 ORDER BY " . $orderBy;
         
@@ -854,15 +854,6 @@ class Inventory {
                 continue;
             }
             
-            // Get status with default
-            $status = $item['status'] ?? 'available';
-            $validStatuses = ['available', 'in_use', 'maintenance', 'retired'];
-            if (!in_array($status, $validStatuses)) {
-                $errors[] = "Item at index $index: Invalid status '$status'. Must be one of: " . implode(', ', $validStatuses);
-                $skipped++;
-                continue;
-            }
-            
             // Check if serial_number exists and is duplicate
             if (!empty($item['serial_number'])) {
                 $stmt = $db->prepare("SELECT id, name FROM inventory_items WHERE serial_number = ?");
@@ -905,25 +896,11 @@ class Inventory {
                     }
                 }
                 
-                // Validate and format purchase_date if provided
-                $purchaseDate = null;
-                if (!empty($item['purchase_date'])) {
-                    // Try to parse the date
-                    $timestamp = strtotime($item['purchase_date']);
-                    if ($timestamp === false) {
-                        $errors[] = "Item at index $index ('{$item['name']}'): Invalid purchase_date format '{$item['purchase_date']}'";
-                        $skipped++;
-                        continue;
-                    }
-                    $purchaseDate = date('Y-m-d', $timestamp);
-                }
-                
                 // Insert item
                 $stmt = $db->prepare("
                     INSERT INTO inventory_items (
-                        name, description, serial_number, category_id, location_id, 
-                        status, quantity, purchase_date
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        name, description, serial_number, category_id, location_id, quantity
+                    ) VALUES (?, ?, ?, ?, ?, ?)
                 ");
                 
                 $stmt->execute([
@@ -932,9 +909,7 @@ class Inventory {
                     $item['serial_number'] ?? null,
                     $categoryId,
                     $locationId,
-                    $status,
-                    1, // Default stock of 1 for imported items
-                    $purchaseDate
+                    1 // Default stock of 1 for imported items
                 ]);
                 
                 $itemId = $db->lastInsertId();
