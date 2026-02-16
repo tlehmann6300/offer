@@ -322,7 +322,7 @@ class Inventory {
         $stmt = $db->prepare("
             SELECT * FROM inventory_history
             WHERE item_id = ?
-            ORDER BY timestamp DESC
+            ORDER BY created_at DESC
             LIMIT ?
         ");
         $stmt->execute([$itemId, $limit]);
@@ -365,7 +365,7 @@ class Inventory {
         $stmt = $db->query("
             SELECT COUNT(DISTINCT item_id) as recent_moves 
             FROM inventory_history 
-            WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+            WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
         ");
         $stats['recent_moves'] = $stmt->fetch()['recent_moves'];
         
@@ -776,14 +776,14 @@ class Inventory {
         // Get all write-offs this month
         $stmt = $db->query("
             SELECT 
-                ih.id, ih.item_id, ih.user_id, ih.change_amount, ih.reason, ih.comment, ih.timestamp,
+                ih.id, ih.item_id, ih.user_id, ih.change_amount, ih.reason, ih.comment, ih.created_at,
                 i.name as item_name, i.unit
             FROM inventory_history ih
             JOIN inventory_items i ON ih.item_id = i.id
             WHERE ih.change_type = 'writeoff'
-            AND MONTH(ih.timestamp) = MONTH(CURRENT_DATE())
-            AND YEAR(ih.timestamp) = YEAR(CURRENT_DATE())
-            ORDER BY ih.timestamp DESC
+            AND MONTH(ih.created_at) = MONTH(CURRENT_DATE())
+            AND YEAR(ih.created_at) = YEAR(CURRENT_DATE())
+            ORDER BY ih.created_at DESC
         ");
         $writeoffs = $stmt->fetchAll();
         

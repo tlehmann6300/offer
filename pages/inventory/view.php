@@ -444,7 +444,7 @@ ob_start();
                 <?php foreach ($history as $entry): ?>
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium">
-                        <?php echo date('d.m.Y H:i', strtotime($entry['timestamp'])); ?>
+                        <?php echo date('d.m.Y H:i', strtotime($entry['created_at'])); ?>
                     </td>
                     <td class="px-6 py-4">
                         <?php
