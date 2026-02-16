@@ -1,10 +1,17 @@
 # SQL Schema Changes Documentation
 
-## ⚠️ IMPORTANT: Fixing "Column not found: needs_helpers" Error
+## ⚠️ IMPORTANT: Fixing "Column not found" Errors
 
-If you're seeing this error on your dashboard:
+If you're seeing these errors on your dashboard or polls pages:
+
+### Error 1: Events Error
 ```
 SQLSTATE[42S22]: Column not found: 1054 Unknown column 'e.needs_helpers' in 'where clause'
+```
+
+### Error 2: Polls Error
+```
+SQLSTATE[42S22]: Column not found: 1054 Unknown column 'p.is_active' in 'where clause'
 ```
 
 **Run this command immediately:**
@@ -12,7 +19,9 @@ SQLSTATE[42S22]: Column not found: 1054 Unknown column 'e.needs_helpers' in 'whe
 php update_database_schema.php
 ```
 
-This will add all missing columns including `needs_helpers` to your database.
+This will add all missing columns including:
+- `needs_helpers` to events table
+- `target_groups`, `is_active`, and `end_date` to polls table
 
 For full deployment instructions, see [DEPLOYMENT.md](../DEPLOYMENT.md) in the root directory.
 
@@ -115,6 +124,25 @@ Added columns for comprehensive event management including registration, status 
 | `needs_helpers` | BOOLEAN | Flag indicating if event needs helpers |
 | `locked_by` | INT UNSIGNED | User ID who locked event |
 | `locked_at` | TIMESTAMP | Lock timestamp |
+
+#### `polls` table - Enhanced Polls System **[UPDATED 2026-02-16]**
+Added columns for poll lifecycle management and audience targeting.
+
+**New Columns**:
+| Column | Type | Description |
+|--------|------|-------------|
+| `target_groups` | JSON | JSON array of target groups (candidate, alumni_board, board, member, head) |
+| `is_active` | BOOLEAN | Flag to activate/deactivate poll display (default: 1) |
+| `end_date` | DATETIME | Poll expiration date (created polls default to 30 days from creation) |
+
+**Indexes Added**:
+- `idx_is_active` - Optimizes queries filtering active polls
+- `idx_end_date` - Optimizes queries filtering by expiration date
+
+**Purpose**: These columns enable:
+- Time-based poll expiration (automatically hide polls after end_date)
+- Manual poll activation/deactivation without deletion
+- Role-based audience filtering for targeted surveys
 
 ### New Tables Created
 

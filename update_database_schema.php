@@ -188,6 +188,41 @@ try {
         "Add allowed_roles column to polls table"
     );
     
+    // Add target_groups column to polls table
+    executeSql(
+        $content_db,
+        "ALTER TABLE polls ADD COLUMN target_groups JSON DEFAULT NULL COMMENT 'JSON array of target groups (candidate, alumni_board, board, member, head)'",
+        "Add target_groups column to polls table"
+    );
+    
+    // Add is_active column to polls table
+    executeSql(
+        $content_db,
+        "ALTER TABLE polls ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT 1 COMMENT 'Flag to activate/deactivate poll display'",
+        "Add is_active column to polls table"
+    );
+    
+    // Add end_date column to polls table
+    executeSql(
+        $content_db,
+        "ALTER TABLE polls ADD COLUMN end_date DATETIME DEFAULT NULL COMMENT 'Poll expiration date'",
+        "Add end_date column to polls table"
+    );
+    
+    // Add index for is_active column
+    executeSql(
+        $content_db,
+        "ALTER TABLE polls ADD INDEX idx_is_active (is_active)",
+        "Add index for is_active column"
+    );
+    
+    // Add index for end_date column
+    executeSql(
+        $content_db,
+        "ALTER TABLE polls ADD INDEX idx_end_date (end_date)",
+        "Add index for end_date column"
+    );
+    
     // Create poll_hidden_by_user table
     $create_poll_hidden_table = "
     CREATE TABLE IF NOT EXISTS poll_hidden_by_user (
