@@ -21,6 +21,7 @@ class Inventory {
             SELECT i.id, i.easyverein_id, i.name, i.description, i.serial_number, 
                    i.category_id, i.location_id, i.quantity, i.min_stock, i.unit, 
                    i.unit_price, i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at,
+                   i.is_archived_in_easyverein,
                    c.name as category_name, c.color as category_color, 
                    l.name as location_name,
                    (i.quantity - COALESCE(SUM(r.amount), 0)) as available_quantity
@@ -148,6 +149,7 @@ class Inventory {
         $sql = "SELECT i.id, i.easyverein_id, i.name, i.description, i.serial_number, 
                        i.category_id, i.location_id, i.quantity, i.min_stock, i.unit, 
                        i.unit_price, i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at,
+                       i.is_archived_in_easyverein,
                        c.name as category_name, 
                        c.color as category_color,
                        l.name as location_name,

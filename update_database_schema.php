@@ -379,6 +379,20 @@ try {
         "Add calculations column to event_documentation table"
     );
     
+    // Add is_archived_in_easyverein column to inventory_items table
+    executeSql(
+        $content_db,
+        "ALTER TABLE inventory_items ADD COLUMN is_archived_in_easyverein BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Flag indicating if item is archived in EasyVerein'",
+        "Add is_archived_in_easyverein column to inventory_items table"
+    );
+    
+    // Add index for is_archived_in_easyverein column
+    executeSql(
+        $content_db,
+        "ALTER TABLE inventory_items ADD INDEX idx_is_archived_in_easyverein (is_archived_in_easyverein)",
+        "Add index for is_archived_in_easyverein column"
+    );
+    
     // Add created_by and updated_by columns to event_documentation table
     executeSql(
         $content_db,
