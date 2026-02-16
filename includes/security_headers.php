@@ -97,6 +97,12 @@ if (!headers_sent()) {
     // Allows images from 'self' and data: schemes (for SVGs)
     // Allows styles from 'self', 'unsafe-inline', and trusted CDNs (Google Fonts, Font Awesome)
     // Allows fonts from 'self', data:, and Google Fonts
+    // 
+    // NOTE: 'unsafe-inline' is used for backwards compatibility with inline scripts/styles
+    // throughout the application. For better security, consider:
+    // 1. Moving inline scripts to external files
+    // 2. Implementing CSP nonces for necessary inline scripts
+    // 3. Using hashes for specific inline scripts
     if (!header_sent_check('Content-Security-Policy')) {
         $csp_directives = [
             "default-src 'self'",
