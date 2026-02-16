@@ -96,15 +96,17 @@ try {
 } catch (PDOException $e) {
     // If needs_helpers column doesn't exist yet, gracefully skip this section
     // This can happen if update_database_schema.php hasn't been run yet
-    $isColumnError = strpos($e->getMessage(), 'Unknown column') !== false || 
-                     strpos($e->getMessage(), 'Column not found') !== false;
+    $errorMessage = $e->getMessage();
+    $isColumnError = strpos($errorMessage, 'Unknown column') !== false || 
+                     strpos($errorMessage, 'Column not found') !== false;
     
     if (!$isColumnError) {
         // If it's not a column error, log and re-throw it
-        error_log("Dashboard: Unexpected database error when fetching helper events: " . $e->getMessage());
+        error_log("Dashboard: Unexpected database error when fetching helper events: " . $errorMessage);
         throw $e;
     }
-    // Otherwise, leave $helperEvents as empty array
+    
+    // Column not found - continue with empty $helperEvents array
     error_log("Dashboard: needs_helpers column not found in events table. Run update_database_schema.php to add it.");
 }
 
