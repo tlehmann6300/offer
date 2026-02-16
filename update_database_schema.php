@@ -153,11 +153,123 @@ try {
     
     $content_db = Database::getContentDB();
     
+    // Add first_name column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN first_name VARCHAR(100) DEFAULT NULL AFTER user_id",
+        "Add first_name column to alumni_profiles table"
+    );
+    
+    // Add last_name column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN last_name VARCHAR(100) DEFAULT NULL AFTER first_name",
+        "Add last_name column to alumni_profiles table"
+    );
+    
     // Add secondary_email column to alumni_profiles
     executeSql(
         $content_db,
         "ALTER TABLE alumni_profiles ADD COLUMN secondary_email VARCHAR(255) DEFAULT NULL COMMENT 'Optional secondary email address for profile display only' AFTER email",
         "Add secondary_email column to alumni_profiles table"
+    );
+    
+    // Add mobile_phone column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN mobile_phone VARCHAR(50) DEFAULT NULL AFTER secondary_email",
+        "Add mobile_phone column to alumni_profiles table"
+    );
+    
+    // Add linkedin_url column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN linkedin_url VARCHAR(255) DEFAULT NULL AFTER mobile_phone",
+        "Add linkedin_url column to alumni_profiles table"
+    );
+    
+    // Add xing_url column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN xing_url VARCHAR(255) DEFAULT NULL AFTER linkedin_url",
+        "Add xing_url column to alumni_profiles table"
+    );
+    
+    // Add industry column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN industry VARCHAR(100) DEFAULT NULL AFTER xing_url",
+        "Add industry column to alumni_profiles table"
+    );
+    
+    // Add company column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN company VARCHAR(255) DEFAULT NULL AFTER industry",
+        "Add company column to alumni_profiles table"
+    );
+    
+    // Add position column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN position VARCHAR(255) DEFAULT NULL AFTER company",
+        "Add position column to alumni_profiles table"
+    );
+    
+    // Add study_program column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN study_program VARCHAR(255) DEFAULT NULL AFTER position",
+        "Add study_program column to alumni_profiles table"
+    );
+    
+    // Add semester column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN semester VARCHAR(50) DEFAULT NULL AFTER study_program",
+        "Add semester column to alumni_profiles table"
+    );
+    
+    // Add angestrebter_abschluss column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN angestrebter_abschluss VARCHAR(100) DEFAULT NULL AFTER semester",
+        "Add angestrebter_abschluss column to alumni_profiles table"
+    );
+    
+    // Add degree column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN degree VARCHAR(100) DEFAULT NULL AFTER angestrebter_abschluss",
+        "Add degree column to alumni_profiles table"
+    );
+    
+    // Add graduation_year column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN graduation_year INT DEFAULT NULL AFTER degree",
+        "Add graduation_year column to alumni_profiles table"
+    );
+    
+    // Add image_path column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN image_path VARCHAR(500) DEFAULT NULL AFTER graduation_year",
+        "Add image_path column to alumni_profiles table"
+    );
+    
+    // Add last_verified_at column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN last_verified_at DATETIME DEFAULT NULL AFTER image_path",
+        "Add last_verified_at column to alumni_profiles table"
+    );
+    
+    // Add last_reminder_sent_at column to alumni_profiles
+    executeSql(
+        $content_db,
+        "ALTER TABLE alumni_profiles ADD COLUMN last_reminder_sent_at DATETIME DEFAULT NULL AFTER last_verified_at",
+        "Add last_reminder_sent_at column to alumni_profiles table"
     );
     
     // Add microsoft_forms_url column to polls table
