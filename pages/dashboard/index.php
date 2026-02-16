@@ -100,7 +100,7 @@ try {
     
     // Check for column-not-found error using SQLSTATE code (42S22) for reliability
     // Also check error message as fallback for different database systems
-    $isColumnError = ($e->getCode() === '42S22') ||
+    $isColumnError = (isset($e->errorInfo[0]) && $e->errorInfo[0] === '42S22') ||
                      stripos($errorMessage, 'Unknown column') !== false || 
                      stripos($errorMessage, 'Column not found') !== false;
     
