@@ -12,6 +12,14 @@ Fatal error: Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unkn
 Fatal error: Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'p.is_active' in 'where clause' in /homepages/34/d795569457/htdocs/intra/pages/dashboard/index.php:382
 ```
 
+### Error 3: JavaScript Export Error
+```
+Uncaught SyntaxError: Unexpected token 'export'
+```
+
+### Error 4: CSS Issues
+CSS styles not loading or displaying incorrectly.
+
 ## Solution (3 steps)
 
 ### Step 1: Deploy Latest Code
@@ -51,13 +59,37 @@ You should see:
 Your database schema is up to date.
 ```
 
+## Step 4: Clear Browser Cache (If JavaScript or CSS Issues Persist)
+
+If you see "Uncaught SyntaxError: Unexpected token 'export'" or CSS styling issues:
+
+1. **Clear Browser Cache**:
+   - Chrome/Edge: Press `Ctrl+Shift+Delete` (Windows) or `Cmd+Shift+Delete` (Mac)
+   - Select "Cached images and files"
+   - Click "Clear data"
+
+2. **Hard Refresh**:
+   - Windows: `Ctrl+F5` or `Ctrl+Shift+R`
+   - Mac: `Cmd+Shift+R`
+
+3. **Try Incognito/Private Mode**:
+   - This disables extensions and uses fresh cache
+   - If it works here, the issue is browser cache or extensions
+
+4. **Disable Browser Extensions**:
+   - Temporarily disable ad blockers and other extensions
+   - Refresh the page
+
+**Note**: The "export" error is typically caused by browser cache or extensions, not the codebase itself.
+
 ## Done!
-Refresh the dashboard in your browser. The error should be gone.
+Refresh the dashboard in your browser. The errors should be gone.
 
 ## If You Need Help
-1. Check the full guide: [DEPLOYMENT.md](DEPLOYMENT.md)
-2. Check error logs in the `/logs/` directory
-3. Contact the development team
+1. Check the full troubleshooting guide: [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+2. Check the deployment guide: [DEPLOYMENT.md](DEPLOYMENT.md)
+3. Check error logs in the `/logs/` directory
+4. Contact the development team
 
 ## Technical Details
 
