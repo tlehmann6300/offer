@@ -81,16 +81,38 @@ $openTasksCount = count($userRentals);
 
 // Get events that need helpers (for all users)
 $contentDb = Database::getContentDB();
-$stmt = $contentDb->query("
-    SELECT e.id, e.title, e.description, e.start_time, e.end_time, e.location
-    FROM events e
-    WHERE e.needs_helpers = 1
-    AND e.status IN ('open', 'planned')
-    AND e.end_time >= NOW()
-    ORDER BY e.start_time ASC
-    LIMIT 5
-");
-$helperEvents = $stmt->fetchAll();
+$helperEvents = [];
+try {
+    $stmt = $contentDb->query("
+        SELECT e.id, e.title, e.description, e.start_time, e.end_time, e.location
+        FROM events e
+        WHERE e.needs_helpers = 1
+        AND e.status IN ('open', 'planned')
+        AND e.end_time >= NOW()
+        ORDER BY e.start_time ASC
+        LIMIT 5
+    ");
+    $helperEvents = $stmt->fetchAll();
+} catch (PDOException $e) {
+    // If needs_helpers column doesn't exist yet, gracefully skip this section
+    // This can happen if update_database_schema.php hasn't been run yet
+    $errorMessage = $e->getMessage();
+    
+    // Check for column-not-found error using SQLSTATE code (42S22) for reliability
+    // Also check error message as fallback for different database systems
+    $isColumnError = (isset($e->errorInfo[0]) && $e->errorInfo[0] === '42S22') ||
+                     stripos($errorMessage, 'Unknown column') !== false ||
+                     stripos($errorMessage, 'Column not found') !== false;
+    
+    if (!$isColumnError) {
+        // For non-column errors, log and re-throw for proper error handling
+        error_log("Dashboard: Unexpected database error when fetching helper events: " . $errorMessage);
+        throw $e;
+    }
+    
+    // Column not found - continue with empty $helperEvents array
+    error_log("Dashboard: needs_helpers column not found in events table. Run update_database_schema.php to add it.");
+}
 
 // Security Audit - nur für Board/Head
 $securityWarning = '';
