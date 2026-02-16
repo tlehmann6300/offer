@@ -96,13 +96,18 @@ CREATE TABLE IF NOT EXISTS `polls` (
   `title` VARCHAR(255) NOT NULL,
   `description` TEXT,
   `microsoft_forms_url` TEXT DEFAULT NULL COMMENT 'Microsoft Forms embed URL or direct link for external survey integration',
+  `target_groups` JSON DEFAULT NULL COMMENT 'JSON array of target groups (candidate, alumni_board, board, member, head)',
   `visible_to_all` BOOLEAN NOT NULL DEFAULT 0 COMMENT 'If true, show poll to all users regardless of roles',
   `is_internal` BOOLEAN NOT NULL DEFAULT 1 COMMENT 'If true, hide poll after user votes. If false (external Forms), show hide button',
   `allowed_roles` JSON DEFAULT NULL COMMENT 'JSON array of Entra roles that can see this poll (filters against user azure_roles)',
+  `is_active` BOOLEAN NOT NULL DEFAULT 1 COMMENT 'Flag to activate/deactivate poll display',
+  `end_date` DATETIME DEFAULT NULL COMMENT 'Poll expiration date',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_by` INT UNSIGNED NOT NULL,
-  INDEX `idx_created_by` (`created_by`)
+  INDEX `idx_created_by` (`created_by`),
+  INDEX `idx_is_active` (`is_active`),
+  INDEX `idx_end_date` (`end_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================
