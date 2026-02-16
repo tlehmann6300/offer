@@ -1064,29 +1064,86 @@ class Event {
         // Extract user IDs
         $userIds = array_column($signups, 'user_id');
         
-        // Get user names from user database, including email for fallback
+        // Get user emails from user database for fallback
         // Build placeholders for IN clause
         $placeholders = implode(',', array_fill(0, count($userIds), '?'));
         
         $stmt = $userDb->prepare("
-            SELECT u.id as user_id, u.email, ap.first_name, ap.last_name
+            SELECT u.id as user_id, u.email
             FROM users u
-            LEFT JOIN alumni_profiles ap ON u.id = ap.user_id
             WHERE u.id IN ($placeholders)
-            ORDER BY COALESCE(ap.last_name, u.email) ASC, COALESCE(ap.first_name, '') ASC
         ");
         $stmt->execute($userIds);
-        $attendees = $stmt->fetchAll();
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // For users without alumni profiles, use a fallback display name
-        foreach ($attendees as &$attendee) {
+        // Create a map of user_id => email for quick lookup
+        $userMap = [];
+        foreach ($users as $user) {
+            $userMap[$user['user_id']] = $user['email'];
+        }
+        
+        // Get alumni profiles from content database
+        $stmt = $contentDb->prepare("
+            SELECT user_id, first_name, last_name
+            FROM alumni_profiles
+            WHERE user_id IN ($placeholders)
+        ");
+        $stmt->execute($userIds);
+        $profiles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Create a map of user_id => profile for quick lookup
+        $profileMap = [];
+        foreach ($profiles as $profile) {
+            $profileMap[$profile['user_id']] = $profile;
+        }
+        
+        // Merge user data with profiles
+        $attendees = [];
+        foreach ($userIds as $userId) {
+            // Skip if user not found in database (defensive programming)
+            if (!isset($userMap[$userId])) {
+                continue;
+            }
+            
+            $email = $userMap[$userId];
+            $attendee = [
+                'user_id' => $userId,
+                'email' => $email,
+                'first_name' => $profileMap[$userId]['first_name'] ?? '',
+                'last_name' => $profileMap[$userId]['last_name'] ?? ''
+            ];
+            
+            // For users without alumni profiles, use a fallback display name
             if (empty($attendee['first_name']) && empty($attendee['last_name'])) {
                 // Use email local part as first name for better display
-                $emailParts = explode('@', $attendee['email'] ?? '');
-                $attendee['first_name'] = $emailParts[0] ?? 'User';
-                $attendee['last_name'] = '';
+                if (!empty($email) && strpos($email, '@') !== false) {
+                    $emailParts = explode('@', $email);
+                    $attendee['first_name'] = $emailParts[0];
+                    $attendee['last_name'] = '';
+                } else {
+                    $attendee['first_name'] = 'User';
+                    $attendee['last_name'] = '';
+                }
             }
-            // Remove email from the output as it's only needed for fallback
+            
+            // Store sort key for proper sorting (use email as fallback for last name)
+            $attendee['_sort_key'] = !empty($attendee['last_name']) ? $attendee['last_name'] : $email;
+            
+            $attendees[] = $attendee;
+        }
+        
+        // Sort by last name (or email if no last name), then first name
+        usort($attendees, function($a, $b) {
+            $sortKeyCmp = strcasecmp($a['_sort_key'], $b['_sort_key']);
+            if ($sortKeyCmp !== 0) {
+                return $sortKeyCmp;
+            }
+            return strcasecmp($a['first_name'], $b['first_name']);
+        });
+        
+        // Remove temporary sort key and email from output
+        foreach ($attendees as &$attendee) {
+            unset($attendee['_sort_key']);
             unset($attendee['email']);
         }
         
