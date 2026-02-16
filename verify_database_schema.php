@@ -27,14 +27,16 @@ $missingItems = [];
 function checkColumn($pdo, $table, $column, $description) {
     global $allChecks, $missingItems;
     
-    // Validate table name to prevent SQL injection
-    if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) {
-        throw new Exception("Invalid table name: $table");
-    }
-    
     try {
-        $stmt = $pdo->prepare("SHOW COLUMNS FROM `$table` LIKE ?");
-        $stmt->execute([$column]);
+        // Use information_schema for fully parameterized query
+        $stmt = $pdo->prepare("
+            SELECT COLUMN_NAME 
+            FROM information_schema.COLUMNS 
+            WHERE TABLE_SCHEMA = DATABASE() 
+            AND TABLE_NAME = ? 
+            AND COLUMN_NAME = ?
+        ");
+        $stmt->execute([$table, $column]);
         $exists = $stmt->rowCount() > 0;
         
         $allChecks[] = [
@@ -66,13 +68,14 @@ function checkColumn($pdo, $table, $column, $description) {
 function checkTable($pdo, $table, $description) {
     global $allChecks, $missingItems;
     
-    // Validate table name to prevent SQL injection
-    if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) {
-        throw new Exception("Invalid table name: $table");
-    }
-    
     try {
-        $stmt = $pdo->prepare("SHOW TABLES LIKE ?");
+        // Use information_schema for fully parameterized query
+        $stmt = $pdo->prepare("
+            SELECT TABLE_NAME 
+            FROM information_schema.TABLES 
+            WHERE TABLE_SCHEMA = DATABASE() 
+            AND TABLE_NAME = ?
+        ");
         $stmt->execute([$table]);
         $exists = $stmt->rowCount() > 0;
         
