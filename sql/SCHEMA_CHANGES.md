@@ -94,6 +94,7 @@ Added columns for comprehensive event management including registration, status 
 | `registration_start` | DATETIME | When registration opens |
 | `registration_end` | DATETIME | When registration closes |
 | `status` | ENUM | planned, open, closed, running, past |
+| `needs_helpers` | BOOLEAN | Flag indicating if event needs helpers |
 | `locked_by` | INT UNSIGNED | User ID who locked event |
 | `locked_at` | TIMESTAMP | Lock timestamp |
 

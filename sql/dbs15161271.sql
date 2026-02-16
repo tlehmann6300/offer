@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `events` (
   `registration_start` DATETIME DEFAULT NULL COMMENT 'When registration opens',
   `registration_end` DATETIME DEFAULT NULL COMMENT 'When registration closes',
   `status` ENUM('planned', 'open', 'closed', 'running', 'past') DEFAULT 'planned' COMMENT 'Event status',
+  `needs_helpers` BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Flag indicating if the event needs helpers',
   `locked_by` INT UNSIGNED DEFAULT NULL COMMENT 'User ID who locked the event for editing',
   `locked_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'When the event was locked',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -32,6 +33,7 @@ CREATE TABLE IF NOT EXISTS `events` (
   INDEX `idx_event_date` (`event_date`),
   INDEX `idx_created_by` (`created_by`),
   INDEX `idx_status` (`status`),
+  INDEX `idx_needs_helpers` (`needs_helpers`),
   INDEX `idx_locked_by` (`locked_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
