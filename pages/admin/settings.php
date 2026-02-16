@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../src/Database.php';
 
-if (!Auth::isBoard()) {
+if (!Auth::canAccessSystemSettings()) {
     header('Location: /index.php');
     exit;
 }
@@ -63,22 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             
             $message = 'Einstellungen erfolgreich gespeichert';
-        } else if (isset($_POST['update_email_settings'])) {
-            $notifyOnNewUser = isset($_POST['notify_on_new_user']) ? 1 : 0;
-            $notifyOnNewEvent = isset($_POST['notify_on_new_event']) ? 1 : 0;
-            $adminEmail = $_POST['admin_email'] ?? '';
-            
-            $stmt = $db->prepare("
-                INSERT INTO system_settings (setting_key, setting_value, updated_by) 
-                VALUES (?, ?, ?)
-                ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_by = VALUES(updated_by)
-            ");
-            
-            $stmt->execute(['notify_on_new_user', $notifyOnNewUser, $_SESSION['user_id']]);
-            $stmt->execute(['notify_on_new_event', $notifyOnNewEvent, $_SESSION['user_id']]);
-            $stmt->execute(['admin_email', $adminEmail, $_SESSION['user_id']]);
-            
-            $message = 'E-Mail-Einstellungen erfolgreich gespeichert';
         } else if (isset($_POST['update_security_settings'])) {
             $sessionTimeout = intval($_POST['session_timeout'] ?? 3600);
             $maxLoginAttempts = intval($_POST['max_login_attempts'] ?? 5);
@@ -117,21 +101,18 @@ $siteName = getSetting($db, 'site_name', 'IBC Intranet');
 $siteDescription = getSetting($db, 'site_description', '');
 $maintenanceMode = getSetting($db, 'maintenance_mode', '0');
 $allowRegistration = getSetting($db, 'allow_registration', '1');
-$notifyOnNewUser = getSetting($db, 'notify_on_new_user', '1');
-$notifyOnNewEvent = getSetting($db, 'notify_on_new_event', '1');
-$adminEmail = getSetting($db, 'admin_email', '');
 $sessionTimeout = getSetting($db, 'session_timeout', '3600');
 $maxLoginAttempts = getSetting($db, 'max_login_attempts', '5');
 $logRetentionDays = getSetting($db, 'log_retention_days', '365');
 
-$title = 'System Einstellungen - IBC Intranet';
+$title = 'Systemeinstellungen - IBC Intranet';
 ob_start();
 ?>
 
 <div class="mb-8">
     <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
         <i class="fas fa-cog text-purple-600 mr-2"></i>
-        System Einstellungen
+        Systemeinstellungen
     </h1>
     <p class="text-gray-600 dark:text-gray-300">Konfiguriere allgemeine Systemeinstellungen und Parameter</p>
 </div>
@@ -211,58 +192,6 @@ ob_start();
             <button type="submit" name="update_system_settings" class="btn-primary">
                 <i class="fas fa-save mr-2"></i>
                 Einstellungen speichern
-            </button>
-        </div>
-    </form>
-</div>
-
-<!-- Email Settings -->
-<div class="card p-6 mb-6">
-    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-        <i class="fas fa-envelope text-green-600 mr-2"></i>
-        E-Mail Benachrichtigungen
-    </h2>
-    
-    <form method="POST" class="space-y-4">
-        <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Admin E-Mail Adresse
-            </label>
-            <input 
-                type="email" 
-                name="admin_email" 
-                value="<?php echo htmlspecialchars($adminEmail); ?>"
-                placeholder="admin@ibc-mannheim.de"
-                class="w-full px-4 py-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-blue-500 focus:border-blue-500"
-            >
-        </div>
-        
-        <div class="space-y-2">
-            <label class="flex items-center space-x-2 cursor-pointer">
-                <input 
-                    type="checkbox" 
-                    name="notify_on_new_user" 
-                    <?php echo $notifyOnNewUser == '1' ? 'checked' : ''; ?>
-                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                >
-                <span class="text-sm text-gray-700 dark:text-gray-300">Bei neuen Benutzern benachrichtigen</span>
-            </label>
-            
-            <label class="flex items-center space-x-2 cursor-pointer">
-                <input 
-                    type="checkbox" 
-                    name="notify_on_new_event" 
-                    <?php echo $notifyOnNewEvent == '1' ? 'checked' : ''; ?>
-                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                >
-                <span class="text-sm text-gray-700 dark:text-gray-300">Bei neuen Events benachrichtigen</span>
-            </label>
-        </div>
-        
-        <div class="pt-4">
-            <button type="submit" name="update_email_settings" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition">
-                <i class="fas fa-save mr-2"></i>
-                E-Mail Einstellungen speichern
             </button>
         </div>
     </form>

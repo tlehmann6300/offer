@@ -650,6 +650,13 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                 </a>
                 <?php endif; ?>
 
+                <!-- Einstellungen (All authenticated users) -->
+                <a href="<?php echo asset('pages/auth/settings.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/auth/settings.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
+                    <i class="fas fa-cog w-5 mr-3"></i>
+                    <span>Einstellungen</span>
+                </a>
+
                 <!-- Schulungsanfrage (Alumni, Alumni-Board) -->
                 <?php if (Auth::canAccessPage('training_requests')): ?>
                 <a href="<?php echo asset('pages/alumni/requests.php'); ?>" 
@@ -712,12 +719,12 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                 </a>
                 <?php endif; ?>
 
-                <!-- Einstellungen (All board members) -->
-                <?php if (Auth::isAdmin()): ?>
+                <!-- Systemeinstellungen (Board roles + alumni_board + alumni_auditor) -->
+                <?php if (Auth::canAccessSystemSettings()): ?>
                 <a href="<?php echo asset('pages/admin/settings.php'); ?>" 
                    class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/admin/settings.php') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
-                    <i class="fas fa-cog w-5 mr-3"></i>
-                    <span>Einstellungen</span>
+                    <i class="fas fa-cogs w-5 mr-3"></i>
+                    <span>Systemeinstellungen</span>
                 </a>
                 <?php endif; ?>
                 
@@ -838,13 +845,6 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                    class='flex items-center justify-center w-full px-4 py-2 text-xs font-medium text-white/90 dark:text-slate-200 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm <?php echo isActivePath('/auth/profile.php') ? 'bg-white/10' : ''; ?>'>
                     <i class='fas fa-user text-xs mr-2'></i> 
                     <span>Mein Profil</span>
-                </a>
-                
-                <!-- Einstellungen -->
-                <a href='<?php echo asset('pages/auth/settings.php'); ?>' 
-                   class='flex items-center justify-center w-full px-4 py-2 text-xs font-medium text-white/90 dark:text-slate-200 border border-white/30 rounded-lg hover:bg-white/10 hover:text-white hover:border-white/50 transition-all duration-200 group backdrop-blur-sm <?php echo isActivePath('/auth/settings.php') ? 'bg-white/10' : ''; ?>'>
-                    <i class='fas fa-cog text-xs mr-2'></i> 
-                    <span>Einstellungen</span>
                 </a>
             </div>
             

@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/helpers.php';
 require_once __DIR__ . '/../../includes/models/User.php';
+require_once __DIR__ . '/../../includes/handlers/GoogleAuthenticator.php';
 
 if (!Auth::check()) {
     header('Location: login.php');
@@ -11,6 +12,9 @@ if (!Auth::check()) {
 $user = Auth::user();
 $message = '';
 $error = '';
+$showQRCode = false;
+$secret = '';
+$qrCodeUrl = '';
 
 // Check for session messages (from email confirmation, etc.)
 if (isset($_SESSION['success_message'])) {
@@ -47,6 +51,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = Auth::user(); // Reload user data
         } else {
             $error = 'Fehler beim Speichern der Design-Einstellungen';
+        }
+    } else if (isset($_POST['enable_2fa'])) {
+        $ga = new PHPGangsta_GoogleAuthenticator();
+        $secret = $ga->createSecret();
+        $qrCodeUrl = $ga->getQRCodeUrl($user['email'], $secret, 'IBC Intranet');
+        $showQRCode = true;
+    } else if (isset($_POST['confirm_2fa'])) {
+        $secret = $_POST['secret'] ?? '';
+        $code = $_POST['code'] ?? '';
+        
+        $ga = new PHPGangsta_GoogleAuthenticator();
+        if ($ga->verifyCode($secret, $code, 2)) {
+            if (User::enable2FA($user['id'], $secret)) {
+                $message = '2FA erfolgreich aktiviert';
+                $user = Auth::user(); // Reload user
+            } else {
+                $error = 'Fehler beim Aktivieren von 2FA';
+            }
+        } else {
+            $error = 'Ungültiger Code. Bitte versuche es erneut.';
+            $secret = $_POST['secret'];
+            $ga = new PHPGangsta_GoogleAuthenticator();
+            $qrCodeUrl = $ga->getQRCodeUrl($user['email'], $secret, 'IBC Intranet');
+            $showQRCode = true;
+        }
+    } else if (isset($_POST['disable_2fa'])) {
+        if (User::disable2FA($user['id'])) {
+            $message = '2FA erfolgreich deaktiviert';
+            $user = Auth::user(); // Reload user
+        } else {
+            $error = 'Fehler beim Deaktivieren von 2FA';
         }
     }
 }
@@ -126,6 +161,99 @@ ob_start();
 
     <!-- Settings Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- 2FA Settings -->
+        <div class="lg:col-span-2">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+                    <i class="fas fa-shield-alt text-green-600 mr-2"></i>
+                    Zwei-Faktor-Authentifizierung (2FA)
+                </h2>
+
+                <?php if (!$showQRCode): ?>
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <p class="text-gray-700 dark:text-gray-300 mb-2">
+                            Status: 
+                            <?php if ($user['tfa_enabled']): ?>
+                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-semibold">
+                                <i class="fas fa-check-circle mr-1"></i>Aktiviert
+                            </span>
+                            <?php else: ?>
+                            <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full font-semibold">
+                                <i class="fas fa-times-circle mr-1"></i>Deaktiviert
+                            </span>
+                            <?php endif; ?>
+                        </p>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                            Schütze dein Konto mit einer zusätzlichen Sicherheitsebene
+                        </p>
+                    </div>
+                    <div>
+                        <?php if ($user['tfa_enabled']): ?>
+                        <form method="POST" onsubmit="return confirm('Möchtest du 2FA wirklich deaktivieren?');">
+                            <button type="submit" name="disable_2fa" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                                <i class="fas fa-times mr-2"></i>2FA deaktivieren
+                            </button>
+                        </form>
+                        <?php else: ?>
+                        <form method="POST">
+                            <button type="submit" name="enable_2fa" class="btn-primary">
+                                <i class="fas fa-plus mr-2"></i>2FA aktivieren
+                            </button>
+                        </form>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400 dark:border-blue-500 p-4">
+                    <p class="text-sm text-blue-700 dark:text-blue-300">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <strong>Empfehlung:</strong> Aktiviere 2FA für zusätzliche Sicherheit. Du benötigst eine Authenticator-App wie Google Authenticator oder Authy.
+                    </p>
+                </div>
+                <?php else: ?>
+                <!-- QR Code Setup -->
+                <div class="max-w-md mx-auto">
+                    <div class="text-center mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">2FA einrichten</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                            Scanne den QR-Code mit deiner Authenticator-App und gib den generierten Code ein
+                        </p>
+                        <div id="qrcode" class="mx-auto mb-4 inline-block"></div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                            Geheimer Schlüssel (manuell): <code class="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-2 py-1 rounded"><?php echo htmlspecialchars($secret); ?></code>
+                        </p>
+                    </div>
+
+                    <form method="POST" class="space-y-4">
+                        <input type="hidden" name="secret" value="<?php echo htmlspecialchars($secret); ?>">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">6-stelliger Code</label>
+                            <input 
+                                type="text" 
+                                name="code" 
+                                required 
+                                maxlength="6"
+                                pattern="[0-9]{6}"
+                                class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg text-center text-2xl tracking-widest"
+                                placeholder="000000"
+                                autofocus
+                            >
+                        </div>
+                        <div class="flex space-x-4">
+                            <a href="settings.php" class="flex-1 text-center px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                                Abbrechen
+                            </a>
+                            <button type="submit" name="confirm_2fa" class="flex-1 btn-primary">
+                                <i class="fas fa-check mr-2"></i>Bestätigen
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
 
         <!-- Notification Settings -->
         <div class="lg:col-span-2">
@@ -271,7 +399,21 @@ if (newTheme === 'dark') {
     }
 }
 <?php endif; ?>
+
+// Generate QR Code for 2FA if needed
+<?php if ($showQRCode): ?>
+var qrcode = new QRious({
+    element: document.getElementById('qrcode'),
+    value: '<?php echo $qrCodeUrl; ?>',
+    size: 250
+});
+<?php endif; ?>
 </script>
+
+<!-- QR Code Library -->
+<?php if ($showQRCode): ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<?php endif; ?>
 
 <?php
 $content = ob_get_clean();

@@ -401,7 +401,7 @@ class Auth {
     }
     
     /**
-     * Check if user can edit admin settings
+     * Check if user can edit admin settings (legacy method - use canAccessSystemSettings instead)
      * 
      * @return bool True ONLY for the 3 Boards (board_finance, board_internal, board_external)
      */
@@ -412,6 +412,20 @@ class Auth {
         
         $userRole = $_SESSION['user_role'] ?? '';
         return in_array($userRole, self::BOARD_ROLES);
+    }
+    
+    /**
+     * Check if user can access system settings
+     * 
+     * @return bool True for board_finance, board_internal, board_external, alumni_board, and alumni_auditor
+     */
+    public static function canAccessSystemSettings() {
+        if (!self::check()) {
+            return false;
+        }
+        
+        $userRole = $_SESSION['user_role'] ?? '';
+        return in_array($userRole, array_merge(self::BOARD_ROLES, ['alumni_board', 'alumni_auditor']));
     }
     
     /**
