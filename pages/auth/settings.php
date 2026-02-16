@@ -52,12 +52,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $error = 'Fehler beim Speichern der Design-Einstellungen';
         }
-    } else if (isset($_POST['enable_2fa'])) {
+    } elseif (isset($_POST['enable_2fa'])) {
         $ga = new PHPGangsta_GoogleAuthenticator();
         $secret = $ga->createSecret();
         $qrCodeUrl = $ga->getQRCodeUrl($user['email'], $secret, 'IBC Intranet');
         $showQRCode = true;
-    } else if (isset($_POST['confirm_2fa'])) {
+    } elseif (isset($_POST['confirm_2fa'])) {
         $secret = $_POST['secret'] ?? '';
         $code = $_POST['code'] ?? '';
         
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $qrCodeUrl = $ga->getQRCodeUrl($user['email'], $secret, 'IBC Intranet');
             $showQRCode = true;
         }
-    } else if (isset($_POST['disable_2fa'])) {
+    } elseif (isset($_POST['disable_2fa'])) {
         if (User::disable2FA($user['id'])) {
             $message = '2FA erfolgreich deaktiviert';
             $user = Auth::user(); // Reload user
@@ -402,7 +402,7 @@ if (newTheme === 'dark') {
 
 // Generate QR Code for 2FA if needed
 <?php if ($showQRCode): ?>
-var qrcode = new QRious({
+var qrCode = new QRious({
     element: document.getElementById('qrcode'),
     value: '<?php echo $qrCodeUrl; ?>',
     size: 250
