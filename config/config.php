@@ -217,14 +217,6 @@ function init_session() {
         // Leave domain empty for single-domain deployments (most secure and reliable)
         // Setting explicit domain can cause cookie issues with OAuth redirects
         $domain = '';
-        // Commenting out explicit domain setting to fix OAuth state parameter issue
-        // if (defined('BASE_URL') && BASE_URL) {
-        //     $parsed = parse_url(BASE_URL);
-        //     // Validate parse_url result before accessing
-        //     if ($parsed !== false && isset($parsed['host'])) {
-        //         $domain = $parsed['host'];
-        //     }
-        // }
         
         // Set secure cookie parameters BEFORE starting session
         // Only require secure flag over HTTPS to prevent session issues over HTTP
