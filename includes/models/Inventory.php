@@ -18,16 +18,21 @@ class Inventory {
     public static function getById($id) {
         $db = Database::getContentDB();
         $stmt = $db->prepare("
-            SELECT i.*, c.name as category_name, c.color as category_color, 
+            SELECT i.id, i.easyverein_id, i.name, i.description, i.serial_number, 
+                   i.category_id, i.location_id, i.quantity, i.min_stock, i.unit, 
+                   i.unit_price, i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at,
+                   c.name as category_name, c.color as category_color, 
                    l.name as location_name,
-                   i.quantity as quantity,
                    (i.quantity - COALESCE(SUM(r.amount), 0)) as available_quantity
             FROM inventory_items i
             LEFT JOIN categories c ON i.category_id = c.id
             LEFT JOIN locations l ON i.location_id = l.id
             LEFT JOIN rentals r ON i.id = r.item_id AND r.actual_return IS NULL
             WHERE i.id = ?
-            GROUP BY i.id
+            GROUP BY i.id, i.easyverein_id, i.name, i.description, i.serial_number, 
+                     i.category_id, i.location_id, i.quantity, i.min_stock, i.unit, 
+                     i.unit_price, i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at,
+                     c.name, c.color, l.name
         ");
         $stmt->execute([$id]);
         return $stmt->fetch();
@@ -143,11 +148,12 @@ class Inventory {
         // SQL query with correct table and column names
         // Note: quantity is an alias for quantity for backward compatibility
         // available_quantity = quantity - active rentals
-        $sql = "SELECT i.*, 
+        $sql = "SELECT i.id, i.easyverein_id, i.name, i.description, i.serial_number, 
+                       i.category_id, i.location_id, i.quantity, i.min_stock, i.unit, 
+                       i.unit_price, i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at,
                        c.name as category_name, 
                        c.color as category_color,
                        l.name as location_name,
-                       i.quantity as quantity,
                        (i.quantity - COALESCE(SUM(r.amount), 0)) as available_quantity
                 FROM inventory_items i
                 LEFT JOIN categories c ON i.category_id = c.id
