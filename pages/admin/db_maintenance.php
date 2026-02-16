@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $systemLogsDeleted = $stmt->rowCount();
             
             // Delete inventory_history older than 1 year
-            $stmt = $contentDb->prepare("DELETE FROM inventory_history WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 YEAR)");
+            $stmt = $contentDb->prepare("DELETE FROM inventory_history WHERE created_at < DATE_SUB(NOW(), INTERVAL 1 YEAR)");
             $stmt->execute();
             $inventoryHistoryDeleted = $stmt->rowCount();
             
