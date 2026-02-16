@@ -11,17 +11,17 @@ if (!Auth::check()) {
 function getUserRentals($userId, $includeReturned = false) {
     $db = Database::getContentDB();
     $sql = "
-        SELECT r.*, i.name as item_name, i.unit, i.image_path
+        SELECT r.*, r.created_at as rented_at, i.name as item_name, i.unit, i.image_path
         FROM rentals r
         JOIN inventory_items i ON r.item_id = i.id
         WHERE r.user_id = ?
     ";
     
     if (!$includeReturned) {
-        $sql .= " AND r.status = 'active'";
+        $sql .= " AND r.actual_return IS NULL";
     }
     
-    $sql .= " ORDER BY r.rented_at DESC";
+    $sql .= " ORDER BY r.created_at DESC";
     
     $stmt = $db->prepare($sql);
     $stmt->execute([$userId]);
