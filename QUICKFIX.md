@@ -20,7 +20,7 @@ Uncaught SyntaxError: Unexpected token 'export'
 ### Error 4: CSS Issues
 CSS styles not loading or displaying incorrectly.
 
-## Solution (3 steps)
+## Solution (4 steps)
 
 ### Step 1: Deploy Latest Code
 Pull and deploy the latest code from this repository to production.
@@ -83,7 +83,7 @@ If you see "Uncaught SyntaxError: Unexpected token 'export'" or CSS styling issu
 **Note**: The "export" error is typically caused by browser cache or extensions, not the codebase itself.
 
 ## Done!
-Refresh the dashboard in your browser. The errors should be gone.
+After completing all steps, refresh the dashboard in your browser. All errors should be resolved.
 
 ## If You Need Help
 1. Check the full troubleshooting guide: [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
