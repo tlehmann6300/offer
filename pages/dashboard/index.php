@@ -97,11 +97,15 @@ try {
     // If needs_helpers column doesn't exist yet, gracefully skip this section
     // This can happen if update_database_schema.php hasn't been run yet
     $errorMessage = $e->getMessage();
-    $isColumnError = strpos($errorMessage, 'Unknown column') !== false || 
+    
+    // Check for column-not-found error using SQLSTATE code (42S22) for reliability
+    // Also check error message as fallback for different database systems
+    $isColumnError = (isset($e->errorInfo[0]) && $e->errorInfo[0] === '42S22') ||
+                     strpos($errorMessage, 'Unknown column') !== false || 
                      strpos($errorMessage, 'Column not found') !== false;
     
     if (!$isColumnError) {
-        // If it's not a column error, log and re-throw it
+        // For non-column errors, log and re-throw for proper error handling
         error_log("Dashboard: Unexpected database error when fetching helper events: " . $errorMessage);
         throw $e;
     }
