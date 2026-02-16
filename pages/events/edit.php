@@ -684,7 +684,7 @@ ob_start();
                         <?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>
                     </span>
                     <span class="text-xs text-gray-500">
-                        <?php echo date('d.m.Y H:i', strtotime($entry['timestamp'])); ?>
+                        <?php echo date('d.m.Y H:i', strtotime($entry['created_at'])); ?>
                     </span>
                 </div>
                 <div class="text-sm text-gray-600">
