@@ -1100,9 +1100,15 @@ class Event {
         // Merge user data with profiles
         $attendees = [];
         foreach ($userIds as $userId) {
+            // Skip if user not found in database (defensive programming)
+            if (!isset($userMap[$userId])) {
+                continue;
+            }
+            
+            $email = $userMap[$userId];
             $attendee = [
                 'user_id' => $userId,
-                'email' => $userMap[$userId] ?? '',
+                'email' => $email,
                 'first_name' => $profileMap[$userId]['first_name'] ?? '',
                 'last_name' => $profileMap[$userId]['last_name'] ?? ''
             ];
@@ -1110,25 +1116,36 @@ class Event {
             // For users without alumni profiles, use a fallback display name
             if (empty($attendee['first_name']) && empty($attendee['last_name'])) {
                 // Use email local part as first name for better display
-                $emailParts = explode('@', $attendee['email']);
-                $attendee['first_name'] = $emailParts[0] ?? 'User';
-                $attendee['last_name'] = '';
+                if (!empty($email) && strpos($email, '@') !== false) {
+                    $emailParts = explode('@', $email);
+                    $attendee['first_name'] = $emailParts[0];
+                    $attendee['last_name'] = '';
+                } else {
+                    $attendee['first_name'] = 'User';
+                    $attendee['last_name'] = '';
+                }
             }
             
-            // Remove email from the output as it's only needed for fallback
-            unset($attendee['email']);
+            // Store sort key for proper sorting (use email as fallback for last name)
+            $attendee['_sort_key'] = !empty($attendee['last_name']) ? $attendee['last_name'] : $email;
             
             $attendees[] = $attendee;
         }
         
-        // Sort by last name, then first name
+        // Sort by last name (or email if no last name), then first name
         usort($attendees, function($a, $b) {
-            $lastNameCmp = strcasecmp($a['last_name'], $b['last_name']);
-            if ($lastNameCmp !== 0) {
-                return $lastNameCmp;
+            $sortKeyCmp = strcasecmp($a['_sort_key'], $b['_sort_key']);
+            if ($sortKeyCmp !== 0) {
+                return $sortKeyCmp;
             }
             return strcasecmp($a['first_name'], $b['first_name']);
         });
+        
+        // Remove temporary sort key and email from output
+        foreach ($attendees as &$attendee) {
+            unset($attendee['_sort_key']);
+            unset($attendee['email']);
+        }
         
         return $attendees;
     }
