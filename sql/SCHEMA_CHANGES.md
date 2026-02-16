@@ -1,5 +1,23 @@
 # SQL Schema Changes Documentation
 
+## ⚠️ IMPORTANT: Fixing "Column not found: needs_helpers" Error
+
+If you're seeing this error on your dashboard:
+```
+SQLSTATE[42S22]: Column not found: 1054 Unknown column 'e.needs_helpers' in 'where clause'
+```
+
+**Run this command immediately:**
+```bash
+php update_database_schema.php
+```
+
+This will add all missing columns including `needs_helpers` to your database.
+
+For full deployment instructions, see [DEPLOYMENT.md](../DEPLOYMENT.md) in the root directory.
+
+---
+
 ## Overview
 This document describes the changes made to the SQL schema files to align them with the PHP backend requirements.
 
