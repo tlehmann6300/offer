@@ -89,7 +89,6 @@ class EventDocumentation {
             SELECT ed.*, e.title as event_title, e.start_time, e.end_time
             FROM event_documentation ed
             INNER JOIN events e ON ed.event_id = e.id
-            WHERE ed.sellers_data IS NOT NULL OR ed.sales_data IS NOT NULL
             ORDER BY e.start_time DESC
         ");
         
