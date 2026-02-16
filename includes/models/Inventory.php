@@ -155,8 +155,8 @@ class Inventory {
                 LEFT JOIN rentals r ON i.id = r.item_id AND r.actual_return IS NULL" 
                 . $whereSQL . "
                 GROUP BY i.id, i.easyverein_id, i.name, i.description, i.serial_number, i.category_id, i.location_id, 
-                         i.status, i.quantity, i.min_stock, i.unit, i.unit_price, i.purchase_date, 
-                         i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at, i.is_archived_in_easyverein,
+                         i.quantity, i.min_stock, i.unit, i.unit_price, 
+                         i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at,
                          c.name, c.color, l.name
                 ORDER BY " . $orderBy;
         
@@ -921,9 +921,8 @@ class Inventory {
                 // Insert item
                 $stmt = $db->prepare("
                     INSERT INTO inventory_items (
-                        name, description, serial_number, category_id, location_id, 
-                        status, quantity, purchase_date
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        name, description, serial_number, category_id, location_id, quantity
+                    ) VALUES (?, ?, ?, ?, ?, ?)
                 ");
                 
                 $stmt->execute([
@@ -932,9 +931,7 @@ class Inventory {
                     $item['serial_number'] ?? null,
                     $categoryId,
                     $locationId,
-                    $status,
-                    1, // Default stock of 1 for imported items
-                    $purchaseDate
+                    1 // Default stock of 1 for imported items
                 ]);
                 
                 $itemId = $db->lastInsertId();
