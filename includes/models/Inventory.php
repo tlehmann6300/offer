@@ -29,10 +29,7 @@ class Inventory {
             LEFT JOIN locations l ON i.location_id = l.id
             LEFT JOIN rentals r ON i.id = r.item_id AND r.actual_return IS NULL
             WHERE i.id = ?
-            GROUP BY i.id, i.easyverein_id, i.name, i.description, i.serial_number, 
-                     i.category_id, i.location_id, i.quantity, i.min_stock, i.unit, 
-                     i.unit_price, i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at,
-                     c.name, c.color, l.name
+            GROUP BY i.id, c.name, c.color, l.name
         ");
         $stmt->execute([$id]);
         return $stmt->fetch();
@@ -160,10 +157,7 @@ class Inventory {
                 LEFT JOIN locations l ON i.location_id = l.id
                 LEFT JOIN rentals r ON i.id = r.item_id AND r.actual_return IS NULL" 
                 . $whereSQL . "
-                GROUP BY i.id, i.easyverein_id, i.name, i.description, i.serial_number, i.category_id, i.location_id, 
-                         i.quantity, i.min_stock, i.unit, i.unit_price, 
-                         i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at,
-                         c.name, c.color, l.name
+                GROUP BY i.id, c.name, c.color, l.name
                 ORDER BY " . $orderBy;
         
         $stmt = $db->prepare($sql);
