@@ -56,8 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_rental'])) {
         
         // Create rental record
         $stmt = $db->prepare("
-            INSERT INTO rentals (user_id, item_id, amount, rented_at, expected_return, status)
-            VALUES (?, ?, ?, NOW(), ?, 'active')
+            INSERT INTO rentals (user_id, item_id, amount, expected_return)
+            VALUES (?, ?, ?, ?)
         ");
         $stmt->execute([
             $_SESSION['user_id'],
@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['return_rental'])) {
             SELECT r.*, i.quantity, i.name as item_name
             FROM rentals r
             JOIN inventory_items i ON r.item_id = i.id
-            WHERE r.id = ? AND r.user_id = ? AND r.status = 'active'
+            WHERE r.id = ? AND r.user_id = ? AND r.actual_return IS NULL
         ");
         $stmt->execute([$rentalId, $_SESSION['user_id']]);
         $rental = $stmt->fetch();

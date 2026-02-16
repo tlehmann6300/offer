@@ -562,7 +562,7 @@ class Inventory {
             SELECT r.*
             FROM rentals r
             WHERE r.item_id = ? AND r.actual_return IS NULL
-            ORDER BY r.rented_at DESC
+            ORDER BY r.created_at DESC
         ");
         $stmt->execute([$itemId]);
         $rentals = $stmt->fetchAll();
@@ -604,7 +604,7 @@ class Inventory {
             $sql .= " AND r.actual_return IS NULL";
         }
         
-        $sql .= " ORDER BY r.rented_at DESC";
+        $sql .= " ORDER BY r.created_at DESC";
         
         $stmt = $db->prepare($sql);
         $stmt->execute([$userId]);
@@ -628,11 +628,9 @@ class Inventory {
                 r.item_id,
                 r.user_id,
                 r.amount as quantity,
-                r.rented_at,
+                r.created_at as rented_at,
                 r.expected_return,
                 r.actual_return as returned_at,
-                r.status,
-                r.defect_notes,
                 i.name as item_name,
                 i.unit
             FROM rentals r
@@ -644,7 +642,7 @@ class Inventory {
             $sql .= " AND r.actual_return IS NULL";
         }
         
-        $sql .= " ORDER BY r.rented_at DESC";
+        $sql .= " ORDER BY r.created_at DESC";
         
         $stmt = $db->prepare($sql);
         $stmt->execute([$userId]);
@@ -724,14 +722,14 @@ class Inventory {
                 r.item_id,
                 r.user_id,
                 r.amount,
-                r.rented_at,
+                r.created_at as rented_at,
                 r.expected_return,
                 i.name as item_name,
                 i.unit
             FROM rentals r
             JOIN inventory_items i ON r.item_id = i.id
             WHERE r.actual_return IS NULL
-            ORDER BY r.rented_at DESC
+            ORDER BY r.created_at DESC
         ");
         $checkouts = $stmt->fetchAll();
         
