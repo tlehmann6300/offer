@@ -22,11 +22,15 @@ class AuthHandler {
         init_session();
         
         // Regenerate session ID periodically to prevent session fixation
+        // BUT skip regeneration during OAuth flow to preserve state parameter
         if (!isset($_SESSION['created'])) {
             $_SESSION['created'] = time();
         } else if (time() - $_SESSION['created'] > 1800) {
-            session_regenerate_id(true);
-            $_SESSION['created'] = time();
+            // Only skip regeneration if OAuth state is present
+            if (!isset($_SESSION['oauth2state'])) {
+                session_regenerate_id(true);
+                $_SESSION['created'] = time();
+            }
         }
         
         // Check for session timeout (30 minutes of inactivity)
@@ -426,6 +430,10 @@ class AuthHandler {
         // Store state in session for CSRF protection
         $_SESSION['oauth2state'] = $provider->getState();
         
+        // Log state storage for debugging (log only presence, not actual value for security)
+        error_log("[OAuth] State stored in session (length: " . strlen($_SESSION['oauth2state']) . ")");
+        error_log("[OAuth] Session ID: " . session_id());
+        
         // Ensure session is written to disk before redirect
         // This is critical for OAuth flow to preserve the state parameter
         session_write_close();
@@ -447,6 +455,13 @@ class AuthHandler {
         
         // Validate state for CSRF protection
         if (!isset($_GET['state']) || !isset($_SESSION['oauth2state']) || $_GET['state'] !== $_SESSION['oauth2state']) {
+            // Log detailed error information for debugging (without exposing actual values)
+            error_log("[OAuth] State validation failed:");
+            error_log("[OAuth]   - GET state present: " . (isset($_GET['state']) ? 'YES' : 'NO'));
+            error_log("[OAuth]   - GET state length: " . (isset($_GET['state']) ? strlen($_GET['state']) : '0'));
+            error_log("[OAuth]   - SESSION oauth2state present: " . (isset($_SESSION['oauth2state']) ? 'YES' : 'NO'));
+            error_log("[OAuth]   - SESSION oauth2state length: " . (isset($_SESSION['oauth2state']) ? strlen($_SESSION['oauth2state']) : '0'));
+            error_log("[OAuth]   - Session ID: " . session_id());
             unset($_SESSION['oauth2state']);
             throw new Exception('Invalid state parameter');
         }
