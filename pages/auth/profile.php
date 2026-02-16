@@ -91,6 +91,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'show_birthday' => isset($_POST['show_birthday']) ? 1 : 0
             ];
             
+            // Validate required fields for profile completion
+            if (empty($profileData['first_name'])) {
+                throw new Exception('Vorname ist erforderlich');
+            }
+            if (empty($profileData['last_name'])) {
+                throw new Exception('Nachname ist erforderlich');
+            }
+            if (empty($profileData['gender'])) {
+                throw new Exception('Geschlecht ist erforderlich');
+            }
+            if (empty($profileData['birthday'])) {
+                throw new Exception('Geburtstag ist erforderlich');
+            }
+            
             // Handle profile picture upload using secure upload utility
             if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
                 $uploadDir = __DIR__ . '/../../uploads/profile/';
@@ -188,8 +202,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($updateSuccess) {
                 $message = 'Profil erfolgreich aktualisiert';
                 
-                // Mark profile as complete if first_name and last_name are provided
-                if (!empty($profileData['first_name']) && !empty($profileData['last_name'])) {
+                // Mark profile as complete if all required fields are provided:
+                // first_name, last_name, gender, and birthday
+                if (!empty($profileData['first_name']) && 
+                    !empty($profileData['last_name']) && 
+                    !empty($profileData['gender']) && 
+                    !empty($profileData['birthday'])) {
                     try {
                         $userDb = Database::getUserDB();
                         $stmt = $userDb->prepare("UPDATE users SET profile_complete = 1 WHERE id = ?");
@@ -579,9 +597,10 @@ ob_start();
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Geschlecht</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Geschlecht *</label>
                         <select 
                             name="gender"
+                            required
                             class="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 rounded-lg"
                         >
                             <option value="">Bitte wählen</option>

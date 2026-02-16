@@ -348,13 +348,36 @@ ob_start();
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex flex-col space-y-1">
-                            <span class="inline-flex items-center px-3 py-1.5 text-sm bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/50 dark:to-indigo-900/50 text-purple-800 dark:text-purple-200 rounded-lg font-semibold shadow-sm">
-                                <i class="fas fa-user-tag mr-2 text-xs"></i>
-                                <?php echo htmlspecialchars(translateRole($user['role'])); ?>
-                            </span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400 italic flex items-center">
-                                <i class="fas fa-info-circle mr-1.5"></i>Microsoft Entra
-                            </span>
+                            <?php 
+                            // Display Microsoft Entra roles if available
+                            $entraRoles = null;
+                            if (!empty($user['entra_roles'])) {
+                                $entraRoles = json_decode($user['entra_roles'], true);
+                            }
+                            
+                            if (!empty($entraRoles) && is_array($entraRoles)): 
+                            ?>
+                                <div class="text-xs text-gray-600 dark:text-gray-300 font-semibold mb-1">
+                                    <i class="fas fa-microsoft mr-1 text-blue-600"></i>Microsoft Entra Rollen:
+                                </div>
+                                <?php foreach ($entraRoles as $entraRole): ?>
+                                <span class="inline-flex items-center px-3 py-1.5 text-xs bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/50 dark:to-indigo-900/50 text-blue-800 dark:text-blue-200 rounded-lg font-medium shadow-sm">
+                                    <i class="fas fa-user-tag mr-1.5 text-xs"></i>
+                                    <?php echo htmlspecialchars($entraRole); ?>
+                                </span>
+                                <?php endforeach; ?>
+                                <span class="text-xs text-gray-500 dark:text-gray-400 italic mt-1">
+                                    Lokale Rolle: <?php echo htmlspecialchars(translateRole($user['role'])); ?>
+                                </span>
+                            <?php else: ?>
+                                <span class="inline-flex items-center px-3 py-1.5 text-sm bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/50 dark:to-indigo-900/50 text-purple-800 dark:text-purple-200 rounded-lg font-semibold shadow-sm">
+                                    <i class="fas fa-user-tag mr-2 text-xs"></i>
+                                    <?php echo htmlspecialchars(translateRole($user['role'])); ?>
+                                </span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400 italic flex items-center">
+                                    <i class="fas fa-info-circle mr-1.5"></i>Microsoft Entra Rollen nicht verfügbar
+                                </span>
+                            <?php endif; ?>
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">

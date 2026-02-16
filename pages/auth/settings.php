@@ -61,7 +61,7 @@ ob_start();
             <i class="fas fa-cog text-purple-600 mr-3"></i>
             Einstellungen
         </h1>
-        <p class="text-gray-600">Verwalte deine Konto- und Sicherheitseinstellungen</p>
+        <p class="text-gray-600">Verwalte deine persönlichen Einstellungen</p>
     </div>
 
     <!-- Success/Error Messages -->
@@ -135,7 +135,7 @@ ob_start();
                     Benachrichtigungen
                 </h2>
                 <p class="text-gray-600 mb-6">
-                    Wähle aus, über welche Ereignisse du per E-Mail benachrichtigt werden möchtest
+                    Wähle aus, über welche Ereignisse du per E-Mail an <strong><?php echo htmlspecialchars($user['email']); ?></strong> benachrichtigt werden möchtest
                 </p>
                 
                 <form method="POST" class="space-y-4">

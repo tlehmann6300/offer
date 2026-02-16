@@ -365,6 +365,33 @@ try {
         "Add sellers_data column to event_documentation table"
     );
     
+    // Add sales_data column to event_documentation table
+    executeSql(
+        $content_db,
+        "ALTER TABLE event_documentation ADD COLUMN sales_data JSON DEFAULT NULL COMMENT 'JSON array of sales entries with items and revenue'",
+        "Add sales_data column to event_documentation table"
+    );
+    
+    // Add calculations column to event_documentation table
+    executeSql(
+        $content_db,
+        "ALTER TABLE event_documentation ADD COLUMN calculations TEXT DEFAULT NULL COMMENT 'Calculation notes and formulas'",
+        "Add calculations column to event_documentation table"
+    );
+    
+    // Add created_by and updated_by columns to event_documentation table
+    executeSql(
+        $content_db,
+        "ALTER TABLE event_documentation ADD COLUMN created_by INT UNSIGNED DEFAULT NULL COMMENT 'User who created the documentation'",
+        "Add created_by column to event_documentation table"
+    );
+    
+    executeSql(
+        $content_db,
+        "ALTER TABLE event_documentation ADD COLUMN updated_by INT UNSIGNED DEFAULT NULL COMMENT 'User who last updated the documentation'",
+        "Add updated_by column to event_documentation table"
+    );
+    
     // Add needs_helpers column to events table
     executeSql(
         $content_db,
