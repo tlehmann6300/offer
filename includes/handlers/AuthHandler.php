@@ -511,8 +511,37 @@ class AuthHandler {
             $claims = $resourceOwner->toArray();
             $azureRoles = $claims['roles'] ?? [];
             
-            // Define role mapping from Azure roles (string) to internal role names (string)
-            // Azure roles should not contain umlauts for technical compatibility
+            // Get Azure Object ID from claims for Microsoft Graph API calls
+            $azureOid = $claims['oid'] ?? null;
+            
+            // Fetch user's group memberships from Microsoft Graph API
+            $entraGroups = [];
+            if ($azureOid) {
+                try {
+                    // Initialize Microsoft Graph Service (uses service account access token)
+                    $graphService = new MicrosoftGraphService();
+                    
+                    // Get user profile (includes groups)
+                    $profileData = $graphService->getUserProfile($azureOid);
+                    $entraGroups = $profileData['groups'] ?? [];
+                    
+                    // Log groups for debugging
+                    if (!empty($entraGroups)) {
+                        error_log("Microsoft Entra groups fetched for user {$azureOid}: " . json_encode($entraGroups));
+                    } else {
+                        error_log("No Microsoft Entra groups found for user {$azureOid}");
+                    }
+                } catch (Exception $e) {
+                    error_log("Failed to fetch user groups from Microsoft Graph during login: " . $e->getMessage());
+                    // Continue with empty groups - will use JWT roles or default
+                }
+            }
+            
+            // Define role mapping from Azure roles/groups (string) to internal role names (string)
+            // This mapping works for both:
+            // 1. App Roles from JWT token (roles claim)
+            // 2. Group display names from Microsoft Entra (Graph API)
+            // Azure roles/groups should not contain umlauts for technical compatibility
             $roleMapping = [
                 'anwaerter' => 'candidate',
                 'mitglied' => 'member',
@@ -523,7 +552,18 @@ class AuthHandler {
                 'alumni' => 'alumni',
                 'alumni_vorstand' => 'alumni_board',
                 'alumni_finanz' => 'alumni_auditor',
-                'ehrenmitglied' => 'honorary_member'
+                'ehrenmitglied' => 'honorary_member',
+                // Also support capitalized versions that might come from group display names
+                'Anwaerter' => 'candidate',
+                'Mitglied' => 'member',
+                'Ressortleiter' => 'head',
+                'Vorstand_Finanzen' => 'board_finance',
+                'Vorstand_Intern' => 'board_internal',
+                'Vorstand_Extern' => 'board_external',
+                'Alumni' => 'alumni',
+                'Alumni_Vorstand' => 'alumni_board',
+                'Alumni_Finanz' => 'alumni_auditor',
+                'Ehrenmitglied' => 'honorary_member'
             ];
             
             // Define role hierarchy for priority selection (higher value = higher priority)
@@ -540,13 +580,31 @@ class AuthHandler {
                 'alumni_auditor' => 10
             ];
             
-            // Find the role with the highest priority
+            // Combine roles from JWT token and Microsoft Entra groups
+            // This ensures we check both sources for role assignment
+            $allRoleSources = array_merge($azureRoles, $entraGroups);
+            
+            // Log all role sources for debugging
+            error_log("Role determination for user {$azureOid}: JWT roles = " . json_encode($azureRoles) . ", Entra groups = " . json_encode($entraGroups));
+            
+            // Find the role with the highest priority from all sources
             $highestPriority = 0;
             $selectedRole = 'member'; // Default to member if no valid role found
             
-            foreach ($azureRoles as $azureRole) {
-                if (isset($roleMapping[$azureRole])) {
-                    $internalRole = $roleMapping[$azureRole];
+            foreach ($allRoleSources as $roleSource) {
+                // Check both exact match and lowercase match for compatibility
+                $roleLower = strtolower($roleSource);
+                
+                if (isset($roleMapping[$roleSource])) {
+                    $internalRole = $roleMapping[$roleSource];
+                    $priority = $roleHierarchy[$internalRole] ?? 0;
+                    
+                    if ($priority > $highestPriority) {
+                        $highestPriority = $priority;
+                        $selectedRole = $internalRole;
+                    }
+                } elseif (isset($roleMapping[$roleLower])) {
+                    $internalRole = $roleMapping[$roleLower];
                     $priority = $roleHierarchy[$internalRole] ?? 0;
                     
                     if ($priority > $highestPriority) {
@@ -557,6 +615,9 @@ class AuthHandler {
             }
             
             $roleName = $selectedRole;
+            
+            // Log the selected role for debugging
+            error_log("Selected role for user {$azureOid}: {$roleName} (priority: {$highestPriority})");
             
             // Get user email from claims
             // Priority: email -> preferred_username -> upn
@@ -625,47 +686,48 @@ class AuthHandler {
                 }
             }
             
-            // Sync profile photo from Microsoft Graph
+            // Sync profile data and photo from Microsoft Graph
             try {
-                // Create MicrosoftGraphService instance
-                $graphService = new MicrosoftGraphService();
+                // Reuse or create MicrosoftGraphService instance
+                if (!isset($graphService) && $azureOid) {
+                    $graphService = new MicrosoftGraphService();
+                }
                 
-                // Get user's Object ID from claims
-                $objectId = $claims['oid'] ?? null;
-                
-                if ($objectId) {
-                    // Get user profile data (job title, company, groups)
-                    try {
-                        $profileData = $graphService->getUserProfile($objectId);
-                        
-                        // Store job title and company in users table
-                        $jobTitle = $profileData['jobTitle'] ?? null;
-                        $companyName = $profileData['companyName'] ?? null;
-                        $groups = $profileData['groups'] ?? [];
-                        
-                        // Convert groups array to JSON string for entra_roles
-                        // Groups are displayName from Microsoft Graph, already human-readable
+                if ($azureOid && isset($graphService)) {
+                    // Get or reuse user profile data (job title, company, groups)
+                    // If we already fetched this earlier for role determination, reuse it
+                    if (!isset($profileData)) {
                         try {
-                            $entraRoles = !empty($groups) ? json_encode($groups, JSON_THROW_ON_ERROR) : null;
-                        } catch (JsonException $e) {
-                            error_log("Failed to JSON encode groups during profile sync for user ID " . intval($userId) . ": " . $e->getMessage());
-                            $entraRoles = null; // Fallback to null if encoding fails
+                            $profileData = $graphService->getUserProfile($azureOid);
+                        } catch (Exception $e) {
+                            error_log("Failed to fetch user profile from Microsoft Graph: " . $e->getMessage());
+                            $profileData = ['jobTitle' => null, 'companyName' => null, 'groups' => []];
                         }
-                        
-                        // Update user record with profile data
-                        $stmt = $db->prepare("UPDATE users SET job_title = ?, company = ?, entra_roles = ? WHERE id = ?");
-                        $stmt->execute([$jobTitle, $companyName, $entraRoles, $userId]);
-                        
-                        // Store Entra roles in session for display
-                        $_SESSION['entra_roles'] = $groups;
-                        
-                    } catch (Exception $e) {
-                        error_log("Failed to fetch user profile from Microsoft Graph: " . $e->getMessage());
-                        // Don't throw - allow login to proceed even if profile fetch fails
                     }
                     
+                    // Store job title and company in users table
+                    $jobTitle = $profileData['jobTitle'] ?? null;
+                    $companyName = $profileData['companyName'] ?? null;
+                    $groups = $profileData['groups'] ?? [];
+                    
+                    // Convert groups array to JSON string for entra_roles
+                    // Groups are displayName from Microsoft Graph, already human-readable
+                    try {
+                        $entraRolesJson = !empty($groups) ? json_encode($groups, JSON_THROW_ON_ERROR) : null;
+                    } catch (JsonException $e) {
+                        error_log("Failed to JSON encode groups during profile sync for user ID " . intval($userId) . ": " . $e->getMessage());
+                        $entraRolesJson = null; // Fallback to null if encoding fails
+                    }
+                    
+                    // Update user record with profile data
+                    $stmt = $db->prepare("UPDATE users SET job_title = ?, company = ?, entra_roles = ? WHERE id = ?");
+                    $stmt->execute([$jobTitle, $companyName, $entraRolesJson, $userId]);
+                    
+                    // Store Entra roles in session for display
+                    $_SESSION['entra_roles'] = $groups;
+                    
                     // Get user photo from Microsoft Graph
-                    $photoData = $graphService->getUserPhoto($objectId);
+                    $photoData = $graphService->getUserPhoto($azureOid);
                     
                     if ($photoData) {
                         // Ensure profile_photos directory exists using realpath for security
