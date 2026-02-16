@@ -1228,7 +1228,7 @@ class Event {
         $stmt = $db->prepare("
             SELECT * FROM event_history
             WHERE event_id = ?
-            ORDER BY timestamp DESC
+            ORDER BY created_at DESC
             LIMIT ?
         ");
         $stmt->execute([$eventId, $limit]);
