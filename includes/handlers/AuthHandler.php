@@ -544,6 +544,10 @@ class AuthHandler {
             // 2. Group display names from Microsoft Entra (Graph API)
             // Azure roles/groups should not contain umlauts for technical compatibility
             // 
+            // Note: Duplicate mappings for different cases (lowercase, Capitalized) are intentional
+            // to provide explicit documentation of all supported formats from Azure.
+            // The fallback logic (lines ~607-615) also checks lowercase versions as a safety net.
+            // 
             // Supported formats:
             // - lowercase with underscore: vorstand_finanzen, vorstand_intern
             // - Capitalized with underscore: Vorstand_Finanzen, Vorstand_Intern

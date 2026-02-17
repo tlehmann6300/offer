@@ -459,11 +459,6 @@ class Inventory {
             return ['success' => false, 'message' => 'Ungültige Menge'];
         }
         
-        // Check if stock is zero (before any checkout attempt)
-        if ($item['quantity'] == 0) {
-            return ['success' => false, 'message' => 'Bestand ist 0. Ausleihen nicht möglich.'];
-        }
-        
         // Begin transaction
         $db->beginTransaction();
         
