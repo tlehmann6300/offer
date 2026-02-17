@@ -644,24 +644,27 @@ class AuthHandler {
             $azureOid = $claims['oid'] ?? null;
             
             if ($existingUser) {
-                // Update existing user - always update role and profile_complete on every login
+                // Update existing user - update role and Azure info but keep profile_complete as is
                 $userId = $existingUser['id'];
                 
-                // Update user table with role from Microsoft and set profile_complete=1
+                // Update user table with role from Microsoft (but don't override profile_complete)
                 // Also store the original Azure roles as JSON for profile display and Azure OID
                 $azureRolesJson = json_encode($azureRoles);
-                $stmt = $db->prepare("UPDATE users SET role = ?, azure_roles = ?, azure_oid = ?, profile_complete = 1, last_login = NOW() WHERE id = ?");
+                $stmt = $db->prepare("UPDATE users SET role = ?, azure_roles = ?, azure_oid = ?, last_login = NOW() WHERE id = ?");
                 $stmt->execute([$roleName, $azureRolesJson, $azureOid, $userId]);
             } else {
                 // Create new user without password (OAuth login only)
                 $azureRolesJson = json_encode($azureRoles);
-                $stmt = $db->prepare("INSERT INTO users (email, password, role, azure_roles, azure_oid, is_alumni_validated, profile_complete) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $db->prepare("INSERT INTO users (email, password, role, azure_roles, azure_oid, is_alumni_validated, profile_complete, notify_new_projects, notify_new_events) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $isAlumniValidated = ($roleName === 'alumni') ? 0 : 1;
-                // Set profile_complete=1 since data comes from Microsoft
-                $profileComplete = 1;
+                // Set profile_complete=0 to force first-time profile completion
+                $profileComplete = 0;
+                // Enable email notifications by default
+                $notifyProjects = 1;
+                $notifyEvents = 1;
                 // Use a random password hash since user will login via OAuth
                 $randomPassword = password_hash(bin2hex(random_bytes(32)), HASH_ALGO);
-                $stmt->execute([$email, $randomPassword, $roleName, $azureRolesJson, $azureOid, $isAlumniValidated, $profileComplete]);
+                $stmt->execute([$email, $randomPassword, $roleName, $azureRolesJson, $azureOid, $isAlumniValidated, $profileComplete, $notifyProjects, $notifyEvents]);
                 $userId = $db->lastInsertId();
             }
             

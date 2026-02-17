@@ -61,6 +61,25 @@ function formatDateTime($date, $format = 'd.m.Y H:i') {
 }
 
 /**
+ * Format name from Entra ID (e.g., "tom.lehmann" -> "Tom Lehmann")
+ * Replaces dots with spaces and capitalizes first letters of each word
+ * 
+ * @param string $name The name to format
+ * @return string The formatted name
+ */
+function formatEntraName($name) {
+    if (empty($name)) {
+        return '';
+    }
+    
+    // Replace dots with spaces
+    $name = str_replace('.', ' ', $name);
+    
+    // Capitalize first letter of each word
+    return mb_convert_case($name, MB_CASE_TITLE, 'UTF-8');
+}
+
+/**
  * Escape HTML
  */
 function e($text) {

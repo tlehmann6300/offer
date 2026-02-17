@@ -749,11 +749,11 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                 $profile = Alumni::getProfileByUserId($currentUser['id']);
                 
                 if ($profile && !empty($profile['first_name'])) {
-                    $firstname = $profile['first_name'];
-                    $lastname = $profile['last_name'] ?? '';
+                    $firstname = formatEntraName($profile['first_name']);
+                    $lastname = formatEntraName($profile['last_name'] ?? '');
                 } elseif (!empty($currentUser['firstname'])) {
-                    $firstname = $currentUser['firstname'];
-                    $lastname = $currentUser['lastname'] ?? '';
+                    $firstname = formatEntraName($currentUser['firstname']);
+                    $lastname = formatEntraName($currentUser['lastname'] ?? '');
                 }
                 
                 $email = $currentUser['email'] ?? '';
