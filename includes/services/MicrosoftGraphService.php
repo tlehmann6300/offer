@@ -135,6 +135,50 @@ class MicrosoftGraphService {
     }
     
     /**
+     * Invite an external (guest) user via Microsoft Graph API
+     * Uses the /invitations endpoint to send a B2B guest invitation to Azure AD.
+     * 
+     * @param string $email Guest user's email address
+     * @param string $displayName Guest user's display name
+     * @param string $redirectUrl URL to redirect guest after accepting invitation
+     * @return array Invitation result with 'userId' and 'inviteRedeemUrl'
+     * @throws Exception If invitation fails
+     */
+    public function inviteGuestUser(string $email, string $displayName, string $redirectUrl): array {
+        $invitationUrl = 'https://graph.microsoft.com/v1.0/invitations';
+        
+        try {
+            $response = $this->httpClient->post($invitationUrl, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->accessToken,
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => [
+                    'invitedUserEmailAddress' => $email,
+                    'invitedUserDisplayName' => $displayName,
+                    'inviteRedirectUrl' => $redirectUrl,
+                    'sendInvitationMessage' => true,
+                    'invitedUserType' => 'Guest'
+                ]
+            ]);
+            
+            $body = json_decode($response->getBody()->getContents(), true);
+            
+            if (!isset($body['invitedUser']['id'])) {
+                throw new Exception('User ID not found in guest invitation response');
+            }
+            
+            return [
+                'userId' => $body['invitedUser']['id'],
+                'inviteRedeemUrl' => $body['inviteRedeemUrl'] ?? ''
+            ];
+            
+        } catch (GuzzleException $e) {
+            throw new Exception('Failed to invite guest user: ' . $e->getMessage());
+        }
+    }
+    
+    /**
      * Assign a role to a user
      * 
      * @param string $userId User ID (Object ID from Azure AD)

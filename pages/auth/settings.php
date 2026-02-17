@@ -209,7 +209,7 @@ ob_start();
                 <div class="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400 dark:border-blue-500 p-4">
                     <p class="text-sm text-blue-700 dark:text-blue-300">
                         <i class="fas fa-info-circle mr-2"></i>
-                        <strong>Empfehlung:</strong> Aktiviere 2FA für zusätzliche Sicherheit. Du benötigst eine Authenticator-App wie Google Authenticator oder Authy.
+                        <strong>Empfehlung:</strong> Aktiviere 2FA für zusätzliche Sicherheit. Du benötigst eine Authenticator-App wie Microsoft Authenticator, Google Authenticator oder Authy.
                     </p>
                 </div>
                 <?php else: ?>

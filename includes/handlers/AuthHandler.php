@@ -131,7 +131,14 @@ class AuthHandler {
         // Check 2FA if enabled
         if ($user['tfa_enabled']) {
             if ($tfaCode === null) {
-                return ['success' => false, 'require_2fa' => true, 'user_id' => $user['id']];
+                // Store pending 2FA user ID in session and redirect to verify_2fa.php
+                self::startSession();
+                session_regenerate_id(true);
+                $_SESSION['2fa_pending_user_id'] = $user['id'];
+                $_SESSION['2fa_pending'] = true;
+                $verifyUrl = (defined('BASE_URL') && BASE_URL) ? BASE_URL . '/pages/auth/verify_2fa.php' : '/pages/auth/verify_2fa.php';
+                header('Location: ' . $verifyUrl);
+                exit;
             }
             
             require_once __DIR__ . '/GoogleAuthenticator.php';
@@ -156,6 +163,10 @@ class AuthHandler {
         // Regenerate session ID to prevent session fixation attacks
         // This must be called after session is started but before setting user-specific session data
         session_regenerate_id(true);
+        
+        // Clear any pending 2FA state
+        unset($_SESSION['2fa_pending_user_id']);
+        unset($_SESSION['2fa_pending']);
         
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_email'] = $user['email'];
