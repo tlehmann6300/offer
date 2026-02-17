@@ -202,6 +202,110 @@ class EmailTemplates {
     }
     
     /**
+     * Get modern responsive profile reminder email template
+     * 
+     * @param string $name User's first name
+     * @param string|null $lastUpdate Date of last profile update (Y-m-d or datetime string), or null
+     * @return string Complete HTML email
+     */
+    public static function getProfileReminderTemplate($name, $lastUpdate = null) {
+        $safeName = htmlspecialchars($name ?: 'Mitglied');
+        
+        // Format the last update date for display
+        if ($lastUpdate) {
+            $date = new \DateTime($lastUpdate);
+            $lastUpdateFormatted = $date->format('d.m.Y');
+            $updateInfo = 'Dein Profil wurde zuletzt am <strong>' . $lastUpdateFormatted . '</strong> aktualisiert.';
+        } else {
+            $updateInfo = 'Dein Profil wurde bisher noch nicht aktualisiert.';
+        }
+        
+        $profileLink = defined('BASE_URL') ? BASE_URL . '/pages/auth/profile.php' : '#';
+        
+        $content = '
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+            <!-- Icon -->
+            <tr>
+                <td align="center" style="padding: 0 0 20px;">
+                    <div style="font-size: 48px; line-height: 1;">📋</div>
+                </td>
+            </tr>
+            
+            <!-- Title -->
+            <tr>
+                <td>
+                    <h1 style="margin: 0 0 20px; font-size: 28px; font-weight: 700; color: #1a1a1a; text-align: center; line-height: 1.3;">
+                        Profil-Erinnerung
+                    </h1>
+                </td>
+            </tr>
+            
+            <!-- Greeting & Message -->
+            <tr>
+                <td>
+                    <p style="margin: 0 0 16px; font-size: 18px; font-weight: 600; color: #1a1a1a;">
+                        Hallo ' . $safeName . ',
+                    </p>
+                    
+                    <p style="margin: 0 0 16px; font-size: 16px; color: #333333; line-height: 1.6;">
+                        ' . $updateInfo . '
+                    </p>
+                    
+                    <p style="margin: 0 0 16px; font-size: 16px; color: #333333; line-height: 1.6;">
+                        Bitte nimm dir einen Moment Zeit, um dein Profil zu überprüfen und bei Bedarf zu aktualisieren.
+                        Aktuelle Daten helfen uns, besser in Kontakt zu bleiben und dich über relevante Neuigkeiten zu informieren.
+                    </p>
+                </td>
+            </tr>
+            
+            <!-- Info Box -->
+            <tr>
+                <td style="padding: 20px 0;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f0f7eb; border-left: 4px solid #6cb73e; border-radius: 4px;">
+                        <tr>
+                            <td style="padding: 16px 20px;">
+                                <p style="margin: 0; font-size: 14px; color: #333333; line-height: 1.6;">
+                                    💡 <strong>Tipp:</strong> Überprüfe deine Kontaktdaten, Fähigkeiten und Interessen, damit wir dir passende Projekte und Events vorschlagen können.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            
+            <!-- CTA Button -->
+            <tr>
+                <td align="center" style="padding: 10px 0 30px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td align="center" style="border-radius: 8px; background: linear-gradient(135deg, #6cb73e 0%, #5a9933 100%); box-shadow: 0 4px 15px rgba(108, 183, 62, 0.3);">
+                                <a href="' . htmlspecialchars($profileLink) . '" target="_blank" style="display: inline-block; padding: 16px 42px; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 8px;">
+                                    Profil aktualisieren
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            
+            <!-- Closing -->
+            <tr>
+                <td>
+                    <p style="margin: 0; font-size: 16px; color: #333333; line-height: 1.6;">
+                        Vielen Dank für deine Unterstützung! 🙏<br>
+                        <strong>Dein IBC-Team</strong>
+                    </p>
+                </td>
+            </tr>
+        </table>';
+        
+        return self::getBaseTemplate('Profil-Erinnerung', $content, [
+            'primaryColor' => '#6cb73e',
+            'secondaryColor' => '#1e4c9c'
+        ]);
+    }
+    
+    /**
      * Get notification email template
      * 
      * @param string $title Notification title
