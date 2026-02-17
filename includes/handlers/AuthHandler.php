@@ -543,28 +543,43 @@ class AuthHandler {
             // 1. App Roles from JWT token (roles claim)
             // 2. Group display names from Microsoft Entra (Graph API)
             // Azure roles/groups should not contain umlauts for technical compatibility
+            // 
+            // Supported formats:
+            // - lowercase with underscore: vorstand_finanzen, vorstand_intern
+            // - Capitalized with underscore: Vorstand_Finanzen, Vorstand_Intern
+            // - Capitalized with space: Vorstand Finanzen, Vorstand Intern
+            // - Simple names: Vorstand -> board_internal (default board role)
             $roleMapping = [
+                // Lowercase versions (for App Roles)
                 'anwaerter' => 'candidate',
                 'mitglied' => 'member',
                 'ressortleiter' => 'head',
                 'vorstand_finanzen' => 'board_finance',
                 'vorstand_intern' => 'board_internal',
                 'vorstand_extern' => 'board_external',
+                'vorstand' => 'board_internal', // Default board role if no specific board type
                 'alumni' => 'alumni',
                 'alumni_vorstand' => 'alumni_board',
                 'alumni_finanz' => 'alumni_auditor',
                 'ehrenmitglied' => 'honorary_member',
-                // Also support capitalized versions that might come from group display names
+                // Capitalized versions with underscore (for Group display names)
                 'Anwaerter' => 'candidate',
                 'Mitglied' => 'member',
                 'Ressortleiter' => 'head',
                 'Vorstand_Finanzen' => 'board_finance',
                 'Vorstand_Intern' => 'board_internal',
                 'Vorstand_Extern' => 'board_external',
+                'Vorstand' => 'board_internal', // Default board role if no specific board type
                 'Alumni' => 'alumni',
                 'Alumni_Vorstand' => 'alumni_board',
                 'Alumni_Finanz' => 'alumni_auditor',
-                'Ehrenmitglied' => 'honorary_member'
+                'Ehrenmitglied' => 'honorary_member',
+                // Capitalized versions with space (alternative Group display names)
+                'Vorstand Finanzen' => 'board_finance',
+                'Vorstand Intern' => 'board_internal',
+                'Vorstand Extern' => 'board_external',
+                'Alumni Vorstand' => 'alumni_board',
+                'Alumni Finanz' => 'alumni_auditor'
             ];
             
             // Define role hierarchy for priority selection (higher value = higher priority)

@@ -24,13 +24,11 @@ class Inventory {
                    i.is_archived_in_easyverein,
                    c.name as category_name, c.color as category_color, 
                    l.name as location_name,
-                   (i.quantity - COALESCE(SUM(r.amount), 0)) as available_quantity
+                   i.quantity as available_quantity
             FROM inventory_items i
             LEFT JOIN categories c ON i.category_id = c.id
             LEFT JOIN locations l ON i.location_id = l.id
-            LEFT JOIN rentals r ON i.id = r.item_id AND r.actual_return IS NULL
             WHERE i.id = ?
-            GROUP BY i.id, c.name, c.color, l.name
         ");
         $stmt->execute([$id]);
         return $stmt->fetch();
@@ -144,8 +142,8 @@ class Inventory {
         }
         
         // SQL query with correct table and column names
-        // Note: quantity is an alias for quantity for backward compatibility
-        // available_quantity = quantity - active rentals
+        // Note: Since quantity is reduced when items are checked out,
+        // available_quantity is simply the current quantity
         $sql = "SELECT i.id, i.easyverein_id, i.name, i.description, i.serial_number, 
                        i.category_id, i.location_id, i.quantity, i.min_stock, i.unit, 
                        i.unit_price, i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at,
@@ -153,13 +151,11 @@ class Inventory {
                        c.name as category_name, 
                        c.color as category_color,
                        l.name as location_name,
-                       (i.quantity - COALESCE(SUM(r.amount), 0)) as available_quantity
+                       i.quantity as available_quantity
                 FROM inventory_items i
                 LEFT JOIN categories c ON i.category_id = c.id
-                LEFT JOIN locations l ON i.location_id = l.id
-                LEFT JOIN rentals r ON i.id = r.item_id AND r.actual_return IS NULL" 
+                LEFT JOIN locations l ON i.location_id = l.id" 
                 . $whereSQL . "
-                GROUP BY i.id, c.name, c.color, l.name
                 ORDER BY " . $orderBy;
         
         $stmt = $db->prepare($sql);
@@ -455,7 +451,17 @@ class Inventory {
         
         // Check if enough stock available
         if ($item['quantity'] < $quantity) {
-            return ['success' => false, 'message' => 'Nicht genügend Bestand verfügbar'];
+            return ['success' => false, 'message' => 'Nicht genügend Bestand verfügbar. Verfügbar: ' . $item['quantity']];
+        }
+        
+        // Special case: if quantity is 0, prevent checkout
+        if ($quantity <= 0) {
+            return ['success' => false, 'message' => 'Ungültige Menge'];
+        }
+        
+        // Check if stock is zero (before any checkout attempt)
+        if ($item['quantity'] == 0) {
+            return ['success' => false, 'message' => 'Bestand ist 0. Ausleihen nicht möglich.'];
         }
         
         // Begin transaction
