@@ -837,7 +837,7 @@ class MailService {
      * @param string $attachmentContent Attachment content
      * @return bool Success status
      */
-    private static function sendEmailWithAttachment($toEmail, $toName, $subject, $htmlBody, $attachmentFilename, $attachmentContent) {
+    public static function sendEmailWithAttachment($toEmail, $toName, $subject, $htmlBody, $attachmentFilename, $attachmentContent) {
         if (self::isVendorMissing()) {
             error_log("Cannot send email with attachment: Composer vendor missing");
             return false;
