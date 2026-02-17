@@ -29,6 +29,6 @@ ob_start();
 <?php
 $content = ob_get_clean();
 
-// Use auth_layout since this page is accessible without login
+// Use auth_layout as it does not require authentication (same as register page)
 require_once __DIR__ . '/../includes/templates/auth_layout.php';
 ?>
