@@ -45,16 +45,13 @@ class Inventory {
     public static function getAvailableStock($id) {
         $db = Database::getContentDB();
         
-        // Get total stock from inventory and sum of active rentals
-        // Note: r.actual_return IS NULL identifies active (unreturned) rentals
+        // Available stock = total quantity - quantity_borrowed
         $stmt = $db->prepare("
             SELECT 
                 i.quantity,
-                COALESCE(SUM(r.amount), 0) as active_rentals
+                COALESCE(i.quantity_borrowed, 0) as quantity_borrowed
             FROM inventory_items i
-            LEFT JOIN rentals r ON i.id = r.item_id AND r.actual_return IS NULL
             WHERE i.id = ?
-            GROUP BY i.id, i.quantity
         ");
         $stmt->execute([$id]);
         $result = $stmt->fetch();
@@ -63,8 +60,8 @@ class Inventory {
             return 0;
         }
         
-        // Formula: Total Stock - Active Rentals
-        $availableStock = $result['quantity'] - $result['active_rentals'];
+        // Formula: Total Stock - Borrowed
+        $availableStock = $result['quantity'] - $result['quantity_borrowed'];
         
         // Ensure non-negative
         return max(0, $availableStock);
@@ -440,20 +437,6 @@ class Inventory {
     public static function checkoutItem($itemId, $userId, $quantity, $purpose, $destination = null, $expectedReturnDate = null) {
         $db = Database::getContentDB();
         
-        // Get current stock
-        $stmt = $db->prepare("SELECT quantity, name FROM inventory_items WHERE id = ?");
-        $stmt->execute([$itemId]);
-        $item = $stmt->fetch();
-        
-        if (!$item) {
-            return ['success' => false, 'message' => 'Artikel nicht gefunden'];
-        }
-        
-        // Check if enough stock available
-        if ($item['quantity'] < $quantity) {
-            return ['success' => false, 'message' => 'Nicht genügend Bestand verfügbar. Verfügbar: ' . $item['quantity']];
-        }
-        
         // Special case: if quantity is 0, prevent checkout
         if ($quantity <= 0) {
             return ['success' => false, 'message' => 'Ungültige Menge'];
@@ -463,21 +446,40 @@ class Inventory {
         $db->beginTransaction();
         
         try {
-            // Create rental record (using rentals table)
-            $stmt = $db->prepare("
-                INSERT INTO rentals (item_id, user_id, amount, expected_return)
-                VALUES (?, ?, ?, ?)
-            ");
-            $stmt->execute([$itemId, $userId, $quantity, $expectedReturnDate]);
+            // Lock the row to prevent race conditions
+            $stmt = $db->prepare("SELECT quantity, COALESCE(quantity_borrowed, 0) AS quantity_borrowed, name FROM inventory_items WHERE id = ? FOR UPDATE");
+            $stmt->execute([$itemId]);
+            $item = $stmt->fetch();
             
-            // Update stock
-            $newStock = $item['quantity'] - $quantity;
-            $stmt = $db->prepare("UPDATE inventory_items SET quantity = ? WHERE id = ?");
-            $stmt->execute([$newStock, $itemId]);
+            if (!$item) {
+                $db->rollBack();
+                return ['success' => false, 'message' => 'Artikel nicht gefunden'];
+            }
+            
+            $newBorrowed = $item['quantity_borrowed'] + $quantity;
+            
+            // Check if enough stock available
+            if ($newBorrowed > $item['quantity']) {
+                $db->rollBack();
+                $available = $item['quantity'] - $item['quantity_borrowed'];
+                return ['success' => false, 'message' => 'Nicht genügend Artikel verfügbar. Verfügbar: ' . $available];
+            }
+            
+            // Update quantity_borrowed
+            $stmt = $db->prepare("UPDATE inventory_items SET quantity_borrowed = ? WHERE id = ?");
+            $stmt->execute([$newBorrowed, $itemId]);
+            
+            // Create rental record
+            $stmt = $db->prepare("
+                INSERT INTO rentals (item_id, user_id, amount, purpose, destination, checkout_date, expected_return, status)
+                VALUES (?, ?, ?, ?, ?, NOW(), ?, 'active')
+            ");
+            $stmt->execute([$itemId, $userId, $quantity, $purpose, $destination, $expectedReturnDate]);
             
             // Log checkout in history
-            // Note: change_amount is negative to indicate stock reduction
-            self::logHistory($itemId, $userId, 'checkout', $item['quantity'], $newStock, -$quantity, 'Ausgeliehen', $purpose . ($destination ? ' - ' . $destination : ''));
+            $oldAvailable = $item['quantity'] - $item['quantity_borrowed'];
+            $newAvailable = $item['quantity'] - $newBorrowed;
+            self::logHistory($itemId, $userId, 'checkout', $oldAvailable, $newAvailable, -$quantity, 'Ausgeliehen', $purpose . ($destination ? ' - ' . $destination : ''));
             
             $db->commit();
             return ['success' => true, 'message' => 'Artikel erfolgreich ausgeliehen'];
@@ -495,7 +497,7 @@ class Inventory {
         
         // Get rental record (using rentals table)
         $stmt = $db->prepare("
-            SELECT r.*, i.quantity, i.name 
+            SELECT r.*, i.quantity, COALESCE(i.quantity_borrowed, 0) AS quantity_borrowed, i.name 
             FROM rentals r
             JOIN inventory_items i ON r.item_id = i.id
             WHERE r.id = ? AND r.actual_return IS NULL
@@ -520,10 +522,7 @@ class Inventory {
         $db->beginTransaction();
         
         try {
-            $goodQuantity = $returnedQuantity - $defectiveQuantity;
-            $newStock = $rental['quantity'] + $goodQuantity;
-            
-            // Update rental record
+            // Update rental record - set status to 'returned'
             $status = $isDefective && $defectiveQuantity > 0 ? 'defective' : 'returned';
             $stmt = $db->prepare("
                 UPDATE rentals 
@@ -532,20 +531,31 @@ class Inventory {
             ");
             $stmt->execute([$defectiveReason, $status, $rentalId]);
             
-            // Update stock (only add back good items)
-            $stmt = $db->prepare("UPDATE inventory_items SET quantity = ? WHERE id = ?");
-            $stmt->execute([$newStock, $rental['item_id']]);
+            // Reduce quantity_borrowed in inventory
+            $newBorrowed = max(0, $rental['quantity_borrowed'] - $returnedQuantity);
+            $stmt = $db->prepare("UPDATE inventory_items SET quantity_borrowed = ? WHERE id = ?");
+            $stmt->execute([$newBorrowed, $rental['item_id']]);
+            
+            // If items are defective, also reduce total quantity
+            if ($defectiveQuantity > 0) {
+                $newTotalQuantity = $rental['quantity'] - $defectiveQuantity;
+                $stmt = $db->prepare("UPDATE inventory_items SET quantity = ? WHERE id = ?");
+                $stmt->execute([max(0, $newTotalQuantity), $rental['item_id']]);
+            }
             
             // Log check-in
+            $goodQuantity = $returnedQuantity - $defectiveQuantity;
+            $oldAvailable = $rental['quantity'] - $rental['quantity_borrowed'];
+            $newAvailable = ($defectiveQuantity > 0 ? $rental['quantity'] - $defectiveQuantity : $rental['quantity']) - $newBorrowed;
             $comment = "Rückgabe: {$returnedQuantity} Stück";
             if ($defectiveQuantity > 0) {
                 $comment .= " (davon {$defectiveQuantity} defekt: {$defectiveReason})";
             }
-            self::logHistory($rental['item_id'], $rental['user_id'], 'checkin', $rental['quantity'], $newStock, $goodQuantity, 'Zurückgegeben', $comment);
+            self::logHistory($rental['item_id'], $rental['user_id'], 'checkin', $oldAvailable, $newAvailable, $goodQuantity, 'Zurückgegeben', $comment);
             
             // If items are defective, log write-off
             if ($defectiveQuantity > 0) {
-                self::logHistory($rental['item_id'], $rental['user_id'], 'writeoff', $newStock, $newStock, -$defectiveQuantity, 'Ausschuss', $defectiveReason);
+                self::logHistory($rental['item_id'], $rental['user_id'], 'writeoff', $newAvailable, $newAvailable, -$defectiveQuantity, 'Ausschuss', $defectiveReason);
             }
             
             $db->commit();
