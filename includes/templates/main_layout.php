@@ -765,6 +765,18 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                 
                 // Check for Entra roles - priority: entra_roles from user table, then session azure_roles, then fallback to internal role
                 $displayRoles = [];
+                
+                // Debug logging for role determination
+                if (!empty($currentUser['entra_roles'])) {
+                    error_log("main_layout.php: User " . intval($currentUser['id']) . " has entra_roles in database: " . $currentUser['entra_roles']);
+                }
+                if (!empty($_SESSION['azure_roles'])) {
+                    error_log("main_layout.php: Session azure_roles for user " . intval($currentUser['id']) . ": " . (is_array($_SESSION['azure_roles']) ? json_encode($_SESSION['azure_roles']) : $_SESSION['azure_roles']));
+                }
+                if (!empty($_SESSION['entra_roles'])) {
+                    error_log("main_layout.php: Session entra_roles for user " . intval($currentUser['id']) . ": " . (is_array($_SESSION['entra_roles']) ? json_encode($_SESSION['entra_roles']) : $_SESSION['entra_roles']));
+                }
+                
                 if (!empty($currentUser['entra_roles'])) {
                     // Parse JSON array from database - groups from Microsoft Graph are already human-readable (displayName)
                     // No translation needed unlike azure_roles which use internal lowercase format
@@ -774,8 +786,13 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                     } else {
                         error_log("Failed to decode entra_roles in main_layout for user ID " . intval($currentUser['id']) . ": " . json_last_error_msg());
                     }
+                } elseif (!empty($_SESSION['entra_roles'])) {
+                    // Prefer entra_roles from session (groups from Microsoft Graph)
+                    if (is_array($_SESSION['entra_roles'])) {
+                        $displayRoles = array_filter($_SESSION['entra_roles']);
+                    }
                 } elseif (!empty($_SESSION['azure_roles'])) {
-                    // Check session variable as alternative
+                    // Check session variable as alternative (App Roles from JWT)
                     if (is_array($_SESSION['azure_roles'])) {
                         $displayRoles = array_filter(array_map('translateAzureRole', $_SESSION['azure_roles']));
                     } else {
