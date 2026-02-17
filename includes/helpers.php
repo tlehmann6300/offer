@@ -68,6 +68,10 @@ function formatDateTime($date, $format = 'd.m.Y H:i') {
  * It's designed for Entra ID names that may use lowercase with dots (e.g., "tom.lehmann"),
  * but can be safely applied to names already in proper format.
  * 
+ * Limitation: Special name patterns like "McDonald" will become "Mcdonald" and 
+ * "O'Brien" will become "O'brien". This is acceptable for Entra ID names which 
+ * typically use simple lowercase format.
+ * 
  * @param string $name The name to format
  * @return string The formatted name
  */

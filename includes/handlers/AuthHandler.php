@@ -8,6 +8,7 @@ require_once __DIR__ . '/../database.php';
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../src/Auth.php';
+require_once __DIR__ . '/../helpers.php';
 
 class AuthHandler {
     
@@ -635,7 +636,6 @@ class AuthHandler {
             $lastName = $claims['family_name'] ?? $claims['surname'] ?? null;
             
             // Format names from Entra ID (e.g., "tom.lehmann" -> "Tom Lehmann")
-            require_once __DIR__ . '/../helpers.php';
             if ($firstName) {
                 $firstName = formatEntraName($firstName);
             }
