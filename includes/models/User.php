@@ -137,6 +137,31 @@ class User {
     }
 
     /**
+     * Get users by multiple roles
+     * Returns users with their first_name, last_name, gender, and email
+     * 
+     * @param array $roles Array of role identifiers
+     * @return array Array of user records
+     */
+    public static function getUsersByRoles(array $roles) {
+        if (empty($roles)) {
+            return [];
+        }
+
+        $db = Database::getUserDB();
+        $placeholders = implode(',', array_fill(0, count($roles), '?'));
+        $stmt = $db->prepare("
+            SELECT id, email, first_name, last_name, gender, role
+            FROM users
+            WHERE role IN ($placeholders)
+              AND deleted_at IS NULL
+            ORDER BY last_name ASC, first_name ASC
+        ");
+        $stmt->execute($roles);
+        return $stmt->fetchAll();
+    }
+
+    /**
      * Enable 2FA for user
      */
     public static function enable2FA($userId, $secret) {

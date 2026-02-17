@@ -209,3 +209,89 @@ function isAlumniRole($role) {
     return in_array($role, ['alumni', 'alumni_board', 'honorary_member']);
 }
 
+/**
+ * Parse an email template JSON and replace placeholders with actual data
+ * 
+ * @param string $jsonContent Raw JSON string from template file
+ * @param array $user User data with keys: first_name, last_name, gender, email
+ * @param array $event Event data from database
+ * @param string $senderName Name of the sender (e.g. board member name)
+ * @return array ['subject' => string, 'body' => string] with all placeholders replaced
+ */
+function parseEmailTemplate($jsonContent, $user, $event, $senderName) {
+    $template = json_decode($jsonContent, true);
+    if (!$template || !isset($template['subject']) || !isset($template['content'])) {
+        return ['subject' => '', 'body' => ''];
+    }
+
+    $subject = $template['subject'];
+    $body = $template['content'];
+
+    // Build greeting based on gender
+    $firstName = $user['first_name'] ?? '';
+    $lastName = $user['last_name'] ?? '';
+    $gender = $user['gender'] ?? '';
+
+    if (strtolower($gender) === 'männlich' || strtolower($gender) === 'male') {
+        $anrede = 'Lieber ' . $firstName;
+    } elseif (strtolower($gender) === 'weiblich' || strtolower($gender) === 'female') {
+        $anrede = 'Liebe ' . $firstName;
+    } else {
+        $anrede = 'Guten Tag ' . trim($firstName . ' ' . $lastName);
+    }
+
+    // Parse event dates
+    $germanMonths = [
+        1 => 'Januar', 2 => 'Februar', 3 => 'März', 4 => 'April',
+        5 => 'Mai', 6 => 'Juni', 7 => 'Juli', 8 => 'August',
+        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Dezember'
+    ];
+    $germanDays = [
+        'Monday' => 'Montag', 'Tuesday' => 'Dienstag', 'Wednesday' => 'Mittwoch',
+        'Thursday' => 'Donnerstag', 'Friday' => 'Freitag', 'Saturday' => 'Samstag',
+        'Sunday' => 'Sonntag'
+    ];
+
+    $startTime = !empty($event['start_time']) ? new DateTime($event['start_time'])
+        : (!empty($event['event_date']) ? new DateTime($event['event_date']) : new DateTime());
+
+    $eventDateDay = $germanDays[$startTime->format('l')] ?? $startTime->format('l');
+    $eventDateDayOf = $startTime->format('j');
+    $eventDateMonth = $germanMonths[(int)$startTime->format('n')] ?? $startTime->format('F');
+    $eventDateHour = $startTime->format('H:i');
+    $eventDate = $startTime->format('d.m.Y');
+    $eventTime = $startTime->format('H:i');
+    $currentYear = $startTime->format('Y');
+
+    // Generate Google Calendar link
+    require_once __DIR__ . '/../src/CalendarService.php';
+    $googleCalendarLink = CalendarService::generateGoogleCalendarLink($event);
+
+    // Build replacements map
+    $replacements = [
+        '{Anrede}'          => $anrede,
+        '{accountName}'     => $senderName,
+        '{eventDateDay}'    => $eventDateDay,
+        '{eventDateDayOf}'  => $eventDateDayOf,
+        '{eventDateMonth}'  => $eventDateMonth,
+        '{EventDateHour}'   => $eventDateHour,
+        '{EventDate}'       => $eventDate,
+        '{EventTime}'       => $eventTime,
+        '{currentYear}'     => $currentYear,
+        '{location}'        => $event['location'] ?? '',
+        '{trainingLink}'    => $event['training_link'] ?? '',
+        '{MeetingLink}'     => $event['meeting_link'] ?? '',
+        '{VoteTransferLink}'=> $event['vote_transfer_link'] ?? '',
+        '{3V}'              => $senderName,
+        '{presentersName}'  => $event['contact_person'] ?? '',
+    ];
+
+    $subject = str_replace(array_keys($replacements), array_values($replacements), $subject);
+    $body = str_replace(array_keys($replacements), array_values($replacements), $body);
+
+    // Append Google Calendar link to body
+    $body .= "\n\nTermin in Google Kalender speichern: " . $googleCalendarLink;
+
+    return ['subject' => $subject, 'body' => $body];
+}
+
