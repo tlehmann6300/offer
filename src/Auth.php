@@ -227,7 +227,14 @@ class Auth {
         // Check 2FA if enabled
         if ($user['tfa_enabled']) {
             if ($tfaCode === null) {
-                return ['success' => false, 'require_2fa' => true, 'user_id' => $user['id']];
+                // Store pending 2FA user ID in session and redirect to verify_2fa.php
+                init_session();
+                session_regenerate_id(true);
+                $_SESSION['2fa_pending_user_id'] = $user['id'];
+                $_SESSION['2fa_pending'] = true;
+                $verifyUrl = (defined('BASE_URL') && BASE_URL) ? BASE_URL . '/pages/auth/verify_2fa.php' : '/pages/auth/verify_2fa.php';
+                header('Location: ' . $verifyUrl);
+                exit;
             }
             
             // Verify 2FA code

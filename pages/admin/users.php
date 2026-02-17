@@ -58,6 +58,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $error = 'Fehler beim Löschen des Benutzers';
         }
+    } else if (isset($_POST['create_alumni_user'])) {
+        $email = $_POST['alumni_email'] ?? '';
+        $displayName = $_POST['alumni_display_name'] ?? '';
+        
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error = 'Ungültige E-Mail-Adresse';
+        } else if (empty($displayName)) {
+            $error = 'Anzeigename ist erforderlich';
+        } else {
+            // Step a) Create user locally in the database with role "alumni"
+            $existingUser = User::getByEmail($email);
+            if ($existingUser) {
+                $error = 'Ein Benutzer mit dieser E-Mail-Adresse existiert bereits';
+            } else {
+                $randomPassword = bin2hex(random_bytes(32));
+                $newUserId = User::create($email, $randomPassword, 'alumni');
+                
+                if ($newUserId) {
+                    // Step b) Invite guest user in Azure AD
+                    try {
+                        require_once __DIR__ . '/../../includes/services/MicrosoftGraphService.php';
+                        $graphService = new MicrosoftGraphService();
+                        $redirectUrl = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/pages/auth/login.php';
+                        $inviteResult = $graphService->inviteGuestUser($email, $displayName, $redirectUrl);
+                        
+                        // Store Azure OID in the local user record
+                        if (!empty($inviteResult['userId'])) {
+                            User::update($newUserId, ['azure_oid' => $inviteResult['userId']]);
+                        }
+                        
+                        // Step c) Show success message
+                        $message = 'User lokal und in Azure angelegt. Eine Einladungs-E-Mail wurde versendet.';
+                    } catch (Exception $e) {
+                        error_log('Azure guest invitation failed for alumni user: ' . $e->getMessage());
+                        $message = 'User lokal angelegt, aber Azure-Einladung fehlgeschlagen. Bitte prüfe die Azure-Konfiguration.';
+                    }
+                } else {
+                    $error = 'Fehler beim Erstellen des Alumni-Benutzers';
+                }
+            }
+        }
     }
 }
 
@@ -143,6 +184,15 @@ ob_start();
                 <span class="relative z-10 flex items-center justify-center">
                     <i class="fas fa-envelope mr-2"></i>
                     Einladungen
+                </span>
+            </button>
+            <button 
+                class="tab-button flex-1 py-4 px-6 text-center font-semibold transition-all duration-200 relative overflow-hidden bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
+                data-tab="alumni"
+            >
+                <span class="relative z-10 flex items-center justify-center">
+                    <i class="fas fa-user-graduate mr-2"></i>
+                    Alumni erstellen
                 </span>
             </button>
             <?php endif; ?>
@@ -453,6 +503,54 @@ ob_start();
 </div>
 <?php endif; ?>
 <!-- End Tab Content: Invitations -->
+
+<!-- Tab Content: Alumni Creation -->
+<?php if ($canManageInvitations): ?>
+<div id="tab-alumni" class="tab-content hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700">
+        <div class="p-6 bg-gradient-to-r from-gray-50 via-slate-50 to-gray-50 dark:from-gray-800 dark:via-gray-750 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+                <i class="fas fa-user-graduate text-purple-600 mr-3"></i>
+                Alumni anlegen &amp; in Azure einladen
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400 mt-2">
+                Erstelle einen neuen Alumni-Benutzer lokal und lade ihn gleichzeitig als Gast in Microsoft Entra ID (Azure AD) ein.
+            </p>
+        </div>
+        <div class="p-6">
+            <form method="POST" class="space-y-4 max-w-lg">
+                <div>
+                    <label for="alumni_email" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">E-Mail-Adresse</label>
+                    <input 
+                        type="email" 
+                        id="alumni_email"
+                        name="alumni_email" 
+                        required 
+                        placeholder="alumni@example.com"
+                        class="w-full px-4 py-3 bg-white border-2 border-gray-200 text-gray-900 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all"
+                    >
+                </div>
+                <div>
+                    <label for="alumni_display_name" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Anzeigename</label>
+                    <input 
+                        type="text" 
+                        id="alumni_display_name"
+                        name="alumni_display_name" 
+                        required 
+                        placeholder="Max Mustermann"
+                        class="w-full px-4 py-3 bg-white border-2 border-gray-200 text-gray-900 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all"
+                    >
+                </div>
+                <button type="submit" name="create_alumni_user" class="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Alumni anlegen &amp; in Azure einladen
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+<!-- End Tab Content: Alumni Creation -->
 
 <script>
 // Tab switching functionality
