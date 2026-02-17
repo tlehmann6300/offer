@@ -226,9 +226,9 @@ class Event {
             // Insert event
             $stmt = $db->prepare("
                 INSERT INTO events (title, description, location, maps_link, start_time, end_time, 
-                                  registration_start, registration_end, contact_person, status, 
+                                  registration_start, registration_end, status, 
                                   is_external, external_link, registration_link, needs_helpers, image_path)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             
             $stmt->execute([
@@ -240,7 +240,6 @@ class Event {
                 $data['end_time'],
                 $data['registration_start'] ?? null,
                 $data['registration_end'] ?? null,
-                $data['contact_person'] ?? null,
                 $calculatedStatus,
                 $data['is_external'] ?? false,
                 $data['external_link'] ?? null,
