@@ -89,10 +89,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                         
                         // Step c) Show success message
-                        $message = 'User lokal und in Azure angelegt';
+                        $message = 'User lokal und in Azure angelegt. Eine Einladungs-E-Mail wurde versendet.';
                     } catch (Exception $e) {
                         error_log('Azure guest invitation failed for alumni user: ' . $e->getMessage());
-                        $message = 'User lokal angelegt, aber Azure-Einladung fehlgeschlagen: ' . $e->getMessage();
+                        $message = 'User lokal angelegt, aber Azure-Einladung fehlgeschlagen. Bitte prüfe die Azure-Konfiguration.';
                     }
                 } else {
                     $error = 'Fehler beim Erstellen des Alumni-Benutzers';

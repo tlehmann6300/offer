@@ -36,6 +36,21 @@ $pendingUserId = intval($_SESSION['2fa_pending_user_id']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $code = $_POST['code'] ?? '';
 
+    // Rate limiting: track failed 2FA attempts in session
+    if (!isset($_SESSION['2fa_attempts'])) {
+        $_SESSION['2fa_attempts'] = 0;
+    }
+
+    if ($_SESSION['2fa_attempts'] >= 5) {
+        // Too many failed attempts - clear state and redirect to login
+        unset($_SESSION['2fa_pending']);
+        unset($_SESSION['2fa_pending_user_id']);
+        unset($_SESSION['2fa_attempts']);
+        $loginUrl = (defined('BASE_URL') && BASE_URL) ? BASE_URL . '/pages/auth/login.php?error=' . urlencode('Zu viele fehlgeschlagene 2FA-Versuche') : '/pages/auth/login.php?error=' . urlencode('Zu viele fehlgeschlagene 2FA-Versuche');
+        header('Location: ' . $loginUrl);
+        exit;
+    }
+
     // Load user from database
     $db = Database::getUserDB();
     $stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
@@ -51,9 +66,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $db->prepare("UPDATE users SET failed_login_attempts = 0, locked_until = NULL, last_login = NOW() WHERE id = ?");
             $stmt->execute([$user['id']]);
 
-            // Clear 2FA pending state
+            // Clear 2FA pending state and attempts
             unset($_SESSION['2fa_pending']);
             unset($_SESSION['2fa_pending_user_id']);
+            unset($_SESSION['2fa_attempts']);
 
             // Set full authentication session
             session_regenerate_id(true);
@@ -69,7 +85,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: ' . $dashboardUrl);
             exit;
         } else {
-            $error = 'Ungültiger 2FA-Code. Bitte versuche es erneut.';
+            $_SESSION['2fa_attempts']++;
+            $remaining = 5 - $_SESSION['2fa_attempts'];
+            $error = 'Ungültiger 2FA-Code. Bitte versuche es erneut. (' . $remaining . ' Versuche übrig)';
         }
     } else {
         // User not found or 2FA not configured - clear state and redirect
