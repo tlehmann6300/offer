@@ -522,4 +522,25 @@ CREATE TABLE IF NOT EXISTS `useful_links` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Useful links shared among board and alumni members';
 
+-- ================================================
+-- TABLE: mail_queue
+-- ================================================
+CREATE TABLE IF NOT EXISTS `mail_queue` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `event_id` INT NOT NULL,
+  `recipient_email` VARCHAR(255) NOT NULL,
+  `recipient_name` VARCHAR(255),
+  `subject` VARCHAR(255) NOT NULL,
+  `body` MEDIUMTEXT NOT NULL,
+  `ics_content` TEXT COMMENT 'Der generierte ICS-Inhalt',
+  `status` ENUM('pending', 'sent', 'failed') DEFAULT 'pending',
+  `attempts` INT DEFAULT 0,
+  `error_message` TEXT,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `sent_at` TIMESTAMP NULL,
+  INDEX `idx_status` (`status`),
+  INDEX `idx_created` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Mail queue for scheduled email delivery';
+
 COMMIT;
