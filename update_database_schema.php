@@ -420,6 +420,13 @@ try {
         "Add index for needs_helpers column"
     );
     
+    // Add contact_person column to events table
+    executeSql(
+        $content_db,
+        "ALTER TABLE events ADD COLUMN contact_person VARCHAR(255) NULL COMMENT 'Contact person for the event'",
+        "Add contact_person column to events table"
+    );
+    
     // Create event_financial_stats table
     $create_financial_stats_table = "
     CREATE TABLE IF NOT EXISTS event_financial_stats (
