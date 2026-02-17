@@ -12,6 +12,7 @@
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../src/Database.php';
 require_once __DIR__ . '/../src/MailService.php';
+require_once __DIR__ . '/../includes/templates/email_templates.php';
 
 // Output start message
 echo "=== Birthday Wishes Email Cron Job ===\n";
@@ -75,7 +76,7 @@ try {
         echo "Sending birthday wishes to: {$firstName} ({$email})... ";
         
         // Get the festive birthday email template
-        $htmlBody = MailService::getBirthdayEmailTemplate($firstName, $gender);
+        $htmlBody = EmailTemplates::getBirthdayTemplate($firstName, $gender);
         
         // Send email using MailService
         try {

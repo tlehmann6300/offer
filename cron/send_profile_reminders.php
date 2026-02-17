@@ -2,7 +2,7 @@
 /**
  * Profile Reminder Cron Script
  * 
- * Sends reminder emails to all users whose profile (updated_at) hasn't been updated in over 1 year.
+ * Sends reminder emails to all users whose last_profile_update is older than 12 months or NULL.
  * Implements idempotency: only sends if last_reminder_sent_at is NULL or older than 13 months.
  * 
  * Usage: php cron/send_profile_reminders.php
@@ -12,6 +12,7 @@
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../src/Database.php';
 require_once __DIR__ . '/../src/MailService.php';
+require_once __DIR__ . '/../includes/templates/email_templates.php';
 
 // Output start message
 echo "=== Profile Reminder Email Cron Job ===\n";
@@ -23,23 +24,23 @@ try {
     $contentDb = Database::getContentDB();
     
     // Query to find users with outdated profiles
-    // - updated_at older than 1 year (12 months)
+    // - last_profile_update older than 12 months or NULL
     // - last_reminder_sent_at is NULL OR older than 13 months (spam protection)
     // - deleted_at IS NULL (exclude soft-deleted users)
     $stmt = $userDb->prepare("
         SELECT 
             u.id,
             u.email,
-            u.updated_at,
+            u.last_profile_update,
             u.last_reminder_sent_at,
             ap.first_name,
             ap.last_name
         FROM users u
         LEFT JOIN " . DB_CONTENT_NAME . ".alumni_profiles ap ON u.id = ap.user_id
-        WHERE u.updated_at < DATE_SUB(NOW(), INTERVAL 12 MONTH)
+        WHERE (u.last_profile_update IS NULL OR u.last_profile_update < DATE_SUB(NOW(), INTERVAL 12 MONTH))
         AND (u.last_reminder_sent_at IS NULL OR u.last_reminder_sent_at < DATE_SUB(NOW(), INTERVAL 13 MONTH))
         AND u.deleted_at IS NULL
-        ORDER BY u.updated_at ASC
+        ORDER BY COALESCE(u.last_profile_update, '1970-01-01') ASC
     ");
     
     $stmt->execute();
@@ -72,23 +73,13 @@ try {
         $firstName = $user['first_name'] ?? 'Mitglied';
         $lastName = $user['last_name'] ?? '';
         $fullName = trim($firstName . ' ' . $lastName);
+        $lastUpdate = $user['last_profile_update'];
         
         echo "Sending profile reminder to: {$fullName} ({$email})... ";
         
-        // Build email content
+        // Build email content using the new responsive template
         $subject = "Bitte aktualisiere dein IBC Profil";
-        
-        $bodyContent = '<p class="email-text">Hallo ' . htmlspecialchars($firstName) . ',</p>
-        <p class="email-text">Dein Profil wurde seit über einem Jahr nicht aktualisiert. 
-        Bitte prüfe, ob deine Daten noch aktuell sind, damit wir in Kontakt bleiben können.</p>
-        <p class="email-text">Bitte nimm dir einen Moment Zeit, um dein Profil zu überprüfen und bei Bedarf zu aktualisieren.</p>';
-        
-        // Create call-to-action button with link to profile page
-        $profileLink = BASE_URL . '/pages/auth/profile.php';
-        $callToAction = '<a href="' . htmlspecialchars($profileLink) . '" class="button">Profil aktualisieren</a>';
-        
-        // Get complete HTML template
-        $htmlBody = MailService::getTemplate('Profil Aktualisierung', $bodyContent, $callToAction);
+        $htmlBody = EmailTemplates::getProfileReminderTemplate($firstName, $lastUpdate);
         
         // Send email using MailService
         try {
