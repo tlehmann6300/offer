@@ -508,4 +508,18 @@ CREATE TABLE IF NOT EXISTS `system_logs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='System-wide audit log for tracking all user and system actions';
 
+-- ================================================
+-- TABLE: useful_links
+-- ================================================
+CREATE TABLE IF NOT EXISTS `useful_links` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `title` VARCHAR(255) NOT NULL,
+  `url` VARCHAR(2048) NOT NULL,
+  `description` TEXT,
+  `created_by` INT,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`created_by`) REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Useful links shared among board and alumni members';
+
 COMMIT;
