@@ -140,6 +140,7 @@ class MailQueue {
                     COUNT(*) as total,
                     SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
                     SUM(CASE WHEN status = 'sent' THEN 1 ELSE 0 END) as sent,
+                    SUM(CASE WHEN status = 'sent' AND DATE(sent_at) = CURDATE() THEN 1 ELSE 0 END) as sent_today,
                     SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed
                 FROM mail_queue
             ");
@@ -151,6 +152,7 @@ class MailQueue {
                 'total' => 0,
                 'pending' => 0,
                 'sent' => 0,
+                'sent_today' => 0,
                 'failed' => 0
             ];
         }
