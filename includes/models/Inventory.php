@@ -546,7 +546,7 @@ class Inventory {
             // Log check-in
             $goodQuantity = $returnedQuantity - $defectiveQuantity;
             $oldAvailable = $rental['quantity'] - $rental['quantity_borrowed'];
-            $newAvailable = ($defectiveQuantity > 0 ? $rental['quantity'] - $defectiveQuantity : $rental['quantity']) - $newBorrowed;
+            $newAvailable = $rental['quantity'] - $defectiveQuantity - $newBorrowed;
             $comment = "Rückgabe: {$returnedQuantity} Stück";
             if ($defectiveQuantity > 0) {
                 $comment .= " (davon {$defectiveQuantity} defekt: {$defectiveReason})";
