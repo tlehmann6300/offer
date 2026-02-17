@@ -83,8 +83,9 @@ function formatEntraName($name) {
     // Replace dots with spaces
     $name = str_replace('.', ' ', $name);
     
-    // Capitalize first letter of each word
-    return mb_convert_case($name, MB_CASE_TITLE, 'UTF-8');
+    // Convert to lowercase first, then capitalize first letter of each word
+    $name = mb_strtolower($name, 'UTF-8');
+    return ucwords($name);
 }
 
 /**

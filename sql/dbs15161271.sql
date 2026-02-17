@@ -368,6 +368,7 @@ CREATE TABLE IF NOT EXISTS `inventory_items` (
   `category_id` INT UNSIGNED DEFAULT NULL,
   `location_id` INT UNSIGNED DEFAULT NULL,
   `quantity` INT NOT NULL DEFAULT 0,
+  `quantity_borrowed` INT NOT NULL DEFAULT 0 COMMENT 'Number of items currently borrowed/checked out',
   `min_stock` INT DEFAULT 0 COMMENT 'Minimum stock level for alerts',
   `unit` VARCHAR(50) DEFAULT 'Stück' COMMENT 'Unit of measurement',
   `unit_price` DECIMAL(10, 2) DEFAULT NULL,
@@ -396,14 +397,20 @@ CREATE TABLE IF NOT EXISTS `rentals` (
   `item_id` INT UNSIGNED NOT NULL,
   `user_id` INT UNSIGNED NOT NULL,
   `amount` INT UNSIGNED NOT NULL DEFAULT 1,
-  `expected_return` DATE NOT NULL,
+  `purpose` VARCHAR(255) DEFAULT NULL COMMENT 'Purpose of the rental',
+  `destination` VARCHAR(255) DEFAULT NULL COMMENT 'Destination/location where item is used',
+  `checkout_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Date when item was checked out',
+  `expected_return` DATE DEFAULT NULL,
   `actual_return` DATE DEFAULT NULL,
+  `status` ENUM('active', 'returned', 'defective') NOT NULL DEFAULT 'active' COMMENT 'Rental status',
   `notes` TEXT,
+  `defect_notes` TEXT,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`item_id`) REFERENCES `inventory_items`(`id`) ON DELETE CASCADE,
   INDEX `idx_item_id` (`item_id`),
   INDEX `idx_user_id` (`user_id`),
-  INDEX `idx_actual_return` (`actual_return`)
+  INDEX `idx_actual_return` (`actual_return`),
+  INDEX `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Item rentals/loans tracking';
 
@@ -414,7 +421,7 @@ CREATE TABLE IF NOT EXISTS `inventory_history` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `item_id` INT UNSIGNED NOT NULL,
   `user_id` INT UNSIGNED NOT NULL,
-  `change_type` ENUM('add', 'remove', 'adjust', 'sync') NOT NULL,
+  `change_type` ENUM('add', 'remove', 'adjust', 'sync', 'checkout', 'checkin', 'writeoff') NOT NULL,
   `old_stock` INT NOT NULL,
   `new_stock` INT NOT NULL,
   `change_amount` INT NOT NULL,

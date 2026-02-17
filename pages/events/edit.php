@@ -606,18 +606,18 @@ ob_start();
                             <?php 
                             endforeach;
                         } else {
-                            // Fallback to hardcoded roles if Graph API is unavailable
+                            // Fallback: Use AuthHandler mapping keys as role options
                             $roles = [
-                                'candidate' => 'Anwärter',
-                                'member' => 'Mitglied',
-                                'honorary_member' => 'Ehrenmitglied',
-                                'head' => 'Ressortleiter',
-                                'alumni' => 'Alumni',
-                                'alumni_board' => 'Alumni-Vorstand',
-                                'alumni_auditor' => 'Alumni-Finanzprüfer',
-                                'board_finance' => 'Vorstand Finanzen',
-                                'board_internal' => 'Vorstand Intern',
-                                'board_external' => 'Vorstand Extern'
+                                'Anwaerter' => 'Anwärter',
+                                'Mitglied' => 'Mitglied',
+                                'Ehrenmitglied' => 'Ehrenmitglied',
+                                'Ressortleiter' => 'Ressortleiter',
+                                'Alumni' => 'Alumni',
+                                'Alumni_Vorstand' => 'Alumni-Vorstand',
+                                'Alumni_Finanz' => 'Alumni-Finanzprüfer',
+                                'Vorstand_Finanzen' => 'Vorstand Finanzen',
+                                'Vorstand_Intern' => 'Vorstand Intern',
+                                'Vorstand_Extern' => 'Vorstand Extern'
                             ];
                             $allowedRoles = $_POST['allowed_roles'] ?? $event['allowed_roles'] ?? [];
                             foreach ($roles as $roleValue => $roleLabel): 
