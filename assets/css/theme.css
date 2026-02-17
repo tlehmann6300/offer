@@ -2363,34 +2363,20 @@ body:not(.dark-mode) .status-indicator.status-info {
     box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
 }
 
-/* Light Mode: Staggered list animations - supports up to 8 items */
+/* Staggered list animations - supports up to 8 items (both light and dark mode) */
 /* Note: For lists with more items, consider using JavaScript-based approach */
-body:not(.dark-mode) .staggered-list > * {
+.staggered-list > * {
     animation: fadeSlideUp 0.5s ease-out backwards;
 }
 
-body:not(.dark-mode) .staggered-list > *:nth-child(1) { animation-delay: 0.05s; }
-body:not(.dark-mode) .staggered-list > *:nth-child(2) { animation-delay: 0.1s; }
-body:not(.dark-mode) .staggered-list > *:nth-child(3) { animation-delay: 0.15s; }
-body:not(.dark-mode) .staggered-list > *:nth-child(4) { animation-delay: 0.2s; }
-body:not(.dark-mode) .staggered-list > *:nth-child(5) { animation-delay: 0.25s; }
-body:not(.dark-mode) .staggered-list > *:nth-child(6) { animation-delay: 0.3s; }
-body:not(.dark-mode) .staggered-list > *:nth-child(7) { animation-delay: 0.35s; }
-body:not(.dark-mode) .staggered-list > *:nth-child(8) { animation-delay: 0.4s; }
-
-/* Dark Mode: Staggered list animations - supports up to 8 items */
-.dark-mode .staggered-list > * {
-    animation: fadeSlideUp 0.5s ease-out backwards;
-}
-
-.dark-mode .staggered-list > *:nth-child(1) { animation-delay: 0.05s; }
-.dark-mode .staggered-list > *:nth-child(2) { animation-delay: 0.1s; }
-.dark-mode .staggered-list > *:nth-child(3) { animation-delay: 0.15s; }
-.dark-mode .staggered-list > *:nth-child(4) { animation-delay: 0.2s; }
-.dark-mode .staggered-list > *:nth-child(5) { animation-delay: 0.25s; }
-.dark-mode .staggered-list > *:nth-child(6) { animation-delay: 0.3s; }
-.dark-mode .staggered-list > *:nth-child(7) { animation-delay: 0.35s; }
-.dark-mode .staggered-list > *:nth-child(8) { animation-delay: 0.4s; }
+.staggered-list > *:nth-child(1) { animation-delay: 0.05s; }
+.staggered-list > *:nth-child(2) { animation-delay: 0.1s; }
+.staggered-list > *:nth-child(3) { animation-delay: 0.15s; }
+.staggered-list > *:nth-child(4) { animation-delay: 0.2s; }
+.staggered-list > *:nth-child(5) { animation-delay: 0.25s; }
+.staggered-list > *:nth-child(6) { animation-delay: 0.3s; }
+.staggered-list > *:nth-child(7) { animation-delay: 0.35s; }
+.staggered-list > *:nth-child(8) { animation-delay: 0.4s; }
 
 /* Improved Table Design */
 table {
@@ -2490,16 +2476,13 @@ body:not(.dark-mode) .card-elevated {
     border: 1px solid rgba(51, 133, 196, 0.15);
 }
 
-body:not(.dark-mode) .card-elevated::before {
-    /* Gradient border effect using mask composite technique:
-     * Creates a 1px gradient border by masking out the content area,
-     * revealing only the border region with green-to-blue gradient */
+/* Card elevated - Common pseudo-element styling */
+.card-elevated::before {
     content: '';
     position: absolute;
     inset: -1px;
     border-radius: var(--radius-lg);
     padding: 1px;
-    background: linear-gradient(135deg, var(--ibc-green), var(--ibc-blue));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -2507,18 +2490,17 @@ body:not(.dark-mode) .card-elevated::before {
     transition: opacity var(--transition-normal);
 }
 
+/* Light Mode: Gradient border effect - Green to Blue */
+body:not(.dark-mode) .card-elevated::before {
+    /* Gradient border effect using mask composite technique:
+     * Creates a 1px gradient border by masking out the content area,
+     * revealing only the border region with green-to-blue gradient */
+    background: linear-gradient(135deg, var(--ibc-green), var(--ibc-blue));
+}
+
+/* Dark Mode: Gradient border effect - Lighter shades for visibility */
 .dark-mode .card-elevated::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: var(--radius-lg);
-    padding: 1px;
     background: linear-gradient(135deg, var(--ibc-green-light), var(--ibc-blue-light));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0;
-    transition: opacity var(--transition-normal);
 }
 
 body:not(.dark-mode) .card-elevated:hover::before {
