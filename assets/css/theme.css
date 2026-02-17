@@ -187,7 +187,16 @@ body {
 body:not(.dark-mode) .sidebar a,
 body:not(.dark-mode) .sidebar span,
 body:not(.dark-mode) .sidebar i,
-body:not(.dark-mode) .sidebar label {
+body:not(.dark-mode) .sidebar label,
+body:not(.dark-mode) .sidebar h1,
+body:not(.dark-mode) .sidebar h2,
+body:not(.dark-mode) .sidebar h3,
+body:not(.dark-mode) .sidebar h4,
+body:not(.dark-mode) .sidebar h5,
+body:not(.dark-mode) .sidebar h6,
+body:not(.dark-mode) .sidebar p,
+body:not(.dark-mode) .sidebar li,
+body:not(.dark-mode) .sidebar div {
     color: #ffffff !important;
 }
 
@@ -1261,17 +1270,18 @@ body.dark-mode .flatpickr-time input:focus {
 }
 
 /* LIGHT MODE: Force dark text for better readability */
-body:not(.dark-mode) h1,
-body:not(.dark-mode) h2,
-body:not(.dark-mode) h3,
-body:not(.dark-mode) p,
-body:not(.dark-mode) li,
-body:not(.dark-mode) span:not(.badge):not(.btn-primary):not(.text-white),
-body:not(.dark-mode) label,
-body:not(.dark-mode) input,
-body:not(.dark-mode) select,
-body:not(.dark-mode) textarea,
-body:not(.dark-mode) td {
+/* Exclude sidebar elements to keep them white on blue background */
+body:not(.dark-mode) h1:not(.sidebar *),
+body:not(.dark-mode) h2:not(.sidebar *),
+body:not(.dark-mode) h3:not(.sidebar *),
+body:not(.dark-mode) p:not(.sidebar *),
+body:not(.dark-mode) li:not(.sidebar *),
+body:not(.dark-mode) span:not(.badge):not(.btn-primary):not(.text-white):not(.sidebar *),
+body:not(.dark-mode) label:not(.sidebar *),
+body:not(.dark-mode) input:not(.sidebar *),
+body:not(.dark-mode) select:not(.sidebar *),
+body:not(.dark-mode) textarea:not(.sidebar *),
+body:not(.dark-mode) td:not(.sidebar *) {
     color: #0f172a !important; /* slate-900 - Almost black for max readability */
 }
 
