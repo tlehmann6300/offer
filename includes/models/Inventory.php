@@ -24,7 +24,7 @@ class Inventory {
                    i.is_archived_in_easyverein,
                    c.name as category_name, c.color as category_color, 
                    l.name as location_name,
-                   i.quantity as available_quantity
+                   (i.quantity - COALESCE(i.quantity_borrowed, 0)) as available_quantity
             FROM inventory_items i
             LEFT JOIN categories c ON i.category_id = c.id
             LEFT JOIN locations l ON i.location_id = l.id
@@ -139,8 +139,7 @@ class Inventory {
         }
         
         // SQL query with correct table and column names
-        // Note: Since quantity is reduced when items are checked out,
-        // available_quantity is simply the current quantity
+        // Available stock = total quantity - quantity borrowed
         $sql = "SELECT i.id, i.easyverein_id, i.name, i.description, i.serial_number, 
                        i.category_id, i.location_id, i.quantity, i.min_stock, i.unit, 
                        i.unit_price, i.image_path, i.notes, i.created_at, i.updated_at, i.last_synced_at,
@@ -148,7 +147,7 @@ class Inventory {
                        c.name as category_name, 
                        c.color as category_color,
                        l.name as location_name,
-                       i.quantity as available_quantity
+                       (i.quantity - COALESCE(i.quantity_borrowed, 0)) as available_quantity
                 FROM inventory_items i
                 LEFT JOIN categories c ON i.category_id = c.id
                 LEFT JOIN locations l ON i.location_id = l.id" 
@@ -495,33 +494,37 @@ class Inventory {
     public static function checkinItem($rentalId, $returnedQuantity, $isDefective, $defectiveQuantity = 0, $defectiveReason = null) {
         $db = Database::getContentDB();
         
-        // Get rental record (using rentals table)
-        $stmt = $db->prepare("
-            SELECT r.*, i.quantity, COALESCE(i.quantity_borrowed, 0) AS quantity_borrowed, i.name 
-            FROM rentals r
-            JOIN inventory_items i ON r.item_id = i.id
-            WHERE r.id = ? AND r.actual_return IS NULL
-        ");
-        $stmt->execute([$rentalId]);
-        $rental = $stmt->fetch();
-        
-        if (!$rental) {
-            return ['success' => false, 'message' => 'Ausleihe nicht gefunden oder bereits zurückgegeben'];
-        }
-        
-        // Validate quantities
-        if ($returnedQuantity > $rental['amount']) {
-            return ['success' => false, 'message' => 'Rückgabemenge kann nicht größer als ausgeliehene Menge sein'];
-        }
-        
-        if ($isDefective && $defectiveQuantity > $returnedQuantity) {
-            return ['success' => false, 'message' => 'Defekte Menge kann nicht größer als Rückgabemenge sein'];
-        }
-        
         // Begin transaction
         $db->beginTransaction();
         
         try {
+            // Get rental record with row lock to prevent race conditions
+            $stmt = $db->prepare("
+                SELECT r.*, i.quantity, COALESCE(i.quantity_borrowed, 0) AS quantity_borrowed, i.name 
+                FROM rentals r
+                JOIN inventory_items i ON r.item_id = i.id
+                WHERE r.id = ? AND r.actual_return IS NULL
+                FOR UPDATE
+            ");
+            $stmt->execute([$rentalId]);
+            $rental = $stmt->fetch();
+            
+            if (!$rental) {
+                $db->rollBack();
+                return ['success' => false, 'message' => 'Ausleihe nicht gefunden oder bereits zurückgegeben'];
+            }
+            
+            // Validate quantities
+            if ($returnedQuantity > $rental['amount']) {
+                $db->rollBack();
+                return ['success' => false, 'message' => 'Rückgabemenge kann nicht größer als ausgeliehene Menge sein'];
+            }
+            
+            if ($isDefective && $defectiveQuantity > $returnedQuantity) {
+                $db->rollBack();
+                return ['success' => false, 'message' => 'Defekte Menge kann nicht größer als Rückgabemenge sein'];
+            }
+            
             // Update rental record - set status to 'returned'
             $status = $isDefective && $defectiveQuantity > 0 ? 'defective' : 'returned';
             $stmt = $db->prepare("
