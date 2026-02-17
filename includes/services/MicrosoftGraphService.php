@@ -416,4 +416,47 @@ class MicrosoftGraphService {
         // Step 3: Assign new role
         return $this->assignRole($userId, $newRoleValue);
     }
+    
+    /**
+     * Get all groups from Microsoft Entra ID
+     * 
+     * @return array Array of groups with 'id' and 'displayName'
+     * @throws Exception If groups retrieval fails
+     */
+    public function getAllGroups(): array {
+        $groupsUrl = "https://graph.microsoft.com/v1.0/groups";
+        
+        try {
+            $response = $this->httpClient->get($groupsUrl, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->accessToken,
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+            
+            $body = json_decode($response->getBody()->getContents(), true);
+            
+            if (!isset($body['value']) || !is_array($body['value'])) {
+                return [];
+            }
+            
+            // Extract id and displayName from each group
+            $groups = [];
+            foreach ($body['value'] as $group) {
+                if (isset($group['id']) && isset($group['displayName'])) {
+                    $groups[] = [
+                        'id' => $group['id'],
+                        'displayName' => $group['displayName']
+                    ];
+                }
+            }
+            
+            return $groups;
+            
+        } catch (GuzzleException $e) {
+            // Return empty array instead of throwing exception for graceful degradation
+            error_log('Failed to get groups from Microsoft Graph: ' . $e->getMessage());
+            return [];
+        }
+    }
 }

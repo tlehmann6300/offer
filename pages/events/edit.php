@@ -3,11 +3,22 @@ require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../includes/handlers/CSRFHandler.php';
 require_once __DIR__ . '/../../includes/models/Event.php';
 require_once __DIR__ . '/../../includes/models/User.php';
+require_once __DIR__ . '/../../includes/services/MicrosoftGraphService.php';
 
 // Only board, alumni_board, head, and those with manage_projects permission can access
 if (!Auth::check() || !(Auth::hasPermission('manage_projects') || Auth::isBoard() || Auth::hasRole(['head', 'alumni_board']))) {
     header('Location: ../auth/login.php');
     exit;
+}
+
+// Try to fetch groups from Microsoft Entra for allowed roles
+$entraGroups = [];
+try {
+    $graphService = new MicrosoftGraphService();
+    $entraGroups = $graphService->getAllGroups();
+} catch (Exception $e) {
+    // If Graph API is unavailable, we'll fall back to hardcoded roles
+    error_log("Could not fetch groups from Microsoft Graph: " . $e->getMessage());
 }
 
 // Check if we're creating a new event or editing an existing one
@@ -74,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$readOnly) {
             'end_time' => $endTime,
             'registration_start' => !empty($_POST['registration_start']) ? $_POST['registration_start'] : null,
             'registration_end' => !empty($_POST['registration_end']) ? $_POST['registration_end'] : null,
-            'contact_person' => trim($_POST['contact_person'] ?? ''),
             'is_external' => isset($_POST['is_external']) ? 1 : 0,
             'external_link' => trim($_POST['external_link'] ?? ''),
             'registration_link' => trim($_POST['registration_link'] ?? ''),
@@ -302,19 +312,6 @@ ob_start();
                         class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
                         placeholder="Event-Beschreibung..."
                     ><?php echo htmlspecialchars($_POST['description'] ?? $event['description'] ?? ''); ?></textarea>
-                </div>
-
-                <!-- Contact Person -->
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ansprechpartner</label>
-                    <input 
-                        type="text" 
-                        name="contact_person"
-                        value="<?php echo htmlspecialchars($_POST['contact_person'] ?? $event['contact_person'] ?? ''); ?>"
-                        <?php echo $readOnly ? 'readonly' : ''; ?>
-                        class="w-full px-4 py-2 bg-white border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 <?php echo $readOnly ? 'bg-gray-100' : ''; ?>"
-                        placeholder="Name des Ansprechpartners"
-                    >
                 </div>
 
                 <!-- Location / Room -->
@@ -587,33 +584,57 @@ ob_start();
                     </label>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                         <?php 
-                        $roles = [
-                            'candidate' => 'Anwärter',
-                            'member' => 'Mitglied',
-                            'honorary_member' => 'Ehrenmitglied',
-                            'head' => 'Ressortleiter',
-                            'alumni' => 'Alumni',
-                            'alumni_board' => 'Alumni-Vorstand',
-                            'alumni_auditor' => 'Alumni-Finanzprüfer',
-                            'board_finance' => 'Vorstand Finanzen',
-                            'board_internal' => 'Vorstand Intern',
-                            'board_external' => 'Vorstand Extern'
-                        ];
-                        $allowedRoles = $_POST['allowed_roles'] ?? $event['allowed_roles'] ?? [];
-                        foreach ($roles as $roleValue => $roleLabel): 
+                        // Use Microsoft Entra groups if available, otherwise fall back to hardcoded roles
+                        if (!empty($entraGroups)) {
+                            // Display groups from Microsoft Entra
+                            $allowedRoles = $_POST['allowed_roles'] ?? $event['allowed_roles'] ?? [];
+                            foreach ($entraGroups as $group): 
+                            ?>
+                            <label class="flex items-center space-x-2">
+                                <input 
+                                    type="checkbox" 
+                                    name="allowed_roles[]"
+                                    value="<?php echo htmlspecialchars($group['id']); ?>"
+                                    <?php echo in_array($group['id'], $allowedRoles) ? 'checked' : ''; ?>
+                                    <?php echo $readOnly ? 'disabled' : ''; ?>
+                                    class="w-4 h-4 text-purple-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-blue-500"
+                                >
+                                <span class="text-sm text-gray-700"><?php echo htmlspecialchars($group['displayName']); ?></span>
+                            </label>
+                            <?php 
+                            endforeach;
+                        } else {
+                            // Fallback to hardcoded roles if Graph API is unavailable
+                            $roles = [
+                                'candidate' => 'Anwärter',
+                                'member' => 'Mitglied',
+                                'honorary_member' => 'Ehrenmitglied',
+                                'head' => 'Ressortleiter',
+                                'alumni' => 'Alumni',
+                                'alumni_board' => 'Alumni-Vorstand',
+                                'alumni_auditor' => 'Alumni-Finanzprüfer',
+                                'board_finance' => 'Vorstand Finanzen',
+                                'board_internal' => 'Vorstand Intern',
+                                'board_external' => 'Vorstand Extern'
+                            ];
+                            $allowedRoles = $_POST['allowed_roles'] ?? $event['allowed_roles'] ?? [];
+                            foreach ($roles as $roleValue => $roleLabel): 
+                            ?>
+                            <label class="flex items-center space-x-2">
+                                <input 
+                                    type="checkbox" 
+                                    name="allowed_roles[]"
+                                    value="<?php echo $roleValue; ?>"
+                                    <?php echo in_array($roleValue, $allowedRoles) ? 'checked' : ''; ?>
+                                    <?php echo $readOnly ? 'disabled' : ''; ?>
+                                    class="w-4 h-4 text-purple-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-blue-500"
+                                >
+                                <span class="text-sm text-gray-700"><?php echo $roleLabel; ?></span>
+                            </label>
+                            <?php 
+                            endforeach;
+                        }
                         ?>
-                        <label class="flex items-center space-x-2">
-                            <input 
-                                type="checkbox" 
-                                name="allowed_roles[]"
-                                value="<?php echo $roleValue; ?>"
-                                <?php echo in_array($roleValue, $allowedRoles) ? 'checked' : ''; ?>
-                                <?php echo $readOnly ? 'disabled' : ''; ?>
-                                class="w-4 h-4 text-purple-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-blue-500"
-                            >
-                            <span class="text-sm text-gray-700"><?php echo $roleLabel; ?></span>
-                        </label>
-                        <?php endforeach; ?>
                     </div>
                 </div>
             </div>

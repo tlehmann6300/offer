@@ -19,22 +19,49 @@ if (!in_array($typeFilter, $validTypes)) {
     $typeFilter = 'all';
 }
 
-// Get all projects that are NOT draft
+// Get all projects based on filter
 $db = Database::getContentDB();
 
 if ($typeFilter === 'all') {
-    $stmt = $db->query("
-        SELECT * FROM projects 
-        WHERE status != 'draft'
-        ORDER BY created_at DESC
-    ");
+    // For "All" filter, exclude draft and archived projects unless user is admin
+    $isAdmin = Auth::isBoard() || Auth::hasPermission('manage_projects');
+    
+    if ($isAdmin) {
+        // Admins see all non-draft projects (including archived)
+        $stmt = $db->query("
+            SELECT * FROM projects 
+            WHERE status != 'draft'
+            ORDER BY created_at DESC
+        ");
+    } else {
+        // Regular users only see active projects: open, running, applying, completed
+        $stmt = $db->query("
+            SELECT * FROM projects 
+            WHERE status IN ('open', 'running', 'applying', 'completed')
+            ORDER BY created_at DESC
+        ");
+    }
 } else {
-    $stmt = $db->prepare("
-        SELECT * FROM projects 
-        WHERE status != 'draft' AND type = ?
-        ORDER BY created_at DESC
-    ");
-    $stmt->execute([$typeFilter]);
+    // For specific type filters (internal/external)
+    $isAdmin = Auth::isBoard() || Auth::hasPermission('manage_projects');
+    
+    if ($isAdmin) {
+        // Admins see all non-draft projects of the specified type
+        $stmt = $db->prepare("
+            SELECT * FROM projects 
+            WHERE status != 'draft' AND type = ?
+            ORDER BY created_at DESC
+        ");
+        $stmt->execute([$typeFilter]);
+    } else {
+        // Regular users only see active projects of the specified type
+        $stmt = $db->prepare("
+            SELECT * FROM projects 
+            WHERE status IN ('open', 'running', 'applying', 'completed') AND type = ?
+            ORDER BY created_at DESC
+        ");
+        $stmt->execute([$typeFilter]);
+    }
 }
 
 $projects = $stmt->fetchAll();
