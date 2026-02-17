@@ -633,6 +633,15 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                 </a>
                 <?php endif; ?>
 
+                <!-- Nützliche Links (Board, Alumni Board, Alumni Auditor) -->
+                <?php if (Auth::hasRole(['board_finance', 'board_internal', 'board_external', 'alumni_board', 'alumni_auditor'])): ?>
+                <a href="<?php echo asset('pages/links/index.php'); ?>" 
+                   class="flex items-center px-6 py-2 text-white hover:bg-white/10 transition-colors duration-200 <?php echo isActivePath('/links/') ? 'bg-white/20 text-white border-r-4 border-ibc-green' : ''; ?>">
+                    <i class="fas fa-link w-5 mr-3"></i>
+                    <span>Nützliche Links</span>
+                </a>
+                <?php endif; ?>
+
                 <!-- Ideenbox (Members, Candidates, Head, Board) -->
                 <?php if (Auth::canAccessPage('ideas')): ?>
                 <a href="<?php echo asset('pages/ideas/index.php'); ?>" 
