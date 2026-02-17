@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['queue_emails'])) {
         } else {
             // Validate template file name (only allow alphanumeric, underscores, hyphens)
             $safeTemplateName = basename($templateFile);
-            if (!preg_match('/^[a-zA-Z0-9_\-]+\.json$/', $safeTemplateName)) {
+            if (!preg_match('/^[a-zA-Z0-9][a-zA-Z0-9_\-]*\.json$/', $safeTemplateName)) {
                 $queueError = 'Ungültiger Vorlagenname.';
             } else {
                 $templatePath = __DIR__ . '/../../assets/mail_vorlage/' . $safeTemplateName;
@@ -94,10 +94,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['queue_emails'])) {
                         }
 
                         // Loop over all recipients
+                        $queueFailCount = 0;
                         foreach ($recipients as $user) {
                             // Parse template for this user
                             $parsed = parseEmailTemplate($jsonContent, $user, $event, $senderName);
                             if (empty($parsed['subject']) || empty($parsed['body'])) {
+                                error_log("parseEmailTemplate: Skipped user " . ($user['email'] ?? 'unknown') . " - empty subject or body");
                                 continue;
                             }
 
@@ -122,13 +124,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['queue_emails'])) {
 
                             if ($queued) {
                                 $queuedCount++;
+                            } else {
+                                $queueFailCount++;
                             }
                         }
 
-                        $queueMessage = sprintf(
-                            '%d E-Mails erfolgreich in die Warteschlange eingereiht.',
-                            $queuedCount
-                        );
+                        if ($queueFailCount > 0) {
+                            $queueMessage = sprintf(
+                                '%d E-Mails erfolgreich in die Warteschlange eingereiht, %d fehlgeschlagen.',
+                                $queuedCount,
+                                $queueFailCount
+                            );
+                        } else {
+                            $queueMessage = sprintf(
+                                '%d E-Mails erfolgreich in die Warteschlange eingereiht.',
+                                $queuedCount
+                            );
+                        }
 
                     } catch (Exception $e) {
                         $queueError = 'Fehler: ' . $e->getMessage();

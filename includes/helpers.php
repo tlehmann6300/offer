@@ -252,7 +252,8 @@ function parseEmailTemplate($jsonContent, $user, $event, $senderName) {
         'Sunday' => 'Sonntag'
     ];
 
-    $startTime = !empty($event['start_time']) ? new DateTime($event['start_time']) : new DateTime();
+    $startTime = !empty($event['start_time']) ? new DateTime($event['start_time'])
+        : (!empty($event['event_date']) ? new DateTime($event['event_date']) : new DateTime());
 
     $eventDateDay = $germanDays[$startTime->format('l')] ?? $startTime->format('l');
     $eventDateDayOf = $startTime->format('j');
