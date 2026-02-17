@@ -64,6 +64,10 @@ function formatDateTime($date, $format = 'd.m.Y H:i') {
  * Format name from Entra ID (e.g., "tom.lehmann" -> "Tom Lehmann")
  * Replaces dots with spaces and capitalizes first letters of each word
  * 
+ * Note: This function is idempotent and safe to apply to any name for display purposes.
+ * It's designed for Entra ID names that may use lowercase with dots (e.g., "tom.lehmann"),
+ * but can be safely applied to names already in proper format.
+ * 
  * @param string $name The name to format
  * @return string The formatted name
  */

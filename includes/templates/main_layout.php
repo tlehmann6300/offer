@@ -748,12 +748,13 @@ if (Auth::check() && isset($_SESSION['profile_incomplete']) && $_SESSION['profil
                 require_once __DIR__ . '/../models/Alumni.php';
                 $profile = Alumni::getProfileByUserId($currentUser['id']);
                 
+                // Profile data may be user-edited, so don't transform it
                 if ($profile && !empty($profile['first_name'])) {
-                    $firstname = formatEntraName($profile['first_name']);
-                    $lastname = formatEntraName($profile['last_name'] ?? '');
+                    $firstname = $profile['first_name'];
+                    $lastname = $profile['last_name'] ?? '';
                 } elseif (!empty($currentUser['firstname'])) {
-                    $firstname = formatEntraName($currentUser['firstname']);
-                    $lastname = formatEntraName($currentUser['lastname'] ?? '');
+                    $firstname = $currentUser['firstname'];
+                    $lastname = $currentUser['lastname'] ?? '';
                 }
                 
                 $email = $currentUser['email'] ?? '';

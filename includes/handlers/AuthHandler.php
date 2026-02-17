@@ -634,6 +634,15 @@ class AuthHandler {
             $firstName = $claims['given_name'] ?? $claims['givenName'] ?? null;
             $lastName = $claims['family_name'] ?? $claims['surname'] ?? null;
             
+            // Format names from Entra ID (e.g., "tom.lehmann" -> "Tom Lehmann")
+            require_once __DIR__ . '/../helpers.php';
+            if ($firstName) {
+                $firstName = formatEntraName($firstName);
+            }
+            if ($lastName) {
+                $lastName = formatEntraName($lastName);
+            }
+            
             // Check if user exists in database
             $db = Database::getUserDB();
             $stmt = $db->prepare("SELECT * FROM users WHERE email = ?");
@@ -655,16 +664,28 @@ class AuthHandler {
             } else {
                 // Create new user without password (OAuth login only)
                 $azureRolesJson = json_encode($azureRoles);
-                $stmt = $db->prepare("INSERT INTO users (email, password, role, azure_roles, azure_oid, is_alumni_validated, profile_complete, notify_new_projects, notify_new_events) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                
+                // Use a random password hash since user will login via OAuth
+                $randomPassword = password_hash(bin2hex(random_bytes(32)), HASH_ALGO);
                 $isAlumniValidated = ($roleName === 'alumni') ? 0 : 1;
                 // Set profile_complete=0 to force first-time profile completion
                 $profileComplete = 0;
                 // Enable email notifications by default
                 $notifyProjects = 1;
                 $notifyEvents = 1;
-                // Use a random password hash since user will login via OAuth
-                $randomPassword = password_hash(bin2hex(random_bytes(32)), HASH_ALGO);
-                $stmt->execute([$email, $randomPassword, $roleName, $azureRolesJson, $azureOid, $isAlumniValidated, $profileComplete, $notifyProjects, $notifyEvents]);
+                
+                $stmt = $db->prepare("
+                    INSERT INTO users (
+                        email, password, role, azure_roles, azure_oid, 
+                        is_alumni_validated, profile_complete, 
+                        notify_new_projects, notify_new_events
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ");
+                $stmt->execute([
+                    $email, $randomPassword, $roleName, $azureRolesJson, $azureOid,
+                    $isAlumniValidated, $profileComplete,
+                    $notifyProjects, $notifyEvents
+                ]);
                 $userId = $db->lastInsertId();
             }
             
