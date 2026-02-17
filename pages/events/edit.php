@@ -588,11 +588,13 @@ ob_start();
                         if (!empty($entraGroups)) {
                             // Display groups from Microsoft Entra
                             $allowedRoles = $_POST['allowed_roles'] ?? $event['allowed_roles'] ?? [];
-                            foreach ($entraGroups as $group): 
+                            foreach ($entraGroups as $groupIndex => $group): 
+                            $groupIdSafe = 'group_' . $groupIndex;
                             ?>
-                            <label class="flex items-center space-x-2">
+                            <label for="<?php echo $groupIdSafe; ?>" class="flex items-center space-x-2">
                                 <input 
                                     type="checkbox" 
+                                    id="<?php echo $groupIdSafe; ?>"
                                     name="allowed_roles[]"
                                     value="<?php echo htmlspecialchars($group['id']); ?>"
                                     <?php echo in_array($group['id'], $allowedRoles) ? 'checked' : ''; ?>
@@ -619,10 +621,12 @@ ob_start();
                             ];
                             $allowedRoles = $_POST['allowed_roles'] ?? $event['allowed_roles'] ?? [];
                             foreach ($roles as $roleValue => $roleLabel): 
+                            $roleIdSafe = 'role_' . $roleValue;
                             ?>
-                            <label class="flex items-center space-x-2">
+                            <label for="<?php echo $roleIdSafe; ?>" class="flex items-center space-x-2">
                                 <input 
                                     type="checkbox" 
+                                    id="<?php echo $roleIdSafe; ?>"
                                     name="allowed_roles[]"
                                     value="<?php echo $roleValue; ?>"
                                     <?php echo in_array($roleValue, $allowedRoles) ? 'checked' : ''; ?>

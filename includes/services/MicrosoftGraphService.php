@@ -455,7 +455,7 @@ class MicrosoftGraphService {
             
         } catch (GuzzleException $e) {
             // Return empty array instead of throwing exception for graceful degradation
-            error_log('Failed to get groups from Microsoft Graph: ' . $e->getMessage());
+            error_log('Failed to fetch groups from Microsoft Graph API for event role selection: ' . $e->getMessage());
             return [];
         }
     }

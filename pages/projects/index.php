@@ -22,10 +22,10 @@ if (!in_array($typeFilter, $validTypes)) {
 // Get all projects based on filter
 $db = Database::getContentDB();
 
+// Check if user is admin - they can see archived projects
+$isAdmin = Auth::isBoard() || Auth::hasPermission('manage_projects');
+
 if ($typeFilter === 'all') {
-    // For "All" filter, exclude draft and archived projects unless user is admin
-    $isAdmin = Auth::isBoard() || Auth::hasPermission('manage_projects');
-    
     if ($isAdmin) {
         // Admins see all non-draft projects (including archived)
         $stmt = $db->query("
@@ -43,8 +43,6 @@ if ($typeFilter === 'all') {
     }
 } else {
     // For specific type filters (internal/external)
-    $isAdmin = Auth::isBoard() || Auth::hasPermission('manage_projects');
-    
     if ($isAdmin) {
         // Admins see all non-draft projects of the specified type
         $stmt = $db->prepare("
