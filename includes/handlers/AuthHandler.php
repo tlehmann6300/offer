@@ -511,6 +511,7 @@ class AuthHandler {
             // Get user claims (including roles)
             $claims = $resourceOwner->toArray();
             $azureRoles = $claims['roles'] ?? [];
+            error_log("DEBUG AZURE ROLES FROM TOKEN: " . print_r($azureRoles, true));
             
             // Get Azure Object ID from claims for Microsoft Graph API calls
             $azureOid = $claims['oid'] ?? null;
@@ -525,6 +526,7 @@ class AuthHandler {
                     // Get user profile (includes groups)
                     $profileData = $graphService->getUserProfile($azureOid);
                     $entraGroups = $profileData['groups'] ?? [];
+                    error_log("DEBUG ENTRA GROUPS: " . print_r($entraGroups, true));
                     
                     // Log groups for debugging
                     if (!empty($entraGroups)) {
@@ -837,7 +839,11 @@ class AuthHandler {
             $stmt = $db->prepare("SELECT profile_complete FROM users WHERE id = ?");
             $stmt->execute([$userId]);
             $userCheck = $stmt->fetch();
-            $_SESSION['profile_incomplete'] = ($userCheck && !$userCheck['profile_complete']);
+            if ($userCheck && intval($userCheck['profile_complete']) === 0) {
+                $_SESSION['profile_incomplete'] = true;
+            } else {
+                $_SESSION['profile_incomplete'] = false;
+            }
             
             // Log successful login
             self::logSystemAction($userId, 'login_success_microsoft', 'user', $userId, 'Successful Microsoft Entra ID login');
