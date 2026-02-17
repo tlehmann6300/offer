@@ -104,6 +104,9 @@ class User {
             return true; // No fields to update
         }
         
+        // Automatically record when the profile was last updated (12-month reminder)
+        $fields[] = "last_profile_update = NOW()";
+        
         $values[] = $id;
         $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ?";
         
