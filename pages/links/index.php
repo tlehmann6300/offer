@@ -36,12 +36,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $canEdit) {
         if ($title !== '' && $url !== '') {
             // Validate URL format
             if (filter_var($url, FILTER_VALIDATE_URL)) {
-                UsefulLink::create([
+                $result = UsefulLink::create([
                     'title' => $title,
                     'url' => $url,
                     'description' => $description
                 ], $user['id']);
-                $_SESSION['success_message'] = 'Link erfolgreich hinzugefügt.';
+                if ($result) {
+                    $_SESSION['success_message'] = 'Link erfolgreich hinzugefügt.';
+                } else {
+                    $_SESSION['error_message'] = 'Fehler beim Speichern des Links.';
+                }
             } else {
                 $_SESSION['error_message'] = 'Bitte gib eine gültige URL ein.';
             }
@@ -57,8 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $canEdit) {
     if (isset($_POST['action']) && $_POST['action'] === 'delete') {
         $id = intval($_POST['link_id'] ?? 0);
         if ($id > 0) {
-            UsefulLink::delete($id);
-            $_SESSION['success_message'] = 'Link erfolgreich gelöscht.';
+            if (UsefulLink::delete($id)) {
+                $_SESSION['success_message'] = 'Link erfolgreich gelöscht.';
+            } else {
+                $_SESSION['error_message'] = 'Fehler beim Löschen des Links.';
+            }
         }
 
         header('Location: ' . $_SERVER['REQUEST_URI']);
