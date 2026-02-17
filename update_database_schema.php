@@ -573,6 +573,74 @@ try {
     );
     
     // ============================================
+    // INVENTORY & RENTALS SCHEMA UPDATES
+    // ============================================
+    echo "\n--- INVENTORY & RENTALS SCHEMA UPDATES ---\n";
+    
+    // Add quantity_borrowed column to inventory_items
+    executeSql(
+        $content_db,
+        "ALTER TABLE inventory_items ADD COLUMN quantity_borrowed INT NOT NULL DEFAULT 0 COMMENT 'Number of items currently borrowed/checked out' AFTER quantity",
+        "Add quantity_borrowed column to inventory_items table"
+    );
+    
+    // Add purpose column to rentals
+    executeSql(
+        $content_db,
+        "ALTER TABLE rentals ADD COLUMN purpose VARCHAR(255) DEFAULT NULL COMMENT 'Purpose of the rental' AFTER amount",
+        "Add purpose column to rentals table"
+    );
+    
+    // Add destination column to rentals
+    executeSql(
+        $content_db,
+        "ALTER TABLE rentals ADD COLUMN destination VARCHAR(255) DEFAULT NULL COMMENT 'Destination/location where item is used' AFTER purpose",
+        "Add destination column to rentals table"
+    );
+    
+    // Add checkout_date column to rentals
+    executeSql(
+        $content_db,
+        "ALTER TABLE rentals ADD COLUMN checkout_date DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Date when item was checked out' AFTER destination",
+        "Add checkout_date column to rentals table"
+    );
+    
+    // Add status column to rentals
+    executeSql(
+        $content_db,
+        "ALTER TABLE rentals ADD COLUMN status ENUM('active', 'returned', 'defective') NOT NULL DEFAULT 'active' COMMENT 'Rental status' AFTER actual_return",
+        "Add status column to rentals table"
+    );
+    
+    // Add defect_notes column to rentals
+    executeSql(
+        $content_db,
+        "ALTER TABLE rentals ADD COLUMN defect_notes TEXT AFTER notes",
+        "Add defect_notes column to rentals table"
+    );
+    
+    // Add index for status in rentals
+    executeSql(
+        $content_db,
+        "ALTER TABLE rentals ADD INDEX idx_status (status)",
+        "Add index for status column in rentals table"
+    );
+    
+    // Make expected_return nullable (was NOT NULL before)
+    executeSql(
+        $content_db,
+        "ALTER TABLE rentals MODIFY COLUMN expected_return DATE DEFAULT NULL",
+        "Make expected_return nullable in rentals table"
+    );
+    
+    // Update inventory_history change_type enum to include checkout/checkin/writeoff
+    executeSql(
+        $content_db,
+        "ALTER TABLE inventory_history MODIFY COLUMN change_type ENUM('add', 'remove', 'adjust', 'sync', 'checkout', 'checkin', 'writeoff') NOT NULL",
+        "Update change_type enum in inventory_history table"
+    );
+    
+    // ============================================
     // SUMMARY
     // ============================================
     echo "==============================================\n";
