@@ -340,6 +340,7 @@ textarea {
     color: var(--text-main);
     border-color: #d1d5db; /* gray-300 */
     transition: border-color 0.2s ease, background-color 0.2s ease;
+    box-sizing: border-box; /* Ensure padding doesn't cause overflow */
 }
 
 input::placeholder,
@@ -2092,13 +2093,13 @@ a.microsoft-btn {
     background-size: cover, cover, 400% 400%;
     background-position: center, center, 0% 50%;
     background-repeat: no-repeat, no-repeat, no-repeat;
-    animation: gradientShift 20s ease infinite;
+    animation: gradientShiftLogin 20s ease infinite;
     position: relative;
     overflow: hidden;
 }
 
-/* Animated gradient background */
-@keyframes gradientShift {
+/* Animated gradient background for login page */
+@keyframes gradientShiftLogin {
     0% {
         background-position: 0% 50%;
     }
@@ -2329,20 +2330,53 @@ body:not(.dark-mode) .status-indicator.status-info {
     color: var(--ibc-info);
 }
 
-/* Light Mode: Staggered list animations - supports up to 8 items */
+/* Dark Mode: Status indicators with glow effect */
+.dark-mode .status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.dark-mode .status-indicator.status-success {
+    background-color: var(--ibc-success);
+    color: var(--ibc-success);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+}
+
+.dark-mode .status-indicator.status-warning {
+    background-color: var(--ibc-warning);
+    color: var(--ibc-warning);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+
+.dark-mode .status-indicator.status-error {
+    background-color: var(--ibc-error);
+    color: var(--ibc-error);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+.dark-mode .status-indicator.status-info {
+    background-color: var(--ibc-info);
+    color: var(--ibc-info);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+
+/* Staggered list animations - supports up to 8 items (both light and dark mode) */
 /* Note: For lists with more items, consider using JavaScript-based approach */
-body:not(.dark-mode) .staggered-list > * {
+.staggered-list > * {
     animation: fadeSlideUp 0.5s ease-out backwards;
 }
 
-body:not(.dark-mode) .staggered-list > *:nth-child(1) { animation-delay: 0.05s; }
-body:not(.dark-mode) .staggered-list > *:nth-child(2) { animation-delay: 0.1s; }
-body:not(.dark-mode) .staggered-list > *:nth-child(3) { animation-delay: 0.15s; }
-body:not(.dark-mode) .staggered-list > *:nth-child(4) { animation-delay: 0.2s; }
-body:not(.dark-mode) .staggered-list > *:nth-child(5) { animation-delay: 0.25s; }
-body:not(.dark-mode) .staggered-list > *:nth-child(6) { animation-delay: 0.3s; }
-body:not(.dark-mode) .staggered-list > *:nth-child(7) { animation-delay: 0.35s; }
-body:not(.dark-mode) .staggered-list > *:nth-child(8) { animation-delay: 0.4s; }
+.staggered-list > *:nth-child(1) { animation-delay: 0.05s; }
+.staggered-list > *:nth-child(2) { animation-delay: 0.1s; }
+.staggered-list > *:nth-child(3) { animation-delay: 0.15s; }
+.staggered-list > *:nth-child(4) { animation-delay: 0.2s; }
+.staggered-list > *:nth-child(5) { animation-delay: 0.25s; }
+.staggered-list > *:nth-child(6) { animation-delay: 0.3s; }
+.staggered-list > *:nth-child(7) { animation-delay: 0.35s; }
+.staggered-list > *:nth-child(8) { animation-delay: 0.4s; }
 
 /* Improved Table Design */
 table {
@@ -2366,6 +2400,13 @@ body:not(.dark-mode) th {
     font-weight: 700;
 }
 
+/* Dark Mode: Enhanced table header */
+.dark-mode th {
+    background: linear-gradient(135deg, #1a1f2e 0%, #242938 100%);
+    border-bottom: 2px solid var(--border-color);
+    font-weight: 700;
+}
+
 td {
     padding: 0.875rem 1.25rem;
 }
@@ -2377,6 +2418,12 @@ tbody tr {
 /* Light Mode: Enhanced row hover */
 body:not(.dark-mode) tbody tr:hover {
     background: linear-gradient(90deg, rgba(0, 102, 179, 0.04) 0%, rgba(0, 166, 81, 0.04) 100%);
+    transform: scale(1.005);
+}
+
+/* Dark Mode: Enhanced row hover */
+.dark-mode tbody tr:hover {
+    background: linear-gradient(90deg, rgba(51, 133, 196, 0.08) 0%, rgba(51, 184, 114, 0.08) 100%);
     transform: scale(1.005);
 }
 
@@ -2401,24 +2448,41 @@ body:not(.dark-mode) .glass-effect {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 }
 
+/* Dark Mode: Glassmorphism effect for special cards */
+.dark-mode .glass-effect {
+    background: rgba(26, 31, 46, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(51, 133, 196, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Elevated cards - Common positioning */
+.card-elevated {
+    position: relative;
+}
+
 /* Light Mode: Elevated cards with premium effect */
 body:not(.dark-mode) .card-elevated {
     background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
     box-shadow: var(--shadow-elevated);
     border: 1px solid rgba(0, 102, 179, 0.08);
-    position: relative;
 }
 
-body:not(.dark-mode) .card-elevated::before {
-    /* Gradient border effect using mask composite technique:
-     * Creates a 1px gradient border by masking out the content area,
-     * revealing only the border region with green-to-blue gradient */
+/* Dark Mode: Elevated cards with premium effect */
+.dark-mode .card-elevated {
+    background: linear-gradient(135deg, #1a1f2e 0%, #242938 100%);
+    box-shadow: var(--shadow-elevated);
+    border: 1px solid rgba(51, 133, 196, 0.15);
+}
+
+/* Card elevated - Common pseudo-element styling */
+.card-elevated::before {
     content: '';
     position: absolute;
     inset: -1px;
     border-radius: var(--radius-lg);
     padding: 1px;
-    background: linear-gradient(135deg, var(--ibc-green), var(--ibc-blue));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -2426,8 +2490,25 @@ body:not(.dark-mode) .card-elevated::before {
     transition: opacity var(--transition-normal);
 }
 
+/* Light Mode: Gradient border effect - Green to Blue */
+body:not(.dark-mode) .card-elevated::before {
+    /* Gradient border effect using mask composite technique:
+     * Creates a 1px gradient border by masking out the content area,
+     * revealing only the border region with green-to-blue gradient */
+    background: linear-gradient(135deg, var(--ibc-green), var(--ibc-blue));
+}
+
+/* Dark Mode: Gradient border effect - Lighter shades for visibility */
+.dark-mode .card-elevated::before {
+    background: linear-gradient(135deg, var(--ibc-green-light), var(--ibc-blue-light));
+}
+
 body:not(.dark-mode) .card-elevated:hover::before {
     opacity: 0.5;
+}
+
+.dark-mode .card-elevated:hover::before {
+    opacity: 0.7;
 }
 
 /* Smooth Scrollbar for the whole page */
